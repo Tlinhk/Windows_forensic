@@ -1,0 +1,15 @@
+PyQt5==5.15.10
+PyQt5-Qt5==5.15.2
+PyQt5-sip==12.13.0
+pyqt5-tools==5.15.9.3.3
+
+# Database (SQLite3 is built-in with Python)
+# hashlib is built-in with Python
+
+# Development tools (optional)
+# pytest==7.4.3
+# black==23.11.0
+# flake8==6.1.0
+
+# Documentation (optional)
+# sphinx==7.2.6 
