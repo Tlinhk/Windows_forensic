@@ -18,23 +18,357 @@ class Ui_Form(object):
         font = QtGui.QFont()
         font.setPointSize(10)
         Form.setFont(font)
-        self.gridLayout = QtWidgets.QGridLayout(Form)
-        self.gridLayout.setObjectName("gridLayout")
-        self.label = QtWidgets.QLabel(Form)
+        Form.setWindowTitle("Quản lý người dùng")
+        
+        # Main Layout
+        self.mainLayout = QtWidgets.QVBoxLayout(Form)
+        self.mainLayout.setContentsMargins(10, 10, 10, 10)
+        self.mainLayout.setSpacing(10)
+        self.mainLayout.setObjectName("mainLayout")
+        
+        # Header Frame
+        self.headerFrame = QtWidgets.QFrame(Form)
+        self.headerFrame.setFrameShape(QtWidgets.QFrame.StyledPanel)
+        self.headerFrame.setStyleSheet("QFrame {\n"
+                                      "    background-color: #f8f9fa;\n"
+                                      "    border: 1px solid #dee2e6;\n"
+                                      "    border-radius: 8px;\n"
+                                      "    padding: 10px;\n"
+                                      "}")
+        self.headerFrame.setObjectName("headerFrame")
+        
+        self.headerLayout = QtWidgets.QHBoxLayout(self.headerFrame)
+        self.headerLayout.setObjectName("headerLayout")
+        
+        # Title Label
+        self.titleLabel = QtWidgets.QLabel(self.headerFrame)
+        font = QtGui.QFont()
+        font.setPointSize(18)
+        font.setBold(True)
+        font.setWeight(75)
+        self.titleLabel.setFont(font)
+        self.titleLabel.setStyleSheet("color: #2c3e50;")
+        self.titleLabel.setObjectName("titleLabel")
+        self.headerLayout.addWidget(self.titleLabel)
+        
+        # Header Spacer
+        spacerItem = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.headerLayout.addItem(spacerItem)
+        
+        # Stats Label
+        self.statsLabel = QtWidgets.QLabel(self.headerFrame)
+        font = QtGui.QFont()
+        font.setPointSize(12)
+        font.setBold(True)
+        font.setWeight(75)
+        self.statsLabel.setFont(font)
+        self.statsLabel.setStyleSheet("color: #6c757d;")
+        self.statsLabel.setObjectName("statsLabel")
+        self.headerLayout.addWidget(self.statsLabel)
+        
+        self.mainLayout.addWidget(self.headerFrame)
+        
+        # Toolbar Frame
+        self.toolbarFrame = QtWidgets.QFrame(Form)
+        self.toolbarFrame.setFrameShape(QtWidgets.QFrame.StyledPanel)
+        self.toolbarFrame.setStyleSheet("QFrame {\n"
+                                       "    background-color: #ffffff;\n"
+                                       "    border: 1px solid #dee2e6;\n"
+                                       "    border-radius: 8px;\n"
+                                       "    padding: 8px;\n"
+                                       "}")
+        self.toolbarFrame.setObjectName("toolbarFrame")
+        
+        self.toolbarLayout = QtWidgets.QHBoxLayout(self.toolbarFrame)
+        self.toolbarLayout.setObjectName("toolbarLayout")
+        
+        # Add User Button
+        self.addUserBtn = QtWidgets.QPushButton(self.toolbarFrame)
+        self.addUserBtn.setMinimumSize(QtCore.QSize(140, 40))
         font = QtGui.QFont()
         font.setPointSize(10)
-        self.label.setFont(font)
-        self.label.setAlignment(QtCore.Qt.AlignCenter)
-        self.label.setObjectName("label")
-        self.gridLayout.addWidget(self.label, 0, 0, 1, 1)
+        font.setBold(True)
+        font.setWeight(75)
+        self.addUserBtn.setFont(font)
+        self.addUserBtn.setStyleSheet("QPushButton {\n"
+                                     "    background-color: #28a745;\n"
+                                     "    color: white;\n"
+                                     "    border: none;\n"
+                                     "    border-radius: 6px;\n"
+                                     "    padding: 8px 16px;\n"
+                                     "}\n"
+                                     "QPushButton:hover {\n"
+                                     "    background-color: #218838;\n"
+                                     "}\n"
+                                     "QPushButton:pressed {\n"
+                                     "    background-color: #1e7e34;\n"
+                                     "}")
+        self.addUserBtn.setObjectName("addUserBtn")
+        self.toolbarLayout.addWidget(self.addUserBtn)
+        
+        # Edit User Button
+        self.editUserBtn = QtWidgets.QPushButton(self.toolbarFrame)
+        self.editUserBtn.setEnabled(False)
+        self.editUserBtn.setMinimumSize(QtCore.QSize(100, 40))
+        font = QtGui.QFont()
+        font.setPointSize(10)
+        self.editUserBtn.setFont(font)
+        self.editUserBtn.setStyleSheet("QPushButton {\n"
+                                      "    background-color: #007bff;\n"
+                                      "    color: white;\n"
+                                      "    border: none;\n"
+                                      "    border-radius: 6px;\n"
+                                      "    padding: 8px 16px;\n"
+                                      "}\n"
+                                      "QPushButton:hover {\n"
+                                      "    background-color: #0056b3;\n"
+                                      "}\n"
+                                      "QPushButton:disabled {\n"
+                                      "    background-color: #6c757d;\n"
+                                      "    color: #ffffff;\n"
+                                      "}")
+        self.editUserBtn.setObjectName("editUserBtn")
+        self.toolbarLayout.addWidget(self.editUserBtn)
+        
+        # Toggle Status Button
+        self.toggleStatusBtn = QtWidgets.QPushButton(self.toolbarFrame)
+        self.toggleStatusBtn.setEnabled(False)
+        self.toggleStatusBtn.setMinimumSize(QtCore.QSize(130, 40))
+        font = QtGui.QFont()
+        font.setPointSize(10)
+        self.toggleStatusBtn.setFont(font)
+        self.toggleStatusBtn.setStyleSheet("QPushButton {\n"
+                                          "    background-color: #ffc107;\n"
+                                          "    color: #212529;\n"
+                                          "    border: none;\n"
+                                          "    border-radius: 6px;\n"
+                                          "    padding: 8px 16px;\n"
+                                          "}\n"
+                                          "QPushButton:hover {\n"
+                                          "    background-color: #e0a800;\n"
+                                          "}\n"
+                                          "QPushButton:disabled {\n"
+                                          "    background-color: #6c757d;\n"
+                                          "    color: #ffffff;\n"
+                                          "}")
+        self.toggleStatusBtn.setObjectName("toggleStatusBtn")
+        self.toolbarLayout.addWidget(self.toggleStatusBtn)
+        
+        # Delete User Button
+        self.deleteUserBtn = QtWidgets.QPushButton(self.toolbarFrame)
+        self.deleteUserBtn.setEnabled(False)
+        self.deleteUserBtn.setMinimumSize(QtCore.QSize(100, 40))
+        font = QtGui.QFont()
+        font.setPointSize(10)
+        self.deleteUserBtn.setFont(font)
+        self.deleteUserBtn.setStyleSheet("QPushButton {\n"
+                                        "    background-color: #dc3545;\n"
+                                        "    color: white;\n"
+                                        "    border: none;\n"
+                                        "    border-radius: 6px;\n"
+                                        "    padding: 8px 16px;\n"
+                                        "}\n"
+                                        "QPushButton:hover {\n"
+                                        "    background-color: #c82333;\n"
+                                        "}\n"
+                                        "QPushButton:disabled {\n"
+                                        "    background-color: #6c757d;\n"
+                                        "    color: #ffffff;\n"
+                                        "}")
+        self.deleteUserBtn.setObjectName("deleteUserBtn")
+        self.toolbarLayout.addWidget(self.deleteUserBtn)
+        
+        # Toolbar Spacer
+        spacerItem1 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.toolbarLayout.addItem(spacerItem1)
+        
+        # Search Label
+        self.searchLabel = QtWidgets.QLabel(self.toolbarFrame)
+        font = QtGui.QFont()
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.searchLabel.setFont(font)
+        self.searchLabel.setObjectName("searchLabel")
+        self.toolbarLayout.addWidget(self.searchLabel)
+        
+        # Search Edit
+        self.searchEdit = QtWidgets.QLineEdit(self.toolbarFrame)
+        self.searchEdit.setMinimumSize(QtCore.QSize(220, 35))
+        font = QtGui.QFont()
+        font.setPointSize(10)
+        self.searchEdit.setFont(font)
+        self.searchEdit.setStyleSheet("QLineEdit {\n"
+                                     "    border: 2px solid #ced4da;\n"
+                                     "    border-radius: 6px;\n"
+                                     "    padding: 8px 12px;\n"
+                                     "    background-color: #ffffff;\n"
+                                     "}\n"
+                                     "QLineEdit:focus {\n"
+                                     "    border-color: #007bff;\n"
+                                     "    outline: none;\n"
+                                     "}")
+        self.searchEdit.setObjectName("searchEdit")
+        self.toolbarLayout.addWidget(self.searchEdit)
+        
+        # Refresh Button
+        self.refreshBtn = QtWidgets.QPushButton(self.toolbarFrame)
+        self.refreshBtn.setMinimumSize(QtCore.QSize(90, 40))
+        font = QtGui.QFont()
+        font.setPointSize(10)
+        self.refreshBtn.setFont(font)
+        self.refreshBtn.setStyleSheet("QPushButton {\n"
+                                     "    background-color: #6c757d;\n"
+                                     "    color: white;\n"
+                                     "    border: none;\n"
+                                     "    border-radius: 6px;\n"
+                                     "    padding: 8px 16px;\n"
+                                     "}\n"
+                                     "QPushButton:hover {\n"
+                                     "    background-color: #545b62;\n"
+                                     "}")
+        self.refreshBtn.setObjectName("refreshBtn")
+        self.toolbarLayout.addWidget(self.refreshBtn)
+        
+        self.mainLayout.addWidget(self.toolbarFrame)
+        
+        # Users Table
+        self.usersTable = QtWidgets.QTableWidget(Form)
+        self.usersTable.setAlternatingRowColors(True)
+        self.usersTable.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
+        self.usersTable.setSortingEnabled(True)
+        self.usersTable.setStyleSheet("QTableWidget {\n"
+                                     "    border: 1px solid #dee2e6;\n"
+                                     "    border-radius: 8px;\n"
+                                     "    background-color: #ffffff;\n"
+                                     "    gridline-color: #dee2e6;\n"
+                                     "}\n"
+                                     "QTableWidget::item {\n"
+                                     "    padding: 8px;\n"
+                                     "    border-bottom: 1px solid #dee2e6;\n"
+                                     "}\n"
+                                     "QTableWidget::item:selected {\n"
+                                     "    background-color: #007bff;\n"
+                                     "    color: white;\n"
+                                     "}\n"
+                                     "QHeaderView::section {\n"
+                                     "    background-color: #f8f9fa;\n"
+                                     "    border: 1px solid #dee2e6;\n"
+                                     "    padding: 8px;\n"
+                                     "    font-weight: bold;\n"
+                                     "}")
+        self.usersTable.setObjectName("usersTable")
+        self.usersTable.setColumnCount(6)
+        self.usersTable.setRowCount(0)
+        
+        # Set column headers
+        headers = ["ID", "👤 Tên đăng nhập", "📧 Email", "🎭 Vai trò", "📅 Ngày tạo", "🔘 Trạng thái"]
+        for i, header in enumerate(headers):
+            item = QtWidgets.QTableWidgetItem()
+            item.setText(header)
+            self.usersTable.setHorizontalHeaderItem(i, item)
+        
+        # Table properties
+        header = self.usersTable.horizontalHeader()
+        header.setCascadingSectionResizes(False)
+        header.setDefaultSectionSize(150)
+        header.setStretchLastSection(True)
+        
+        self.mainLayout.addWidget(self.usersTable)
+        
+        # Status Frame
+        self.statusFrame = QtWidgets.QFrame(Form)
+        self.statusFrame.setFrameShape(QtWidgets.QFrame.StyledPanel)
+        self.statusFrame.setStyleSheet("QFrame {\n"
+                                      "    background-color: #f8f9fa;\n"
+                                      "    border: 1px solid #dee2e6;\n"
+                                      "    border-radius: 8px;\n"
+                                      "    padding: 8px;\n"
+                                      "}")
+        self.statusFrame.setObjectName("statusFrame")
+        
+        self.statusLayout = QtWidgets.QHBoxLayout(self.statusFrame)
+        self.statusLayout.setObjectName("statusLayout")
+        
+        # Status Label
+        self.statusLabel = QtWidgets.QLabel(self.statusFrame)
+        font = QtGui.QFont()
+        font.setPointSize(10)
+        self.statusLabel.setFont(font)
+        self.statusLabel.setStyleSheet("color: #6c757d;")
+        self.statusLabel.setObjectName("statusLabel")
+        self.statusLayout.addWidget(self.statusLabel)
+        
+        # Status Spacer
+        spacerItem2 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.statusLayout.addItem(spacerItem2)
+        
+        # Active Users Label
+        self.activeUsersLabel = QtWidgets.QLabel(self.statusFrame)
+        font = QtGui.QFont()
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.activeUsersLabel.setFont(font)
+        self.activeUsersLabel.setStyleSheet("color: #28a745;")
+        self.activeUsersLabel.setObjectName("activeUsersLabel")
+        self.statusLayout.addWidget(self.activeUsersLabel)
+        
+        # Inactive Users Label
+        self.inactiveUsersLabel = QtWidgets.QLabel(self.statusFrame)
+        font = QtGui.QFont()
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.inactiveUsersLabel.setFont(font)
+        self.inactiveUsersLabel.setStyleSheet("color: #dc3545;")
+        self.inactiveUsersLabel.setObjectName("inactiveUsersLabel")
+        self.statusLayout.addWidget(self.inactiveUsersLabel)
+        
+        # Admin Users Label
+        self.adminUsersLabel = QtWidgets.QLabel(self.statusFrame)
+        font = QtGui.QFont()
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.adminUsersLabel.setFont(font)
+        self.adminUsersLabel.setStyleSheet("color: #fd7e14;")
+        self.adminUsersLabel.setObjectName("adminUsersLabel")
+        self.statusLayout.addWidget(self.adminUsersLabel)
+        
+        # Analyst Users Label
+        self.analystUsersLabel = QtWidgets.QLabel(self.statusFrame)
+        font = QtGui.QFont()
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.analystUsersLabel.setFont(font)
+        self.analystUsersLabel.setStyleSheet("color: #17a2b8;")
+        self.analystUsersLabel.setObjectName("analystUsersLabel")
+        self.statusLayout.addWidget(self.analystUsersLabel)
+        
+        self.mainLayout.addWidget(self.statusFrame)
 
         self.retranslateUi(Form)
         QtCore.QMetaObject.connectSlotsByName(Form)
 
     def retranslateUi(self, Form):
         _translate = QtCore.QCoreApplication.translate
-        Form.setWindowTitle(_translate("Form", "Form"))
-        self.label.setText(_translate("Form", "User management"))
+        Form.setWindowTitle(_translate("Form", "Quản lý người dùng"))
+        self.titleLabel.setText(_translate("Form", "👥 Quản lý người dùng"))
+        self.statsLabel.setText(_translate("Form", "📊 Tổng: 0 users"))
+        self.addUserBtn.setText(_translate("Form", "➕ Thêm người dùng"))
+        self.editUserBtn.setText(_translate("Form", "✏️ Sửa"))
+        self.toggleStatusBtn.setText(_translate("Form", "🔄 Đổi trạng thái"))
+        self.deleteUserBtn.setText(_translate("Form", "🗑️ Xóa"))
+        self.searchLabel.setText(_translate("Form", "🔍 Tìm kiếm:"))
+        self.searchEdit.setPlaceholderText(_translate("Form", "Nhập tên đăng nhập, email..."))
+        self.refreshBtn.setText(_translate("Form", "🔄 Làm mới"))
+        self.statusLabel.setText(_translate("Form", "Sẵn sàng"))
+        self.activeUsersLabel.setText(_translate("Form", "🟢 Hoạt động: 0"))
+        self.inactiveUsersLabel.setText(_translate("Form", "🔴 Không hoạt động: 0"))
+        self.adminUsersLabel.setText(_translate("Form", "👑 Admin: 0"))
+        self.analystUsersLabel.setText(_translate("Form", "🔍 Analyst: 0"))
 
 
 if __name__ == "__main__":

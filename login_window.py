@@ -33,7 +33,7 @@ class LoginWindow(QMainWindow):
         # Connect signals
         self.ui.login_button.clicked.connect(self.handle_login)
         self.ui.password_input.returnPressed.connect(self.handle_login)
-        self.ui.username_input.returnPressed.connect(self.ui.password_input.setFocus)
+        self.ui.username_input.returnPressed.connect(lambda: self.ui.password_input.setFocus())
         self.ui.forgot_password_label.mousePressEvent = self.show_forgot_password_dialog
         self.ui.show_password_btn.clicked.connect(self.toggle_password_visibility)
         
