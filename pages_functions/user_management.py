@@ -201,23 +201,6 @@ class UserManagement(QWidget):
                 self.ui.toggleStatusBtn.setEnabled(False)
                 self.ui.toggleStatusBtn.setToolTip("Chỉ Admin mới có quyền thay đổi trạng thái người dùng")
             
-            # Hiển thị thông báo
-            self.update_status("❌ Chỉ Admin mới có quyền quản lý người dùng")
-            
-            # Hiển thị message box cảnh báo
-            QMessageBox.warning(
-                self,
-                "🔒 Quyền truy cập bị hạn chế",
-                f"Xin chào {self.current_user.get('username', 'User')}!\n\n"
-                "🚫 Bạn không có quyền quản lý người dùng.\n"
-                "Chỉ những tài khoản có vai trò 'ADMIN' mới có thể:\n\n"
-                "• ➕ Thêm người dùng mới\n"
-                "• ✏️ Sửa thông tin người dùng\n"
-                "• 🗑️ Xóa người dùng\n"
-                "• 🔄 Thay đổi trạng thái người dùng\n\n"
-                "👀 Bạn chỉ có thể xem danh sách người dùng."
-            )
-            return False
         else:
             self.update_status("✅ Admin có đầy đủ quyền quản lý người dùng")
             return True
@@ -622,7 +605,6 @@ class DeleteTypeDialog(QDialog):
 
 💀 NHỮNG GÌ SẼ BỊ MẤT VĨNH VIỄN:
 • Toàn bộ thông tin user
-• Tất cả activity logs 
 • Mọi dữ liệu liên quan
 
 ⚠️ THAO TÁC NÀY KHÔNG THỂ HOÀN TÁC!
@@ -761,7 +743,6 @@ class DeleteTypeDialog(QDialog):
             f"🚨 CẢNH BÁO CUỐI CÙNG!\n\n"
             f"Bạn THỰC SỰ muốn XÓA VĨNH VIỄN user '{self.user_info.get('username', '')}'?\n\n"
             f"💀 User sẽ bị xóa hoàn toàn khỏi database\n"
-            f"📝 Tất cả activity logs sẽ bị mất\n"
             f"⚠️ KHÔNG THỂ HOÀN TÁC!\n\n"
             f"Nhấn 'Yes' để XÓA VĨNH VIỄN ngay lập tức.",
             QMessageBox.Yes | QMessageBox.No,
