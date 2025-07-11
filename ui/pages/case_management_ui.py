@@ -14,27 +14,367 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_Form(object):
     def setupUi(self, Form):
         Form.setObjectName("Form")
-        Form.resize(1038, 597)
+        Form.resize(1682, 814)
         font = QtGui.QFont()
         font.setPointSize(10)
         Form.setFont(font)
-        self.gridLayout = QtWidgets.QGridLayout(Form)
-        self.gridLayout.setObjectName("gridLayout")
-        self.label = QtWidgets.QLabel(Form)
+        Form.setStyleSheet("QWidget {\n"
+"    background-color: #f8f9fa;\n"
+"}\n"
+"\n"
+"QGroupBox {\n"
+"    font-weight: bold;\n"
+"    border: 2px solid #dee2e6;\n"
+"    border-radius: 8px;\n"
+"    margin-top: 10px;\n"
+"    padding-top: 10px;\n"
+"    background-color: white;\n"
+"}\n"
+"\n"
+"QGroupBox::title {\n"
+"    subcontrol-origin: margin;\n"
+"    left: 10px;\n"
+"    padding: 0 8px 0 8px;\n"
+"    color: #495057;\n"
+"}\n"
+"\n"
+"QPushButton {\n"
+"    background-color: #007bff;\n"
+"    border: none;\n"
+"    color: white;\n"
+"    padding: 10px 20px;\n"
+"    border-radius: 6px;\n"
+"    font-weight: 500;\n"
+"    min-height: 16px;\n"
+"}\n"
+"\n"
+"QPushButton:hover {\n"
+"    background-color: #0056b3;\n"
+"}\n"
+"\n"
+"QPushButton:pressed {\n"
+"    background-color: #004085;\n"
+"}\n"
+"\n"
+"QPushButton#newCaseBtn {\n"
+"    background-color: #28a745;\n"
+"    font-size: 14px;\n"
+"    padding: 12px 24px;\n"
+"}\n"
+"\n"
+"QPushButton#newCaseBtn:hover {\n"
+"    background-color: #1e7e34;\n"
+"}\n"
+"\n"
+"QPushButton#deleteBtn {\n"
+"    background-color: #dc3545;\n"
+"}\n"
+"\n"
+"QPushButton#deleteBtn:hover {\n"
+"    background-color: #c82333;\n"
+"}\n"
+"\n"
+"QPushButton#importBtn {\n"
+"    background-color: #fd7e14;\n"
+"}\n"
+"\n"
+"QPushButton#importBtn:hover {\n"
+"    background-color: #e8610c;\n"
+"}\n"
+"\n"
+"QPushButton#editCaseBtn {\n"
+"    background-color: #ffc107;\n"
+"}\n"
+"\n"
+"QPushButton#editCaseBtn:hover {\n"
+"    background-color: #e0a800;\n"
+"}\n"
+"\n"
+"QPushButton#deleteCaseBtn {\n"
+"    background-color: #dc3545;\n"
+"}\n"
+"\n"
+"QPushButton#deleteCaseBtn:hover {\n"
+"    background-color: #c82333;\n"
+"}\n"
+"\n"
+"QLineEdit {\n"
+"    border: 1px solid #ced4da;\n"
+"    border-radius: 4px;\n"
+"    padding: 8px 12px;\n"
+"    font-size: 14px;\n"
+"    background-color: white;\n"
+"}\n"
+"\n"
+"QLineEdit:focus {\n"
+"    border-color: #80bdff;\n"
+"    outline: 0;\n"
+"    box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);\n"
+"}\n"
+"\n"
+"QTableWidget {\n"
+"    gridline-color: #dee2e6;\n"
+"    background-color: white;\n"
+"    border: 1px solid #dee2e6;\n"
+"    border-radius: 4px;\n"
+"    selection-background-color: #007bff;\n"
+"}\n"
+"\n"
+"QTableWidget::item {\n"
+"    padding: 12px 8px;\n"
+"    border-bottom: 1px solid #f8f9fa;\n"
+"}\n"
+"\n"
+"QTableWidget::item:selected {\n"
+"    background-color: #007bff;\n"
+"    color: white;\n"
+"}\n"
+"\n"
+"QTableWidget::item:hover {\n"
+"    background-color:rgb(26, 123, 192);\n"
+"    color:#ffffff;\n"
+"}\n"
+"\n"
+"QHeaderView::section {\n"
+"    background-color: #e9ecef;\n"
+"    padding: 12px 8px;\n"
+"    border: none;\n"
+"    border-right: 1px solid #dee2e6;\n"
+"    font-weight: 600;\n"
+"    color: #495057;\n"
+"}\n"
+"\n"
+"QComboBox {\n"
+"    border: 1px solid #ced4da;\n"
+"    border-radius: 4px;\n"
+"    padding: 8px 12px;\n"
+"    background-color: white;\n"
+"    min-width: 120px;\n"
+"}\n"
+"\n"
+"QLabel#titleLabel {\n"
+"    color: #343a40;\n"
+"    font-size: 20px;\n"
+"    font-weight: bold;\n"
+"}\n"
+"\n"
+"QLabel#currentCaseLabel {\n"
+"    color: #007bff;\n"
+"    font-size: 16px;\n"
+"    font-weight: bold;\n"
+"}\n"
+"\n"
+"QLabel#noSelectionLabel {\n"
+"    color: #6c757d;\n"
+"    font-size: 14px;\n"
+"    font-style: italic;\n"
+"}")
+        self.mainLayout = QtWidgets.QVBoxLayout(Form)
+        self.mainLayout.setContentsMargins(20, 20, 20, 20)
+        self.mainLayout.setSpacing(16)
+        self.mainLayout.setObjectName("mainLayout")
+        self.headerLayout = QtWidgets.QHBoxLayout()
+        self.headerLayout.setSpacing(16)
+        self.headerLayout.setObjectName("headerLayout")
+        self.mainLayout.addLayout(self.headerLayout)
+        self.contentLayout = QtWidgets.QHBoxLayout()
+        self.contentLayout.setSpacing(16)
+        self.contentLayout.setObjectName("contentLayout")
+        self.caseListGroup = QtWidgets.QGroupBox(Form)
         font = QtGui.QFont()
-        font.setPointSize(10)
-        self.label.setFont(font)
-        self.label.setAlignment(QtCore.Qt.AlignCenter)
-        self.label.setObjectName("label")
-        self.gridLayout.addWidget(self.label, 0, 0, 1, 1)
+        font.setPointSize(9)
+        font.setBold(True)
+        font.setItalic(False)
+        font.setWeight(75)
+        self.caseListGroup.setFont(font)
+        self.caseListGroup.setObjectName("caseListGroup")
+        self.caseListLayout = QtWidgets.QVBoxLayout(self.caseListGroup)
+        self.caseListLayout.setObjectName("caseListLayout")
+        self.caseActionsLayout = QtWidgets.QHBoxLayout()
+        self.caseActionsLayout.setSpacing(12)
+        self.caseActionsLayout.setObjectName("caseActionsLayout")
+        self.newCaseBtn = QtWidgets.QPushButton(self.caseListGroup)
+        font = QtGui.QFont()
+        font.setPointSize(-1)
+        font.setBold(True)
+        font.setWeight(62)
+        self.newCaseBtn.setFont(font)
+        self.newCaseBtn.setObjectName("newCaseBtn")
+        self.caseActionsLayout.addWidget(self.newCaseBtn)
+        self.searchCaseEdit = QtWidgets.QLineEdit(self.caseListGroup)
+        font = QtGui.QFont()
+        font.setPointSize(-1)
+        self.searchCaseEdit.setFont(font)
+        self.searchCaseEdit.setObjectName("searchCaseEdit")
+        self.caseActionsLayout.addWidget(self.searchCaseEdit)
+        self.refreshBtn = QtWidgets.QPushButton(self.caseListGroup)
+        font = QtGui.QFont()
+        font.setBold(True)
+        font.setWeight(62)
+        self.refreshBtn.setFont(font)
+        self.refreshBtn.setObjectName("refreshBtn")
+        self.caseActionsLayout.addWidget(self.refreshBtn)
+        self.editCaseBtn = QtWidgets.QPushButton(self.caseListGroup)
+        font = QtGui.QFont()
+        font.setBold(True)
+        font.setWeight(62)
+        self.editCaseBtn.setFont(font)
+        self.editCaseBtn.setStyleSheet("background-color: #ffc107;")
+        self.editCaseBtn.setObjectName("editCaseBtn")
+        self.caseActionsLayout.addWidget(self.editCaseBtn)
+        self.deleteCaseBtn = QtWidgets.QPushButton(self.caseListGroup)
+        font = QtGui.QFont()
+        font.setBold(True)
+        font.setWeight(62)
+        self.deleteCaseBtn.setFont(font)
+        self.deleteCaseBtn.setStyleSheet("background-color: #dc3545;")
+        self.deleteCaseBtn.setObjectName("deleteCaseBtn")
+        self.caseActionsLayout.addWidget(self.deleteCaseBtn)
+        self.caseListLayout.addLayout(self.caseActionsLayout)
+        self.casesTable = QtWidgets.QTableWidget(self.caseListGroup)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        font.setItalic(False)
+        self.casesTable.setFont(font)
+        self.casesTable.setAlternatingRowColors(True)
+        self.casesTable.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
+        self.casesTable.setObjectName("casesTable")
+        self.casesTable.setColumnCount(6)
+        self.casesTable.setRowCount(0)
+        item = QtWidgets.QTableWidgetItem()
+        self.casesTable.setHorizontalHeaderItem(0, item)
+        item = QtWidgets.QTableWidgetItem()
+        self.casesTable.setHorizontalHeaderItem(1, item)
+        item = QtWidgets.QTableWidgetItem()
+        self.casesTable.setHorizontalHeaderItem(2, item)
+        item = QtWidgets.QTableWidgetItem()
+        self.casesTable.setHorizontalHeaderItem(3, item)
+        item = QtWidgets.QTableWidgetItem()
+        self.casesTable.setHorizontalHeaderItem(4, item)
+        item = QtWidgets.QTableWidgetItem()
+        self.casesTable.setHorizontalHeaderItem(5, item)
+        self.caseListLayout.addWidget(self.casesTable)
+        self.contentLayout.addWidget(self.caseListGroup)
+        self.evidenceGroup = QtWidgets.QGroupBox(Form)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        font.setBold(True)
+        font.setItalic(False)
+        font.setWeight(75)
+        self.evidenceGroup.setFont(font)
+        self.evidenceGroup.setObjectName("evidenceGroup")
+        self.evidenceLayout = QtWidgets.QVBoxLayout(self.evidenceGroup)
+        self.evidenceLayout.setObjectName("evidenceLayout")
+        self.evidenceActionsLayout = QtWidgets.QHBoxLayout()
+        self.evidenceActionsLayout.setSpacing(12)
+        self.evidenceActionsLayout.setObjectName("evidenceActionsLayout")
+        self.importBtn = QtWidgets.QPushButton(self.evidenceGroup)
+        font = QtGui.QFont()
+        font.setBold(True)
+        font.setWeight(62)
+        self.importBtn.setFont(font)
+        self.importBtn.setObjectName("importBtn")
+        self.evidenceActionsLayout.addWidget(self.importBtn)
+        self.collectBtn = QtWidgets.QPushButton(self.evidenceGroup)
+        font = QtGui.QFont()
+        font.setBold(True)
+        font.setWeight(62)
+        self.collectBtn.setFont(font)
+        self.collectBtn.setObjectName("collectBtn")
+        self.evidenceActionsLayout.addWidget(self.collectBtn)
+        self.removeEvidenceBtn = QtWidgets.QPushButton(self.evidenceGroup)
+        font = QtGui.QFont()
+        font.setBold(True)
+        font.setWeight(62)
+        self.removeEvidenceBtn.setFont(font)
+        self.removeEvidenceBtn.setStyleSheet("background-color: #dc3545;")
+        self.removeEvidenceBtn.setObjectName("removeEvidenceBtn")
+        self.evidenceActionsLayout.addWidget(self.removeEvidenceBtn)
+        spacerItem = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.evidenceActionsLayout.addItem(spacerItem)
+        self.startAnalysisBtn = QtWidgets.QPushButton(self.evidenceGroup)
+        font = QtGui.QFont()
+        font.setBold(True)
+        font.setWeight(62)
+        self.startAnalysisBtn.setFont(font)
+        self.startAnalysisBtn.setStyleSheet("background-color: #6f42c1;")
+        self.startAnalysisBtn.setObjectName("startAnalysisBtn")
+        self.evidenceActionsLayout.addWidget(self.startAnalysisBtn)
+        self.evidenceLayout.addLayout(self.evidenceActionsLayout)
+        self.evidenceTable = QtWidgets.QTableWidget(self.evidenceGroup)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        font.setItalic(False)
+        self.evidenceTable.setFont(font)
+        self.evidenceTable.setAlternatingRowColors(True)
+        self.evidenceTable.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
+        self.evidenceTable.setObjectName("evidenceTable")
+        self.evidenceTable.setColumnCount(5)
+        self.evidenceTable.setRowCount(0)
+        item = QtWidgets.QTableWidgetItem()
+        self.evidenceTable.setHorizontalHeaderItem(0, item)
+        item = QtWidgets.QTableWidgetItem()
+        self.evidenceTable.setHorizontalHeaderItem(1, item)
+        item = QtWidgets.QTableWidgetItem()
+        self.evidenceTable.setHorizontalHeaderItem(2, item)
+        item = QtWidgets.QTableWidgetItem()
+        self.evidenceTable.setHorizontalHeaderItem(3, item)
+        item = QtWidgets.QTableWidgetItem()
+        self.evidenceTable.setHorizontalHeaderItem(4, item)
+        self.evidenceLayout.addWidget(self.evidenceTable)
+        self.noSelectionLabel = QtWidgets.QLabel(self.evidenceGroup)
+        font = QtGui.QFont()
+        font.setPointSize(-1)
+        font.setItalic(True)
+        self.noSelectionLabel.setFont(font)
+        self.noSelectionLabel.setAlignment(QtCore.Qt.AlignCenter)
+        self.noSelectionLabel.setWordWrap(True)
+        self.noSelectionLabel.setObjectName("noSelectionLabel")
+        self.evidenceLayout.addWidget(self.noSelectionLabel)
+        self.contentLayout.addWidget(self.evidenceGroup)
+        self.mainLayout.addLayout(self.contentLayout)
 
         self.retranslateUi(Form)
         QtCore.QMetaObject.connectSlotsByName(Form)
 
     def retranslateUi(self, Form):
         _translate = QtCore.QCoreApplication.translate
-        Form.setWindowTitle(_translate("Form", "Form"))
-        self.label.setText(_translate("Form", "Case management "))
+        Form.setWindowTitle(_translate("Form", "Quản lý Case"))
+        self.caseListGroup.setTitle(_translate("Form", "Danh sách Case"))
+        self.newCaseBtn.setText(_translate("Form", "➕ Tạo mới"))
+        self.searchCaseEdit.setPlaceholderText(_translate("Form", "🔍 Tìm kiếm case..."))
+        self.refreshBtn.setText(_translate("Form", "🔄"))
+        self.editCaseBtn.setText(_translate("Form", "✏️"))
+        self.deleteCaseBtn.setText(_translate("Form", "🗑"))
+        self.casesTable.setSortingEnabled(True)
+        item = self.casesTable.horizontalHeaderItem(0)
+        item.setText(_translate("Form", "Tên Case"))
+        item = self.casesTable.horizontalHeaderItem(1)
+        item.setText(_translate("Form", "Điều tra viên"))
+        item = self.casesTable.horizontalHeaderItem(2)
+        item.setText(_translate("Form", "Ngày tạo"))
+        item = self.casesTable.horizontalHeaderItem(3)
+        item.setText(_translate("Form", "Evidence"))
+        item = self.casesTable.horizontalHeaderItem(4)
+        item.setText(_translate("Form", "Trạng thái"))
+        item = self.casesTable.horizontalHeaderItem(5)
+        item.setText(_translate("Form", "Đường dẫn"))
+        self.evidenceGroup.setTitle(_translate("Form", "Evidence của Case"))
+        self.importBtn.setText(_translate("Form", "📥 Add evidence"))
+        self.collectBtn.setText(_translate("Form", "🔍 Thu thập"))
+        self.removeEvidenceBtn.setText(_translate("Form", "🗑️ Delete evidence"))
+        self.startAnalysisBtn.setText(_translate("Form", "Phân tích"))
+        item = self.evidenceTable.horizontalHeaderItem(0)
+        item.setText(_translate("Form", "Tên Evidence"))
+        item = self.evidenceTable.horizontalHeaderItem(1)
+        item.setText(_translate("Form", "Loại"))
+        item = self.evidenceTable.horizontalHeaderItem(2)
+        item.setText(_translate("Form", "Đường dẫn"))
+        item = self.evidenceTable.horizontalHeaderItem(3)
+        item.setText(_translate("Form", "Kích thước"))
+        item = self.evidenceTable.horizontalHeaderItem(4)
+        item.setText(_translate("Form", "Hash"))
+        self.noSelectionLabel.setText(_translate("Form", "💡 Chọn một case từ danh sách để xem và quản lý evidence"))
 
 
 if __name__ == "__main__":
