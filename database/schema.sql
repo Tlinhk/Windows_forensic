@@ -12,32 +12,36 @@ CREATE TABLE Users (
     full_name VARCHAR(100) NOT NULL,
     phone_number VARCHAR(20),
     email VARCHAR(100),
-    role VARCHAR(20) DEFAULT 'ANALYST',
+    role VARCHAR(20) DEFAULT 'INVESTIGATOR',
     is_active BOOLEAN DEFAULT 1,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 
 );
 
--- Cases table
+-- Cases table (simplified with single investigator)
 CREATE TABLE Cases (
     case_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    case_code VARCHAR(50) UNIQUE,
     title VARCHAR(200) NOT NULL,
     desc TEXT,
+    archive_path TEXT, 
+    user_id INTEGER,
     status VARCHAR(20) DEFAULT 'OPEN',
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    finished_at DATETIME
+    finished_at DATETIME,
+    FOREIGN KEY (user_id) REFERENCES Users(user_id)
 );
 
--- Forensics table (Many-to-Many relationship between Cases and Users)
-CREATE TABLE Case_Assignees (
-    case_id INTEGER NOT NULL,
-    user_id INTEGER NOT NULL,
-    status VARCHAR(20) DEFAULT 'Inactive',
-    assigned_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (case_id, user_id),
-    FOREIGN KEY (case_id) REFERENCES Cases(case_id) ON DELETE CASCADE,
-    FOREIGN KEY (user_id) REFERENCES Users(user_id) ON DELETE CASCADE
-);
+-- Trigger tự động tạo case_code sau khi INSERT
+CREATE TRIGGER auto_generate_case_code 
+AFTER INSERT ON Cases 
+FOR EACH ROW
+WHEN NEW.case_code IS NULL
+BEGIN
+    UPDATE Cases 
+    SET case_code = 'VU' || strftime('%Y', NEW.created_at) || printf('%04d', NEW.case_id)
+    WHERE case_id = NEW.case_id;
+END;
 
 -- Artefacts table
 CREATE TABLE Artefacts (
@@ -106,9 +110,7 @@ CREATE TABLE Activity_logs (
 -- Create indexes for better performance
 CREATE INDEX idx_case_status ON Cases(status);
 CREATE INDEX idx_case_created ON Cases(created_at);
-CREATE INDEX idx_forensics_case ON Case_Assignees(case_id);
-CREATE INDEX idx_forensics_user ON Case_Assignees(user_id);
-CREATE INDEX idx_forensics_status ON Case_Assignees(status);
+CREATE INDEX idx_case_investigator ON Cases(user_id);
 CREATE INDEX idx_artefacts_case ON Artefacts(case_id);
 CREATE INDEX idx_artefacts_type ON Artefacts(evidence_type);
 CREATE INDEX idx_hashes_artefact ON Hashes(artefact_id);
@@ -121,5 +123,5 @@ CREATE INDEX idx_activity_user ON Activity_logs(user_id);
 CREATE INDEX idx_activity_timestamp ON Activity_logs(timestamp);
 
 -- Insert default admin user (password: admin123)
-INSERT INTO Users (username, password_hash, full_name, phone_number,email, role, is_active) VALUES 
-('admin', '240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9', 'Hà Thùy Linh','0357857581','halinh9716@gmail.com', 'ADMIN', 1)
+INSERT INTO Users (username, password_hash, full_name, phone_number, email, role, is_active) VALUES 
+('admin', '240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9', 'Hà Thùy Linh','0357857581','halinh9716@gmail.com', 'ADMIN', 1);

@@ -92,7 +92,7 @@ class DatabaseManager:
     
     def authenticate_user(self, username: str, password: str) -> Optional[Dict]:
         query = """
-            SELECT user_id, username, password_hash, email, role, is_active 
+            SELECT user_id, username, password_hash, full_name, email, role, is_active 
             FROM Users 
             WHERE username = ? AND is_active = 1
         """
@@ -181,12 +181,17 @@ class DatabaseManager:
     
     # ==================== CASE MANAGEMENT ====================
     
-    def create_case(self, title: str, desc: str = "", status: str = "OPEN") -> Optional[int]:
+    def create_case(self, title: str, desc: str = "", status: str = "OPEN", 
+                   archive_path: str = "", user_id: int = None) -> Optional[int]:
+        # Use current user as investigator if not specified
+        if user_id is None:
+            user_id = self.current_user_id
+            
         query = """
-            INSERT INTO Cases (title, desc, status)
-            VALUES (?, ?, ?)
+            INSERT INTO Cases (title, desc, status, archive_path, user_id)
+            VALUES (?, ?, ?, ?, ?)
         """
-        cursor = self.execute_query(query, (title, desc, status))
+        cursor = self.execute_query(query, (title, desc, status, archive_path, user_id))
         if cursor:
             case_id = cursor.lastrowid
             self.log_activity(
@@ -195,6 +200,27 @@ class DatabaseManager:
             )
             return case_id
         return None
+    
+    def delete_case(self, case_id: int) -> bool:
+        """Xóa case và tất cả data liên quan"""
+        try:
+            # Xóa artifacts
+            self.execute_query("DELETE FROM Artefacts WHERE case_id = ?", (case_id,))
+            # Xóa activity logs
+            self.execute_query("DELETE FROM Activity_logs WHERE case_id = ?", (case_id,))
+            # Xóa reports
+            self.execute_query("DELETE FROM Reports WHERE case_id = ?", (case_id,))
+            # Xóa case
+            cursor = self.execute_query("DELETE FROM Cases WHERE case_id = ?", (case_id,))
+            return cursor is not None
+        except Exception as e:
+            print(f"Error deleting case: {e}")
+            return False
+    
+    def get_artefact_hashes(self, artefact_id: int) -> List[Dict]:
+        """Lấy tất cả hash của một artefact"""
+        query = "SELECT * FROM Hashes WHERE artefact_id = ?"
+        return self.fetch_all(query, (artefact_id,))
     
     def get_cases(self, status: str = None) -> List[Dict]:
         """Get all cases or filter by status"""
@@ -231,77 +257,41 @@ class DatabaseManager:
         cursor = self.execute_query(query, tuple(params))
         return cursor is not None
     
-    # ==================== FORENSICS (CASE-USER RELATIONSHIP) ====================
+    # ==================== SIMPLIFIED CASE-INVESTIGATOR RELATIONSHIP ====================
     
-    def assign_user_to_case(self, case_id: int, user_id: int, status: str = "ASSIGNED") -> bool:
-        """Gán user vào case (mối quan hệ n-n)"""
+    def get_cases_by_investigator(self, user_id: int) -> List[Dict]:
+        """Lấy danh sách cases của một investigator"""
         query = """
-            INSERT OR REPLACE INTO Case_Assignees(case_id, user_id, status)
-            VALUES (?, ?, ?)
-        """
-        cursor = self.execute_query(query, (case_id, user_id, status))
-        if cursor:
-            self.log_activity(
-                case_id=case_id,
-                user_id=user_id,
-                action="ASSIGN_TO_CASE"
-            )
-            return True
-        return False
-    
-    def remove_user_from_case(self, case_id: int, user_id: int) -> bool:
-        """Xóa user khỏi case"""
-        query = "DELETE FROM Case_Assignees WHERE case_id = ? AND user_id = ?"
-        cursor = self.execute_query(query, (case_id, user_id))
-        if cursor:
-            self.log_activity(
-                case_id=case_id,
-                user_id=user_id,
-                action="REMOVE_FROM_CASE"
-            )
-            return True
-        return False
-    
-    def get_users_by_case(self, case_id: int) -> List[Dict]:
-        """Lấy danh sách users của một case"""
-        query = """
-            SELECT u.user_id, u.username, u.full_name, u.email, u.role,
-                   f.status, f.assigned_at
-            FROM Users u
-            JOIN Case_Assignees f ON u.user_id = f.user_id
-            WHERE f.case_id = ? AND u.is_active = 1
-            ORDER BY f.assigned_at DESC
-        """
-        return self.fetch_all(query, (case_id,))
-    
-    def get_cases_by_user(self, user_id: int) -> List[Dict]:
-        """Lấy danh sách cases của một user"""
-        query = """
-            SELECT c.case_id, c.title, c.desc, c.status, c.created_at,
-                   f.status as assignment_status, f.assigned_at
+            SELECT c.*, u.username, u.full_name 
             FROM Cases c
-            JOIN Case_Assignees f ON c.case_id = f.case_id
-            WHERE f.user_id = ?
-            ORDER BY f.assigned_at DESC
+            LEFT JOIN Users u ON c.user_id = u.user_id
+            WHERE c.user_id = ?
+            ORDER BY c.created_at DESC
         """
         return self.fetch_all(query, (user_id,))
     
-    def update_user_case_status(self, case_id: int, user_id: int, status: str) -> bool:
-        """Cập nhật trạng thái của user trong case"""
-        query = """
-            UPDATE Case_Assignees 
-            SET status = ? 
-            WHERE case_id = ? AND user_id = ?
-        """
-        cursor = self.execute_query(query, (status, case_id, user_id))
-        return cursor is not None
+    def update_case_investigator(self, case_id: int, user_id: int) -> bool:
+        """Cập nhật investigator của case"""
+        query = "UPDATE Cases SET user_id = ? WHERE case_id = ?"
+        cursor = self.execute_query(query, (user_id, case_id))
+        if cursor:
+            self.log_activity(
+                case_id=case_id,
+                user_id=user_id,
+                action="ASSIGN_INVESTIGATOR"
+            )
+            return True
+        return False
     
-    def get_case_with_users(self, case_id: int) -> Optional[Dict]:
-        """Lấy thông tin case kèm danh sách users"""
-        case = self.get_case_by_id(case_id)
-        if case:
-            case['users'] = self.get_users_by_case(case_id)
-        return case
+    def get_case_with_investigator(self, case_id: int) -> Optional[Dict]:
+        """Lấy thông tin case kèm thông tin investigator"""
+        query = """
+            SELECT c.*, u.username, u.full_name, u.email, u.role
+            FROM Cases c
+            LEFT JOIN Users u ON c.user_id = u.user_id
+            WHERE c.case_id = ?
+        """
+        return self.fetch_one(query, (case_id,))
     
     # ==================== ARTIFACT MANAGEMENT ====================
     
@@ -326,25 +316,99 @@ class DatabaseManager:
         query = "SELECT * FROM Artefacts WHERE case_id = ? AND is_deleted = 0 ORDER BY collected_at DESC"
         return self.fetch_all(query, (case_id,))
     
+    def get_deleted_artifacts_by_case(self, case_id: int) -> List[Dict]:
+        """Get soft-deleted artifacts for audit purposes (admin only)"""
+        query = "SELECT * FROM Artefacts WHERE case_id = ? AND is_deleted = 1 ORDER BY collected_at DESC"
+        return self.fetch_all(query, (case_id,))
+    
+    def restore_artifact(self, artifact_id: int) -> bool:
+        """Restore a soft-deleted artifact (admin only)"""
+        try:
+            query = "UPDATE Artefacts SET is_deleted = 0 WHERE artefact_id = ?"
+            cursor = self.execute_query(query, (artifact_id,))
+            
+            if cursor:
+                # Log the restoration activity
+                self.log_activity(
+                    artefact_id=artifact_id,
+                    action="RESTORE_EVIDENCE"
+                )
+                return True
+            return False
+        except Exception as e:
+            print(f"Error restoring artifact: {e}")
+            return False
+    
     def delete_artifact(self, artifact_id: int) -> bool:
-        """Soft delete artifact"""
-        query = "UPDATE Artefacts SET is_deleted = 1 WHERE artefact_id = ?"
-        cursor = self.execute_query(query, (artifact_id,))
-        return cursor is not None
+        """Soft delete artifact following forensic best practices"""
+        try:
+            # Soft delete the artifact (preserves original data for audit)
+            query = "UPDATE Artefacts SET is_deleted = 1 WHERE artefact_id = ?"
+            cursor = self.execute_query(query, (artifact_id,))
+            
+            if cursor:
+                # Clean up hashes since artifact is logically "deleted" from user view
+                # But keep them in a way that can be restored if needed for legal purposes
+                hash_query = "DELETE FROM Hashes WHERE artefact_id = ?"
+                self.execute_query(hash_query, (artifact_id,))
+                
+                # Log the deletion activity for audit trail
+                self.log_activity(
+                    artefact_id=artifact_id,
+                    action="DELETE_EVIDENCE"
+                )
+                return True
+            return False
+        except Exception as e:
+            print(f"Error deleting artifact: {e}")
+            return False
     
     # ==================== HASH MANAGEMENT ====================
     
-    def add_hash(self, artifact_id: int, sha256: str, hash_type: str = "SHA256") -> bool:
+    def add_hash(self, artifact_id: int, hash_type: str, hash_value: str) -> bool:
+        """
+        Add hash for an artifact
+        
+        Args:
+            artifact_id: ID of the artifact
+            hash_type: Purpose/type of hash (e.g., 'origin', 'integrity_check', 'verification', 'backup')
+            hash_value: The actual hash value (SHA256, MD5, SHA1, etc.)
+            
+        Note: 
+            - hash_type indicates the PURPOSE of the hash (when/why it was calculated)
+            - sha256 column stores the actual hash value regardless of algorithm used
+        """
         query = """
             INSERT INTO Hashes (artefact_id, hash_type, sha256, generated_by)
             VALUES (?, ?, ?, ?)
         """
-        cursor = self.execute_query(query, (artifact_id, hash_type, sha256, self.current_user_id))
+        cursor = self.execute_query(query, (artifact_id, hash_type, hash_value, self.current_user_id))
         return cursor is not None
     
-    def get_hash_by_artifact(self, artifact_id: int) -> Optional[Dict]:
-        query = "SELECT * FROM Hashes WHERE artefact_id = ?"
-        return self.fetch_one(query, (artifact_id,))
+    def get_hash_by_artifact(self, artifact_id: int, hash_type: str = None) -> Optional[Dict]:
+        """Get hash by artifact ID and optionally filter by hash_type"""
+        if hash_type:
+            query = "SELECT * FROM Hashes WHERE artefact_id = ? AND hash_type = ?"
+            return self.fetch_one(query, (artifact_id, hash_type))
+        else:
+            query = "SELECT * FROM Hashes WHERE artefact_id = ?"
+            return self.fetch_one(query, (artifact_id,))
+    
+    def get_origin_hash(self, artifact_id: int) -> Optional[str]:
+        """Get the original hash value for integrity verification"""
+        result = self.get_hash_by_artifact(artifact_id, "origin")
+        return result['sha256'] if result else None
+    
+    def add_integrity_check_hash(self, artifact_id: int, hash_value: str) -> bool:
+        """Add integrity check hash to verify evidence hasn't been tampered with"""
+        return self.add_hash(artifact_id, "integrity_check", hash_value)
+    
+    def verify_integrity(self, artifact_id: int, current_hash: str) -> bool:
+        """Verify evidence integrity by comparing with origin hash"""
+        origin_hash = self.get_origin_hash(artifact_id)
+        if not origin_hash:
+            return False
+        return origin_hash == current_hash
     
     # ==================== ANALYSIS RESULTS ====================
     
@@ -399,6 +463,10 @@ class DatabaseManager:
         # Use current_user_id if user_id not specified
         if user_id is None:
             user_id = self.current_user_id
+            
+        # Skip logging if no user_id
+        if user_id is None:
+            return True
             
         query = """
             INSERT INTO Activity_logs (case_id, artefact_id, user_id, action, tool_used)
