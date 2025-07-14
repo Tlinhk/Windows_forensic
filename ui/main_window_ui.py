@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'ui/main_window.ui'
+# Form implementation generated from reading ui file '.\main_window.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.11
 #
@@ -75,7 +75,7 @@ class Ui_MainWindow(object):
 "")
         self.toolBox.setObjectName("toolBox")
         self.page_3 = QtWidgets.QWidget()
-        self.page_3.setGeometry(QtCore.QRect(0, 0, 444, 467))
+        self.page_3.setGeometry(QtCore.QRect(0, 0, 457, 467))
         self.page_3.setObjectName("page_3")
         self.verticalLayout = QtWidgets.QVBoxLayout(self.page_3)
         self.verticalLayout.setContentsMargins(5, 5, 5, 5)
@@ -112,7 +112,7 @@ class Ui_MainWindow(object):
         icon.addPixmap(QtGui.QPixmap(":/icons/icons/antivirus_2894894.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.toolBox.addItem(self.page_3, icon, "")
         self.page_4 = QtWidgets.QWidget()
-        self.page_4.setGeometry(QtCore.QRect(0, 0, 444, 467))
+        self.page_4.setGeometry(QtCore.QRect(0, 0, 457, 467))
         self.page_4.setObjectName("page_4")
         self.verticalLayout_2 = QtWidgets.QVBoxLayout(self.page_4)
         self.verticalLayout_2.setContentsMargins(5, 5, 5, 5)
@@ -140,7 +140,7 @@ class Ui_MainWindow(object):
         icon1.addPixmap(QtGui.QPixmap(":/icons/icons/icons8-collect-50.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.toolBox.addItem(self.page_4, icon1, "")
         self.page_5 = QtWidgets.QWidget()
-        self.page_5.setGeometry(QtCore.QRect(0, 0, 444, 467))
+        self.page_5.setGeometry(QtCore.QRect(0, 0, 457, 467))
         self.page_5.setObjectName("page_5")
         self.verticalLayout_3 = QtWidgets.QVBoxLayout(self.page_5)
         self.verticalLayout_3.setContentsMargins(5, 5, 5, 5)
@@ -200,7 +200,7 @@ class Ui_MainWindow(object):
         icon2.addPixmap(QtGui.QPixmap(":/icons/icons/icons8-combo-chart-50.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.toolBox.addItem(self.page_5, icon2, "")
         self.page_6 = QtWidgets.QWidget()
-        self.page_6.setGeometry(QtCore.QRect(0, 0, 444, 467))
+        self.page_6.setGeometry(QtCore.QRect(0, 0, 457, 467))
         self.page_6.setObjectName("page_6")
         self.verticalLayout_4 = QtWidgets.QVBoxLayout(self.page_6)
         self.verticalLayout_4.setContentsMargins(5, 5, 5, 5)
@@ -218,7 +218,7 @@ class Ui_MainWindow(object):
         icon3.addPixmap(QtGui.QPixmap(":/icons/icons/icons8-report-50 (1).png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.toolBox.addItem(self.page_6, icon3, "")
         self.page_7 = QtWidgets.QWidget()
-        self.page_7.setGeometry(QtCore.QRect(0, 0, 444, 467))
+        self.page_7.setGeometry(QtCore.QRect(0, 0, 457, 467))
         self.page_7.setObjectName("page_7")
         self.verticalLayout_5 = QtWidgets.QVBoxLayout(self.page_7)
         self.verticalLayout_5.setContentsMargins(5, 5, 5, 5)
@@ -230,7 +230,7 @@ class Ui_MainWindow(object):
         icon4.addPixmap(QtGui.QPixmap(":/icons/icons/icons8-system-setting-53 (1).png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.toolBox.addItem(self.page_7, icon4, "")
         self.page_8 = QtWidgets.QWidget()
-        self.page_8.setGeometry(QtCore.QRect(0, 0, 444, 467))
+        self.page_8.setGeometry(QtCore.QRect(0, 0, 457, 467))
         self.page_8.setObjectName("page_8")
         self.gridLayout_3 = QtWidgets.QGridLayout(self.page_8)
         self.gridLayout_3.setContentsMargins(5, 5, 5, 5)
@@ -266,8 +266,8 @@ class Ui_MainWindow(object):
         self.pushButton_12.setMaximumSize(QtCore.QSize(30, 30))
         self.pushButton_12.setText("")
         icon6 = QtGui.QIcon()
-        icon6.addPixmap(QtGui.QPixmap(":/icons/icons/arrow-96-48.ico"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        icon6.addPixmap(QtGui.QPixmap(":/icons/icons/arrow-31-48.ico"), QtGui.QIcon.Normal, QtGui.QIcon.On)
+        icon6.addPixmap(QtGui.QPixmap(":/icon/icons/arrow-96-48.ico"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon6.addPixmap(QtGui.QPixmap(":/icon/icons/arrow-31-48.ico"), QtGui.QIcon.Normal, QtGui.QIcon.On)
         self.pushButton_12.setIcon(icon6)
         self.pushButton_12.setCheckable(True)
         self.pushButton_12.setObjectName("pushButton_12")
@@ -303,7 +303,7 @@ class Ui_MainWindow(object):
 "}\n"
 "")
         self.user_label.setText("")
-        self.user_label.setPixmap(QtGui.QPixmap(":/icons/icons/user-48.ico"))
+        self.user_label.setPixmap(QtGui.QPixmap(":/icon/icons/user-48.ico"))
         self.user_label.setScaledContents(True)
         self.user_label.setObjectName("user_label")
         self.horizontalLayout_2.addWidget(self.user_label)
@@ -315,11 +315,11 @@ class Ui_MainWindow(object):
 "\n"
 "QTabBar::close-button {\n"
 "    margin-left: 3px;\n"
-"    image: url(:/icons/icons/x-mark-4-32.ico);\n"
+"    image: url(:/icon/icons/x-mark-4-32.ico);\n"
 "}\n"
 "\n"
 "QTabBar::close-button:hover {\n"
-"    image: url(:/icons/icons/x-mark-4-48.ico)\n"
+"    image: url(:/icon/icons/x-mark-4-48.ico);\n"
 "}\n"
 "\n"
 "QTabBar::tab {\n"
@@ -330,12 +330,12 @@ class Ui_MainWindow(object):
 "                margin-right: 2px;\n"
 "                border-top-left-radius: 6px;\n"
 "                border-top-right-radius: 6px;\n"
+"                font-size: 16px; \n"
 "}\n"
 "     \n"
 "QTabBar::tab:selected {\n"
-"                background-color: #fd7e14;\n"
+"                background-color: #28a745 ;\n"
 "                color: #ffffff;\n"
-"                border: 2px solid #fd7e14;\n"
 "                border-bottom: none;\n"
 "            }\n"
 "            \n"
@@ -380,3 +380,13 @@ class Ui_MainWindow(object):
         self.timestamp_label.setText(_translate("MainWindow", "🕒 --"))
         self.username_label.setText(_translate("MainWindow", "Người dùng"))
 from static import resource_rc
+
+
+if __name__ == "__main__":
+    import sys
+    app = QtWidgets.QApplication(sys.argv)
+    MainWindow = QtWidgets.QMainWindow()
+    ui = Ui_MainWindow()
+    ui.setupUi(MainWindow)
+    MainWindow.show()
+    sys.exit(app.exec_())

@@ -49,7 +49,7 @@ class ForensicCollectionWorker(QObject):
             )
             os.makedirs(self.collection_dir, exist_ok=True)
             
-            self.log_message.emit(f"🚀 BẮT ĐẦU THU THẬP FORENSIC - {self.start_time.strftime('%Y-%m-%d %H:%M:%S')}")
+            self.log_message.emit(f"BẮT ĐẦU THU THẬP FORENSIC - {self.start_time.strftime('%Y-%m-%d %H:%M:%S')}")
             self.log_message.emit(f"📁 Thư mục thu thập: {self.collection_dir}")
             
             # Get system information first
@@ -58,23 +58,23 @@ class ForensicCollectionWorker(QObject):
             # Define tasks in Order of Volatility (highest to lowest)
             tasks = []
             if self.collection_options.get('ram_acquisition'):
-                tasks.append(('🥇 RAM Acquisition', self.collect_ram_dump, 40))
+                tasks.append(('RAM Acquisition', self.collect_ram_dump, 40))
             if self.collection_options.get('system_time'):
-                tasks.append(('🥈 System Time & Uptime', self.collect_system_time, 5))
+                tasks.append(('System Time & Uptime', self.collect_system_time, 5))
             if self.collection_options.get('network_state'):
-                tasks.append(('🥉 Network State', self.collect_network_state, 10))
+                tasks.append(('Network State', self.collect_network_state, 10))
             if self.collection_options.get('process_info'):
-                tasks.append(('🏅 Process Information', self.collect_process_info, 15))
+                tasks.append(('Process Information', self.collect_process_info, 15))
             if self.collection_options.get('user_sessions'):
-                tasks.append(('🏅 User Sessions', self.collect_user_sessions, 5))
+                tasks.append(('User Sessions', self.collect_user_sessions, 5))
             if self.collection_options.get('clipboard'):
-                tasks.append(('📎 Clipboard Content', self.collect_clipboard, 2))
+                tasks.append(('Clipboard Content', self.collect_clipboard, 2))
             if self.collection_options.get('command_history'):
-                tasks.append(('📝 Command History', self.collect_command_history, 8))
+                tasks.append(('Command History', self.collect_command_history, 8))
             if self.collection_options.get('services_drivers'):
-                tasks.append(('⚙️ Services & Drivers', self.collect_services_drivers, 10))
+                tasks.append(('Services & Drivers', self.collect_services_drivers, 10))
             if self.collection_options.get('environment_vars'):
-                tasks.append(('🌍 Environment Variables', self.collect_environment_vars, 5))
+                tasks.append(('Environment Variables', self.collect_environment_vars, 5))
             
             total_weight = sum(weight for _, _, weight in tasks)
             completed_weight = 0
@@ -83,7 +83,7 @@ class ForensicCollectionWorker(QObject):
                 if not self.running:
                     break
                     
-                self.log_message.emit(f"📋 Bắt đầu: {task_name}")
+                self.log_message.emit(f"Bắt đầu: {task_name}")
                 self.evidence_log.emit(f"[{datetime.now().strftime('%H:%M:%S')}] Starting: {task_name}")
                 
                 overall_progress = int((completed_weight / total_weight) * 100)
@@ -177,11 +177,11 @@ Tool: Windows Forensic System - Volatile Collection Module
             # - DumpIt
             # - Belkasoft RAM Capturer
             
-            self.log_message.emit("🧠 Bắt đầu thu thập RAM - Sử dụng công cụ chuyên dụng...")
+            self.log_message.emit("Bắt đầu thu thập RAM - Sử dụng công cụ chuyên dụng...")
             
             # Simulate RAM collection (replace with actual tool)
             ram_size_gb = psutil.virtual_memory().total / (1024**3)
-            self.log_message.emit(f"💾 Kích thước RAM: {ram_size_gb:.2f} GB")
+            self.log_message.emit(f"Kích thước RAM: {ram_size_gb:.2f} GB")
             
             # Create metadata file for RAM dump
             metadata = {
@@ -200,7 +200,7 @@ Tool: Windows Forensic System - Volatile Collection Module
             self.evidence_files.append(metadata_file)
             
             # Note: Actual RAM dump would be created by external tool
-            self.log_message.emit(f"💾 RAM metadata saved: {metadata_file}")
+            self.log_message.emit(f"RAM metadata saved: {metadata_file}")
             
             return True
             
@@ -389,7 +389,7 @@ Tool: Windows Forensic System - Volatile Collection Module
             
             for cmd, filename in commands:
                 try:
-                    self.log_message.emit(f"🔍 Chạy lệnh: {cmd}")
+                    self.log_message.emit(f"Chạy lệnh: {cmd}")
                     
                     # Special handling for handle.exe which might not exist
                     if 'handle.exe' in cmd:
@@ -434,7 +434,7 @@ Tool: Windows Forensic System - Volatile Collection Module
             timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
             output_file = os.path.join(self.collection_dir, f"process_modules_{timestamp}.txt")
             
-            self.log_message.emit("🔍 Thu thập modules cho từng process...")
+            self.log_message.emit("Thu thập modules cho từng process...")
             
             with open(output_file, 'w', encoding='utf-8') as f:
                 f.write("=== PROCESS MODULES (DLLs) ===\n")
@@ -730,7 +730,7 @@ Uptime: {str(datetime.now() - datetime.fromtimestamp(psutil.boot_time()))}
 Current Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"""
             
             self.ui.systemInfoText.setText(info)
-            self.ui.ramSizeLabel.setText(f"🧠 RAM: {ram_gb:.1f} GB | 💾 Cần: ~{ram_gb:.1f} GB | 📦 Gói: ~{ram_gb*0.3:.1f} GB")
+            self.ui.ramSizeLabel.setText(f" RAM: {ram_gb:.1f} GB | Cần: ~{ram_gb:.1f} GB | Gói: ~{ram_gb*0.3:.1f} GB")
             
         except Exception as e:
             self.ui.systemInfoText.setText(f"Lỗi khi tải thông tin hệ thống: {str(e)}")
@@ -838,13 +838,12 @@ Current Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"""
         msg = QMessageBox(self)
         msg.setIcon(QMessageBox.Warning)
         msg.setWindowTitle("Xác nhận Thu thập Forensic")
-        msg.setText("🚨 BẮT ĐẦU THU THẬP DỮ LIỆU KHĂNG BIẾN")
+        msg.setText("BẮT ĐẦU THU THẬP DỮ LIỆU KHẢ BIẾN")
         msg.setInformativeText(
-            f"Bạn có chắc chắn muốn bắt đầu thu thập forensic?\n\n"
-            f"📋 Case: {case_info['case_id']}\n"
-            f"🔬 Loại: Thu thập dữ liệu khả biến (VOLATILE)\n"
-            f"👤 Investigator: {case_info['investigator']}\n"
-            f"💾 Output: {output_path}\n\n"
+            f"Case: {case_info['case_id']}\n"
+            f"Loại: Thu thập dữ liệu khả biến (VOLATILE)\n"
+            f"Investigator: {case_info['investigator']}\n"
+            f"Output: {output_path}\n\n"
             f"⚠️ Quá trình này sẽ tác động đến hệ thống và không thể hoàn tác!"
         )
         msg.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
@@ -933,10 +932,8 @@ Current Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"""
                 self,
                 "Hoàn thành Thu thập Forensic",
                 f"✅ {message}\n\n"
-                f"📦 Evidence Package: {os.path.basename(package_path)}\n"
-                f"📁 Đường dẫn: {package_path}\n\n"
-                f"🔐 Đã tính toán hash SHA-256\n"
-                f"📋 Chain of custody đã được ghi lại"
+                f"Evidence Package: {os.path.basename(package_path)}\n"
+                f"Đường dẫn: {package_path}\n\n"
             )
         else:
             QMessageBox.warning(self, "Lỗi Thu thập", f"❌ {message}")
@@ -976,7 +973,7 @@ Current Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"""
                 QMessageBox.information(
                     self,
                     "Thành công",
-                    f"✅ Evidence log đã được lưu: {filename}"
+                    f"Evidence log đã được lưu: {filename}"
                 )
             except Exception as e:
                 QMessageBox.critical(

@@ -113,7 +113,7 @@ border: none;
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>444</width>
+             <width>457</width>
              <height>467</height>
             </rect>
            </property>
@@ -217,7 +217,7 @@ border: none;
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>444</width>
+             <width>457</width>
              <height>467</height>
             </rect>
            </property>
@@ -300,7 +300,7 @@ border: none;
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>444</width>
+             <width>457</width>
              <height>467</height>
             </rect>
            </property>
@@ -455,7 +455,7 @@ border: none;
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>444</width>
+             <width>457</width>
              <height>467</height>
             </rect>
            </property>
@@ -514,7 +514,7 @@ border: none;
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>444</width>
+             <width>457</width>
              <height>467</height>
             </rect>
            </property>
@@ -561,7 +561,7 @@ border: none;
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>444</width>
+             <width>457</width>
              <height>467</height>
             </rect>
            </property>
@@ -665,9 +665,9 @@ border: none;
               <string/>
              </property>
              <property name="icon">
-              <iconset>
-               <normaloff>:/icons/icons/arrow-96-48.ico</normaloff>
-               <normalon>:/icons/icons/arrow-31-48.ico</normalon>:/icons/icons/arrow-96-48.ico</iconset>
+              <iconset resource="../static/resource.qrc">
+               <normaloff>:/icon/icons/arrow-96-48.ico</normaloff>
+               <normalon>:/icon/icons/arrow-31-48.ico</normalon>:/icon/icons/arrow-96-48.ico</iconset>
              </property>
              <property name="checkable">
               <bool>true</bool>
@@ -675,19 +675,19 @@ border: none;
             </widget>
            </item>
            <item>
-                         <widget class="QLabel" name="timestamp_label">
-              <property name="styleSheet">
-               <string notr="true">#timestamp_label {
+            <widget class="QLabel" name="timestamp_label">
+             <property name="styleSheet">
+              <string notr="true">#timestamp_label {
     color: #ffffff;
     font-size: 16px;
     font-weight: 500;
     padding: 5px 10px;
 }</string>
-              </property>
-              <property name="text">
-               <string>🕒 --</string>
-              </property>
-             </widget>
+             </property>
+             <property name="text">
+              <string>🕒 --</string>
+             </property>
+            </widget>
            </item>
            <item>
             <spacer name="horizontalSpacer">
@@ -703,19 +703,19 @@ border: none;
             </spacer>
            </item>
            <item>
-                         <widget class="QLabel" name="username_label">
-              <property name="styleSheet">
-               <string notr="true">#username_label {
+            <widget class="QLabel" name="username_label">
+             <property name="styleSheet">
+              <string notr="true">#username_label {
     color: #ffffff;
     font-size: 16px;
     font-weight: bold;
     padding: 5px 8px;
 }</string>
-              </property>
-              <property name="text">
-               <string>Người dùng</string>
-              </property>
-             </widget>
+             </property>
+             <property name="text">
+              <string>Người dùng</string>
+             </property>
+            </widget>
            </item>
            <item>
             <widget class="QLabel" name="user_label">
@@ -744,7 +744,7 @@ border: none;
               <string/>
              </property>
              <property name="pixmap">
-              <pixmap>:/icons/icons/user-48.ico</pixmap>
+              <pixmap resource="../static/resource.qrc">:/icon/icons/user-48.ico</pixmap>
              </property>
              <property name="scaledContents">
               <bool>true</bool>
@@ -763,11 +763,11 @@ border: none;
 
 QTabBar::close-button {
     margin-left: 3px;
-	image: url(:/icons/icons/x-mark-4-32.ico);
+	image: url(:/icon/icons/x-mark-4-32.ico);
 }
 
 QTabBar::close-button:hover {
-	image: url(:/icons/icons/x-mark-4-48.ico)
+	image: url(:/icon/icons/x-mark-4-48.ico);
 }
 
 QTabBar::tab {
@@ -778,12 +778,12 @@ QTabBar::tab {
                 margin-right: 2px;
                 border-top-left-radius: 6px;
                 border-top-right-radius: 6px;
+				font-size: 16px; 
 }
      
 QTabBar::tab:selected {
-                background-color: #fd7e14;
+                background-color: #28a745 ;
                 color: #ffffff;
-                border: 2px solid #fd7e14;
                 border-bottom: none;
             }
             

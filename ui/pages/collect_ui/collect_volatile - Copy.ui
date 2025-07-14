@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1400</width>
-    <height>893</height>
+    <height>852</height>
    </rect>
   </property>
   <property name="font">
@@ -113,6 +113,46 @@ QCheckBox {
     <number>15</number>
    </property>
    <item>
+    <widget class="QLabel" name="titleLabel">
+     <property name="font">
+      <font>
+       <pointsize>13</pointsize>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="styleSheet">
+      <string>color: #dc3545; padding: 10px; background-color: #fff5f5; border: 2px solid #dc3545; border-radius: 8px;</string>
+     </property>
+     <property name="text">
+      <string>🚨 FORENSIC LIVE COLLECTION - Thu thập Dữ liệu Khả biến</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="warningLabel">
+     <property name="font">
+      <font>
+       <pointsize>9</pointsize>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="styleSheet">
+      <string>background-color: #fff3cd; color: #856404; padding: 8px; border: 1px solid #ffeaa7; border-radius: 4px; font-weight: bold;</string>
+     </property>
+     <property name="text">
+      <string>⚠️  CẢNH BÁO: Thu thập theo &quot;Order of Volatility&quot; - Dữ liệu RAM ưu tiên cao nhất. Chạy từ thiết bị ngoài để tối thiểu tác động!</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item>
     <layout class="QHBoxLayout" name="mainHorizontalLayout">
      <property name="spacing">
       <number>15</number>
@@ -120,18 +160,6 @@ QCheckBox {
      <item>
       <layout class="QVBoxLayout" name="leftColumnLayout">
        <property name="spacing">
-        <number>10</number>
-       </property>
-       <property name="leftMargin">
-        <number>10</number>
-       </property>
-       <property name="topMargin">
-        <number>15</number>
-       </property>
-       <property name="rightMargin">
-        <number>10</number>
-       </property>
-       <property name="bottomMargin">
         <number>10</number>
        </property>
        <item>
@@ -144,7 +172,7 @@ QCheckBox {
          </property>
          <property name="font">
           <font>
-           <pointsize>10</pointsize>
+           <pointsize>9</pointsize>
            <weight>75</weight>
            <bold>true</bold>
           </font>
@@ -154,10 +182,7 @@ QCheckBox {
          </property>
          <layout class="QVBoxLayout" name="configLayout">
           <property name="spacing">
-           <number>15</number>
-          </property>
-          <property name="leftMargin">
-           <number>15</number>
+           <number>8</number>
           </property>
           <item>
            <layout class="QHBoxLayout" name="targetSystemLayout"/>
@@ -168,11 +193,11 @@ QCheckBox {
              <widget class="QLabel" name="caseIdLabel">
               <property name="font">
                <font>
-                <pointsize>10</pointsize>
+                <pointsize>9</pointsize>
                </font>
               </property>
               <property name="text">
-               <string>  Case name:</string>
+               <string>📋 Case name:</string>
               </property>
              </widget>
             </item>
@@ -183,7 +208,7 @@ QCheckBox {
               </property>
               <property name="font">
                <font>
-                <pointsize>10</pointsize>
+                <pointsize>9</pointsize>
                </font>
               </property>
               <property name="placeholderText">
@@ -199,13 +224,13 @@ QCheckBox {
              <widget class="QLabel" name="outputDeviceLabel">
               <property name="font">
                <font>
-                <pointsize>10</pointsize>
-                <weight>50</weight>
-                <bold>false</bold>
+                <pointsize>9</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
                </font>
               </property>
               <property name="text">
-               <string>  Thiết bị lưu trữ:</string>
+               <string>💾 Thiết bị lưu trữ:</string>
               </property>
              </widget>
             </item>
@@ -216,7 +241,7 @@ QCheckBox {
               </property>
               <property name="font">
                <font>
-                <pointsize>10</pointsize>
+                <pointsize>9</pointsize>
                </font>
               </property>
               <property name="text">
@@ -263,21 +288,9 @@ QCheckBox {
        </item>
        <item>
         <widget class="QGroupBox" name="orderOfVolatilityGroup">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>16777215</width>
-           <height>1677215</height>
-          </size>
-         </property>
          <property name="font">
           <font>
-           <pointsize>10</pointsize>
+           <pointsize>9</pointsize>
            <weight>75</weight>
            <bold>true</bold>
           </font>
@@ -287,22 +300,26 @@ QCheckBox {
          </property>
          <layout class="QVBoxLayout" name="volatilityLayout">
           <property name="spacing">
-           <number>20</number>
+           <number>5</number>
           </property>
-          <property name="leftMargin">
-           <number>15</number>
-          </property>
-          <property name="topMargin">
-           <number>30</number>
-          </property>
-          <property name="bottomMargin">
-           <number>10</number>
-          </property>
+          <item>
+           <widget class="QLabel" name="priorityInfoLabel">
+            <property name="font">
+             <font>
+              <pointsize>9</pointsize>
+              <italic>true</italic>
+             </font>
+            </property>
+            <property name="text">
+             <string>Thứ tự ưu tiên từ cao đến thấp (càng lên trên càng dễ mất):</string>
+            </property>
+           </widget>
+          </item>
           <item>
            <widget class="QCheckBox" name="ramAcquisitionCheck">
             <property name="font">
              <font>
-              <pointsize>10</pointsize>
+              <pointsize>9</pointsize>
               <weight>75</weight>
               <bold>true</bold>
              </font>
@@ -311,7 +328,7 @@ QCheckBox {
              <string>color: #dc3545; font-weight: bold;</string>
             </property>
             <property name="text">
-             <string>1. RAM Acquisition (Ưu tiên cao nhất)</string>
+             <string>🥇 1. RAM Acquisition (Bộ nhớ vật lý - Ưu tiên cao nhất)</string>
             </property>
             <property name="checked">
              <bool>true</bool>
@@ -322,11 +339,11 @@ QCheckBox {
            <widget class="QCheckBox" name="systemTimeCheck">
             <property name="font">
              <font>
-              <pointsize>10</pointsize>
+              <pointsize>9</pointsize>
              </font>
             </property>
             <property name="text">
-             <string>2. System Time &amp; Uptime</string>
+             <string>🥈 2. System Time &amp; Uptime (Thời gian hệ thống)</string>
             </property>
             <property name="checked">
              <bool>true</bool>
@@ -337,11 +354,11 @@ QCheckBox {
            <widget class="QCheckBox" name="networkStateCheck">
             <property name="font">
              <font>
-              <pointsize>10</pointsize>
+              <pointsize>9</pointsize>
              </font>
             </property>
             <property name="text">
-             <string>3. Network State</string>
+             <string>🥉 3. Network State (Kết nối mạng đang hoạt động)</string>
             </property>
             <property name="checked">
              <bool>true</bool>
@@ -352,11 +369,11 @@ QCheckBox {
            <widget class="QCheckBox" name="processInfoCheck">
             <property name="font">
              <font>
-              <pointsize>10</pointsize>
+              <pointsize>9</pointsize>
              </font>
             </property>
             <property name="text">
-             <string>4. Process Information </string>
+             <string>🏅 4. Process Information (Tiến trình đang chạy)</string>
             </property>
             <property name="checked">
              <bool>true</bool>
@@ -367,11 +384,11 @@ QCheckBox {
            <widget class="QCheckBox" name="userSessionsCheck">
             <property name="font">
              <font>
-              <pointsize>10</pointsize>
+              <pointsize>9</pointsize>
              </font>
             </property>
             <property name="text">
-             <string>5. User Sessions </string>
+             <string>🏅 5. User Sessions (Phiên đăng nhập)</string>
             </property>
             <property name="checked">
              <bool>true</bool>
@@ -382,11 +399,11 @@ QCheckBox {
            <widget class="QCheckBox" name="clipboardCheck">
             <property name="font">
              <font>
-              <pointsize>10</pointsize>
+              <pointsize>9</pointsize>
              </font>
             </property>
             <property name="text">
-             <string>6. Clipboard Content</string>
+             <string>📎 6. Clipboard Content (Nội dung clipboard)</string>
             </property>
             <property name="checked">
              <bool>true</bool>
@@ -397,11 +414,11 @@ QCheckBox {
            <widget class="QCheckBox" name="commandHistoryCheck">
             <property name="font">
              <font>
-              <pointsize>10</pointsize>
+              <pointsize>9</pointsize>
              </font>
             </property>
             <property name="text">
-             <string>7. Command History</string>
+             <string>📝 7. Command History (Lịch sử lệnh)</string>
             </property>
             <property name="checked">
              <bool>true</bool>
@@ -412,11 +429,11 @@ QCheckBox {
            <widget class="QCheckBox" name="servicesDriversCheck">
             <property name="font">
              <font>
-              <pointsize>10</pointsize>
+              <pointsize>9</pointsize>
              </font>
             </property>
             <property name="text">
-             <string>8. Services &amp; Drivers</string>
+             <string>⚙️ 8. Services &amp; Drivers (Dịch vụ &amp; Trình điều khiển)</string>
             </property>
             <property name="checked">
              <bool>true</bool>
@@ -427,11 +444,11 @@ QCheckBox {
            <widget class="QCheckBox" name="environmentVarsCheck">
             <property name="font">
              <font>
-              <pointsize>10</pointsize>
+              <pointsize>9</pointsize>
              </font>
             </property>
             <property name="text">
-             <string>9. Environment Variables</string>
+             <string>🌍 9. Environment Variables (Biến môi trường)</string>
             </property>
             <property name="checked">
              <bool>false</bool>
@@ -442,7 +459,7 @@ QCheckBox {
            <spacer name="volatilityVerticalSpacer">
             <property name="font">
              <font>
-              <pointsize>10</pointsize>
+              <pointsize>9</pointsize>
              </font>
             </property>
             <property name="orientation">
@@ -465,7 +482,7 @@ QCheckBox {
              <widget class="QPushButton" name="selectAllBtn">
               <property name="font">
                <font>
-                <pointsize>10</pointsize>
+                <pointsize>9</pointsize>
                 <weight>75</weight>
                 <bold>true</bold>
                </font>
@@ -479,7 +496,7 @@ QCheckBox {
              <widget class="QPushButton" name="clearAllBtn">
               <property name="font">
                <font>
-                <pointsize>10</pointsize>
+                <pointsize>9</pointsize>
                 <weight>75</weight>
                 <bold>true</bold>
                </font>
@@ -507,16 +524,13 @@ QCheckBox {
           <string>Cấu hình RAM Acquisition</string>
          </property>
          <layout class="QVBoxLayout" name="ramConfigLayout">
-          <property name="leftMargin">
-           <number>15</number>
-          </property>
           <item>
            <layout class="QHBoxLayout" name="ramFormatLayout">
             <item>
              <widget class="QLabel" name="ramFormatLabel">
               <property name="font">
                <font>
-                <pointsize>10</pointsize>
+                <pointsize>9</pointsize>
                </font>
               </property>
               <property name="text">
@@ -528,7 +542,7 @@ QCheckBox {
              <widget class="QComboBox" name="ramFormatCombo">
               <property name="font">
                <font>
-                <pointsize>10</pointsize>
+                <pointsize>9</pointsize>
                </font>
               </property>
               <property name="currentIndex">
@@ -557,11 +571,11 @@ QCheckBox {
            <widget class="QCheckBox" name="calculateHashCheck">
             <property name="font">
              <font>
-              <pointsize>10</pointsize>
+              <pointsize>9</pointsize>
              </font>
             </property>
             <property name="text">
-             <string>Tính toán Hash SHA-256 trong quá trình thu thập</string>
+             <string>🔐 Tính toán Hash SHA-256 trong quá trình thu thập</string>
             </property>
             <property name="checked">
              <bool>true</bool>
@@ -572,11 +586,11 @@ QCheckBox {
            <widget class="QCheckBox" name="compressRamCheck">
             <property name="font">
              <font>
-              <pointsize>10</pointsize>
+              <pointsize>9</pointsize>
              </font>
             </property>
             <property name="text">
-             <string>Nén RAM dump (tiết kiệm không gian)</string>
+             <string>🗜️ Nén RAM dump (tiết kiệm không gian)</string>
             </property>
             <property name="checked">
              <bool>false</bool>
@@ -596,9 +610,9 @@ QCheckBox {
           </font>
          </property>
          <property name="styleSheet">
-          <string notr="true">QPushButton {
+          <string>QPushButton {
     background-color: #dc3545;
-    font-size: 17px;
+    font-size: 16px;
     border: 2px solid #bd2130;
 }
 
@@ -622,29 +636,17 @@ QPushButton:pressed {
        <property name="spacing">
         <number>10</number>
        </property>
-       <property name="leftMargin">
-        <number>10</number>
-       </property>
-       <property name="topMargin">
-        <number>15</number>
-       </property>
-       <property name="rightMargin">
-        <number>10</number>
-       </property>
-       <property name="bottomMargin">
-        <number>10</number>
-       </property>
        <item>
         <widget class="QGroupBox" name="systemInfoGroup">
          <property name="font">
           <font>
-           <pointsize>10</pointsize>
+           <pointsize>9</pointsize>
            <weight>75</weight>
            <bold>true</bold>
           </font>
          </property>
          <property name="title">
-          <string>Thông tin hệ thống đích</string>
+          <string>💻 Thông tin Hệ thống</string>
          </property>
          <layout class="QVBoxLayout" name="systemInfoLayout">
           <item>
@@ -656,7 +658,7 @@ QPushButton:pressed {
              </font>
             </property>
             <property name="styleSheet">
-             <string notr="true">font-size: 17px;</string>
+             <string notr="true">font-size: 14px;</string>
             </property>
             <property name="readOnly">
              <bool>true</bool>
@@ -673,13 +675,13 @@ QPushButton:pressed {
         <widget class="QGroupBox" name="progressGroup">
          <property name="font">
           <font>
-           <pointsize>10</pointsize>
+           <pointsize>9</pointsize>
            <weight>75</weight>
            <bold>true</bold>
           </font>
          </property>
          <property name="title">
-          <string>Tiến trình Thu thập</string>
+          <string>📊 Tiến trình Thu thập</string>
          </property>
          <layout class="QVBoxLayout" name="progressLayout">
           <property name="spacing">
@@ -689,7 +691,7 @@ QPushButton:pressed {
            <widget class="QLabel" name="currentTaskLabel">
             <property name="font">
              <font>
-              <pointsize>10</pointsize>
+              <pointsize>9</pointsize>
               <weight>75</weight>
               <bold>true</bold>
              </font>
@@ -703,7 +705,7 @@ QPushButton:pressed {
            <widget class="QProgressBar" name="overallProgressBar">
             <property name="font">
              <font>
-              <pointsize>10</pointsize>
+              <pointsize>9</pointsize>
              </font>
             </property>
             <property name="value">
@@ -718,7 +720,7 @@ QPushButton:pressed {
            <widget class="QLabel" name="taskDetailLabel">
             <property name="font">
              <font>
-              <pointsize>10</pointsize>
+              <pointsize>9</pointsize>
              </font>
             </property>
             <property name="text">
@@ -730,7 +732,7 @@ QPushButton:pressed {
            <widget class="QProgressBar" name="taskProgressBar">
             <property name="font">
              <font>
-              <pointsize>10</pointsize>
+              <pointsize>9</pointsize>
              </font>
             </property>
             <property name="value">
@@ -747,7 +749,7 @@ QPushButton:pressed {
              <widget class="QLabel" name="elapsedTimeLabel">
               <property name="font">
                <font>
-                <pointsize>10</pointsize>
+                <pointsize>9</pointsize>
                </font>
               </property>
               <property name="text">
@@ -777,7 +779,7 @@ QPushButton:pressed {
              <widget class="QLabel" name="etaLabel">
               <property name="font">
                <font>
-                <pointsize>10</pointsize>
+                <pointsize>9</pointsize>
                </font>
               </property>
               <property name="text">
@@ -791,11 +793,11 @@ QPushButton:pressed {
            <widget class="QLabel" name="ramSizeLabel">
             <property name="font">
              <font>
-              <pointsize>10</pointsize>
+              <pointsize>9</pointsize>
              </font>
             </property>
             <property name="text">
-             <string>RAM: -- GB | Cần: -- GB | Gói: -- MB</string>
+             <string>RAM: -- GB | 💾 Cần: -- GB | 📦 Gói: -- MB</string>
             </property>
            </widget>
           </item>
@@ -827,13 +829,13 @@ QPushButton:pressed {
         <widget class="QGroupBox" name="evidenceLogGroup">
          <property name="font">
           <font>
-           <pointsize>10</pointsize>
+           <pointsize>9</pointsize>
            <weight>75</weight>
            <bold>true</bold>
           </font>
          </property>
          <property name="title">
-          <string>Evidence Log &amp; Chain of Custody</string>
+          <string>📋 Evidence Log &amp; Chain of Custody</string>
          </property>
          <layout class="QVBoxLayout" name="evidenceLogLayout">
           <property name="spacing">
@@ -848,7 +850,7 @@ QPushButton:pressed {
              </font>
             </property>
             <property name="styleSheet">
-             <string notr="true">font-size: 17px;</string>
+             <string notr="true">font-size: 14px;</string>
             </property>
             <property name="readOnly">
              <bool>true</bool>
@@ -864,7 +866,7 @@ QPushButton:pressed {
              <widget class="QPushButton" name="clearLogBtn">
               <property name="font">
                <font>
-                <pointsize>10</pointsize>
+                <pointsize>9</pointsize>
                 <weight>75</weight>
                 <bold>true</bold>
                </font>
@@ -878,7 +880,7 @@ QPushButton:pressed {
              <widget class="QPushButton" name="saveLogBtn">
               <property name="font">
                <font>
-                <pointsize>10</pointsize>
+                <pointsize>9</pointsize>
                 <weight>75</weight>
                 <bold>true</bold>
                </font>
@@ -913,7 +915,7 @@ QPushButton:pressed {
               </property>
               <property name="font">
                <font>
-                <pointsize>10</pointsize>
+                <pointsize>9</pointsize>
                 <weight>75</weight>
                 <bold>true</bold>
                </font>

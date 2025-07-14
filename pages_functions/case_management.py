@@ -819,7 +819,7 @@ class Case(QWidget):
         self.ui.deleteCaseBtn.clicked.connect(self.delete_selected_case)
         self.ui.importBtn.clicked.connect(self.show_import_evidence_dialog)
         self.ui.removeEvidenceBtn.clicked.connect(self.remove_evidence)
-        self.ui.collectBtn.clicked.connect(self.show_collect_dialog)
+#        self.ui.collectBtn.clicked.connect(self.show_collect_dialog)
         self.ui.startAnalysisBtn.clicked.connect(self.start_analysis)
         
         # Table events

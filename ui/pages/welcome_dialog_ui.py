@@ -33,7 +33,7 @@ class Ui_WelcomeDialog(object):
 "    border: 2px solid #e2e8f0;\n"
 "    border-radius: 8px;\n"
 "    padding: 15px;\n"
-"    font-size: 14px;\n"
+"    font-size: 16px;\n"
 "    font-weight: bold;\n"
 "    color: #2d3748;\n"
 "    text-align: left;\n"
@@ -53,7 +53,7 @@ class Ui_WelcomeDialog(object):
 "    color: white;\n"
 "    border: none;\n"
 "    padding: 8px 20px;\n"
-"    font-size: 12px;\n"
+"    font-size: 14px;\n"
 "}\n"
 "\n"
 "QPushButton#closeBtn:hover {\n"
@@ -71,22 +71,11 @@ class Ui_WelcomeDialog(object):
         self.headerLabel.setAlignment(QtCore.Qt.AlignCenter)
         self.headerLabel.setObjectName("headerLabel")
         font = QtGui.QFont()
-        font.setPointSize(20)
+        font.setPointSize(16)
         font.setBold(True)
         self.headerLabel.setFont(font)
         self.headerLabel.setText("Windows Forensic System")
         self.verticalLayout.addWidget(self.headerLabel)
-        
-        # Subtitle
-        self.subtitleLabel = QtWidgets.QLabel(WelcomeDialog)
-        self.subtitleLabel.setAlignment(QtCore.Qt.AlignCenter)
-        self.subtitleLabel.setObjectName("subtitleLabel")
-        font = QtGui.QFont()
-        font.setPointSize(12)
-        self.subtitleLabel.setFont(font)
-        #self.subtitleLabel.setText("Chào mừng bạn đến với hệ thống điều tra số")
-        self.subtitleLabel.setStyleSheet("color: #718096; font-weight: normal;")
-        self.verticalLayout.addWidget(self.subtitleLabel)
         
         # Spacer - reduce space between title and options
         spacer1 = QtWidgets.QSpacerItem(20, 10, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)

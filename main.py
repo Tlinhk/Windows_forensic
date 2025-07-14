@@ -364,9 +364,9 @@ class MyWindow(QMainWindow):
     def update_user_info(self, full_name="Administrator"):
         """Update user information"""
         try:
-            self.username_label.setText(f"👋 {full_name}")
+            self.username_label.setText(f"{full_name}")
         except:
-            self.username_label.setText("👋 Guest")
+            self.username_label.setText("Guest")
 
     def set_current_user(self, user_data):
         """Set current user data"""
