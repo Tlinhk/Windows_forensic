@@ -867,14 +867,15 @@ class Case(QWidget):
             self.load_cases()
     
     def show_import_evidence_dialog(self):
-        """Hiển thị dialog import evidence"""
+        """Hiển thị Add Evidence Wizard khi ấn nút Add evidence"""
         if not self.current_case_id:
             QMessageBox.warning(self, "Cảnh báo", "Vui lòng chọn một case trước!")
             return
-            
-        dialog = ImportEvidenceDialog(self.current_case_id, self)
-        if dialog.exec_() == QDialog.Accepted:
-            self.load_evidence()
+        
+        # Sử dụng AddEvidenceWizard thay vì ImportEvidenceDialog, truyền self (QWidget) làm parent
+        wizard = AddEvidenceWizard(case_id=self.current_case_id, parent=self)
+        wizard.evidence_added.connect(lambda data: self.load_evidence())
+        wizard.exec_()
     
     def load_cases(self):
         """Load danh sách cases từ database"""
