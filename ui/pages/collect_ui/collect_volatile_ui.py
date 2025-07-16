@@ -14,31 +14,618 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_Form(object):
     def setupUi(self, Form):
         Form.setObjectName("Form")
-        Form.resize(1038, 597)
+        Form.resize(1400, 893)
         font = QtGui.QFont()
         font.setPointSize(10)
         Form.setFont(font)
-        self.gridLayout = QtWidgets.QGridLayout(Form)
-        self.gridLayout.setObjectName("gridLayout")
-        self.label = QtWidgets.QLabel(Form)
+        self.mainLayout = QtWidgets.QVBoxLayout(Form)
+        self.mainLayout.setContentsMargins(15, 15, 15, 15)
+        self.mainLayout.setSpacing(10)
+        self.mainLayout.setObjectName("mainLayout")
+        self.mainHorizontalLayout = QtWidgets.QHBoxLayout()
+        self.mainHorizontalLayout.setSpacing(15)
+        self.mainHorizontalLayout.setObjectName("mainHorizontalLayout")
+        self.leftColumnLayout = QtWidgets.QVBoxLayout()
+        self.leftColumnLayout.setContentsMargins(10, 15, 10, 10)
+        self.leftColumnLayout.setSpacing(10)
+        self.leftColumnLayout.setObjectName("leftColumnLayout")
+        self.acquisitionConfigGroup = QtWidgets.QGroupBox(Form)
+        self.acquisitionConfigGroup.setMinimumSize(QtCore.QSize(450, 0))
         font = QtGui.QFont()
         font.setPointSize(10)
-        self.label.setFont(font)
-        self.label.setAlignment(QtCore.Qt.AlignCenter)
-        self.label.setObjectName("label")
-        self.gridLayout.addWidget(self.label, 0, 0, 1, 1)
+        font.setBold(True)
+        font.setWeight(75)
+        self.acquisitionConfigGroup.setFont(font)
+        self.acquisitionConfigGroup.setObjectName("acquisitionConfigGroup")
+        self.configLayout = QtWidgets.QVBoxLayout(self.acquisitionConfigGroup)
+        self.configLayout.setContentsMargins(15, -1, -1, -1)
+        self.configLayout.setSpacing(15)
+        self.configLayout.setObjectName("configLayout")
+        self.targetSystemLayout = QtWidgets.QHBoxLayout()
+        self.targetSystemLayout.setObjectName("targetSystemLayout")
+        self.configLayout.addLayout(self.targetSystemLayout)
+        self.caseInfoLayout = QtWidgets.QHBoxLayout()
+        self.caseInfoLayout.setObjectName("caseInfoLayout")
+        self.caseIdLabel = QtWidgets.QLabel(self.acquisitionConfigGroup)
+        font = QtGui.QFont()
+        font.setPointSize(10)
+        self.caseIdLabel.setFont(font)
+        self.caseIdLabel.setObjectName("caseIdLabel")
+        self.caseInfoLayout.addWidget(self.caseIdLabel)
+        self.caseIdEdit = QtWidgets.QLineEdit(self.acquisitionConfigGroup)
+        self.caseIdEdit.setEnabled(False)
+        font = QtGui.QFont()
+        font.setPointSize(10)
+        self.caseIdEdit.setFont(font)
+        self.caseIdEdit.setObjectName("caseIdEdit")
+        self.caseInfoLayout.addWidget(self.caseIdEdit)
+        self.configLayout.addLayout(self.caseInfoLayout)
+        self.outputDeviceLayout = QtWidgets.QHBoxLayout()
+        self.outputDeviceLayout.setObjectName("outputDeviceLayout")
+        self.outputDeviceLabel = QtWidgets.QLabel(self.acquisitionConfigGroup)
+        font = QtGui.QFont()
+        font.setPointSize(10)
+        font.setBold(False)
+        font.setWeight(50)
+        self.outputDeviceLabel.setFont(font)
+        self.outputDeviceLabel.setObjectName("outputDeviceLabel")
+        self.outputDeviceLayout.addWidget(self.outputDeviceLabel)
+        self.outputPathEdit = QtWidgets.QLineEdit(self.acquisitionConfigGroup)
+        self.outputPathEdit.setEnabled(False)
+        font = QtGui.QFont()
+        font.setPointSize(10)
+        self.outputPathEdit.setFont(font)
+        self.outputPathEdit.setObjectName("outputPathEdit")
+        self.outputDeviceLayout.addWidget(self.outputPathEdit)
+        self.browseOutputBtn = QtWidgets.QPushButton(self.acquisitionConfigGroup)
+        self.browseOutputBtn.setMinimumSize(QtCore.QSize(40, 30))
+        self.browseOutputBtn.setMaximumSize(QtCore.QSize(40, 30))
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        font.setBold(True)
+        font.setWeight(75)
+        self.browseOutputBtn.setFont(font)
+        self.browseOutputBtn.setStyleSheet(
+            "background-color: rgb(255, 255, 255);\n"
+            "border-color: rgb(194, 199, 200);"
+        )
+        self.browseOutputBtn.setText("")
+        icon = QtGui.QIcon()
+        icon.addPixmap(
+            QtGui.QPixmap(":/icons/icons/icons8-folder-50.png"),
+            QtGui.QIcon.Normal,
+            QtGui.QIcon.Off,
+        )
+        self.browseOutputBtn.setIcon(icon)
+        self.browseOutputBtn.setObjectName("browseOutputBtn")
+        self.outputDeviceLayout.addWidget(self.browseOutputBtn)
+        self.configLayout.addLayout(self.outputDeviceLayout)
+        self.investigatorLayout = QtWidgets.QHBoxLayout()
+        self.investigatorLayout.setObjectName("investigatorLayout")
+        self.configLayout.addLayout(self.investigatorLayout)
+        self.leftColumnLayout.addWidget(self.acquisitionConfigGroup)
+        self.orderOfVolatilityGroup = QtWidgets.QGroupBox(Form)
+        sizePolicy = QtWidgets.QSizePolicy(
+            QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Expanding
+        )
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(
+            self.orderOfVolatilityGroup.sizePolicy().hasHeightForWidth()
+        )
+        self.orderOfVolatilityGroup.setSizePolicy(sizePolicy)
+        self.orderOfVolatilityGroup.setMaximumSize(QtCore.QSize(16777215, 1677215))
+        font = QtGui.QFont()
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.orderOfVolatilityGroup.setFont(font)
+        self.orderOfVolatilityGroup.setObjectName("orderOfVolatilityGroup")
+        self.volatilityLayout = QtWidgets.QVBoxLayout(self.orderOfVolatilityGroup)
+        self.volatilityLayout.setContentsMargins(15, 30, -1, 10)
+        self.volatilityLayout.setSpacing(20)
+        self.volatilityLayout.setObjectName("volatilityLayout")
+        self.ramAcquisitionCheck = QtWidgets.QCheckBox(self.orderOfVolatilityGroup)
+        font = QtGui.QFont()
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.ramAcquisitionCheck.setFont(font)
+        self.ramAcquisitionCheck.setChecked(True)
+        self.ramAcquisitionCheck.setObjectName("ramAcquisitionCheck")
+        self.volatilityLayout.addWidget(self.ramAcquisitionCheck)
+        self.systemTimeCheck = QtWidgets.QCheckBox(self.orderOfVolatilityGroup)
+        font = QtGui.QFont()
+        font.setPointSize(10)
+        self.systemTimeCheck.setFont(font)
+        self.systemTimeCheck.setChecked(True)
+        self.systemTimeCheck.setObjectName("systemTimeCheck")
+        self.volatilityLayout.addWidget(self.systemTimeCheck)
+        self.networkStateCheck = QtWidgets.QCheckBox(self.orderOfVolatilityGroup)
+        font = QtGui.QFont()
+        font.setPointSize(10)
+        self.networkStateCheck.setFont(font)
+        self.networkStateCheck.setChecked(True)
+        self.networkStateCheck.setObjectName("networkStateCheck")
+        self.volatilityLayout.addWidget(self.networkStateCheck)
+        self.processInfoCheck = QtWidgets.QCheckBox(self.orderOfVolatilityGroup)
+        font = QtGui.QFont()
+        font.setPointSize(10)
+        self.processInfoCheck.setFont(font)
+        self.processInfoCheck.setChecked(True)
+        self.processInfoCheck.setObjectName("processInfoCheck")
+        self.volatilityLayout.addWidget(self.processInfoCheck)
+        self.userSessionsCheck = QtWidgets.QCheckBox(self.orderOfVolatilityGroup)
+        font = QtGui.QFont()
+        font.setPointSize(10)
+        self.userSessionsCheck.setFont(font)
+        self.userSessionsCheck.setChecked(True)
+        self.userSessionsCheck.setObjectName("userSessionsCheck")
+        self.volatilityLayout.addWidget(self.userSessionsCheck)
+        self.clipboardCheck = QtWidgets.QCheckBox(self.orderOfVolatilityGroup)
+        font = QtGui.QFont()
+        font.setPointSize(10)
+        self.clipboardCheck.setFont(font)
+        self.clipboardCheck.setChecked(True)
+        self.clipboardCheck.setObjectName("clipboardCheck")
+        self.volatilityLayout.addWidget(self.clipboardCheck)
+        self.commandHistoryCheck = QtWidgets.QCheckBox(self.orderOfVolatilityGroup)
+        font = QtGui.QFont()
+        font.setPointSize(10)
+        self.commandHistoryCheck.setFont(font)
+        self.commandHistoryCheck.setChecked(True)
+        self.commandHistoryCheck.setObjectName("commandHistoryCheck")
+        self.volatilityLayout.addWidget(self.commandHistoryCheck)
+        self.servicesDriversCheck = QtWidgets.QCheckBox(self.orderOfVolatilityGroup)
+        font = QtGui.QFont()
+        font.setPointSize(10)
+        self.servicesDriversCheck.setFont(font)
+        self.servicesDriversCheck.setChecked(True)
+        self.servicesDriversCheck.setObjectName("servicesDriversCheck")
+        self.volatilityLayout.addWidget(self.servicesDriversCheck)
+        self.environmentVarsCheck = QtWidgets.QCheckBox(self.orderOfVolatilityGroup)
+        font = QtGui.QFont()
+        font.setPointSize(10)
+        self.environmentVarsCheck.setFont(font)
+        self.environmentVarsCheck.setChecked(False)
+        self.environmentVarsCheck.setObjectName("environmentVarsCheck")
+        self.volatilityLayout.addWidget(self.environmentVarsCheck)
+        self.sharedResourcesCheck = QtWidgets.QCheckBox(self.orderOfVolatilityGroup)
+        font = QtGui.QFont()
+        font.setPointSize(10)
+        self.sharedResourcesCheck.setFont(font)
+        self.sharedResourcesCheck.setChecked(False)
+        self.sharedResourcesCheck.setObjectName("sharedResourcesCheck")
+        self.volatilityLayout.addWidget(self.sharedResourcesCheck)
+        spacerItem = QtWidgets.QSpacerItem(
+            20, 20, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding
+        )
+        self.volatilityLayout.addItem(spacerItem)
+        self.volatilityButtonsLayout = QtWidgets.QHBoxLayout()
+        self.volatilityButtonsLayout.setObjectName("volatilityButtonsLayout")
+        self.selectAllBtn = QtWidgets.QPushButton(self.orderOfVolatilityGroup)
+        font = QtGui.QFont()
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.selectAllBtn.setFont(font)
+        self.selectAllBtn.setObjectName("selectAllBtn")
+        self.volatilityButtonsLayout.addWidget(self.selectAllBtn)
+        self.clearAllBtn = QtWidgets.QPushButton(self.orderOfVolatilityGroup)
+        font = QtGui.QFont()
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.clearAllBtn.setFont(font)
+        self.clearAllBtn.setObjectName("clearAllBtn")
+        self.volatilityButtonsLayout.addWidget(self.clearAllBtn)
+        self.volatilityLayout.addLayout(self.volatilityButtonsLayout)
+        self.leftColumnLayout.addWidget(self.orderOfVolatilityGroup)
+        self.ramConfigGroup = QtWidgets.QGroupBox(Form)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        font.setBold(True)
+        font.setWeight(75)
+        self.ramConfigGroup.setFont(font)
+        self.ramConfigGroup.setObjectName("ramConfigGroup")
+        self.ramConfigLayout = QtWidgets.QVBoxLayout(self.ramConfigGroup)
+        self.ramConfigLayout.setContentsMargins(15, -1, -1, -1)
+        self.ramConfigLayout.setObjectName("ramConfigLayout")
+        self.ramFormatLayout = QtWidgets.QHBoxLayout()
+        self.ramFormatLayout.setObjectName("ramFormatLayout")
+        self.ramFormatLabel = QtWidgets.QLabel(self.ramConfigGroup)
+        font = QtGui.QFont()
+        font.setPointSize(10)
+        self.ramFormatLabel.setFont(font)
+        self.ramFormatLabel.setObjectName("ramFormatLabel")
+        self.ramFormatLayout.addWidget(self.ramFormatLabel)
+        self.ramFormatCombo = QtWidgets.QComboBox(self.ramConfigGroup)
+        font = QtGui.QFont()
+        font.setPointSize(10)
+        self.ramFormatCombo.setFont(font)
+        self.ramFormatCombo.setObjectName("ramFormatCombo")
+        self.ramFormatCombo.addItem("")
+        self.ramFormatCombo.addItem("")
+        self.ramFormatCombo.addItem("")
+        self.ramFormatLayout.addWidget(self.ramFormatCombo)
+        self.ramConfigLayout.addLayout(self.ramFormatLayout)
+        self.calculateHashCheck = QtWidgets.QCheckBox(self.ramConfigGroup)
+        font = QtGui.QFont()
+        font.setPointSize(10)
+        self.calculateHashCheck.setFont(font)
+        self.calculateHashCheck.setChecked(True)
+        self.calculateHashCheck.setObjectName("calculateHashCheck")
+        self.ramConfigLayout.addWidget(self.calculateHashCheck)
+        self.compressRamCheck = QtWidgets.QCheckBox(self.ramConfigGroup)
+        font = QtGui.QFont()
+        font.setPointSize(10)
+        self.compressRamCheck.setFont(font)
+        self.compressRamCheck.setChecked(False)
+        self.compressRamCheck.setObjectName("compressRamCheck")
+        self.ramConfigLayout.addWidget(self.compressRamCheck)
+        self.leftColumnLayout.addWidget(self.ramConfigGroup)
+        self.startCollectionBtn = QtWidgets.QPushButton(Form)
+        font = QtGui.QFont()
+        font.setPointSize(-1)
+        font.setBold(True)
+        font.setWeight(75)
+        self.startCollectionBtn.setFont(font)
+        self.startCollectionBtn.setStyleSheet(
+            "QPushButton {\n"
+            "    background-color: #dc3545;\n"
+            "    font-size: 17px;\n"
+            "    border: 2px solid #bd2130;\n"
+            "}\n"
+            "\n"
+            "QPushButton:hover {\n"
+            "    background-color: #c82333;\n"
+            "}\n"
+            "\n"
+            "QPushButton:pressed {\n"
+            "    background-color: #bd2130;\n"
+            "}"
+        )
+        self.startCollectionBtn.setObjectName("startCollectionBtn")
+        self.leftColumnLayout.addWidget(self.startCollectionBtn)
+        self.mainHorizontalLayout.addLayout(self.leftColumnLayout)
+        self.rightColumnLayout = QtWidgets.QVBoxLayout()
+        self.rightColumnLayout.setContentsMargins(10, 15, 10, 10)
+        self.rightColumnLayout.setSpacing(10)
+        self.rightColumnLayout.setObjectName("rightColumnLayout")
+        self.systemInfoGroup = QtWidgets.QGroupBox(Form)
+        font = QtGui.QFont()
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.systemInfoGroup.setFont(font)
+        self.systemInfoGroup.setObjectName("systemInfoGroup")
+        self.systemInfoLayout = QtWidgets.QVBoxLayout(self.systemInfoGroup)
+        self.systemInfoLayout.setObjectName("systemInfoLayout")
+        self.systemInfoText = QtWidgets.QTextEdit(self.systemInfoGroup)
+        font = QtGui.QFont()
+        font.setFamily("Consolas,monospace")
+        font.setPointSize(-1)
+        self.systemInfoText.setFont(font)
+        self.systemInfoText.setStyleSheet("font-size: 17px;")
+        self.systemInfoText.setReadOnly(True)
+        self.systemInfoText.setObjectName("systemInfoText")
+        self.systemInfoLayout.addWidget(self.systemInfoText)
+        self.rightColumnLayout.addWidget(self.systemInfoGroup)
+        self.progressGroup = QtWidgets.QGroupBox(Form)
+        font = QtGui.QFont()
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.progressGroup.setFont(font)
+        self.progressGroup.setObjectName("progressGroup")
+        self.progressLayout = QtWidgets.QVBoxLayout(self.progressGroup)
+        self.progressLayout.setSpacing(8)
+        self.progressLayout.setObjectName("progressLayout")
+        self.currentTaskLabel = QtWidgets.QLabel(self.progressGroup)
+        font = QtGui.QFont()
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.currentTaskLabel.setFont(font)
+        self.currentTaskLabel.setObjectName("currentTaskLabel")
+        self.progressLayout.addWidget(self.currentTaskLabel)
+        self.overallProgressBar = QtWidgets.QProgressBar(self.progressGroup)
+        font = QtGui.QFont()
+        font.setPointSize(10)
+        self.overallProgressBar.setFont(font)
+        self.overallProgressBar.setProperty("value", 0)
+        self.overallProgressBar.setObjectName("overallProgressBar")
+        self.progressLayout.addWidget(self.overallProgressBar)
+        self.taskDetailLabel = QtWidgets.QLabel(self.progressGroup)
+        font = QtGui.QFont()
+        font.setPointSize(10)
+        self.taskDetailLabel.setFont(font)
+        self.taskDetailLabel.setObjectName("taskDetailLabel")
+        self.progressLayout.addWidget(self.taskDetailLabel)
+        self.taskProgressBar = QtWidgets.QProgressBar(self.progressGroup)
+        font = QtGui.QFont()
+        font.setPointSize(10)
+        self.taskProgressBar.setFont(font)
+        self.taskProgressBar.setProperty("value", 0)
+        self.taskProgressBar.setObjectName("taskProgressBar")
+        self.progressLayout.addWidget(self.taskProgressBar)
+        self.timeInfoLayout = QtWidgets.QHBoxLayout()
+        self.timeInfoLayout.setObjectName("timeInfoLayout")
+        self.elapsedTimeLabel = QtWidgets.QLabel(self.progressGroup)
+        font = QtGui.QFont()
+        font.setPointSize(10)
+        self.elapsedTimeLabel.setFont(font)
+        self.elapsedTimeLabel.setObjectName("elapsedTimeLabel")
+        self.timeInfoLayout.addWidget(self.elapsedTimeLabel)
+        spacerItem1 = QtWidgets.QSpacerItem(
+            40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum
+        )
+        self.timeInfoLayout.addItem(spacerItem1)
+        self.etaLabel = QtWidgets.QLabel(self.progressGroup)
+        font = QtGui.QFont()
+        font.setPointSize(10)
+        self.etaLabel.setFont(font)
+        self.etaLabel.setObjectName("etaLabel")
+        self.timeInfoLayout.addWidget(self.etaLabel)
+        self.progressLayout.addLayout(self.timeInfoLayout)
+        self.ramSizeLabel = QtWidgets.QLabel(self.progressGroup)
+        font = QtGui.QFont()
+        font.setPointSize(10)
+        self.ramSizeLabel.setFont(font)
+        self.ramSizeLabel.setObjectName("ramSizeLabel")
+        self.progressLayout.addWidget(self.ramSizeLabel)
+        spacerItem2 = QtWidgets.QSpacerItem(
+            20, 20, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding
+        )
+        self.progressLayout.addItem(spacerItem2)
+        self.rightColumnLayout.addWidget(self.progressGroup)
+        self.evidenceLogGroup = QtWidgets.QGroupBox(Form)
+        font = QtGui.QFont()
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.evidenceLogGroup.setFont(font)
+        self.evidenceLogGroup.setObjectName("evidenceLogGroup")
+        self.evidenceLogLayout = QtWidgets.QVBoxLayout(self.evidenceLogGroup)
+        self.evidenceLogLayout.setSpacing(8)
+        self.evidenceLogLayout.setObjectName("evidenceLogLayout")
+        self.evidenceLogText = QtWidgets.QTextEdit(self.evidenceLogGroup)
+        font = QtGui.QFont()
+        font.setFamily("Consolas,monospace")
+        font.setPointSize(-1)
+        self.evidenceLogText.setFont(font)
+        self.evidenceLogText.setStyleSheet("font-size: 17px;")
+        self.evidenceLogText.setReadOnly(True)
+        self.evidenceLogText.setObjectName("evidenceLogText")
+        self.evidenceLogLayout.addWidget(self.evidenceLogText)
+        self.evidenceControlLayout = QtWidgets.QHBoxLayout()
+        self.evidenceControlLayout.setObjectName("evidenceControlLayout")
+        self.clearLogBtn = QtWidgets.QPushButton(self.evidenceLogGroup)
+        font = QtGui.QFont()
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.clearLogBtn.setFont(font)
+        self.clearLogBtn.setObjectName("clearLogBtn")
+        self.evidenceControlLayout.addWidget(self.clearLogBtn)
+        self.saveLogBtn = QtWidgets.QPushButton(self.evidenceLogGroup)
+        font = QtGui.QFont()
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.saveLogBtn.setFont(font)
+        self.saveLogBtn.setObjectName("saveLogBtn")
+        self.evidenceControlLayout.addWidget(self.saveLogBtn)
+        spacerItem3 = QtWidgets.QSpacerItem(
+            40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum
+        )
+        self.evidenceControlLayout.addItem(spacerItem3)
+        self.stopCollectionBtn = QtWidgets.QPushButton(self.evidenceLogGroup)
+        self.stopCollectionBtn.setEnabled(False)
+        font = QtGui.QFont()
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.stopCollectionBtn.setFont(font)
+        self.stopCollectionBtn.setObjectName("stopCollectionBtn")
+        self.evidenceControlLayout.addWidget(self.stopCollectionBtn)
+        self.evidenceLogLayout.addLayout(self.evidenceControlLayout)
+        self.rightColumnLayout.addWidget(self.evidenceLogGroup)
+        self.mainHorizontalLayout.addLayout(self.rightColumnLayout)
+        self.mainLayout.addLayout(self.mainHorizontalLayout)
 
         self.retranslateUi(Form)
+        self.ramFormatCombo.setCurrentIndex(1)
         QtCore.QMetaObject.connectSlotsByName(Form)
 
     def retranslateUi(self, Form):
         _translate = QtCore.QCoreApplication.translate
-        Form.setWindowTitle(_translate("Form", "Form"))
-        self.label.setText(_translate("Form", "Collect volatile"))
+        Form.setWindowTitle(
+            _translate("Form", "Thu thập dữ liệu khả biến - Forensic Live Collection")
+        )
+        Form.setStyleSheet(
+            _translate(
+                "Form",
+                "QWidget {\n"
+                "    background-color: #f8f9fa;\n"
+                "}\n"
+                "\n"
+                "QGroupBox {\n"
+                "    font-weight: bold;\n"
+                "    border: 2px solid #dee2e6;\n"
+                "    border-radius: 8px;\n"
+                "    margin-top: 1ex;\n"
+                "    padding-top: 10px;\n"
+                "    background-color: white;\n"
+                "}\n"
+                "\n"
+                "QGroupBox::title {\n"
+                "    subcontrol-origin: margin;\n"
+                "    left: 10px;\n"
+                "    padding: 0 8px 0 8px;\n"
+                "    color: #495057;\n"
+                "}\n"
+                "\n"
+                "QPushButton {\n"
+                "    background-color: #007bff;\n"
+                "    color: white;\n"
+                "    border: none;\n"
+                "    padding: 8px 16px;\n"
+                "    border-radius: 4px;\n"
+                "    font-weight: bold;\n"
+                "}\n"
+                "\n"
+                "QPushButton:hover {\n"
+                "    background-color: #0056b3;\n"
+                "}\n"
+                "\n"
+                "QPushButton:pressed {\n"
+                "    background-color: #004085;\n"
+                "}\n"
+                "\n"
+                "QPushButton:disabled {\n"
+                "    background-color: #6c757d;\n"
+                "}\n"
+                "\n"
+                "QProgressBar {\n"
+                "    border: 1px solid #dee2e6;\n"
+                "    border-radius: 4px;\n"
+                "    text-align: center;\n"
+                "    background-color: #e9ecef;\n"
+                "}\n"
+                "\n"
+                "QProgressBar::chunk {\n"
+                "    background-color: #28a745;\n"
+                "    border-radius: 3px;\n"
+                "}\n"
+                "\n"
+                "QTextEdit {\n"
+                "    border: 1px solid #ced4da;\n"
+                "    border-radius: 4px;\n"
+                "    padding: 8px;\n"
+                "    background-color: white;\n"
+                "    font-family: 'Consolas', monospace;\n"
+                "}\n"
+                "\n"
+                "QComboBox {\n"
+                "    border: 1px solid #ced4da;\n"
+                "    border-radius: 4px;\n"
+                "    padding: 4px 8px;\n"
+                "    background-color: white;\n"
+                "}\n"
+                "\n"
+                "QLabel {\n"
+                "    color: #495057;\n"
+                "}\n"
+                "\n"
+                "QCheckBox {\n"
+                "    color: #495057;\n"
+                "    spacing: 8px;\n"
+                "}",
+            )
+        )
+        self.acquisitionConfigGroup.setTitle(_translate("Form", "Cấu hình Thu thập"))
+        self.caseIdLabel.setText(_translate("Form", "  Case name:"))
+        self.caseIdEdit.setPlaceholderText(
+            _translate("Form", "VD: Điều tra máy tính A")
+        )
+        self.outputDeviceLabel.setText(_translate("Form", "  Thiết bị lưu trữ:"))
+        self.outputPathEdit.setText(_translate("Form", "E:\\ForensicCollection"))
+        self.outputPathEdit.setPlaceholderText(
+            _translate("Form", "Chọn thiết bị ngoài (USB/External HDD)")
+        )
+        self.orderOfVolatilityGroup.setTitle(
+            _translate("Form", "Order of Volatility - Thứ tự thu thập")
+        )
+        self.ramAcquisitionCheck.setStyleSheet(
+            _translate("Form", "color: #dc3545; font-weight: bold;")
+        )
+        self.ramAcquisitionCheck.setText(
+            _translate("Form", "1. RAM Acquisition (Ưu tiên cao nhất)")
+        )
+        self.systemTimeCheck.setText(_translate("Form", "2. System Time & Uptime"))
+        self.networkStateCheck.setText(_translate("Form", "3. Network State"))
+        self.processInfoCheck.setText(_translate("Form", "4. Process Information "))
+        self.userSessionsCheck.setText(_translate("Form", "5. Logged-On Users"))
+        self.clipboardCheck.setText(_translate("Form", "6. Clipboard Content"))
+        self.commandHistoryCheck.setText(_translate("Form", "7. Command History"))
+        self.servicesDriversCheck.setText(_translate("Form", "8. Services & Drivers"))
+        self.environmentVarsCheck.setText(
+            _translate("Form", "9. Environment Variables")
+        )
+        self.sharedResourcesCheck.setText(
+            _translate("Form", "10. Shared Resources (Locally Shared Folders)")
+        )
+        self.selectAllBtn.setText(_translate("Form", "✅ Chọn tất cả"))
+        self.clearAllBtn.setText(_translate("Form", "❌ Bỏ chọn tất cả"))
+        self.ramConfigGroup.setTitle(_translate("Form", "Cấu hình RAM Acquisition"))
+        self.ramFormatLabel.setText(_translate("Form", "📄 Định dạng:"))
+        self.ramFormatCombo.setItemText(
+            0, _translate("Form", "RAW (.mem) - Tiêu chuẩn")
+        )
+        self.ramFormatCombo.setItemText(
+            1, _translate("Form", "RAW (.raw) - Tương thích rộng")
+        )
+        self.ramFormatCombo.setItemText(
+            2, _translate("Form", "AFF4 (.aff4) - Nén & Metadata")
+        )
+        self.calculateHashCheck.setText(
+            _translate("Form", "Tính toán Hash SHA-256 trong quá trình thu thập")
+        )
+        self.compressRamCheck.setText(
+            _translate("Form", "Nén RAM dump (tiết kiệm không gian)")
+        )
+        self.startCollectionBtn.setText(_translate("Form", "BẮT ĐẦU THU THẬP"))
+        self.systemInfoGroup.setTitle(_translate("Form", "Thông tin hệ thống đích"))
+        self.systemInfoText.setPlaceholderText(
+            _translate("Form", "Thông tin hệ thống sẽ hiển thị ở đây...")
+        )
+        self.progressGroup.setTitle(_translate("Form", "Tiến trình Thu thập"))
+        self.currentTaskLabel.setText(
+            _translate("Form", "Trạng thái: Sẵn sàng thu thập")
+        )
+        self.overallProgressBar.setFormat(_translate("Form", "Tổng tiến trình: %p%"))
+        self.taskDetailLabel.setText(_translate("Form", "Chi tiết: Chưa bắt đầu"))
+        self.taskProgressBar.setFormat(_translate("Form", "Tác vụ hiện tại: %p%"))
+        self.elapsedTimeLabel.setText(_translate("Form", "⏱️ Thời gian: 00:00:00"))
+        self.etaLabel.setText(_translate("Form", "📅 ETA: --:--:--"))
+        self.ramSizeLabel.setText(
+            _translate("Form", "RAM: -- GB | Cần: -- GB | Gói: -- MB")
+        )
+        self.evidenceLogGroup.setTitle(
+            _translate("Form", "Evidence Log & Chain of Custody")
+        )
+        self.evidenceLogText.setPlaceholderText(
+            _translate("Form", "Evidence log và chain of custody sẽ được ghi ở đây...")
+        )
+        self.clearLogBtn.setText(_translate("Form", "🗑️ Xóa log"))
+        self.saveLogBtn.setText(_translate("Form", "💾 Lưu log"))
+        self.stopCollectionBtn.setStyleSheet(
+            _translate(
+                "Form",
+                "QPushButton {\n"
+                "    background-color: #dc3545;\n"
+                "    font-weight: bold;\n"
+                "}\n"
+                "\n"
+                "QPushButton:hover {\n"
+                "    background-color: #c82333;\n"
+                "}\n"
+                "\n"
+                "QPushButton:pressed {\n"
+                "    background-color: #bd2130;\n"
+                "}",
+            )
+        )
+        self.stopCollectionBtn.setText(_translate("Form", "⏹️ DỪNG THU THẬP"))
+
+
+from static import resource_rc
 
 
 if __name__ == "__main__":
     import sys
+
     app = QtWidgets.QApplication(sys.argv)
     Form = QtWidgets.QWidget()
     ui = Ui_Form()

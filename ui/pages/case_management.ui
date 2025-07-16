@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1038</width>
-    <height>597</height>
+    <width>1506</width>
+    <height>891</height>
    </rect>
   </property>
   <property name="font">
@@ -16,26 +16,673 @@
    </font>
   </property>
   <property name="windowTitle">
-   <string>Form</string>
+   <string>Quản lý Case</string>
   </property>
-  <layout class="QGridLayout" name="gridLayout">
+  <property name="styleSheet">
+   <string notr="true">QWidget {
+    background-color: #f8f9fa;
+}
+
+QGroupBox {
+    font-weight: bold;
+    border: 2px solid #dee2e6;
+    border-radius: 8px;
+    margin-top: 10px;
+    padding-top: 10px;
+    background-color: white;
+}
+
+QGroupBox::title {
+    subcontrol-origin: margin;
+    left: 10px;
+    padding: 0 8px 0 8px;
+    color: #495057;
+}
+
+QPushButton {
+    background-color: #007bff;
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-weight: 500;
+    min-height: 16px;
+}
+
+QPushButton:hover {
+    background-color: #0056b3;
+}
+
+QPushButton:pressed {
+    background-color: #004085;
+}
+
+QPushButton#newCaseBtn {
+    background-color: #28a745;
+    font-size: 14px;
+    padding: 12px 24px;
+}
+
+QPushButton#newCaseBtn:hover {
+    background-color: #1e7e34;
+}
+
+QPushButton#deleteBtn {
+    background-color: #dc3545;
+}
+
+QPushButton#deleteBtn:hover {
+    background-color: #c82333;
+}
+
+QPushButton#importBtn {
+    background-color: #fd7e14;
+}
+
+QPushButton#importBtn:hover {
+    background-color: #e8610c;
+}
+
+QPushButton#editCaseBtn {
+    background-color: #ffc107;
+}
+
+QPushButton#editCaseBtn:hover {
+    background-color: #e0a800;
+}
+
+QPushButton#deleteCaseBtn {
+    background-color: #dc3545;
+}
+
+QPushButton#deleteCaseBtn:hover {
+    background-color: #c82333;
+}
+
+QLineEdit {
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    padding: 8px 12px;
+    font-size: 14px;
+    background-color: white;
+}
+
+QLineEdit:focus {
+    border-color: #80bdff;
+    outline: 0;
+    box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
+}
+
+QTableWidget {
+    gridline-color: #dee2e6;
+    background-color: white;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    selection-background-color: #007bff;
+}
+
+QTableWidget::item {
+    padding: 12px 8px;
+    border-bottom: 1px solid #f8f9fa;
+}
+
+QTableWidget::item:selected {
+    background-color: #007bff;
+    color: white;
+}
+
+QTableWidget::item:hover {
+    background-color:rgb(26, 123, 192);
+    color:#ffffff;
+}
+
+QHeaderView::section {
+    background-color: #e9ecef;
+    padding: 12px 8px;
+    border: none;
+    border-right: 1px solid #dee2e6;
+    font-weight: 600;
+    color: #495057;
+}
+
+QComboBox {
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    padding: 8px 12px;
+    background-color: white;
+    min-width: 120px;
+}
+
+QLabel#titleLabel {
+    color: #343a40;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+QLabel#currentCaseLabel {
+    color: #007bff;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+QLabel#noSelectionLabel {
+    color: #6c757d;
+    font-size: 14px;
+    font-style: italic;
+}</string>
+  </property>
+  <layout class="QGridLayout" name="gridLayout_2">
    <item row="0" column="0">
-    <widget class="QLabel" name="label">
+    <widget class="QGroupBox" name="caseListGroup">
      <property name="font">
       <font>
        <pointsize>10</pointsize>
+       <weight>75</weight>
+       <italic>false</italic>
+       <bold>true</bold>
       </font>
      </property>
-     <property name="text">
-      <string>Case management </string>
+     <property name="title">
+      <string>Danh sách Case</string>
      </property>
-     <property name="alignment">
-      <set>Qt::AlignCenter</set>
+     <layout class="QGridLayout" name="gridLayout_3">
+      <property name="verticalSpacing">
+       <number>7</number>
+      </property>
+      <item row="0" column="0">
+       <layout class="QVBoxLayout" name="verticalLayout">
+        <property name="spacing">
+         <number>5</number>
+        </property>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout">
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
+          <item>
+           <widget class="QPushButton" name="newCaseBtn">
+            <property name="maximumSize">
+             <size>
+              <width>150</width>
+              <height>16777215</height>
+             </size>
+            </property>
+            <property name="font">
+             <font>
+              <pointsize>-1</pointsize>
+              <weight>62</weight>
+              <bold>true</bold>
+             </font>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">font-size: 16px;</string>
+            </property>
+            <property name="text">
+             <string>Tạo mới</string>
+            </property>
+            <property name="icon">
+             <iconset resource="../../static/resource.qrc">
+              <normaloff>:/icons/icons/add_google_icon.png</normaloff>:/icons/icons/add_google_icon.png</iconset>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="searchCaseEdit">
+            <property name="maximumSize">
+             <size>
+              <width>680</width>
+              <height>16777215</height>
+             </size>
+            </property>
+            <property name="font">
+             <font>
+              <pointsize>-1</pointsize>
+             </font>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">font-size: 16px;</string>
+            </property>
+            <property name="placeholderText">
+             <string>🔍 Tìm kiếm case...</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QFrame" name="frame">
+            <property name="maximumSize">
+             <size>
+              <width>150</width>
+              <height>16777215</height>
+             </size>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">background-color: rgb(255, 255, 255);</string>
+            </property>
+            <property name="frameShape">
+             <enum>QFrame::StyledPanel</enum>
+            </property>
+            <property name="frameShadow">
+             <enum>QFrame::Raised</enum>
+            </property>
+            <layout class="QGridLayout" name="gridLayout">
+             <item row="0" column="0">
+              <widget class="QPushButton" name="refreshBtn">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="minimumSize">
+                <size>
+                 <width>15</width>
+                 <height>36</height>
+                </size>
+               </property>
+               <property name="font">
+                <font>
+                 <weight>62</weight>
+                 <bold>true</bold>
+                </font>
+               </property>
+               <property name="toolTip">
+                <string>Refresh case</string>
+               </property>
+               <property name="styleSheet">
+                <string notr="true">background-color: rgb(255, 255, 255);</string>
+               </property>
+               <property name="text">
+                <string/>
+               </property>
+               <property name="icon">
+                <iconset resource="../../static/resource.qrc">
+                 <normaloff>:/icons/icons/icons8-refresh-32.png</normaloff>:/icons/icons/icons8-refresh-32.png</iconset>
+               </property>
+               <property name="iconSize">
+                <size>
+                 <width>20</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="1">
+              <widget class="QPushButton" name="editCaseBtn">
+               <property name="minimumSize">
+                <size>
+                 <width>20</width>
+                 <height>36</height>
+                </size>
+               </property>
+               <property name="font">
+                <font>
+                 <weight>62</weight>
+                 <bold>true</bold>
+                </font>
+               </property>
+               <property name="toolTip">
+                <string>Edit case</string>
+               </property>
+               <property name="styleSheet">
+                <string notr="true">background-color: #ffffff;</string>
+               </property>
+               <property name="text">
+                <string/>
+               </property>
+               <property name="icon">
+                <iconset resource="../../static/resource.qrc">
+                 <normaloff>:/icons/icons/icons8-edit-50.png</normaloff>:/icons/icons/icons8-edit-50.png</iconset>
+               </property>
+               <property name="iconSize">
+                <size>
+                 <width>20</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="2">
+              <widget class="QPushButton" name="deleteCaseBtn">
+               <property name="minimumSize">
+                <size>
+                 <width>25</width>
+                 <height>36</height>
+                </size>
+               </property>
+               <property name="font">
+                <font>
+                 <weight>62</weight>
+                 <bold>true</bold>
+                </font>
+               </property>
+               <property name="toolTip">
+                <string>Delete case</string>
+               </property>
+               <property name="styleSheet">
+                <string notr="true">background-color: #ffffff;</string>
+               </property>
+               <property name="text">
+                <string/>
+               </property>
+               <property name="icon">
+                <iconset resource="../../static/resource.qrc">
+                 <normaloff>:/icons/icons/icons8-delete-48.png</normaloff>:/icons/icons/icons8-delete-48.png</iconset>
+               </property>
+               <property name="iconSize">
+                <size>
+                 <width>20</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <widget class="QTableWidget" name="casesTable">
+          <property name="font">
+           <font>
+            <pointsize>10</pointsize>
+            <italic>false</italic>
+           </font>
+          </property>
+          <property name="styleSheet">
+           <string notr="true"/>
+          </property>
+          <property name="alternatingRowColors">
+           <bool>true</bool>
+          </property>
+          <property name="selectionBehavior">
+           <enum>QAbstractItemView::SelectRows</enum>
+          </property>
+          <property name="sortingEnabled">
+           <bool>true</bool>
+          </property>
+          <column>
+           <property name="text">
+            <string>Tên Case</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Điều tra viên</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Ngày tạo</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Evidence</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Trạng thái</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Đường dẫn</string>
+           </property>
+          </column>
+         </widget>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="0" column="1">
+    <widget class="QGroupBox" name="evidenceGroup">
+     <property name="font">
+      <font>
+       <pointsize>10</pointsize>
+       <weight>75</weight>
+       <italic>false</italic>
+       <bold>true</bold>
+      </font>
      </property>
+     <property name="title">
+      <string>Evidence của Case</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_5">
+      <item row="0" column="0">
+       <layout class="QVBoxLayout" name="verticalLayout_2">
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_3">
+          <item>
+           <widget class="QFrame" name="frame_2">
+            <property name="maximumSize">
+             <size>
+              <width>300</width>
+              <height>16777215</height>
+             </size>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">background-color: rgb(255, 255, 255);</string>
+            </property>
+            <property name="frameShape">
+             <enum>QFrame::StyledPanel</enum>
+            </property>
+            <property name="frameShadow">
+             <enum>QFrame::Raised</enum>
+            </property>
+            <layout class="QGridLayout" name="gridLayout_4">
+             <property name="leftMargin">
+              <number>0</number>
+             </property>
+             <property name="rightMargin">
+              <number>0</number>
+             </property>
+             <item row="0" column="0">
+              <layout class="QHBoxLayout" name="horizontalLayout_2">
+               <property name="spacing">
+                <number>3</number>
+               </property>
+               <item>
+                <widget class="QPushButton" name="importBtn">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="minimumSize">
+                  <size>
+                   <width>40</width>
+                   <height>36</height>
+                  </size>
+                 </property>
+                 <property name="font">
+                  <font>
+                   <pointsize>10</pointsize>
+                   <weight>62</weight>
+                   <bold>true</bold>
+                  </font>
+                 </property>
+                 <property name="toolTip">
+                  <string>Add evidence </string>
+                 </property>
+                 <property name="styleSheet">
+                  <string notr="true">background-color: rgb(94, 150, 255);
+color: rgb(255, 255, 255);</string>
+                 </property>
+                 <property name="text">
+                  <string>Add</string>
+                 </property>
+                 <property name="icon">
+                  <iconset resource="../../static/resource.qrc">
+                   <normaloff>:/icons/icons/add_google_icon.png</normaloff>:/icons/icons/add_google_icon.png</iconset>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QPushButton" name="removeEvidenceBtn">
+                 <property name="minimumSize">
+                  <size>
+                   <width>40</width>
+                   <height>36</height>
+                  </size>
+                 </property>
+                 <property name="font">
+                  <font>
+                   <pointsize>10</pointsize>
+                   <weight>62</weight>
+                   <bold>true</bold>
+                  </font>
+                 </property>
+                 <property name="toolTip">
+                  <string>Delete evidence</string>
+                 </property>
+                 <property name="styleSheet">
+                  <string notr="true">background-color: rgb(94, 150, 255);
+color: rgb(255, 255, 255);</string>
+                 </property>
+                 <property name="text">
+                  <string>Delete</string>
+                 </property>
+                 <property name="icon">
+                  <iconset resource="../../static/resource.qrc">
+                   <normaloff>:/icons/icons/delete.png</normaloff>:/icons/icons/delete.png</iconset>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item>
+           <spacer name="evidenceActionSpacer">
+            <property name="font">
+             <font>
+              <pointsize>9</pointsize>
+              <italic>false</italic>
+             </font>
+            </property>
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeType">
+             <enum>QSizePolicy::Fixed</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>500</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="QPushButton" name="startAnalysisBtn">
+            <property name="maximumSize">
+             <size>
+              <width>150</width>
+              <height>16777215</height>
+             </size>
+            </property>
+            <property name="font">
+             <font>
+              <pointsize>10</pointsize>
+              <weight>62</weight>
+              <bold>true</bold>
+             </font>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">background-color: #28a745;</string>
+            </property>
+            <property name="text">
+             <string> Phân tích</string>
+            </property>
+            <property name="icon">
+             <iconset resource="../../static/resource.qrc">
+              <normaloff>:/icons/icons/icons8-combo-chart-50.png</normaloff>:/icons/icons/icons8-combo-chart-50.png</iconset>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <widget class="QTableWidget" name="evidenceTable">
+          <property name="font">
+           <font>
+            <pointsize>10</pointsize>
+            <italic>false</italic>
+           </font>
+          </property>
+          <property name="alternatingRowColors">
+           <bool>true</bool>
+          </property>
+          <property name="selectionBehavior">
+           <enum>QAbstractItemView::SelectRows</enum>
+          </property>
+          <column>
+           <property name="text">
+            <string>Tên Evidence</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Loại</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Đường dẫn</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Kích thước</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Hash</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>MIME Type</string>
+           </property>
+          </column>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="noSelectionLabel">
+        <property name="font">
+         <font>
+          <pointsize>-1</pointsize>
+          <italic>true</italic>
+         </font>
+        </property>
+        <property name="text">
+         <string>💡 Chọn một case từ danh sách để xem và quản lý evidence</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+        <property name="wordWrap">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </widget>
    </item>
   </layout>
  </widget>
- <resources/>
+ <resources>
+  <include location="../../static/resource.qrc"/>
+ </resources>
  <connections/>
 </ui>
