@@ -248,8 +248,16 @@ QCheckBox {
                 <bold>true</bold>
                </font>
               </property>
+              <property name="styleSheet">
+               <string notr="true">background-color: rgb(255, 255, 255);
+border-color: rgb(194, 199, 200);</string>
+              </property>
               <property name="text">
-               <string>📁</string>
+               <string/>
+              </property>
+              <property name="icon">
+               <iconset resource="../../../static/resource.qrc">
+                <normaloff>:/icons/icons/icons8-folder-50.png</normaloff>:/icons/icons/icons8-folder-50.png</iconset>
               </property>
              </widget>
             </item>
@@ -371,7 +379,7 @@ QCheckBox {
              </font>
             </property>
             <property name="text">
-             <string>5. User Sessions </string>
+             <string>5. Logged-On Users</string>
             </property>
             <property name="checked">
              <bool>true</bool>
@@ -432,6 +440,21 @@ QCheckBox {
             </property>
             <property name="text">
              <string>9. Environment Variables</string>
+            </property>
+            <property name="checked">
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="sharedResourcesCheck">
+            <property name="font">
+             <font>
+              <pointsize>10</pointsize>
+             </font>
+            </property>
+            <property name="text">
+             <string>10. Shared Resources (Locally Shared Folders)</string>
             </property>
             <property name="checked">
              <bool>false</bool>
@@ -948,6 +971,8 @@ QPushButton:pressed {
    </item>
   </layout>
  </widget>
- <resources/>
+ <resources>
+  <include location="../../../static/resource.qrc"/>
+ </resources>
  <connections/>
 </ui>

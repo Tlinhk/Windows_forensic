@@ -222,7 +222,7 @@ QLabel#noSelectionLabel {
             </property>
             <property name="icon">
              <iconset resource="../../static/resource.qrc">
-              <normaloff>:/icon/icons/add_google_icon.png</normaloff>:/icon/icons/add_google_icon.png</iconset>
+              <normaloff>:/icons/icons/add_google_icon.png</normaloff>:/icons/icons/add_google_icon.png</iconset>
             </property>
            </widget>
           </item>
@@ -296,7 +296,7 @@ QLabel#noSelectionLabel {
                </property>
                <property name="icon">
                 <iconset resource="../../static/resource.qrc">
-                 <normaloff>:/icon/icons/icons8-refresh-32.png</normaloff>:/icon/icons/icons8-refresh-32.png</iconset>
+                 <normaloff>:/icons/icons/icons8-refresh-32.png</normaloff>:/icons/icons/icons8-refresh-32.png</iconset>
                </property>
                <property name="iconSize">
                 <size>
@@ -331,7 +331,7 @@ QLabel#noSelectionLabel {
                </property>
                <property name="icon">
                 <iconset resource="../../static/resource.qrc">
-                 <normaloff>:/icon/icons/icons8-edit-50.png</normaloff>:/icon/icons/icons8-edit-50.png</iconset>
+                 <normaloff>:/icons/icons/icons8-edit-50.png</normaloff>:/icons/icons/icons8-edit-50.png</iconset>
                </property>
                <property name="iconSize">
                 <size>
@@ -366,7 +366,7 @@ QLabel#noSelectionLabel {
                </property>
                <property name="icon">
                 <iconset resource="../../static/resource.qrc">
-                 <normaloff>:/icon/icons/icons8-delete-48.png</normaloff>:/icon/icons/icons8-delete-48.png</iconset>
+                 <normaloff>:/icons/icons/icons8-delete-48.png</normaloff>:/icons/icons/icons8-delete-48.png</iconset>
                </property>
                <property name="iconSize">
                 <size>
@@ -501,6 +501,7 @@ QLabel#noSelectionLabel {
                  </property>
                  <property name="font">
                   <font>
+                   <pointsize>10</pointsize>
                    <weight>62</weight>
                    <bold>true</bold>
                   </font>
@@ -517,7 +518,7 @@ color: rgb(255, 255, 255);</string>
                  </property>
                  <property name="icon">
                   <iconset resource="../../static/resource.qrc">
-                   <normaloff>:/icon/icons/add_google_icon.png</normaloff>:/icon/icons/add_google_icon.png</iconset>
+                   <normaloff>:/icons/icons/add_google_icon.png</normaloff>:/icons/icons/add_google_icon.png</iconset>
                  </property>
                 </widget>
                </item>
@@ -531,6 +532,7 @@ color: rgb(255, 255, 255);</string>
                  </property>
                  <property name="font">
                   <font>
+                   <pointsize>10</pointsize>
                    <weight>62</weight>
                    <bold>true</bold>
                   </font>
@@ -547,7 +549,7 @@ color: rgb(255, 255, 255);</string>
                  </property>
                  <property name="icon">
                   <iconset resource="../../static/resource.qrc">
-                   <normaloff>:/icon/icons/delete.png</normaloff>:/icon/icons/delete.png</iconset>
+                   <normaloff>:/icons/icons/delete.png</normaloff>:/icons/icons/delete.png</iconset>
                  </property>
                 </widget>
                </item>
@@ -588,6 +590,7 @@ color: rgb(255, 255, 255);</string>
             </property>
             <property name="font">
              <font>
+              <pointsize>10</pointsize>
               <weight>62</weight>
               <bold>true</bold>
              </font>
@@ -600,7 +603,7 @@ color: rgb(255, 255, 255);</string>
             </property>
             <property name="icon">
              <iconset resource="../../static/resource.qrc">
-              <normaloff>:/icon/icons/icons8-combo-chart-50.png</normaloff>:/icon/icons/icons8-combo-chart-50.png</iconset>
+              <normaloff>:/icons/icons/icons8-combo-chart-50.png</normaloff>:/icons/icons/icons8-combo-chart-50.png</iconset>
             </property>
            </widget>
           </item>

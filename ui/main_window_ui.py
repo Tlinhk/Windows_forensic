@@ -266,8 +266,8 @@ class Ui_MainWindow(object):
         self.pushButton_12.setMaximumSize(QtCore.QSize(30, 30))
         self.pushButton_12.setText("")
         icon6 = QtGui.QIcon()
-        icon6.addPixmap(QtGui.QPixmap(":/icon/icons/arrow-96-48.ico"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        icon6.addPixmap(QtGui.QPixmap(":/icon/icons/arrow-31-48.ico"), QtGui.QIcon.Normal, QtGui.QIcon.On)
+        icon6.addPixmap(QtGui.QPixmap(":/icons/icons/arrow-96-48.ico"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon6.addPixmap(QtGui.QPixmap(":/icons/icons/arrow-31-48.ico"), QtGui.QIcon.Normal, QtGui.QIcon.On)
         self.pushButton_12.setIcon(icon6)
         self.pushButton_12.setCheckable(True)
         self.pushButton_12.setObjectName("pushButton_12")
@@ -303,7 +303,7 @@ class Ui_MainWindow(object):
 "}\n"
 "")
         self.user_label.setText("")
-        self.user_label.setPixmap(QtGui.QPixmap(":/icon/icons/user-48.ico"))
+        self.user_label.setPixmap(QtGui.QPixmap(":/icons/icons/user-48.ico"))
         self.user_label.setScaledContents(True)
         self.user_label.setObjectName("user_label")
         self.horizontalLayout_2.addWidget(self.user_label)
@@ -315,11 +315,11 @@ class Ui_MainWindow(object):
 "\n"
 "QTabBar::close-button {\n"
 "    margin-left: 3px;\n"
-"    image: url(:/icon/icons/x-mark-4-32.ico);\n"
+"    image: url(:/icons/icons/x-mark-4-32.ico);\n"
 "}\n"
 "\n"
 "QTabBar::close-button:hover {\n"
-"    image: url(:/icon/icons/x-mark-4-48.ico);\n"
+"    image: url(:/icons/icons/x-mark-4-48.ico);\n"
 "}\n"
 "\n"
 "QTabBar::tab {\n"

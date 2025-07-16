@@ -71,7 +71,7 @@ class Ui_WelcomeDialog(object):
         self.headerLabel.setAlignment(QtCore.Qt.AlignCenter)
         self.headerLabel.setObjectName("headerLabel")
         font = QtGui.QFont()
-        font.setPointSize(16)
+        font.setPointSize(14)
         font.setBold(True)
         self.headerLabel.setFont(font)
         self.headerLabel.setText("Windows Forensic System")

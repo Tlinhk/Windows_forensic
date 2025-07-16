@@ -371,10 +371,9 @@ class AddEvidenceWizard(QDialog):
                         case_info = self.db_manager.get_case_by_id(self.case_id)
                         if case_info:
                             case_data = {
-                                'case_id': case_info.get('case_code', f"CASE-{self.case_id}"),
+                                'case_id': case_info.get('case_id'),
                                 'case_name': case_info.get('title', 'Unknown Case'),
-                                'investigator': 'Current User',
-                                'database_case_id': self.case_id
+                                'investigator': 'Current User'
                             }
                             volatile_page.set_case_data(case_data)
                     

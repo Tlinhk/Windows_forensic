@@ -118,7 +118,7 @@ border: none;
             </rect>
            </property>
            <attribute name="icon">
-            <iconset>
+            <iconset resource="../static/resource.qrc">
              <normaloff>:/icons/icons/antivirus_2894894.png</normaloff>:/icons/icons/antivirus_2894894.png</iconset>
            </attribute>
            <attribute name="label">
@@ -222,7 +222,7 @@ border: none;
             </rect>
            </property>
            <attribute name="icon">
-            <iconset>
+            <iconset resource="../static/resource.qrc">
              <normaloff>:/icons/icons/icons8-collect-50.png</normaloff>:/icons/icons/icons8-collect-50.png</iconset>
            </attribute>
            <attribute name="label">
@@ -305,7 +305,7 @@ border: none;
             </rect>
            </property>
            <attribute name="icon">
-            <iconset>
+            <iconset resource="../static/resource.qrc">
              <normaloff>:/icons/icons/icons8-combo-chart-50.png</normaloff>:/icons/icons/icons8-combo-chart-50.png</iconset>
            </attribute>
            <attribute name="label">
@@ -460,7 +460,7 @@ border: none;
             </rect>
            </property>
            <attribute name="icon">
-            <iconset>
+            <iconset resource="../static/resource.qrc">
              <normaloff>:/icons/icons/icons8-report-50 (1).png</normaloff>:/icons/icons/icons8-report-50 (1).png</iconset>
            </attribute>
            <attribute name="label">
@@ -519,7 +519,7 @@ border: none;
             </rect>
            </property>
            <attribute name="icon">
-            <iconset>
+            <iconset resource="../static/resource.qrc">
              <normaloff>:/icons/icons/icons8-system-setting-53 (1).png</normaloff>:/icons/icons/icons8-system-setting-53 (1).png</iconset>
            </attribute>
            <attribute name="label">
@@ -566,7 +566,7 @@ border: none;
             </rect>
            </property>
            <attribute name="icon">
-            <iconset>
+            <iconset resource="../static/resource.qrc">
              <normaloff>:/icons/icons/icons8-logout-50.png</normaloff>:/icons/icons/icons8-logout-50.png</iconset>
            </attribute>
            <attribute name="label">
@@ -666,8 +666,8 @@ border: none;
              </property>
              <property name="icon">
               <iconset resource="../static/resource.qrc">
-               <normaloff>:/icon/icons/arrow-96-48.ico</normaloff>
-               <normalon>:/icon/icons/arrow-31-48.ico</normalon>:/icon/icons/arrow-96-48.ico</iconset>
+               <normaloff>:/icons/icons/arrow-96-48.ico</normaloff>
+               <normalon>:/icons/icons/arrow-31-48.ico</normalon>:/icons/icons/arrow-96-48.ico</iconset>
              </property>
              <property name="checkable">
               <bool>true</bool>
@@ -744,7 +744,7 @@ border: none;
               <string/>
              </property>
              <property name="pixmap">
-              <pixmap resource="../static/resource.qrc">:/icon/icons/user-48.ico</pixmap>
+              <pixmap resource="../static/resource.qrc">:/icons/icons/user-48.ico</pixmap>
              </property>
              <property name="scaledContents">
               <bool>true</bool>
@@ -763,11 +763,11 @@ border: none;
 
 QTabBar::close-button {
     margin-left: 3px;
-	image: url(:/icon/icons/x-mark-4-32.ico);
+	image: url(:/icons/icons/x-mark-4-32.ico);
 }
 
 QTabBar::close-button:hover {
-	image: url(:/icon/icons/x-mark-4-48.ico);
+	image: url(:/icons/icons/x-mark-4-48.ico);
 }
 
 QTabBar::tab {

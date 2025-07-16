@@ -965,6 +965,10 @@ class Case(QWidget):
                 hash_text = hashes[0]['sha256'][:16] + "..." if hashes else ''
                 self.ui.evidenceTable.setItem(row, 4, QTableWidgetItem(hash_text))
                 
+                # MIME Type
+                mime_type = evidence.get('mime_type', '')
+                self.ui.evidenceTable.setItem(row, 5, QTableWidgetItem(mime_type))
+                
                 # Store evidence_id
                 self.ui.evidenceTable.item(row, 0).setData(Qt.UserRole, evidence['artefact_id'])
                 

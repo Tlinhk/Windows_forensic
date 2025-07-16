@@ -14,7 +14,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_Form(object):
     def setupUi(self, Form):
         Form.setObjectName("Form")
-        Form.resize(1400, 852)
+        Form.resize(1400, 893)
         font = QtGui.QFont()
         font.setPointSize(10)
         Form.setFont(font)
@@ -85,6 +85,18 @@ class Ui_Form(object):
         font.setBold(True)
         font.setWeight(75)
         self.browseOutputBtn.setFont(font)
+        self.browseOutputBtn.setStyleSheet(
+            "background-color: rgb(255, 255, 255);\n"
+            "border-color: rgb(194, 199, 200);"
+        )
+        self.browseOutputBtn.setText("")
+        icon = QtGui.QIcon()
+        icon.addPixmap(
+            QtGui.QPixmap(":/icons/icons/icons8-folder-50.png"),
+            QtGui.QIcon.Normal,
+            QtGui.QIcon.Off,
+        )
+        self.browseOutputBtn.setIcon(icon)
         self.browseOutputBtn.setObjectName("browseOutputBtn")
         self.outputDeviceLayout.addWidget(self.browseOutputBtn)
         self.configLayout.addLayout(self.outputDeviceLayout)
@@ -93,10 +105,14 @@ class Ui_Form(object):
         self.configLayout.addLayout(self.investigatorLayout)
         self.leftColumnLayout.addWidget(self.acquisitionConfigGroup)
         self.orderOfVolatilityGroup = QtWidgets.QGroupBox(Form)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Expanding)
+        sizePolicy = QtWidgets.QSizePolicy(
+            QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Expanding
+        )
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.orderOfVolatilityGroup.sizePolicy().hasHeightForWidth())
+        sizePolicy.setHeightForWidth(
+            self.orderOfVolatilityGroup.sizePolicy().hasHeightForWidth()
+        )
         self.orderOfVolatilityGroup.setSizePolicy(sizePolicy)
         self.orderOfVolatilityGroup.setMaximumSize(QtCore.QSize(16777215, 1677215))
         font = QtGui.QFont()
@@ -174,7 +190,16 @@ class Ui_Form(object):
         self.environmentVarsCheck.setChecked(False)
         self.environmentVarsCheck.setObjectName("environmentVarsCheck")
         self.volatilityLayout.addWidget(self.environmentVarsCheck)
-        spacerItem = QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        self.sharedResourcesCheck = QtWidgets.QCheckBox(self.orderOfVolatilityGroup)
+        font = QtGui.QFont()
+        font.setPointSize(10)
+        self.sharedResourcesCheck.setFont(font)
+        self.sharedResourcesCheck.setChecked(False)
+        self.sharedResourcesCheck.setObjectName("sharedResourcesCheck")
+        self.volatilityLayout.addWidget(self.sharedResourcesCheck)
+        spacerItem = QtWidgets.QSpacerItem(
+            20, 20, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding
+        )
         self.volatilityLayout.addItem(spacerItem)
         self.volatilityButtonsLayout = QtWidgets.QHBoxLayout()
         self.volatilityButtonsLayout.setObjectName("volatilityButtonsLayout")
@@ -245,19 +270,21 @@ class Ui_Form(object):
         font.setBold(True)
         font.setWeight(75)
         self.startCollectionBtn.setFont(font)
-        self.startCollectionBtn.setStyleSheet("QPushButton {\n"
-"    background-color: #dc3545;\n"
-"    font-size: 17px;\n"
-"    border: 2px solid #bd2130;\n"
-"}\n"
-"\n"
-"QPushButton:hover {\n"
-"    background-color: #c82333;\n"
-"}\n"
-"\n"
-"QPushButton:pressed {\n"
-"    background-color: #bd2130;\n"
-"}")
+        self.startCollectionBtn.setStyleSheet(
+            "QPushButton {\n"
+            "    background-color: #dc3545;\n"
+            "    font-size: 17px;\n"
+            "    border: 2px solid #bd2130;\n"
+            "}\n"
+            "\n"
+            "QPushButton:hover {\n"
+            "    background-color: #c82333;\n"
+            "}\n"
+            "\n"
+            "QPushButton:pressed {\n"
+            "    background-color: #bd2130;\n"
+            "}"
+        )
         self.startCollectionBtn.setObjectName("startCollectionBtn")
         self.leftColumnLayout.addWidget(self.startCollectionBtn)
         self.mainHorizontalLayout.addLayout(self.leftColumnLayout)
@@ -330,7 +357,9 @@ class Ui_Form(object):
         self.elapsedTimeLabel.setFont(font)
         self.elapsedTimeLabel.setObjectName("elapsedTimeLabel")
         self.timeInfoLayout.addWidget(self.elapsedTimeLabel)
-        spacerItem1 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        spacerItem1 = QtWidgets.QSpacerItem(
+            40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum
+        )
         self.timeInfoLayout.addItem(spacerItem1)
         self.etaLabel = QtWidgets.QLabel(self.progressGroup)
         font = QtGui.QFont()
@@ -345,7 +374,9 @@ class Ui_Form(object):
         self.ramSizeLabel.setFont(font)
         self.ramSizeLabel.setObjectName("ramSizeLabel")
         self.progressLayout.addWidget(self.ramSizeLabel)
-        spacerItem2 = QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        spacerItem2 = QtWidgets.QSpacerItem(
+            20, 20, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding
+        )
         self.progressLayout.addItem(spacerItem2)
         self.rightColumnLayout.addWidget(self.progressGroup)
         self.evidenceLogGroup = QtWidgets.QGroupBox(Form)
@@ -385,7 +416,9 @@ class Ui_Form(object):
         self.saveLogBtn.setFont(font)
         self.saveLogBtn.setObjectName("saveLogBtn")
         self.evidenceControlLayout.addWidget(self.saveLogBtn)
-        spacerItem3 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        spacerItem3 = QtWidgets.QSpacerItem(
+            40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum
+        )
         self.evidenceControlLayout.addItem(spacerItem3)
         self.stopCollectionBtn = QtWidgets.QPushButton(self.evidenceLogGroup)
         self.stopCollectionBtn.setEnabled(False)
@@ -407,142 +440,192 @@ class Ui_Form(object):
 
     def retranslateUi(self, Form):
         _translate = QtCore.QCoreApplication.translate
-        Form.setWindowTitle(_translate("Form", "Thu thập dữ liệu khả biến - Forensic Live Collection"))
-        Form.setStyleSheet(_translate("Form", "QWidget {\n"
-"    background-color: #f8f9fa;\n"
-"}\n"
-"\n"
-"QGroupBox {\n"
-"    font-weight: bold;\n"
-"    border: 2px solid #dee2e6;\n"
-"    border-radius: 8px;\n"
-"    margin-top: 1ex;\n"
-"    padding-top: 10px;\n"
-"    background-color: white;\n"
-"}\n"
-"\n"
-"QGroupBox::title {\n"
-"    subcontrol-origin: margin;\n"
-"    left: 10px;\n"
-"    padding: 0 8px 0 8px;\n"
-"    color: #495057;\n"
-"}\n"
-"\n"
-"QPushButton {\n"
-"    background-color: #007bff;\n"
-"    color: white;\n"
-"    border: none;\n"
-"    padding: 8px 16px;\n"
-"    border-radius: 4px;\n"
-"    font-weight: bold;\n"
-"}\n"
-"\n"
-"QPushButton:hover {\n"
-"    background-color: #0056b3;\n"
-"}\n"
-"\n"
-"QPushButton:pressed {\n"
-"    background-color: #004085;\n"
-"}\n"
-"\n"
-"QPushButton:disabled {\n"
-"    background-color: #6c757d;\n"
-"}\n"
-"\n"
-"QProgressBar {\n"
-"    border: 1px solid #dee2e6;\n"
-"    border-radius: 4px;\n"
-"    text-align: center;\n"
-"    background-color: #e9ecef;\n"
-"}\n"
-"\n"
-"QProgressBar::chunk {\n"
-"    background-color: #28a745;\n"
-"    border-radius: 3px;\n"
-"}\n"
-"\n"
-"QTextEdit {\n"
-"    border: 1px solid #ced4da;\n"
-"    border-radius: 4px;\n"
-"    padding: 8px;\n"
-"    background-color: white;\n"
-"    font-family: \'Consolas\', monospace;\n"
-"}\n"
-"\n"
-"QComboBox {\n"
-"    border: 1px solid #ced4da;\n"
-"    border-radius: 4px;\n"
-"    padding: 4px 8px;\n"
-"    background-color: white;\n"
-"}\n"
-"\n"
-"QLabel {\n"
-"    color: #495057;\n"
-"}\n"
-"\n"
-"QCheckBox {\n"
-"    color: #495057;\n"
-"    spacing: 8px;\n"
-"}"))
+        Form.setWindowTitle(
+            _translate("Form", "Thu thập dữ liệu khả biến - Forensic Live Collection")
+        )
+        Form.setStyleSheet(
+            _translate(
+                "Form",
+                "QWidget {\n"
+                "    background-color: #f8f9fa;\n"
+                "}\n"
+                "\n"
+                "QGroupBox {\n"
+                "    font-weight: bold;\n"
+                "    border: 2px solid #dee2e6;\n"
+                "    border-radius: 8px;\n"
+                "    margin-top: 1ex;\n"
+                "    padding-top: 10px;\n"
+                "    background-color: white;\n"
+                "}\n"
+                "\n"
+                "QGroupBox::title {\n"
+                "    subcontrol-origin: margin;\n"
+                "    left: 10px;\n"
+                "    padding: 0 8px 0 8px;\n"
+                "    color: #495057;\n"
+                "}\n"
+                "\n"
+                "QPushButton {\n"
+                "    background-color: #007bff;\n"
+                "    color: white;\n"
+                "    border: none;\n"
+                "    padding: 8px 16px;\n"
+                "    border-radius: 4px;\n"
+                "    font-weight: bold;\n"
+                "}\n"
+                "\n"
+                "QPushButton:hover {\n"
+                "    background-color: #0056b3;\n"
+                "}\n"
+                "\n"
+                "QPushButton:pressed {\n"
+                "    background-color: #004085;\n"
+                "}\n"
+                "\n"
+                "QPushButton:disabled {\n"
+                "    background-color: #6c757d;\n"
+                "}\n"
+                "\n"
+                "QProgressBar {\n"
+                "    border: 1px solid #dee2e6;\n"
+                "    border-radius: 4px;\n"
+                "    text-align: center;\n"
+                "    background-color: #e9ecef;\n"
+                "}\n"
+                "\n"
+                "QProgressBar::chunk {\n"
+                "    background-color: #28a745;\n"
+                "    border-radius: 3px;\n"
+                "}\n"
+                "\n"
+                "QTextEdit {\n"
+                "    border: 1px solid #ced4da;\n"
+                "    border-radius: 4px;\n"
+                "    padding: 8px;\n"
+                "    background-color: white;\n"
+                "    font-family: 'Consolas', monospace;\n"
+                "}\n"
+                "\n"
+                "QComboBox {\n"
+                "    border: 1px solid #ced4da;\n"
+                "    border-radius: 4px;\n"
+                "    padding: 4px 8px;\n"
+                "    background-color: white;\n"
+                "}\n"
+                "\n"
+                "QLabel {\n"
+                "    color: #495057;\n"
+                "}\n"
+                "\n"
+                "QCheckBox {\n"
+                "    color: #495057;\n"
+                "    spacing: 8px;\n"
+                "}",
+            )
+        )
         self.acquisitionConfigGroup.setTitle(_translate("Form", "Cấu hình Thu thập"))
         self.caseIdLabel.setText(_translate("Form", "  Case name:"))
-        self.caseIdEdit.setPlaceholderText(_translate("Form", "VD: Điều tra máy tính A"))
+        self.caseIdEdit.setPlaceholderText(
+            _translate("Form", "VD: Điều tra máy tính A")
+        )
         self.outputDeviceLabel.setText(_translate("Form", "  Thiết bị lưu trữ:"))
         self.outputPathEdit.setText(_translate("Form", "E:\\ForensicCollection"))
-        self.outputPathEdit.setPlaceholderText(_translate("Form", "Chọn thiết bị ngoài (USB/External HDD)"))
-        self.browseOutputBtn.setText(_translate("Form", "📁"))
-        self.orderOfVolatilityGroup.setTitle(_translate("Form", "Order of Volatility - Thứ tự thu thập"))
-        self.ramAcquisitionCheck.setStyleSheet(_translate("Form", "color: #dc3545; font-weight: bold;"))
-        self.ramAcquisitionCheck.setText(_translate("Form", "1. RAM Acquisition (Ưu tiên cao nhất)"))
+        self.outputPathEdit.setPlaceholderText(
+            _translate("Form", "Chọn thiết bị ngoài (USB/External HDD)")
+        )
+        self.orderOfVolatilityGroup.setTitle(
+            _translate("Form", "Order of Volatility - Thứ tự thu thập")
+        )
+        self.ramAcquisitionCheck.setStyleSheet(
+            _translate("Form", "color: #dc3545; font-weight: bold;")
+        )
+        self.ramAcquisitionCheck.setText(
+            _translate("Form", "1. RAM Acquisition (Ưu tiên cao nhất)")
+        )
         self.systemTimeCheck.setText(_translate("Form", "2. System Time & Uptime"))
         self.networkStateCheck.setText(_translate("Form", "3. Network State"))
         self.processInfoCheck.setText(_translate("Form", "4. Process Information "))
-        self.userSessionsCheck.setText(_translate("Form", "5. User Sessions "))
+        self.userSessionsCheck.setText(_translate("Form", "5. Logged-On Users"))
         self.clipboardCheck.setText(_translate("Form", "6. Clipboard Content"))
         self.commandHistoryCheck.setText(_translate("Form", "7. Command History"))
         self.servicesDriversCheck.setText(_translate("Form", "8. Services & Drivers"))
-        self.environmentVarsCheck.setText(_translate("Form", "9. Environment Variables"))
+        self.environmentVarsCheck.setText(
+            _translate("Form", "9. Environment Variables")
+        )
+        self.sharedResourcesCheck.setText(
+            _translate("Form", "10. Shared Resources (Locally Shared Folders)")
+        )
         self.selectAllBtn.setText(_translate("Form", "✅ Chọn tất cả"))
         self.clearAllBtn.setText(_translate("Form", "❌ Bỏ chọn tất cả"))
         self.ramConfigGroup.setTitle(_translate("Form", "Cấu hình RAM Acquisition"))
         self.ramFormatLabel.setText(_translate("Form", "📄 Định dạng:"))
-        self.ramFormatCombo.setItemText(0, _translate("Form", "RAW (.mem) - Tiêu chuẩn"))
-        self.ramFormatCombo.setItemText(1, _translate("Form", "RAW (.raw) - Tương thích rộng"))
-        self.ramFormatCombo.setItemText(2, _translate("Form", "AFF4 (.aff4) - Nén & Metadata"))
-        self.calculateHashCheck.setText(_translate("Form", "Tính toán Hash SHA-256 trong quá trình thu thập"))
-        self.compressRamCheck.setText(_translate("Form", "Nén RAM dump (tiết kiệm không gian)"))
+        self.ramFormatCombo.setItemText(
+            0, _translate("Form", "RAW (.mem) - Tiêu chuẩn")
+        )
+        self.ramFormatCombo.setItemText(
+            1, _translate("Form", "RAW (.raw) - Tương thích rộng")
+        )
+        self.ramFormatCombo.setItemText(
+            2, _translate("Form", "AFF4 (.aff4) - Nén & Metadata")
+        )
+        self.calculateHashCheck.setText(
+            _translate("Form", "Tính toán Hash SHA-256 trong quá trình thu thập")
+        )
+        self.compressRamCheck.setText(
+            _translate("Form", "Nén RAM dump (tiết kiệm không gian)")
+        )
         self.startCollectionBtn.setText(_translate("Form", "BẮT ĐẦU THU THẬP"))
         self.systemInfoGroup.setTitle(_translate("Form", "Thông tin hệ thống đích"))
-        self.systemInfoText.setPlaceholderText(_translate("Form", "Thông tin hệ thống sẽ hiển thị ở đây..."))
+        self.systemInfoText.setPlaceholderText(
+            _translate("Form", "Thông tin hệ thống sẽ hiển thị ở đây...")
+        )
         self.progressGroup.setTitle(_translate("Form", "Tiến trình Thu thập"))
-        self.currentTaskLabel.setText(_translate("Form", "Trạng thái: Sẵn sàng thu thập"))
+        self.currentTaskLabel.setText(
+            _translate("Form", "Trạng thái: Sẵn sàng thu thập")
+        )
         self.overallProgressBar.setFormat(_translate("Form", "Tổng tiến trình: %p%"))
         self.taskDetailLabel.setText(_translate("Form", "Chi tiết: Chưa bắt đầu"))
         self.taskProgressBar.setFormat(_translate("Form", "Tác vụ hiện tại: %p%"))
         self.elapsedTimeLabel.setText(_translate("Form", "⏱️ Thời gian: 00:00:00"))
         self.etaLabel.setText(_translate("Form", "📅 ETA: --:--:--"))
-        self.ramSizeLabel.setText(_translate("Form", "RAM: -- GB | Cần: -- GB | Gói: -- MB"))
-        self.evidenceLogGroup.setTitle(_translate("Form", "Evidence Log & Chain of Custody"))
-        self.evidenceLogText.setPlaceholderText(_translate("Form", "Evidence log và chain of custody sẽ được ghi ở đây..."))
+        self.ramSizeLabel.setText(
+            _translate("Form", "RAM: -- GB | Cần: -- GB | Gói: -- MB")
+        )
+        self.evidenceLogGroup.setTitle(
+            _translate("Form", "Evidence Log & Chain of Custody")
+        )
+        self.evidenceLogText.setPlaceholderText(
+            _translate("Form", "Evidence log và chain of custody sẽ được ghi ở đây...")
+        )
         self.clearLogBtn.setText(_translate("Form", "🗑️ Xóa log"))
         self.saveLogBtn.setText(_translate("Form", "💾 Lưu log"))
-        self.stopCollectionBtn.setStyleSheet(_translate("Form", "QPushButton {\n"
-"    background-color: #dc3545;\n"
-"    font-weight: bold;\n"
-"}\n"
-"\n"
-"QPushButton:hover {\n"
-"    background-color: #c82333;\n"
-"}\n"
-"\n"
-"QPushButton:pressed {\n"
-"    background-color: #bd2130;\n"
-"}"))
+        self.stopCollectionBtn.setStyleSheet(
+            _translate(
+                "Form",
+                "QPushButton {\n"
+                "    background-color: #dc3545;\n"
+                "    font-weight: bold;\n"
+                "}\n"
+                "\n"
+                "QPushButton:hover {\n"
+                "    background-color: #c82333;\n"
+                "}\n"
+                "\n"
+                "QPushButton:pressed {\n"
+                "    background-color: #bd2130;\n"
+                "}",
+            )
+        )
         self.stopCollectionBtn.setText(_translate("Form", "⏹️ DỪNG THU THẬP"))
+
+
+from static import resource_rc
 
 
 if __name__ == "__main__":
     import sys
+
     app = QtWidgets.QApplication(sys.argv)
     Form = QtWidgets.QWidget()
     ui = Ui_Form()
