@@ -21,9 +21,7 @@ CREATE TABLE Users (
 -- Cases table (simplified with single investigator)
 CREATE TABLE Cases (
     case_id INTEGER PRIMARY KEY AUTOINCREMENT,
-    case_code VARCHAR(50) UNIQUE,
     title VARCHAR(200) NOT NULL,
-    desc TEXT,
     archive_path TEXT, 
     user_id INTEGER,
     status VARCHAR(20) DEFAULT 'OPEN',
@@ -31,17 +29,6 @@ CREATE TABLE Cases (
     finished_at DATETIME,
     FOREIGN KEY (user_id) REFERENCES Users(user_id)
 );
-
--- Trigger tự động tạo case_code sau khi INSERT
-CREATE TRIGGER auto_generate_case_code 
-AFTER INSERT ON Cases 
-FOR EACH ROW
-WHEN NEW.case_code IS NULL
-BEGIN
-    UPDATE Cases 
-    SET case_code = 'VU' || strftime('%Y', NEW.created_at) || printf('%04d', NEW.case_id)
-    WHERE case_id = NEW.case_id;
-END;
 
 -- Artefacts table
 CREATE TABLE Artefacts (

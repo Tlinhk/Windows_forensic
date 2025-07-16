@@ -42,15 +42,21 @@ class ForensicCollectionWorker(QObject):
         try:
             self.log_evidence_start()
 
-            # Create timestamped collection directory
+            # Create evidence directory structure
             timestamp = self.start_time.strftime("%Y%m%d_%H%M%S")
-            case_id = self.case_info.get("case_id", "UNKNOWN")
-            evidence_id = self.case_info.get("evidence_id", "VOLATILE-001")
+            case_name = self.case_info.get("case_name", "UNKNOWN")
 
-            self.collection_dir = os.path.join(
-                self.output_path, f"{case_id}_{evidence_id}_{timestamp}"
+            # Tạo thư mục lớn cho lần thu thập này
+            evidence_root = os.path.join(
+                self.output_path, f"{case_name}_evidence_{timestamp}"
             )
-            os.makedirs(self.collection_dir, exist_ok=True)
+            os.makedirs(evidence_root, exist_ok=True)
+
+            # Tạo thư mục volatile bên trong
+            volatile_dir = os.path.join(evidence_root, f"volatile_{timestamp}")
+            os.makedirs(volatile_dir, exist_ok=True)
+
+            self.collection_dir = volatile_dir
 
             self.log_message.emit(
                 f"BẮT ĐẦU THU THẬP FORENSIC - {self.start_time.strftime('%Y-%m-%d %H:%M:%S')}"
@@ -1075,15 +1081,28 @@ Current Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"""
 
     def get_case_info(self):
         """Get case information"""
+        # Lấy tên case từ UI (ưu tiên field caseNameEdit nếu có)
+        case_name = ""
+        if hasattr(self.ui, "caseNameEdit") and self.ui.caseNameEdit.text().strip():
+            case_name = self.ui.caseNameEdit.text().strip()
+        elif hasattr(self.ui, "caseIdEdit") and self.ui.caseIdEdit.text().strip():
+            val = self.ui.caseIdEdit.text().strip()
+            # Nếu có dạng 'id - tên', tách lấy tên
+            if " - " in val:
+                case_name = val.split(" - ", 1)[1].strip()
+            else:
+                case_name = val
         return {
             "case_id": self.ui.caseIdEdit.text() or "UNKNOWN",
-            "investigator": "System Administrator",  # Fallback investigator
+            "case_name": case_name or "UNKNOWN",
+            "investigator": "System Administrator",
         }
 
     def start_collection(self):
         """Start forensic volatile data collection"""
         options = self.get_collection_options()
         case_info = self.get_case_info()
+        case_info["case_name"] = self.current_case_name or "UNKNOWN"
 
         # Validation
         if not any(options.values()):
@@ -1254,31 +1273,19 @@ Current Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"""
                 )
 
     def set_case_data(self, case_data):
-        """Set case data for evidence collection"""
-        self.current_case_id = case_data.get("case_id")
+        """Set case data for evidence collection (volatile)"""
+        # Lưu case_name vào biến riêng
+        self.current_case_name = case_data.get("case_name", "UNKNOWN")
 
-        # Update UI với thông tin case
-        if case_data.get("case_id") and case_data.get("case_name"):
-            # Hiển thị cả mã case và tên case
-            case_display = f"{case_data['case_id']} - {case_data['case_name']}"
-            self.ui.caseIdEdit.setText(case_display)
-        elif case_data.get("case_id"):
-            self.ui.caseIdEdit.setText(case_data["case_id"])
+        # Hiển thị case_name lên ô caseIdEdit
+        self.ui.caseIdEdit.setText(self.current_case_name)
 
-        # if case_data.get('investigator'):
-        #    self.ui.investigatorEdit.setText(case_data['investigator'])
-
-        # Update output path để include case info và volatile
-        if case_data.get("case_id") and case_data.get("case_name"):
-            # Tạo đường dẫn với mã case, tên case và chú thích volatile
-            safe_case_name = "".join(
-                c for c in case_data["case_name"] if c.isalnum() or c in (" ", "-", "_")
-            ).rstrip()
-            output_path = f"E:\\ForensicCollection\\{case_data['case_id']}_{safe_case_name}_volatile"
-            self.ui.outputPathEdit.setText(output_path)
-        elif case_data.get("case_id"):
-            output_path = f"E:\\ForensicCollection\\{case_data['case_id']}_volatile"
-            self.ui.outputPathEdit.setText(output_path)
+        # Tạo đường dẫn output chỉ với case_name
+        safe_case_name = "".join(
+            c for c in self.current_case_name if c.isalnum() or c in (" ", "-", "_")
+        ).rstrip()
+        output_path = f"E:\\ForensicCollection\\{safe_case_name}_evidence"
+        self.ui.outputPathEdit.setText(output_path)
 
     def set_case_id(self, case_id):
         """Set current case ID for evidence collection (legacy method)"""
