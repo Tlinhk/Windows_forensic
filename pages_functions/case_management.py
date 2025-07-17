@@ -913,6 +913,18 @@ class Case(QWidget):
         # Load data
         self.load_cases()
 
+    def load_specific_case(self, case_id, case_data):
+        """Load specific case"""
+        self.current_case_id = case_id
+        for r in range(self.ui.casesTable.rowCount()):
+            item = self.ui.casesTable.item(r, 0)
+            if item and item.data(Qt.UserRole) == case_id:
+                self.ui.casesTable.selectRow(r)
+                break
+        title = case_data.get("title", "N/A")
+        self.ui.noSelectionLabel.setText(f"📁 Case hiện tại: {title}")
+        self.load_evidence()
+
     def setup_tables(self):
         """Cấu hình tables"""
         # Cases table
@@ -1021,6 +1033,8 @@ class Case(QWidget):
             item = self.ui.casesTable.item(current_row, 0)
             if item:
                 self.current_case_id = item.data(Qt.UserRole)
+                if self.main_window:
+                    self.main_window.current_case_id = self.current_case_id
                 case_name = item.text()
                 self.ui.noSelectionLabel.setText(f"📁 Case hiện tại: {case_name}")
                 self.load_evidence()

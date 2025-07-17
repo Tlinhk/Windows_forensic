@@ -65,7 +65,7 @@ class MyWindow(QMainWindow):
         self.opened_windows = {}
 
         ## Create dict for menu buttons and tab windows
-
+        self.current_case_id = None
         self.menu_btns_list = {
             self.dashboard_btn: ("Dashboard", lambda: Dashboard()),
             self.case_btn: ("Quản lý vụ án", lambda: Case(main_window=self)),
@@ -262,6 +262,25 @@ class MyWindow(QMainWindow):
         Function for showing the selected window
         """
         sender_btn = self.sender()
+        # Danh sách các nút cần phải có case trước khi sử dụng
+        require_case = {
+            self.volatile_btn,
+            self.nonvolatile_btn,
+            self.memory_btn,
+            self.registry_btn,
+            self.browser_btn,
+            self.file_btn,
+            self.metadata_btn,
+            self.eventlog_btn,
+        }
+        if sender_btn in require_case and not self.current_case_id:
+            QMessageBox.warning(
+                self,
+                "Cảnh báo",
+                "Vui lòng chọn một case trước khi thực hiện thao tác này!",
+            )
+            return
+
         if (
             sender_btn
             and isinstance(sender_btn, QtWidgets.QPushButton)
