@@ -1,37 +1,1198 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>Form</class>
- <widget class="QWidget" name="Form">
+ <class>CollectNonvolatileForm</class>
+ <widget class="QWidget" name="CollectNonvolatileForm">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1038</width>
-    <height>552</height>
+    <width>1200</width>
+    <height>850</height>
    </rect>
   </property>
-  <property name="font">
-   <font>
-    <pointsize>10</pointsize>
-   </font>
-  </property>
   <property name="windowTitle">
-   <string>Form</string>
+   <string>Thu thập Dữ liệu Bất biến (Non-Volatile)</string>
   </property>
-  <layout class="QGridLayout" name="gridLayout">
-   <item row="0" column="0">
-    <widget class="QLabel" name="label">
-     <property name="font">
-      <font>
-       <pointsize>10</pointsize>
-      </font>
+  <layout class="QVBoxLayout" name="mainLayout">
+   <item>
+    <widget class="QFrame" name="frame_wizard_header">
+     <property name="frameShape">
+      <enum>QFrame::StyledPanel</enum>
      </property>
-     <property name="text">
-      <string>Collect nonvolatile</string>
+     <property name="frameShadow">
+      <enum>QFrame::Raised</enum>
      </property>
-     <property name="alignment">
-      <set>Qt::AlignCenter</set>
+     <layout class="QHBoxLayout" name="horizontalLayout_header">
+      <item>
+       <widget class="QLabel" name="label_step1">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>40</height>
+         </size>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">background-color: #2196F3; color: white; border-radius: 5px; padding: 5px; font-weight: bold;</string>
+        </property>
+        <property name="text">
+         <string>1. Thiết lập &amp; Nguồn</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="label_step2">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>40</height>
+         </size>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">background-color: #E0E0E0; color: #333; border-radius: 5px; padding: 5px; font-weight: bold;</string>
+        </property>
+        <property name="text">
+         <string>2. Phương pháp thu thập</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="label_step3">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>40</height>
+         </size>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">background-color: #E0E0E0; color: #333; border-radius: 5px; padding: 5px; font-weight: bold;</string>
+        </property>
+        <property name="text">
+         <string>3. Cấu hình</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="label_step4">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>40</height>
+         </size>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">background-color: #E0E0E0; color: #333; border-radius: 5px; padding: 5px; font-weight: bold;</string>
+        </property>
+        <property name="text">
+         <string>4. Tổng quan</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="label_step5">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>40</height>
+         </size>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">background-color: #E0E0E0; color: #333; border-radius: 5px; padding: 5px; font-weight: bold;</string>
+        </property>
+        <property name="text">
+         <string>5. Tiến trình</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QStackedWidget" name="stackedWidget">
+     <property name="currentIndex">
+      <number>2</number>
      </property>
+     <widget class="QWidget" name="page_step1_setup">
+      <layout class="QVBoxLayout" name="verticalLayout_step1">
+       <item>
+        <widget class="QGroupBox" name="groupBox_case_info">
+         <property name="title">
+          <string>Thông tin Vụ việc</string>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_case_info">
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_case_id">
+            <property name="text">
+             <string>Mã vụ việc:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QLineEdit" name="lineEdit_case_id">
+            <property name="placeholderText">
+             <string>VD: Case-2025-001</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="2">
+           <widget class="QLabel" name="label_investigator">
+            <property name="text">
+             <string>Tên Điều tra viên:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="3">
+           <widget class="QLineEdit" name="lineEdit_investigator">
+            <property name="placeholderText">
+             <string>VD: Nguyen Van A</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_case_description">
+            <property name="text">
+             <string>Mô tả:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1" colspan="3">
+           <widget class="QLineEdit" name="lineEdit_case_description">
+            <property name="placeholderText">
+             <string>Mô tả ngắn về vụ việc...</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="groupBox_source_device">
+         <property name="title">
+          <string>Thiết bị Nguồn</string>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_source">
+          <item>
+           <widget class="QTableWidget" name="tableWidget_devices">
+            <property name="selectionMode">
+             <enum>QAbstractItemView::SingleSelection</enum>
+            </property>
+            <property name="selectionBehavior">
+             <enum>QAbstractItemView::SelectRows</enum>
+            </property>
+            <column>
+             <property name="text">
+              <string>Model</string>
+             </property>
+            </column>
+            <column>
+             <property name="text">
+              <string>Chuẩn kết nối</string>
+             </property>
+            </column>
+            <column>
+             <property name="text">
+              <string>Dung lượng</string>
+             </property>
+            </column>
+            <column>
+             <property name="text">
+              <string>Phân vùng</string>
+             </property>
+            </column>
+            <column>
+             <property name="text">
+              <string>Trạng thái mã hóa</string>
+             </property>
+            </column>
+           </widget>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_source_controls">
+            <item>
+             <widget class="QPushButton" name="pushButton_refresh_devices">
+              <property name="text">
+               <string>🔄 Làm mới</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer_source">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
+             <widget class="QCheckBox" name="checkBox_accept_risk">
+              <property name="enabled">
+               <bool>true</bool>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">color: red; font-weight: bold;</string>
+              </property>
+              <property name="text">
+               <string>⚠️ Tôi chấp nhận rủi ro khi thu thập trên hệ thống không có chống ghi</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <spacer name="verticalSpacer_step1">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="page_step2_strategy">
+      <layout class="QVBoxLayout" name="verticalLayout_step2">
+       <item>
+        <widget class="QFrame" name="frame_triage_card">
+         <property name="frameShape">
+          <enum>QFrame::StyledPanel</enum>
+         </property>
+         <property name="frameShadow">
+          <enum>QFrame::Raised</enum>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_triage_card">
+          <item>
+           <widget class="QRadioButton" name="radioButton_triage">
+            <property name="styleSheet">
+             <string notr="true">font-size: 14pt; font-weight: bold;</string>
+            </property>
+            <property name="text">
+             <string>🔍 Thu thập Triage (Nhanh &amp; có Mục tiêu)</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="label_triage_description">
+            <property name="text">
+             <string>Trích xuất nhanh các dấu vết quan trọng nhất để đánh giá ban đầu. Lý tưởng cho ứng cứu sự cố và khi thời gian có hạn. Không thu thập toàn bộ dữ liệu.</string>
+            </property>
+            <property name="wordWrap">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QFrame" name="frame_full_image_card">
+         <property name="frameShape">
+          <enum>QFrame::StyledPanel</enum>
+         </property>
+         <property name="frameShadow">
+          <enum>QFrame::Raised</enum>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_image_card">
+          <item>
+           <widget class="QRadioButton" name="radioButton_full_image">
+            <property name="styleSheet">
+             <string notr="true">font-size: 14pt; font-weight: bold;</string>
+            </property>
+            <property name="text">
+             <string>💿 Tạo ảnh Toàn bộ (Toàn diện &amp; An toàn)</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="label_full_image_description">
+            <property name="text">
+             <string>Tạo một bản sao pháp lý chính xác bit-for-bit. Thu thập tất cả mọi thứ, bao gồm cả dữ liệu đã xóa. Đây là tiêu chuẩn vàng cho phân tích sâu.</string>
+            </property>
+            <property name="wordWrap">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <spacer name="verticalSpacer_step2">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="page_step3_config">
+      <layout class="QVBoxLayout" name="verticalLayout_step3">
+       <item>
+        <widget class="QStackedWidget" name="stackedWidget_config">
+         <property name="currentIndex">
+          <number>1</number>
+         </property>
+         <widget class="QWidget" name="page_triage_config">
+          <layout class="QHBoxLayout" name="horizontalLayout_triage_page">
+           <item>
+            <widget class="QFrame" name="frame_targets">
+             <property name="frameShape">
+              <enum>QFrame::StyledPanel</enum>
+             </property>
+             <property name="frameShadow">
+              <enum>QFrame::Raised</enum>
+             </property>
+             <layout class="QVBoxLayout" name="verticalLayout_targets">
+              <item>
+               <widget class="QCheckBox" name="checkBox_use_targets">
+                <property name="text">
+                 <string>Sử dụng Tùy chọn Mục tiêu (Use Target options)</string>
+                </property>
+                <property name="checked">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QGroupBox" name="groupBox_target_options">
+                <property name="title">
+                 <string>Tùy chọn Mục tiêu</string>
+                </property>
+                <layout class="QGridLayout" name="gridLayout_target_options">
+                 <item row="0" column="0">
+                  <widget class="QLabel" name="label_target_source">
+                   <property name="text">
+                    <string>Nguồn mục tiêu:</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="0" column="1">
+                  <widget class="QLineEdit" name="lineEdit_target_source"/>
+                 </item>
+                 <item row="0" column="2">
+                  <widget class="QToolButton" name="toolButton_target_source">
+                   <property name="text">
+                    <string>...</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="1" column="0">
+                  <widget class="QLabel" name="label_target_destination">
+                   <property name="text">
+                    <string>Đích mục tiêu:</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="1" column="1">
+                  <widget class="QLineEdit" name="lineEdit_target_destination">
+                   <property name="placeholderText">
+                    <string>Thư mục để lưu kết quả</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="1" column="2">
+                  <widget class="QToolButton" name="toolButton_target_destination">
+                   <property name="text">
+                    <string>...</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+              <item>
+               <widget class="QGroupBox" name="groupBox_targets">
+                <property name="title">
+                 <string>Mục tiêu (Targets)</string>
+                </property>
+                <layout class="QVBoxLayout" name="verticalLayout_targets_group">
+                 <item>
+                  <layout class="QHBoxLayout" name="horizontalLayout_triage_predefined">
+                   <item>
+                    <widget class="QLabel" name="label_predefined">
+                     <property name="text">
+                      <string>Gói định sẵn:</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QToolButton" name="toolButton_sans">
+                     <property name="text">
+                      <string>!SANS_Triage</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QToolButton" name="toolButton_quick">
+                     <property name="text">
+                      <string>Quick_System_Info</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QToolButton" name="toolButton_browser">
+                     <property name="text">
+                      <string>Browser_and_Email</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <spacer name="horizontalSpacer_predefined">
+                     <property name="orientation">
+                      <enum>Qt::Horizontal</enum>
+                     </property>
+                     <property name="sizeHint" stdset="0">
+                      <size>
+                       <width>40</width>
+                       <height>20</height>
+                      </size>
+                     </property>
+                    </spacer>
+                   </item>
+                  </layout>
+                 </item>
+                 <item>
+                  <widget class="QLineEdit" name="lineEdit_targets_search">
+                   <property name="placeholderText">
+                    <string>🔍 Tìm kiếm mục tiêu...</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QTableWidget" name="tableWidget_targets">
+                   <column>
+                    <property name="text">
+                     <string>Chọn</string>
+                    </property>
+                   </column>
+                   <column>
+                    <property name="text">
+                     <string>Tên</string>
+                    </property>
+                   </column>
+                   <column>
+                    <property name="text">
+                     <string>Thư mục</string>
+                    </property>
+                   </column>
+                   <column>
+                    <property name="text">
+                     <string>Mô tả</string>
+                    </property>
+                   </column>
+                  </widget>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
+            <widget class="QFrame" name="frame_modules">
+             <property name="frameShape">
+              <enum>QFrame::StyledPanel</enum>
+             </property>
+             <property name="frameShadow">
+              <enum>QFrame::Raised</enum>
+             </property>
+             <layout class="QVBoxLayout" name="verticalLayout_modules">
+              <item>
+               <widget class="QCheckBox" name="checkBox_use_modules">
+                <property name="text">
+                 <string>Sử dụng Tùy chọn Module (Use Module options)</string>
+                </property>
+                <property name="checked">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QGroupBox" name="groupBox_module_options">
+                <property name="title">
+                 <string>Tùy chọn Module</string>
+                </property>
+                <layout class="QGridLayout" name="gridLayout_module_options">
+                 <item row="0" column="0">
+                  <widget class="QLabel" name="label_module_source">
+                   <property name="text">
+                    <string>Nguồn module:</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="0" column="1">
+                  <widget class="QLineEdit" name="lineEdit_module_source"/>
+                 </item>
+                 <item row="0" column="2">
+                  <widget class="QToolButton" name="toolButton_module_source">
+                   <property name="text">
+                    <string>...</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="1" column="0">
+                  <widget class="QLabel" name="label_module_destination">
+                   <property name="text">
+                    <string>Đích module:</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="1" column="1">
+                  <widget class="QLineEdit" name="lineEdit_module_destination">
+                   <property name="placeholderText">
+                    <string>Thư mục để lưu kết quả xử lý của module</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="1" column="2">
+                  <widget class="QToolButton" name="toolButton_module_destination">
+                   <property name="text">
+                    <string>...</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+              <item>
+               <widget class="QGroupBox" name="groupBox_modules">
+                <property name="title">
+                 <string>Modules</string>
+                </property>
+                <layout class="QVBoxLayout" name="verticalLayout_modules_group">
+                 <item>
+                  <widget class="QLineEdit" name="lineEdit_modules_search">
+                   <property name="placeholderText">
+                    <string>🔍 Tìm kiếm module...</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QTableWidget" name="tableWidget_modules">
+                   <column>
+                    <property name="text">
+                     <string>Chọn</string>
+                    </property>
+                   </column>
+                   <column>
+                    <property name="text">
+                     <string>Tên</string>
+                    </property>
+                   </column>
+                   <column>
+                    <property name="text">
+                     <string>Thể loại</string>
+                    </property>
+                   </column>
+                   <column>
+                    <property name="text">
+                     <string>Mô tả</string>
+                    </property>
+                   </column>
+                  </widget>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+              <item>
+               <widget class="QGroupBox" name="groupBox_export_options">
+                <property name="title">
+                 <string>Định dạng Xuất (Export Format)</string>
+                </property>
+                <layout class="QHBoxLayout" name="horizontalLayout_export">
+                 <item>
+                  <widget class="QRadioButton" name="radioButton_export_csv">
+                   <property name="text">
+                    <string>CSV</string>
+                   </property>
+                   <property name="checked">
+                    <bool>true</bool>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QRadioButton" name="radioButton_export_json">
+                   <property name="text">
+                    <string>JSON</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QRadioButton" name="radioButton_export_html">
+                   <property name="text">
+                    <string>HTML</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QRadioButton" name="radioButton_export_default">
+                   <property name="text">
+                    <string>Mặc định</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+         <widget class="QWidget" name="page_image_config">
+          <layout class="QVBoxLayout" name="verticalLayout_image_config">
+           <item>
+            <widget class="QGroupBox" name="groupBox_image_source">
+             <property name="title">
+              <string>Nguồn Ảnh (Image Source)</string>
+             </property>
+             <layout class="QGridLayout" name="gridLayout_image_source">
+              <item row="0" column="0">
+               <widget class="QLabel" name="label_image_source">
+                <property name="text">
+                 <string>Thiết bị nguồn:</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1">
+               <widget class="QLineEdit" name="lineEdit_image_source">
+                <property name="readOnly">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
+            <widget class="QGroupBox" name="groupBox_image_destination">
+             <property name="title">
+              <string>Đích Ảnh (Image Destination)</string>
+             </property>
+             <layout class="QVBoxLayout" name="verticalLayout_image_destination">
+              <item>
+               <layout class="QGridLayout" name="gridLayout_image_destination">
+                <item row="0" column="0">
+                 <widget class="QLabel" name="label_destination_folder">
+                  <property name="text">
+                   <string>Thư mục đích:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="1">
+                 <widget class="QLineEdit" name="lineEdit_destination_folder">
+                  <property name="placeholderText">
+                   <string>Chọn thư mục để lưu tệp ảnh</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="2">
+                 <widget class="QPushButton" name="pushButton_browse_folder">
+                  <property name="text">
+                   <string>Duyệt...</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="0">
+                 <widget class="QLabel" name="label_image_filename">
+                  <property name="text">
+                   <string>Tên tệp ảnh:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="1" colspan="2">
+                 <widget class="QLineEdit" name="lineEdit_image_filename">
+                  <property name="placeholderText">
+                   <string>Tên tệp (không bao gồm phần mở rộng)</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
+            <widget class="QGroupBox" name="groupBox_image_format">
+             <property name="title">
+              <string>Định dạng Ảnh (Image Format)</string>
+             </property>
+             <layout class="QVBoxLayout" name="verticalLayout_image_format">
+              <item>
+               <layout class="QGridLayout" name="gridLayout_image_format">
+                <item row="0" column="0">
+                 <widget class="QRadioButton" name="radioButton_raw">
+                  <property name="text">
+                   <string>Raw (dd)</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="0">
+                 <widget class="QRadioButton" name="radioButton_e01">
+                  <property name="text">
+                   <string>E01 (Expert Witness Format)</string>
+                  </property>
+                  <property name="checked">
+                   <bool>true</bool>
+                  </property>
+                 </widget>
+                </item>
+                <item row="2" column="0">
+                 <widget class="QRadioButton" name="radioButton_aff">
+                  <property name="text">
+                   <string>AFF (Advanced Forensic Format)</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
+            <widget class="QGroupBox" name="groupBox_image_settings">
+             <property name="title">
+              <string>Cài đặt Ảnh (Image Settings)</string>
+             </property>
+             <layout class="QVBoxLayout" name="verticalLayout_image_settings">
+              <item>
+               <layout class="QGridLayout" name="gridLayout_image_settings">
+                <item row="0" column="0">
+                 <widget class="QLabel" name="label_fragment_size">
+                  <property name="text">
+                   <string>Kích thước phân mảnh (MB):</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="1">
+                 <widget class="QSpinBox" name="spinBox_fragment_size">
+                  <property name="specialValueText">
+                   <string>Không phân mảnh</string>
+                  </property>
+                  <property name="minimum">
+                   <number>0</number>
+                  </property>
+                  <property name="maximum">
+                   <number>102400</number>
+                  </property>
+                  <property name="value">
+                   <number>1500</number>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="0">
+                 <widget class="QLabel" name="label_compression">
+                  <property name="text">
+                   <string>Mức độ nén (0=Không, 1=Nhanh, ..., 9=Tối đa):</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="1">
+                 <widget class="QComboBox" name="comboBox_compression">
+                  <item>
+                   <property name="text">
+                    <string>0 - Không nén</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>1 - Nhanh nhất</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>5 - Bình thường</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>9 - Tối đa</string>
+                   </property>
+                  </item>
+                 </widget>
+                </item>
+                <item row="2" column="0" colspan="2">
+                 <widget class="QCheckBox" name="checkBox_ad_encryption">
+                  <property name="text">
+                   <string>Sử dụng mã hóa AD</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
+            <widget class="QGroupBox" name="groupBox_verification">
+             <property name="title">
+              <string>Tùy chọn Xác minh (Verification Options)</string>
+             </property>
+             <layout class="QVBoxLayout" name="verticalLayout_verification">
+              <item>
+               <widget class="QCheckBox" name="checkBox_verify_after_creation">
+                <property name="text">
+                 <string>Xác minh ảnh sau khi tạo</string>
+                </property>
+                <property name="checked">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QCheckBox" name="checkBox_precalculate_progress">
+                <property name="text">
+                 <string>Tính toán trước thống kê tiến trình</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QCheckBox" name="checkBox_create_directory_listing">
+                <property name="text">
+                 <string>Tạo danh sách thư mục của tất cả các tệp trong ảnh sau khi tạo</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
+            <widget class="QGroupBox" name="groupBox_hashing">
+             <property name="title">
+              <string>Tùy chọn Băm (Hash Options)</string>
+             </property>
+             <layout class="QHBoxLayout" name="horizontalLayout_hashing">
+              <item>
+               <widget class="QCheckBox" name="checkBox_md5">
+                <property name="text">
+                 <string>MD5</string>
+                </property>
+                <property name="checked">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QCheckBox" name="checkBox_sha1">
+                <property name="text">
+                 <string>SHA-1</string>
+                </property>
+                <property name="checked">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QCheckBox" name="checkBox_sha256">
+                <property name="text">
+                 <string>SHA-256</string>
+                </property>
+                <property name="checked">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
+            <spacer name="verticalSpacer_step3">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>40</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
+         </widget>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="page_step4_overview">
+      <layout class="QVBoxLayout" name="verticalLayout_step4">
+       <item>
+        <widget class="QGroupBox" name="groupBox_summary">
+         <property name="title">
+          <string>Bảng Tóm tắt Cấu hình</string>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_summary">
+          <item>
+           <widget class="QTextBrowser" name="textBrowser_summary"/>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="groupBox_command_line">
+         <property name="title">
+          <string>Dòng lệnh Tương đương</string>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_command_line">
+          <item>
+           <widget class="QLineEdit" name="lineEdit_command_line">
+            <property name="readOnly">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="page_step5_progress">
+      <layout class="QVBoxLayout" name="verticalLayout_step5">
+       <item>
+        <widget class="QGroupBox" name="groupBox_progress">
+         <property name="title">
+          <string>Tiến trình và Thống kê</string>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_progress">
+          <item row="0" column="0" colspan="4">
+           <widget class="QProgressBar" name="progressBar">
+            <property name="value">
+             <number>0</number>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_source_progress">
+            <property name="text">
+             <string>Nguồn:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QLabel" name="label_source_progress_val">
+            <property name="text">
+             <string>0 GB / 0 GB</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="2">
+           <widget class="QLabel" name="label_speed">
+            <property name="text">
+             <string>Tốc độ:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="3">
+           <widget class="QLabel" name="label_speed_val">
+            <property name="text">
+             <string>0 MB/s</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="label_time_elapsed">
+            <property name="text">
+             <string>Đã trôi qua:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="QLabel" name="label_time_elapsed_val">
+            <property name="text">
+             <string>00:00:00</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="2">
+           <widget class="QLabel" name="label_eta">
+            <property name="text">
+             <string>Ước tính (ETA):</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="3">
+           <widget class="QLabel" name="label_eta_val">
+            <property name="text">
+             <string>00:00:00</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0">
+           <widget class="QLabel" name="label_errors">
+            <property name="text">
+             <string>Lỗi đọc:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="1">
+           <widget class="QLabel" name="label_errors_val">
+            <property name="styleSheet">
+             <string notr="true">color: red;</string>
+            </property>
+            <property name="text">
+             <string>0</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="groupBox_log">
+         <property name="title">
+          <string>Nhật ký Trực tiếp</string>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_log">
+          <item>
+           <widget class="QTextBrowser" name="textBrowser_log"/>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_log_controls">
+            <item>
+             <widget class="QPushButton" name="pushButton_pause">
+              <property name="text">
+               <string>⏸️ Tạm dừng</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="pushButton_stop">
+              <property name="text">
+               <string>⏹️ Dừng</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer_log">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
+             <widget class="QPushButton" name="pushButton_save_log">
+              <property name="text">
+               <string>💾 Lưu Nhật ký</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+   <item>
+    <widget class="QFrame" name="frame_navigation">
+     <property name="frameShape">
+      <enum>QFrame::StyledPanel</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Raised</enum>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout_nav">
+      <item>
+       <widget class="QPushButton" name="pushButton_previous">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>120</width>
+          <height>40</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>← Quay lại</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer_nav">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QPushButton" name="pushButton_next">
+        <property name="minimumSize">
+         <size>
+          <width>120</width>
+          <height>40</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>Tiếp →</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="pushButton_start">
+        <property name="minimumSize">
+         <size>
+          <width>200</width>
+          <height>50</height>
+         </size>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">background-color: #4CAF50; color: white; font-weight: bold; font-size: 14px;</string>
+        </property>
+        <property name="text">
+         <string>🚀 Bắt đầu Thu thập</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </widget>
    </item>
   </layout>
