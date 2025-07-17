@@ -886,10 +886,11 @@ class ImportEvidenceDialog(QDialog):
 
 
 class Case(QWidget):
-    def __init__(self):
+    def __init__(self, main_window=None):
         super(Case, self).__init__()
         self.ui = Ui_Form()
         self.ui.setupUi(self)
+        self.main_window = main_window
         self.current_case_id = None
 
         # Setup tables
@@ -961,59 +962,57 @@ class Case(QWidget):
         wizard.exec_()
 
     def load_cases(self):
-        """Load danh sách cases từ database"""
+        """Tải danh sách các case từ database và hiển thị lên bảng"""
         try:
-            # Lấy tất cả cases với thông tin investigator
-            all_cases = db.get_cases()
-            cases = []
-            for case in all_cases:
-                case_with_investigator = db.get_case_with_investigator(case["case_id"])
-                if case_with_investigator:
-                    cases.append(case_with_investigator)
-                else:
-                    cases.append(case)
+            # Gọi hàm mới để lấy tất cả chi tiết trong một lần query
+            cases = db.get_all_cases_details()
+            if cases is None:
+                cases = []
+
             self.ui.casesTable.setRowCount(len(cases))
 
             for row, case in enumerate(cases):
-                self.ui.casesTable.setItem(
-                    row, 0, QTableWidgetItem(case.get("title", ""))
-                )
-
-                # Hiển thị tên investigator thay vì Single/Multi User
-                investigator_name = case.get("full_name", "Chưa phân công")
-                self.ui.casesTable.setItem(row, 1, QTableWidgetItem(investigator_name))
-
+                # Lấy dữ liệu từ kết quả query
+                case_id = case.get("case_id")
+                title = case.get("title", "N/A")
+                investigator = case.get("investigator_name", "N/A")
                 created_at = case.get("created_at", "")
-                if created_at:
-                    # Format datetime
-                    try:
-                        dt = datetime.fromisoformat(created_at.replace("Z", "+00:00"))
-                        formatted_date = dt.strftime("%d/%m/%Y")
-                    except:
-                        formatted_date = created_at
-                else:
-                    formatted_date = ""
+                evidence_count = case.get("evidence_count", 0)
+                status = case.get("status", "N/A")
+                archive_path = case.get("archive_path", "N/A")
 
+                # Định dạng lại ngày tạo
+                try:
+                    formatted_date = datetime.fromisoformat(
+                        created_at.replace("Z", "+00:00")
+                    ).strftime("%d/%m/%Y")
+                except:
+                    formatted_date = created_at
+
+                # --- Nạp dữ liệu vào bảng ĐÚNG THỨ TỰ GIAO DIỆN ---
+                # Cột 0: Tên Case
+                title_item = QTableWidgetItem(title)
+                # Lưu case_id vào item này để các chức năng khác sử dụng
+                title_item.setData(Qt.UserRole, case_id)
+                self.ui.casesTable.setItem(row, 0, title_item)
+
+                # Cột 1: Điều tra viên
+                self.ui.casesTable.setItem(row, 1, QTableWidgetItem(investigator))
+                # Cột 2: Ngày tạo
                 self.ui.casesTable.setItem(row, 2, QTableWidgetItem(formatted_date))
-
-                # Count evidence
-                evidence_count = len(db.get_artifacts_by_case(case["case_id"]))
+                # Cột 3: Evidence (Số lượng)
                 self.ui.casesTable.setItem(
                     row, 3, QTableWidgetItem(str(evidence_count))
                 )
-                self.ui.casesTable.setItem(
-                    row, 4, QTableWidgetItem(case.get("status", ""))
-                )
-
-                # Hiển thị đường dẫn lưu case
-                case_path = case.get("archive_path", "N/A")
-                self.ui.casesTable.setItem(row, 5, QTableWidgetItem(case_path))
-
-                # Store case_id in first column
-                self.ui.casesTable.item(row, 0).setData(Qt.UserRole, case["case_id"])
+                # Cột 4: Trạng thái
+                self.ui.casesTable.setItem(row, 4, QTableWidgetItem(status))
+                # Cột 5: Đường dẫn
+                self.ui.casesTable.setItem(row, 5, QTableWidgetItem(archive_path))
 
         except Exception as e:
-            QMessageBox.critical(self, "Lỗi", f"Không thể load cases: {str(e)}")
+            QMessageBox.critical(
+                self, "Lỗi Tải Dữ Liệu", f"Không thể tải danh sách case: {e}"
+            )
 
     def on_case_selected(self):
         """Xử lý khi chọn case"""
@@ -1246,31 +1245,35 @@ class Case(QWidget):
             )
 
     def start_analysis(self):
-        """Bắt đầu phân tích"""
-        if not self.current_case_id:
-            QMessageBox.warning(self, "Cảnh báo", "Vui lòng chọn case để phân tích!")
-            return
-
-        evidence_count = self.ui.evidenceTable.rowCount()
-        if evidence_count == 0:
+        """
+        Bắt đầu workflow phân tích bằng cách chuyển sang tab phân tích
+        cho case đang được chọn.
+        """
+        selected_rows = self.ui.casesTable.selectionModel().selectedRows()
+        if not selected_rows:
             QMessageBox.warning(
-                self, "Cảnh báo", "Case này chưa có evidence nào để phân tích!"
+                self, "Lỗi", "Vui lòng chọn một case để bắt đầu phân tích!"
             )
             return
 
-        QMessageBox.information(
-            self,
-            "Bắt đầu phân tích",
-            f"🚀 Sẵn sàng phân tích case với {evidence_count} evidence!\n\n"
-            "Bạn có thể sử dụng các module phân tích:\n"
-            "• Memory Analysis\n"
-            "• Registry Analysis\n"
-            "• Browser Analysis\n"
-            "• File Analysis\n"
-            "• Metadata Analysis\n"
-            "• Event Log Analysis\n\n"
-            "Hãy chuyển đến các tab phân tích tương ứng.",
-        )
+        # Lấy case ID từ data role của item ở cột 0 (Tên Case)
+        selected_row = selected_rows[0].row()
+        case_item = self.ui.casesTable.item(selected_row, 0)
+        if case_item:
+            case_id = case_item.data(Qt.UserRole)
+
+            if self.main_window and hasattr(
+                self.main_window, "switch_to_memory_analysis_tab"
+            ):
+                self.main_window.switch_to_memory_analysis_tab(case_id)
+            else:
+                QMessageBox.critical(
+                    self,
+                    "Lỗi Tích Hợp",
+                    "Không thể gọi đến cửa sổ chính để chuyển tab phân tích.",
+                )
+        else:
+            QMessageBox.warning(self, "Lỗi", "Không thể xác định ID của case đã chọn.")
 
     def format_file_size(self, size_bytes):
         """Format kích thước file"""
