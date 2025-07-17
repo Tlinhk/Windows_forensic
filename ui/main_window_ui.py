@@ -75,7 +75,7 @@ class Ui_MainWindow(object):
 "")
         self.toolBox.setObjectName("toolBox")
         self.page_3 = QtWidgets.QWidget()
-        self.page_3.setGeometry(QtCore.QRect(0, 0, 194, 467))
+        self.page_3.setGeometry(QtCore.QRect(0, 0, 457, 467))
         self.page_3.setObjectName("page_3")
         self.verticalLayout = QtWidgets.QVBoxLayout(self.page_3)
         self.verticalLayout.setContentsMargins(5, 5, 5, 5)
@@ -112,7 +112,7 @@ class Ui_MainWindow(object):
         icon.addPixmap(QtGui.QPixmap(":/icons/icons/antivirus_2894894.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.toolBox.addItem(self.page_3, icon, "")
         self.page_4 = QtWidgets.QWidget()
-        self.page_4.setGeometry(QtCore.QRect(0, 0, 194, 467))
+        self.page_4.setGeometry(QtCore.QRect(0, 0, 457, 467))
         self.page_4.setObjectName("page_4")
         self.verticalLayout_2 = QtWidgets.QVBoxLayout(self.page_4)
         self.verticalLayout_2.setContentsMargins(5, 5, 5, 5)
@@ -140,7 +140,7 @@ class Ui_MainWindow(object):
         icon1.addPixmap(QtGui.QPixmap(":/icons/icons/icons8-collect-50.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.toolBox.addItem(self.page_4, icon1, "")
         self.page_5 = QtWidgets.QWidget()
-        self.page_5.setGeometry(QtCore.QRect(0, 0, 231, 446))
+        self.page_5.setGeometry(QtCore.QRect(0, 0, 457, 467))
         self.page_5.setObjectName("page_5")
         self.verticalLayout_3 = QtWidgets.QVBoxLayout(self.page_5)
         self.verticalLayout_3.setContentsMargins(5, 5, 5, 5)
@@ -200,7 +200,7 @@ class Ui_MainWindow(object):
         icon2.addPixmap(QtGui.QPixmap(":/icons/icons/icons8-combo-chart-50.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.toolBox.addItem(self.page_5, icon2, "")
         self.page_6 = QtWidgets.QWidget()
-        self.page_6.setGeometry(QtCore.QRect(0, 0, 194, 467))
+        self.page_6.setGeometry(QtCore.QRect(0, 0, 457, 467))
         self.page_6.setObjectName("page_6")
         self.verticalLayout_4 = QtWidgets.QVBoxLayout(self.page_6)
         self.verticalLayout_4.setContentsMargins(5, 5, 5, 5)
@@ -218,7 +218,7 @@ class Ui_MainWindow(object):
         icon3.addPixmap(QtGui.QPixmap(":/icons/icons/icons8-report-50 (1).png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.toolBox.addItem(self.page_6, icon3, "")
         self.page_7 = QtWidgets.QWidget()
-        self.page_7.setGeometry(QtCore.QRect(0, 0, 194, 467))
+        self.page_7.setGeometry(QtCore.QRect(0, 0, 457, 467))
         self.page_7.setObjectName("page_7")
         self.verticalLayout_5 = QtWidgets.QVBoxLayout(self.page_7)
         self.verticalLayout_5.setContentsMargins(5, 5, 5, 5)
@@ -230,7 +230,7 @@ class Ui_MainWindow(object):
         icon4.addPixmap(QtGui.QPixmap(":/icons/icons/icons8-system-setting-53 (1).png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.toolBox.addItem(self.page_7, icon4, "")
         self.page_8 = QtWidgets.QWidget()
-        self.page_8.setGeometry(QtCore.QRect(0, 0, 194, 467))
+        self.page_8.setGeometry(QtCore.QRect(0, 0, 457, 467))
         self.page_8.setObjectName("page_8")
         self.gridLayout_3 = QtWidgets.QGridLayout(self.page_8)
         self.gridLayout_3.setContentsMargins(5, 5, 5, 5)
@@ -255,7 +255,7 @@ class Ui_MainWindow(object):
         self.gridLayout_2.setObjectName("gridLayout_2")
         self.search_widget = QtWidgets.QWidget(self.main_widget)
         self.search_widget.setStyleSheet("#search_widget {\n"
-"    background-color: #ABB2B9;\n"
+"    background-color: #2980b9;\n"
 "}\n"
 "")
         self.search_widget.setObjectName("search_widget")
@@ -272,56 +272,26 @@ class Ui_MainWindow(object):
         self.pushButton_12.setCheckable(True)
         self.pushButton_12.setObjectName("pushButton_12")
         self.horizontalLayout_2.addWidget(self.pushButton_12)
-        spacerItem6 = QtWidgets.QSpacerItem(260, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.timestamp_label = QtWidgets.QLabel(self.search_widget)
+        self.timestamp_label.setStyleSheet("#timestamp_label {\n"
+"    color: #ffffff;\n"
+"    font-size: 16px;\n"
+"    font-weight: 500;\n"
+"    padding: 5px 10px;\n"
+"}")
+        self.timestamp_label.setObjectName("timestamp_label")
+        self.horizontalLayout_2.addWidget(self.timestamp_label)
+        spacerItem6 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.horizontalLayout_2.addItem(spacerItem6)
-        self.search_frame = QtWidgets.QFrame(self.search_widget)
-        self.search_frame.setStyleSheet("#search_frame {\n"
-"    border: 1px solid #aa7e6f;\n"
-"    border-radius: 15px;\n"
-"    background-color: #fff;\n"
-"}\n"
-"\n"
-"#search_frame QPushButton {\n"
-"    padding: 5px 5px;\n"
-"    border-radius: 15px;\n"
-"}\n"
-"\n"
-"#search_frame QPushButton:pressed {\n"
-"    padding-left: 10px;\n"
-"}\n"
-"#search_frame QLineEdit {\n"
-"    border: none;\n"
-"}\n"
-"\n"
-"")
-        self.search_frame.setFrameShape(QtWidgets.QFrame.StyledPanel)
-        self.search_frame.setFrameShadow(QtWidgets.QFrame.Raised)
-        self.search_frame.setObjectName("search_frame")
-        self.horizontalLayout = QtWidgets.QHBoxLayout(self.search_frame)
-        self.horizontalLayout.setContentsMargins(15, 0, 5, 0)
-        self.horizontalLayout.setSpacing(6)
-        self.horizontalLayout.setObjectName("horizontalLayout")
-        self.lineEdit = QtWidgets.QLineEdit(self.search_frame)
-        self.lineEdit.setMinimumSize(QtCore.QSize(350, 0))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        self.lineEdit.setFont(font)
-        self.lineEdit.setClearButtonEnabled(True)
-        self.lineEdit.setObjectName("lineEdit")
-        self.horizontalLayout.addWidget(self.lineEdit)
-        self.pushButton_13 = QtWidgets.QPushButton(self.search_frame)
-        self.pushButton_13.setMinimumSize(QtCore.QSize(30, 30))
-        self.pushButton_13.setMaximumSize(QtCore.QSize(30, 30))
-        self.pushButton_13.setText("")
-        icon7 = QtGui.QIcon()
-        icon7.addPixmap(QtGui.QPixmap(":/icons/icons/search-3-48.ico"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.pushButton_13.setIcon(icon7)
-        self.pushButton_13.setObjectName("pushButton_13")
-        self.horizontalLayout.addWidget(self.pushButton_13)
-        self.horizontalLayout_2.addWidget(self.search_frame)
-        spacerItem7 = QtWidgets.QSpacerItem(259, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.horizontalLayout_2.addItem(spacerItem7)
+        self.username_label = QtWidgets.QLabel(self.search_widget)
+        self.username_label.setStyleSheet("#username_label {\n"
+"    color: #ffffff;\n"
+"    font-size: 16px;\n"
+"    font-weight: bold;\n"
+"    padding: 5px 8px;\n"
+"}")
+        self.username_label.setObjectName("username_label")
+        self.horizontalLayout_2.addWidget(self.username_label)
         self.user_label = QtWidgets.QLabel(self.search_widget)
         self.user_label.setMinimumSize(QtCore.QSize(30, 30))
         self.user_label.setMaximumSize(QtCore.QSize(30, 30))
@@ -349,7 +319,7 @@ class Ui_MainWindow(object):
 "}\n"
 "\n"
 "QTabBar::close-button:hover {\n"
-"    image: url(:/icons/icons/x-mark-4-48.ico)\n"
+"    image: url(:/icons/icons/x-mark-4-48.ico);\n"
 "}\n"
 "\n"
 "QTabBar::tab {\n"
@@ -360,12 +330,12 @@ class Ui_MainWindow(object):
 "                margin-right: 2px;\n"
 "                border-top-left-radius: 6px;\n"
 "                border-top-right-radius: 6px;\n"
+"                font-size: 16px; \n"
 "}\n"
 "     \n"
 "QTabBar::tab:selected {\n"
-"                background-color: #2E86AB;\n"
+"                background-color: #28a745 ;\n"
 "                color: #ffffff;\n"
-"                border: 2px solid #2E86AB;\n"
 "                border-bottom: none;\n"
 "            }\n"
 "            \n"
@@ -407,7 +377,8 @@ class Ui_MainWindow(object):
         self.toolBox.setItemText(self.toolBox.indexOf(self.page_6), _translate("MainWindow", "Báo cáo"))
         self.toolBox.setItemText(self.toolBox.indexOf(self.page_7), _translate("MainWindow", "Cài đặt hệ thống"))
         self.toolBox.setItemText(self.toolBox.indexOf(self.page_8), _translate("MainWindow", "Đăng xuất"))
-        self.lineEdit.setPlaceholderText(_translate("MainWindow", "Nhập từ khóa tìm kiếm"))
+        self.timestamp_label.setText(_translate("MainWindow", "🕒 --"))
+        self.username_label.setText(_translate("MainWindow", "Người dùng"))
 from static import resource_rc
 
 

@@ -1,0 +1,408 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>ImportEvidenceDialog</class>
+ <widget class="QDialog" name="ImportEvidenceDialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>706</width>
+    <height>689</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Import Evidence</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">QDialog {
+    background-color: #f8f9fa;
+}
+
+QGroupBox {
+    font-weight: bold;
+    border: 2px solid #dee2e6;
+    border-radius: 8px;
+    margin-top: 10px;
+    padding-top: 10px;
+    background-color: white;
+}
+
+QGroupBox::title {
+    subcontrol-origin: margin;
+    left: 10px;
+    padding: 0 8px 0 8px;
+    color: #495057;
+}
+
+QPushButton {
+    background-color: #007bff;
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-weight: 500;
+    font-size: 14px;
+}
+
+QPushButton:hover {
+    background-color: #0056b3;
+}
+
+QPushButton:pressed {
+    background-color: #004085;
+}
+
+QPushButton#importBtn {
+    background-color: #28a745;
+    font-size: 16px;
+    padding: 12px 24px;
+}
+
+QPushButton#importBtn:hover {
+    background-color: #1e7e34;
+}
+
+QPushButton#cancelBtn {
+    background-color: #6c757d;
+}
+
+QPushButton#cancelBtn:hover {
+    background-color: #545b62;
+}
+
+QPushButton#browseBtn {
+    background-color: #17a2b8;
+    padding: 8px 16px;
+}
+
+QPushButton#browseBtn:hover {
+    background-color: #117a8b;
+}
+
+QLineEdit {
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    padding: 8px 12px;
+    font-size: 14px;
+    background-color: white;
+}
+
+QLineEdit:focus {
+    border-color: #007bff;
+    outline: 0;
+    box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
+}
+
+QComboBox {
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    padding: 8px 12px;
+    background-color: white;
+    min-width: 120px;
+}
+
+QTextEdit {
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    padding: 8px;
+    background-color: white;
+}
+
+QCheckBox {
+    spacing: 8px;
+    font-size: 14px;
+}
+
+QCheckBox::indicator {
+    width: 18px;
+    height: 18px;
+}
+
+QCheckBox::indicator:unchecked {
+    border: 2px solid #ced4da;
+    border-radius: 3px;
+    background-color: white;
+}
+
+QCheckBox::indicator:checked {
+    border: 2px solid #007bff;
+    border-radius: 3px;
+    background-color: #007bff;
+}
+
+QRadioButton {
+    spacing: 8px;
+    font-size: 14px;
+}
+
+QRadioButton::indicator {
+    width: 18px;
+    height: 18px;
+}
+
+QRadioButton::indicator:unchecked {
+    border: 2px solid #ced4da;
+    border-radius: 9px;
+    background-color: white;
+}
+
+QRadioButton::indicator:checked {
+    border: 2px solid #007bff;
+    border-radius: 9px;
+    background-color: #007bff;
+}
+
+QLabel#titleLabel {
+    color: #343a40;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+QLabel#typeDescLabel {
+    color: #6c757d;
+    font-size: 12px;
+    font-style: italic;
+}</string>
+  </property>
+  <property name="modal">
+   <bool>true</bool>
+  </property>
+  <layout class="QVBoxLayout" name="mainLayout">
+   <property name="spacing">
+    <number>16</number>
+   </property>
+   <property name="leftMargin">
+    <number>20</number>
+   </property>
+   <property name="topMargin">
+    <number>20</number>
+   </property>
+   <property name="rightMargin">
+    <number>20</number>
+   </property>
+   <property name="bottomMargin">
+    <number>20</number>
+   </property>
+   <item>
+    <widget class="QLabel" name="titleLabel">
+     <property name="text">
+      <string>Import Evidence vào Case</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="evidenceTypeGroup">
+     <property name="font">
+      <font>
+       <pointsize>9</pointsize>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="title">
+      <string>Loại Evidence</string>
+     </property>
+     <layout class="QVBoxLayout" name="evidenceTypeLayout">
+      <item>
+       <layout class="QHBoxLayout" name="typeSelectionLayout">
+        <item>
+         <widget class="QRadioButton" name="volatileRadio">
+          <property name="toolTip">
+           <string/>
+          </property>
+          <property name="text">
+           <string>🔴 VOLATILE (RAM, Processes, Network...)</string>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QRadioButton" name="nonVolatileRadio">
+          <property name="text">
+           <string>🔵 NON-VOLATILE (Disk, Files, Registry...)</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="fileSelectionGroup">
+     <property name="font">
+      <font>
+       <pointsize>9</pointsize>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="title">
+      <string>Chọn Files để Import</string>
+     </property>
+     <layout class="QVBoxLayout" name="fileSelectionLayout">
+      <item>
+       <layout class="QHBoxLayout" name="filePathLayout">
+        <item>
+         <widget class="QLineEdit" name="filePathEdit">
+          <property name="readOnly">
+           <bool>true</bool>
+          </property>
+          <property name="placeholderText">
+           <string>Chọn file(s) để import... </string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="browseBtn">
+          <property name="text">
+           <string>📂 Chọn Files</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="evidenceInfoGroup">
+     <property name="font">
+      <font>
+       <pointsize>9</pointsize>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="title">
+      <string>Thông tin Evidence (Tùy chọn)</string>
+     </property>
+     <layout class="QGridLayout" name="evidenceInfoLayout">
+      <item row="0" column="0">
+       <widget class="QLabel" name="evidenceNameLabel">
+        <property name="font">
+         <font>
+          <weight>75</weight>
+          <bold>true</bold>
+         </font>
+        </property>
+        <property name="text">
+         <string>Tên Evidence:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QLineEdit" name="evidenceNameEdit">
+        <property name="placeholderText">
+         <string>Để trống để tự động đặt tên theo file (VD: memory_dump.dmp)</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="optionsGroup">
+     <property name="font">
+      <font>
+       <pointsize>9</pointsize>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="title">
+      <string>Tùy chọn Import</string>
+     </property>
+     <layout class="QVBoxLayout" name="optionsLayout">
+      <item>
+       <layout class="QHBoxLayout" name="optionsRowLayout">
+        <item>
+         <widget class="QCheckBox" name="calculateHashCheck">
+          <property name="text">
+           <string>Tính toán hash (SHA256)</string>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="verifyIntegrityCheck">
+          <property name="text">
+           <string>Kiểm tra tính toàn vẹn</string>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="optionsRow2Layout">
+        <item>
+         <widget class="QCheckBox" name="compressCheck">
+          <property name="text">
+           <string>Nén dữ liệu để tiết kiệm không gian</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="indexContentCheck">
+          <property name="text">
+           <string>Lập chỉ mục nội dung (cho tìm kiếm nhanh)</string>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="buttonLayout">
+     <property name="spacing">
+      <number>12</number>
+     </property>
+     <item>
+      <spacer name="buttonSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="cancelBtn">
+       <property name="text">
+        <string>Hủy</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="importBtn">
+       <property name="text">
+        <string>✅ Import Evidence</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

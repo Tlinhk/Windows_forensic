@@ -1,4 +1,5 @@
 PyQt5==5.15.11
+psutil==7.0.0
 
 # Database (SQLite3 is built-in with Python)
 # hashlib is built-in with Python
