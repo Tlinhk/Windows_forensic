@@ -1,18 +1,10 @@
-from PyQt5.QtWidgets import (
-    QDialog,
-    QMessageBox,
-    QVBoxLayout,
-    QHBoxLayout,
-    QTableWidget,
-    QTableWidgetItem,
-    QPushButton,
-    QLabel,
-    QHeaderView,
-    QAbstractItemView,
-)
+from PyQt5.QtWidgets import (QDialog, QMessageBox, QVBoxLayout, QHBoxLayout, 
+                              QTableWidget, QTableWidgetItem, QPushButton, 
+                              QLabel, QHeaderView, QAbstractItemView)
 from PyQt5.QtCore import Qt, pyqtSignal
 from ui.pages.welcome_dialog_ui import Ui_WelcomeDialog
 from database.db_manager import db
+
 
 
 class RecentCaseDialog(QDialog):
@@ -88,33 +80,32 @@ class RecentCaseDialog(QDialog):
                 background-color: #e2e8f0;
                 color: #4a5568;
             }
-        """
-        )
+        """)
+    
 
     def setup_connections(self):
         """Setup connections"""
         self.open_btn.clicked.connect(self.open_selected_case)
         self.cancel_btn.clicked.connect(self.reject)
         self.table.itemDoubleClicked.connect(self.open_selected_case)
-
+    
     def load_recent_cases(self):
         """Load cases into table"""
         self.table.setRowCount(len(self.recent_cases))
-
+        
         for row, case in enumerate(self.recent_cases):
             # Case Name
-            name_item = QTableWidgetItem(
-                case.get("title", f"Case {case.get('case_id')}")
-            )
-            name_item.setData(Qt.ItemDataRole.UserRole, case.get("case_id"))
+            name_item = QTableWidgetItem(case.get('title', f"Case {case.get('case_id')}"))
+            name_item.setData(Qt.ItemDataRole.UserRole, case.get('case_id'))
             self.table.setItem(row, 0, name_item)
-
+            
             # Path
-            path_item = QTableWidgetItem(case.get("archive_path", "N/A"))
+            path_item = QTableWidgetItem(case.get('archive_path', 'N/A'))
             self.table.setItem(row, 1, path_item)
-
+        
         if self.recent_cases:
             self.table.selectRow(0)
+    
 
     def open_selected_case(self):
         """Open selected case"""
@@ -124,6 +115,7 @@ class RecentCaseDialog(QDialog):
             if name_item:
                 case_id = name_item.data(Qt.ItemDataRole.UserRole)
                 self.selected_case = {
+
                     "case_id": case_id,
                     "case_data": self.recent_cases[current_row],
                 }
@@ -147,6 +139,7 @@ class WelcomeDialog(QDialog):
         self.ui = Ui_WelcomeDialog()
         self.ui.setupUi(self)
 
+
         # Set dialog properties
         self.setModal(True)
 
@@ -161,11 +154,12 @@ class WelcomeDialog(QDialog):
         self.ui.openRecentBtn.clicked.connect(self.handle_open_recent)
         self.ui.openCaseBtn.clicked.connect(self.handle_case_management)
         self.ui.closeBtn.clicked.connect(self.reject)
-
+                           
     def load_recent_cases(self):
         """Load recent cases from database"""
         try:
             all_cases = db.get_cases()
+
 
             # Get top 5 most recent cases
             self.recent_cases = sorted(
@@ -184,7 +178,7 @@ class WelcomeDialog(QDialog):
         """Handle new case creation"""
         self.accept()
         self.new_case_requested.emit()
-
+                           
     def handle_open_recent(self):
         """Handle opening recent case"""
         if not self.recent_cases:
@@ -195,12 +189,14 @@ class WelcomeDialog(QDialog):
             )
             return
 
+
         # Show Open Recent Case dialog (inline)
         recent_dialog = self.create_recent_case_dialog()
         if recent_dialog.exec_() == QDialog.Accepted:
             selected_case = recent_dialog.get_selected_case()
             if selected_case:
                 # Store selected case for main window to access
+
                 self.selected_case_id = selected_case["case_id"]
                 self.selected_case_data = selected_case["case_data"]
 
@@ -218,6 +214,7 @@ class WelcomeDialog(QDialog):
         self.accept()
         self.case_management_requested.emit()
 
+
     def get_selected_case_id(self):
         """Get selected case ID for recent case opening"""
         return getattr(self, "selected_case_id", None)
@@ -225,3 +222,4 @@ class WelcomeDialog(QDialog):
     def get_selected_case_data(self):
         """Get selected case data for recent case opening"""
         return getattr(self, "selected_case_data", None)
+

@@ -326,7 +326,7 @@ class DatabaseManager:
         except Exception as e:
             print(f"❌ Lỗi nghiêm trọng khi hard delete user: {e}")
             return False
-    
+
     # ==================== CASE MANAGEMENT ====================
 
     def create_case(
