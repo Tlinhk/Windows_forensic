@@ -890,6 +890,7 @@ class Case(QWidget):
         super(Case, self).__init__()
         self.ui = Ui_Form()
         self.ui.setupUi(self)
+
         self.main_window = main_window
         self.current_case_id = None
 
@@ -912,6 +913,7 @@ class Case(QWidget):
 
         # Load data
         self.load_cases()
+
 
     def load_specific_case(self, case_id, case_data):
         """Load specific case"""
@@ -1033,6 +1035,7 @@ class Case(QWidget):
             item = self.ui.casesTable.item(current_row, 0)
             if item:
                 self.current_case_id = item.data(Qt.UserRole)
+
                 if self.main_window:
                     self.main_window.current_case_id = self.current_case_id
                 case_name = item.text()

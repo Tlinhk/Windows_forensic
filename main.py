@@ -1,3 +1,4 @@
+
 from PyQt5.QtWidgets import QApplication, QMainWindow, QMessageBox, QPushButton, QMenu
 from PyQt5.QtCore import pyqtSignal, QTimer, Qt
 from datetime import datetime
@@ -10,9 +11,7 @@ from pages_functions.dashboard import Dashboard
 from pages_functions.case_management import Case
 from pages_functions.user_management import UserManagement
 from pages_functions.collect.volatile.volatile import Volatile
-from pages_functions.collect.nonvolatile.nonvolatile import Nonvolatile
-
-# Updated import for the new MemoryAnalysisPage class
+from pages_functions.collect.nonvolatile.nonvolatile import NonVolatilePage
 from pages_functions.analysis.memory_analysis import MemoryAnalysisPage
 from pages_functions.analysis.registry_analysis import RegistryAnalysis
 from pages_functions.analysis.browser_analysis import BrowserAnalysis
@@ -61,6 +60,7 @@ class MyWindow(QMainWindow):
         self.update_timestamp()
         self.update_user_info()
 
+
         # Use a dictionary to store created instances to avoid re-creation
         self.opened_windows = {}
 
@@ -71,7 +71,7 @@ class MyWindow(QMainWindow):
             self.case_btn: ("Quản lý vụ án", lambda: Case(main_window=self)),
             self.user_management_btn: ("User Management", lambda: UserManagement()),
             self.volatile_btn: ("Volatile", lambda: Volatile()),
-            self.nonvolatile_btn: ("Non-Volatile", lambda: Nonvolatile()),
+            self.nonvolatile_btn: ("Non-Volatile", lambda: NonvolatilePage()),
             self.memory_btn: (
                 "Phân tích bộ nhớ",
                 lambda: MemoryAnalysisPage(parent=self),
@@ -104,6 +104,7 @@ class MyWindow(QMainWindow):
 
         self.user_label.mousePressEvent = self.user_label_clicked
         # self.logout_btn.clicked.connect(self.confirm_logout)
+
 
     def get_or_create_window(self, key, widget_factory):
         if key not in self.opened_windows:
@@ -145,6 +146,7 @@ class MyWindow(QMainWindow):
             current_tab_index = self.ui.tabWidget.currentIndex()
             if current_tab_index >= 0:
                 current_widget = self.ui.tabWidget.widget(current_tab_index)
+
                 if (
                     current_widget
                     and hasattr(current_widget, "set_case_data")
@@ -165,6 +167,7 @@ class MyWindow(QMainWindow):
                             "created_date": case_info.get("created_at", ""),
                             "archive_path": case_info.get("archive_path", ""),
                         }
+
                         current_widget.set_case_data(case_data)
                 elif (
                     current_widget
@@ -190,6 +193,7 @@ class MyWindow(QMainWindow):
             current_tab_index = self.ui.tabWidget.currentIndex()
             if current_tab_index >= 0:
                 current_widget = self.ui.tabWidget.widget(current_tab_index)
+
                 if (
                     current_widget
                     and hasattr(current_widget, "set_case_data")
@@ -210,6 +214,7 @@ class MyWindow(QMainWindow):
                             "created_date": case_info.get("created_at", ""),
                             "archive_path": case_info.get("archive_path", ""),
                         }
+
                         current_widget.set_case_data(case_data)
                 elif (
                     current_widget
@@ -227,6 +232,7 @@ class MyWindow(QMainWindow):
         Function for showing case management window as default
         :return:
         """
+
         key = self.case_btn
         title, factory = self.menu_btns_list[key]
 
@@ -323,6 +329,7 @@ class MyWindow(QMainWindow):
             else:
                 button.setChecked(True)
 
+
     def open_tab_flag(self, tab_title):
         """
         Check if tab is already open
@@ -331,6 +338,7 @@ class MyWindow(QMainWindow):
             if self.ui.tabWidget.tabText(i) == tab_title:
                 return True, i
         return False, -1
+
 
     def user_label_clicked(self, ev):
         """

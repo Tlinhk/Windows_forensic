@@ -1,0 +1,21 @@
+Description: F-Secure Antivirus Data
+Author: Drew Ervin
+Version: 1.0
+Id: 8bfd6f82-f867-4ce2-89ac-22802ff9a15f
+RecreateDirectories: true
+Targets:
+    -
+        Name: F-Secure Logs
+        Category: Antivirus
+        Path: C:\ProgramData\F-Secure\Log\
+        Recursive: true
+    -
+        Name: F-Secure User Logs
+        Category: Antivirus
+        Path: C:\users\%user%\AppData\Local\F-Secure\Log\
+        Recursive: true
+    -
+        Name: F-Secure Scheduled Scan Reports
+        Category: Antivirus
+        Path: C:\ProgramData\F-Secure\Antivirus\ScheduledScanReports\
+        Recursive: true

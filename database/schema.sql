@@ -87,6 +87,7 @@ CREATE TABLE Activity_logs (
     case_id INTEGER,
     user_id INTEGER,
     action VARCHAR(50) NOT NULL,
+    details TEXT, -- Added details column
     timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
     tool_used VARCHAR(100),
     FOREIGN KEY (artefact_id) REFERENCES Artefacts(artefact_id),
