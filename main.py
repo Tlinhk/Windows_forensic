@@ -1,6 +1,8 @@
-from PyQt5.QtWidgets import QApplication, QMainWindow, QMessageBox
+
+from PyQt5.QtWidgets import QApplication, QMainWindow, QMessageBox, QPushButton, QMenu
 from PyQt5.QtCore import pyqtSignal, QTimer, Qt
 from datetime import datetime
+from PyQt5 import QtWidgets
 
 
 from login_window import LoginWindow
@@ -10,7 +12,7 @@ from pages_functions.case_management import Case
 from pages_functions.user_management import UserManagement
 from pages_functions.collect.volatile.volatile import Volatile
 from pages_functions.collect.nonvolatile.nonvolatile import NonVolatilePage
-from pages_functions.analysis.memory_analysis import MemoryAnalysis
+from pages_functions.analysis.memory_analysis import MemoryAnalysisPage
 from pages_functions.analysis.registry_analysis import RegistryAnalysis
 from pages_functions.analysis.browser_analysis import BrowserAnalysis
 from pages_functions.analysis.file_analysis import FileAnalysis
@@ -58,23 +60,29 @@ class MyWindow(QMainWindow):
         self.update_timestamp()
         self.update_user_info()
 
+
+        # Use a dictionary to store created instances to avoid re-creation
+        self.opened_windows = {}
+
         ## Create dict for menu buttons and tab windows
-
+        self.current_case_id = None
         self.menu_btns_list = {
-            self.dashboard_btn: Dashboard(),
-            self.case_btn: Case(),
-            self.user_management_btn: UserManagement(),
-            self.volatile_btn: Volatile(),
-            self.nonvolatile_btn: NonVolatilePage(),
-            self.memory_btn: MemoryAnalysis(),
-            self.registry_btn: RegistryAnalysis(),
-            self.browser_btn: BrowserAnalysis(),
-            self.file_btn: FileAnalysis(),
-            self.metadata_btn: MetadataAnalysis(),
-            self.eventlog_btn: EventlogAnalysis(),
-            self.report_btn: Report(),
+            self.dashboard_btn: ("Dashboard", lambda: Dashboard()),
+            self.case_btn: ("Quản lý vụ án", lambda: Case(main_window=self)),
+            self.user_management_btn: ("User Management", lambda: UserManagement()),
+            self.volatile_btn: ("Volatile", lambda: Volatile()),
+            self.nonvolatile_btn: ("Non-Volatile", lambda: NonvolatilePage()),
+            self.memory_btn: (
+                "Phân tích bộ nhớ",
+                lambda: MemoryAnalysisPage(parent=self),
+            ),
+            self.registry_btn: ("Registry", lambda: RegistryAnalysis()),
+            self.browser_btn: ("Browser", lambda: BrowserAnalysis()),
+            self.file_btn: ("File", lambda: FileAnalysis()),
+            self.metadata_btn: ("Metadata", lambda: MetadataAnalysis()),
+            self.eventlog_btn: ("Event Log", lambda: EventlogAnalysis()),
+            self.report_btn: ("Report", lambda: Report()),
         }
-
         ##Show home window when start app
         self.show_case_management_window()
 
@@ -97,6 +105,34 @@ class MyWindow(QMainWindow):
         self.user_label.mousePressEvent = self.user_label_clicked
         # self.logout_btn.clicked.connect(self.confirm_logout)
 
+
+    def get_or_create_window(self, key, widget_factory):
+        if key not in self.opened_windows:
+            self.opened_windows[key] = widget_factory()
+        return self.opened_windows[key]
+
+    def switch_to_memory_analysis_tab(self, case_id=None):
+        """Switches to the memory analysis tab and sets the case_id."""
+        # Switch to the memory analysis tab by simulating a button click
+        self.memory_btn.click()
+
+        def set_case_data():
+            # Find the memory analysis widget in the current tab
+            current_tab_index = self.ui.tabWidget.currentIndex()
+            if current_tab_index >= 0:
+                current_widget = self.ui.tabWidget.widget(current_tab_index)
+                # Check if the widget is an instance of MemoryAnalysisPage and has the load_case_data method
+                if (
+                    current_widget
+                    and isinstance(current_widget, MemoryAnalysisPage)
+                    and hasattr(current_widget, "load_case_data")
+                ):
+                    if case_id:
+                        current_widget.load_case_data(case_id)
+
+        # Delay to ensure the tab has been created before setting data
+        QTimer.singleShot(100, set_case_data)
+
     def switch_to_volatile_tab(self, case_id=None):
         """Chuyển sang tab volatile và set case_id với thông tin case đầy đủ"""
         # Chuyển sang tab volatile
@@ -110,7 +146,12 @@ class MyWindow(QMainWindow):
             current_tab_index = self.ui.tabWidget.currentIndex()
             if current_tab_index >= 0:
                 current_widget = self.ui.tabWidget.widget(current_tab_index)
-                if hasattr(current_widget, "set_case_data") and case_id:
+
+                if (
+                    current_widget
+                    and hasattr(current_widget, "set_case_data")
+                    and case_id
+                ):
                     # Lấy thông tin case đầy đủ từ database
                     from database.db_manager import DatabaseManager
 
@@ -126,12 +167,13 @@ class MyWindow(QMainWindow):
                             "created_date": case_info.get("created_at", ""),
                             "archive_path": case_info.get("archive_path", ""),
                         }
-                        # Special handling for NonVolatilePage
-                        if isinstance(current_widget, NonVolatilePage):
-                            current_widget.set_case_data(case_data)
-                        else:
-                             current_widget.set_case_data(case_data)
-                elif hasattr(current_widget, "set_case_id") and case_id:
+
+                        current_widget.set_case_data(case_data)
+                elif (
+                    current_widget
+                    and hasattr(current_widget, "set_case_id")
+                    and case_id
+                ):
                     # Fallback cho old method
                     current_widget.set_case_id(case_id)
 
@@ -151,7 +193,12 @@ class MyWindow(QMainWindow):
             current_tab_index = self.ui.tabWidget.currentIndex()
             if current_tab_index >= 0:
                 current_widget = self.ui.tabWidget.widget(current_tab_index)
-                if hasattr(current_widget, "set_case_data") and case_id:
+
+                if (
+                    current_widget
+                    and hasattr(current_widget, "set_case_data")
+                    and case_id
+                ):
                     # Lấy thông tin case đầy đủ từ database
                     from database.db_manager import DatabaseManager
 
@@ -167,12 +214,13 @@ class MyWindow(QMainWindow):
                             "created_date": case_info.get("created_at", ""),
                             "archive_path": case_info.get("archive_path", ""),
                         }
-                        # Special handling for NonVolatilePage
-                        if isinstance(current_widget, NonVolatilePage):
-                            current_widget.set_case_data(case_data)
-                        else:
-                            current_widget.set_case_data(case_data)
-                elif hasattr(current_widget, "set_case_id") and case_id:
+
+                        current_widget.set_case_data(case_data)
+                elif (
+                    current_widget
+                    and hasattr(current_widget, "set_case_id")
+                    and case_id
+                ):
                     # Fallback cho old method
                     current_widget.set_case_id(case_id)
 
@@ -184,14 +232,18 @@ class MyWindow(QMainWindow):
         Function for showing case management window as default
         :return:
         """
-        result = self.open_tab_flag(self.case_btn.text())
+
+        key = self.case_btn
+        title, factory = self.menu_btns_list[key]
+
+        is_open, index = self.open_tab_flag(title)
         self.set_btn_checked(self.case_btn)
 
-        if result[0]:
-            self.ui.tabWidget.setCurrentIndex(result[1])
+        if is_open:
+            self.ui.tabWidget.setCurrentIndex(index)
         else:
-            title = self.case_btn.text()
-            curIndex = self.ui.tabWidget.addTab(Case(), title)
+            widget = self.get_or_create_window(title, factory)
+            curIndex = self.ui.tabWidget.addTab(widget, title)
             self.ui.tabWidget.setCurrentIndex(curIndex)
             self.ui.tabWidget.setVisible(True)
 
@@ -213,21 +265,45 @@ class MyWindow(QMainWindow):
 
     def show_selected_window(self):
         """
-        Function for showing selected window
-        :return:
+        Function for showing the selected window
         """
-        button = self.sender()
+        sender_btn = self.sender()
+        # Danh sách các nút cần phải có case trước khi sử dụng
+        require_case = {
+            self.volatile_btn,
+            self.nonvolatile_btn,
+            self.memory_btn,
+            self.registry_btn,
+            self.browser_btn,
+            self.file_btn,
+            self.metadata_btn,
+            self.eventlog_btn,
+        }
+        if sender_btn in require_case and not self.current_case_id:
+            QMessageBox.warning(
+                self,
+                "Cảnh báo",
+                "Vui lòng chọn một case trước khi thực hiện thao tác này!",
+            )
+            return
 
-        result = self.open_tab_flag(button.text())
-        self.set_btn_checked(button)
+        if (
+            sender_btn
+            and isinstance(sender_btn, QtWidgets.QPushButton)
+            and sender_btn in self.menu_btns_list
+        ):
+            title, factory = self.menu_btns_list[sender_btn]
 
-        if result[0]:
-            self.ui.tabWidget.setCurrentIndex(result[1])
-        else:
-            title = button.text()
-            curIndex = self.ui.tabWidget.addTab(self.menu_btns_list[button], title)
-            self.ui.tabWidget.setCurrentIndex(curIndex)
-            self.ui.tabWidget.setVisible(True)
+            is_open, index = self.open_tab_flag(title)
+            self.set_btn_checked(sender_btn)
+
+            if is_open:
+                self.ui.tabWidget.setCurrentIndex(index)
+            else:
+                widget = self.get_or_create_window(title, factory)
+                curIndex = self.ui.tabWidget.addTab(widget, title)
+                self.ui.tabWidget.setCurrentIndex(curIndex)
+                self.ui.tabWidget.setVisible(True)
 
     def close_tab(self, index):
         """
@@ -253,25 +329,22 @@ class MyWindow(QMainWindow):
             else:
                 button.setChecked(True)
 
-    def open_tab_flag(self, tab):
-        """
-        Check if selected window showed or not
-        :param tab: tab title
-        :return: bool and index
-        """
-        open_tab_count = self.ui.tabWidget.count()
 
-        for i in range(open_tab_count):
-            tab_name = self.ui.tabWidget.tabText(i)
-            if tab_name == tab:
+    def open_tab_flag(self, tab_title):
+        """
+        Check if tab is already open
+        """
+        for i in range(self.ui.tabWidget.count()):
+            if self.ui.tabWidget.tabText(i) == tab_title:
                 return True, i
-            else:
-                continue
+        return False, -1
 
-        return (False,)
 
-    def user_label_clicked(self, event):
-        """Xử lý khi click vào user icon"""
+    def user_label_clicked(self, ev):
+        """
+        Handles click on user label to show menu
+        :param ev:
+        """
         from PyQt5.QtWidgets import QMenu, QAction
         from PyQt5.QtCore import QPoint
         from PyQt5.QtGui import QCursor

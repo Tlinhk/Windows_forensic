@@ -109,6 +109,7 @@ class DatabaseManager:
     
     def create_user(self, username: str, password: str, email: str, role: str = "ANALYST", 
                     full_name: str = "", phone_number: str = "") -> bool:
+
         hashed_password = self.hash_password(password)
         
         # Nếu không có full_name, dùng username làm mặc định
@@ -432,14 +433,37 @@ class DatabaseManager:
         return False
 
     def get_case_with_investigator(self, case_id: int) -> Optional[Dict]:
-        """Lấy thông tin case kèm thông tin investigator"""
+        """Lấy thông tin case và tên của investigator"""
         query = """
-            SELECT c.*, u.username, u.full_name, u.email, u.role
-            FROM Cases c
-            LEFT JOIN Users u ON c.user_id = u.user_id
+            SELECT c.*, u.full_name 
+            FROM Cases c 
+            LEFT JOIN Users u ON c.user_id = u.user_id 
             WHERE c.case_id = ?
         """
         return self.fetch_one(query, (case_id,))
+
+    def get_all_cases_details(self) -> List[Dict]:
+        """
+        Lấy tất cả các case với thông tin chi tiết: tên investigator, số lượng evidence, và đường dẫn.
+        Sử dụng một câu lệnh JOIN hiệu quả.
+        """
+        query = """
+            SELECT 
+                c.case_id, 
+                c.title, 
+                c.status, 
+                c.created_at,
+                c.archive_path, 
+                u.full_name AS investigator_name,
+                (SELECT COUNT(a.artefact_id) FROM Artefacts a WHERE a.case_id = c.case_id) AS evidence_count
+            FROM 
+                Cases c
+            LEFT JOIN 
+                Users u ON c.user_id = u.user_id
+            ORDER BY 
+                c.created_at DESC;
+        """
+        return self.fetch_all(query)
 
     # ==================== ARTIFACT MANAGEMENT ====================
 
@@ -610,35 +634,31 @@ class DatabaseManager:
         return self.fetch_all(query, (case_id,))
 
     # ==================== ACTIVITY LOGGING ====================
-    
-    def log_activity(self, action: str, case_id: int = None,
-                    artefact_id: int = None, user_id: int = None,
-                    tool_used: str = None, details: str = None) -> bool:
+  
+    def log_activity(
+        self,
+        action: str,
+        case_id: int = None,
+        artefact_id: int = None,
+        user_id: int = None,
+        tool_used: str = None,
+    ) -> bool:
         # Use current_user_id if user_id not specified
         if user_id is None:
             user_id = self.current_user_id
-        
-        # Kiểm tra xem bảng có cột details không
-        try:
-            # Thử insert với details trước
-            query = """
-                INSERT INTO Activity_logs (case_id, artefact_id, user_id, action, tool_used, details)
-                VALUES (?, ?, ?, ?, ?, ?)
-            """
-            cursor = self.execute_query(query, (case_id, artefact_id, user_id, action, tool_used, details))
-            return cursor is not None
-        except:
-            # Nếu lỗi, thử insert không có details
-            try:
-                query = """
-                    INSERT INTO Activity_logs (case_id, artefact_id, user_id, action, tool_used)
-                    VALUES (?, ?, ?, ?, ?)
-                """
-                cursor = self.execute_query(query, (case_id, artefact_id, user_id, action, tool_used))
-                return cursor is not None
-            except Exception as e:
-                print(f"❌ Lỗi log activity: {e}")
-                return False
+
+        # Skip logging if no user_id
+        if user_id is None:
+            return True
+
+        query = """
+            INSERT INTO Activity_logs (case_id, artefact_id, user_id, action, tool_used)
+            VALUES (?, ?, ?, ?, ?)
+        """
+        cursor = self.execute_query(
+            query, (case_id, artefact_id, user_id, action, tool_used)
+        )
+        return cursor is not None
 
     def get_activity_logs(self, case_id: int = None, limit: int = 100) -> List[Dict]:
         if case_id:

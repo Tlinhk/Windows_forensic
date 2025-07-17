@@ -11,37 +11,168 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 
-class Ui_Form(object):
-    def setupUi(self, Form):
-        Form.setObjectName("Form")
-        Form.resize(1038, 597)
+class Ui_MemoryAnalysisWidget(object):
+    def setupUi(self, MemoryAnalysisWidget):
+        MemoryAnalysisWidget.setObjectName("MemoryAnalysisWidget")
+        MemoryAnalysisWidget.resize(1280, 765)
+        self.mainLayout = QtWidgets.QHBoxLayout(MemoryAnalysisWidget)
+        self.mainLayout.setObjectName("mainLayout")
+        self.splitter = QtWidgets.QSplitter(MemoryAnalysisWidget)
+        self.splitter.setOrientation(QtCore.Qt.Horizontal)
+        self.splitter.setObjectName("splitter")
+        self.sidebar = QtWidgets.QFrame(self.splitter)
+        self.sidebar.setFrameShape(QtWidgets.QFrame.StyledPanel)
+        self.sidebar.setObjectName("sidebar")
+        self.sidebarLayout = QtWidgets.QVBoxLayout(self.sidebar)
+        self.sidebarLayout.setObjectName("sidebarLayout")
+        self.label_case_info = QtWidgets.QLabel(self.sidebar)
+        self.label_case_info.setObjectName("label_case_info")
+        self.sidebarLayout.addWidget(self.label_case_info)
+        self.groupBoxMemoryFile = QtWidgets.QGroupBox(self.sidebar)
         font = QtGui.QFont()
         font.setPointSize(10)
-        Form.setFont(font)
-        self.gridLayout = QtWidgets.QGridLayout(Form)
-        self.gridLayout.setObjectName("gridLayout")
-        self.label = QtWidgets.QLabel(Form)
+        font.setBold(True)
+        font.setWeight(75)
+        self.groupBoxMemoryFile.setFont(font)
+        self.groupBoxMemoryFile.setObjectName("groupBoxMemoryFile")
+        self.memoryFileLayout = QtWidgets.QVBoxLayout(self.groupBoxMemoryFile)
+        self.memoryFileLayout.setObjectName("memoryFileLayout")
+        self.labelEvidence = QtWidgets.QLabel(self.groupBoxMemoryFile)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.labelEvidence.setFont(font)
+        self.labelEvidence.setObjectName("labelEvidence")
+        self.memoryFileLayout.addWidget(self.labelEvidence)
+        self.listWidgetMemoryFiles = QtWidgets.QListWidget(self.groupBoxMemoryFile)
+        self.listWidgetMemoryFiles.setObjectName("listWidgetMemoryFiles")
+        self.memoryFileLayout.addWidget(self.listWidgetMemoryFiles)
+        self.labelFileInfo = QtWidgets.QLabel(self.groupBoxMemoryFile)
+        self.labelFileInfo.setStyleSheet("font-size: 12px; color: #666; font-style: italic;")
+        self.labelFileInfo.setObjectName("labelFileInfo")
+        self.memoryFileLayout.addWidget(self.labelFileInfo)
+        self.sidebarLayout.addWidget(self.groupBoxMemoryFile)
+        self.groupBoxVolatilityPlugins = QtWidgets.QGroupBox(self.sidebar)
         font = QtGui.QFont()
         font.setPointSize(10)
-        self.label.setFont(font)
-        self.label.setAlignment(QtCore.Qt.AlignCenter)
-        self.label.setObjectName("label")
-        self.gridLayout.addWidget(self.label, 0, 0, 1, 1)
+        font.setBold(True)
+        font.setWeight(75)
+        self.groupBoxVolatilityPlugins.setFont(font)
+        self.groupBoxVolatilityPlugins.setObjectName("groupBoxVolatilityPlugins")
+        self.pluginsLayout = QtWidgets.QVBoxLayout(self.groupBoxVolatilityPlugins)
+        self.pluginsLayout.setObjectName("pluginsLayout")
+        self.lineEditPluginSearch = QtWidgets.QLineEdit(self.groupBoxVolatilityPlugins)
+        self.lineEditPluginSearch.setObjectName("lineEditPluginSearch")
+        self.pluginsLayout.addWidget(self.lineEditPluginSearch)
+        self.listWidgetPlugins = QtWidgets.QListWidget(self.groupBoxVolatilityPlugins)
+        self.listWidgetPlugins.setMinimumSize(QtCore.QSize(0, 140))
+        self.listWidgetPlugins.setSelectionMode(QtWidgets.QAbstractItemView.MultiSelection)
+        self.listWidgetPlugins.setObjectName("listWidgetPlugins")
+        self.pluginsLayout.addWidget(self.listWidgetPlugins)
+        self.labelPluginSuggestion = QtWidgets.QLabel(self.groupBoxVolatilityPlugins)
+        font = QtGui.QFont()
+        font.setPointSize(-1)
+        font.setItalic(True)
+        self.labelPluginSuggestion.setFont(font)
+        self.labelPluginSuggestion.setStyleSheet("font-size: 12px; color: #1976d2; font-style: italic;")
+        self.labelPluginSuggestion.setObjectName("labelPluginSuggestion")
+        self.pluginsLayout.addWidget(self.labelPluginSuggestion)
+        self.sidebarLayout.addWidget(self.groupBoxVolatilityPlugins)
+        self.btnStart = QtWidgets.QPushButton(self.sidebar)
+        self.btnStart.setStyleSheet("font-size: 15px; font-weight: bold; background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #1976d2, stop:1 #42a5f5); color: white; border-radius: 6px; padding: 10px 0; margin-top: 8px; margin-bottom: 4px;")
+        self.btnStart.setObjectName("btnStart")
+        self.sidebarLayout.addWidget(self.btnStart)
+        self.btnExport = QtWidgets.QPushButton(self.sidebar)
+        self.btnExport.setStyleSheet("font-size: 15px; background: #e3f2fd; color: #1976d2; border-radius: 6px; padding: 6px 0; margin-bottom: 4px;")
+        self.btnExport.setObjectName("btnExport")
+        self.sidebarLayout.addWidget(self.btnExport)
+        self.progressBar = QtWidgets.QProgressBar(self.sidebar)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.progressBar.setFont(font)
+        self.progressBar.setMinimum(0)
+        self.progressBar.setMaximum(100)
+        self.progressBar.setProperty("value", 0)
+        self.progressBar.setTextVisible(True)
+        self.progressBar.setObjectName("progressBar")
+        self.sidebarLayout.addWidget(self.progressBar)
+        self.groupBoxLog = QtWidgets.QGroupBox(self.sidebar)
+        font = QtGui.QFont()
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.groupBoxLog.setFont(font)
+        self.groupBoxLog.setObjectName("groupBoxLog")
+        self.logLayout = QtWidgets.QVBoxLayout(self.groupBoxLog)
+        self.logLayout.setObjectName("logLayout")
+        self.listWidget_log = QtWidgets.QListWidget(self.groupBoxLog)
+        self.listWidget_log.setStyleSheet("background: #f5f5f5; font-size: 12px; border-radius: 5px;")
+        self.listWidget_log.setObjectName("listWidget_log")
+        self.logLayout.addWidget(self.listWidget_log)
+        self.sidebarLayout.addWidget(self.groupBoxLog)
+        self.tabWidget = QtWidgets.QTabWidget(self.splitter)
+        self.tabWidget.setStyleSheet("QTabBar::tab {\n"
+"    min-width: 220px; /* Increased width to ensure full text visibility */\n"
+"    padding: 5px 15px; /* Adjust padding for better spacing */\n"
+"    text-align: left; /* Align text to the left */\n"
+"    font-size: 16px; /* Explicit font size */\n"
+"}\n"
+"\n"
+"QTabBar::tab:selected {\n"
+"    background-color: #2a82da;\n"
+"    color: white;\n"
+"    border: 1px solid #2a82da;\n"
+"    border-bottom-color: #2a82da; /* same as background color */\n"
+"}\n"
+"\n"
+"QTabBar::tab:!selected {\n"
+"    background-color: #f0f0f0;\n"
+"    border: 1px solid #dcdcdc;\n"
+"    border-bottom-color: #dcdcdc; /* same as border color */\n"
+"}\n"
+"\n"
+"QTabBar::close-button {\n"
+"    image: url(:/icons/icons8-close-30.png); /* Ensure you have this icon in your resources */\n"
+"    subcontrol-position: right;\n"
+"}\n"
+"\n"
+"QTabBar::close-button:hover {\n"
+"    background: #ff7878;}")
+        self.tabWidget.setTabsClosable(True)
+        self.tabWidget.setObjectName("tabWidget")
+        self.mainLayout.addWidget(self.splitter)
 
-        self.retranslateUi(Form)
-        QtCore.QMetaObject.connectSlotsByName(Form)
+        self.retranslateUi(MemoryAnalysisWidget)
+        self.tabWidget.setCurrentIndex(-1)
+        QtCore.QMetaObject.connectSlotsByName(MemoryAnalysisWidget)
 
-    def retranslateUi(self, Form):
+    def retranslateUi(self, MemoryAnalysisWidget):
         _translate = QtCore.QCoreApplication.translate
-        Form.setWindowTitle(_translate("Form", "Form"))
-        self.label.setText(_translate("Form", "Memory analysis"))
+        self.label_case_info.setStyleSheet(_translate("MemoryAnalysisWidget", "font-weight: bold; font-size: 15px; color: #1976d2; margin-bottom: 8px;"))
+        self.label_case_info.setText(_translate("MemoryAnalysisWidget", "Case: [Chưa chọn]"))
+        self.groupBoxMemoryFile.setStyleSheet(_translate("MemoryAnalysisWidget", "QGroupBox { font-weight: bold; }"))
+        self.groupBoxMemoryFile.setTitle(_translate("MemoryAnalysisWidget", "Memory File Selection"))
+        self.labelEvidence.setText(_translate("MemoryAnalysisWidget", "Available Memory Files:"))
+        self.listWidgetMemoryFiles.setStyleSheet(_translate("MemoryAnalysisWidget", "font-size: 12px;"))
+        self.labelFileInfo.setText(_translate("MemoryAnalysisWidget", "File info: Select a file from the list"))
+        self.groupBoxVolatilityPlugins.setStyleSheet(_translate("MemoryAnalysisWidget", "QGroupBox { font-weight: bold; }"))
+        self.groupBoxVolatilityPlugins.setTitle(_translate("MemoryAnalysisWidget", "Volatility Plugins"))
+        self.lineEditPluginSearch.setStyleSheet(_translate("MemoryAnalysisWidget", "background: #e3f2fd; border-radius: 5px; padding: 4px 8px; font-size: 12px; margin-bottom: 4px;"))
+        self.lineEditPluginSearch.setPlaceholderText(_translate("MemoryAnalysisWidget", "Search plugins..."))
+        self.listWidgetPlugins.setStyleSheet(_translate("MemoryAnalysisWidget", "font-size: 12px;"))
+        self.labelPluginSuggestion.setText(_translate("MemoryAnalysisWidget", "💡 Suggested: Select a memory file first"))
+        self.btnStart.setText(_translate("MemoryAnalysisWidget", "▶️ Analyze Selected File"))
+        self.btnExport.setText(_translate("MemoryAnalysisWidget", "💾 Export Results"))
+        self.progressBar.setStyleSheet(_translate("MemoryAnalysisWidget", "border-radius: 5px; height: 18px; background: #f5f5f5; color: #1976d2;"))
+        self.progressBar.setFormat(_translate("MemoryAnalysisWidget", "Analysis progress: %p%"))
+        self.groupBoxLog.setStyleSheet(_translate("MemoryAnalysisWidget", "QGroupBox { font-weight: bold; }"))
+        self.groupBoxLog.setTitle(_translate("MemoryAnalysisWidget", "Analysis Log"))
 
 
 if __name__ == "__main__":
     import sys
     app = QtWidgets.QApplication(sys.argv)
-    Form = QtWidgets.QWidget()
-    ui = Ui_Form()
-    ui.setupUi(Form)
-    Form.show()
+    MemoryAnalysisWidget = QtWidgets.QWidget()
+    ui = Ui_MemoryAnalysisWidget()
+    ui.setupUi(MemoryAnalysisWidget)
+    MemoryAnalysisWidget.show()
     sys.exit(app.exec_())

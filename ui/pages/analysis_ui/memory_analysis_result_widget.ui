@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MemoryAnalysisResultWidget</class>
+ <widget class="QWidget" name="MemoryAnalysisResultWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>950</width>
+    <height>680</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Analysis Result</string>
+  </property>
+  <layout class="QVBoxLayout" name="mainResultLayout">
+   <item>
+    <widget class="QTabWidget" name="resultTabWidget">
+     <property name="styleSheet">
+      <string notr="true">QTabWidget::pane {
+    border: 1px solid #C4C4C3;
+    top: -1px; 
+}
+
+QTabBar::tab {
+    background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                stop: 0 #f6f7fa, stop: 1.0 #e2e4e8);
+    border: 1px solid #C4C4C3;
+    border-bottom-color: #C2C7CB;
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+    min-width: 110px; /* Tăng độ rộng tối thiểu */
+    padding: 5px;
+    margin-right: 2px;
+}
+
+QTabBar::tab:selected {
+    background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                stop: 0 #e3f2fd, stop: 1.0 #dbe9f6); /* Light blue gradient */
+    border-color: #9B9B9B;
+    border-bottom-color: #e3f2fd; /* Same as background to connect to pane */
+    color: #1976d2; /* Dark blue text */
+    font-weight: bold;
+}
+
+QTabBar::tab:!selected:hover {
+    background: #e6eaf1;
+}</string>
+     </property>
+     <property name="currentIndex">
+      <number>0</number>
+     </property>
+     <widget class="QWidget" name="tab_overview">
+      <attribute name="title">
+       <string>Overview</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_overview">
+       <item>
+        <widget class="QLabel" name="label_stats">
+         <property name="text">
+          <string>Analysis summary will be displayed here.</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QTableView" name="table_overview"/>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="tab_process_tree">
+      <attribute name="title">
+       <string>Process Tree</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_process_tree">
+       <item>
+        <widget class="QTreeView" name="treeView_process"/>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="tab_network">
+      <attribute name="title">
+       <string>Network</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_network">
+       <item>
+        <widget class="QTableView" name="table_network"/>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="tab_malfind">
+      <attribute name="title">
+       <string>Malfind</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_malfind">
+       <item>
+        <widget class="QTableView" name="table_malfind"/>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="tab_user_activity">
+      <attribute name="title">
+       <string>User Activity</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_user_activity">
+       <item>
+        <widget class="QTextEdit" name="textedit_cmd"/>
+       </item>
+       <item>
+        <widget class="QTextEdit" name="textedit_clipboard"/>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="tab_fs_registry">
+      <attribute name="title">
+       <string>FS / Registry</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_fs_registry">
+       <item>
+        <widget class="QTableView" name="table_fs"/>
+       </item>
+       <item>
+        <widget class="QTreeView" name="treeView_registry"/>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="tab_creds_keys">
+      <attribute name="title">
+       <string>Creds / Keys</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_creds_keys">
+       <item>
+        <widget class="QTableView" name="table_hashdump"/>
+       </item>
+       <item>
+        <widget class="QTextEdit" name="textedit_keys"/>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="tab_timeline">
+      <attribute name="title">
+       <string>Timeline</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_timeline">
+       <item>
+        <widget class="QGraphicsView" name="graphicsView_timeline"/>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="tab_artifacts">
+      <attribute name="title">
+       <string>Artifacts</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_artifacts">
+       <item>
+        <widget class="QTableView" name="table_artifacts"/>
+       </item>
+       <item>
+        <widget class="QPushButton" name="button_export_all">
+         <property name="text">
+          <string>Export All</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
