@@ -297,14 +297,37 @@ class DatabaseManager:
         return False
 
     def get_case_with_investigator(self, case_id: int) -> Optional[Dict]:
-        """Lấy thông tin case kèm thông tin investigator"""
+        """Lấy thông tin case và tên của investigator"""
         query = """
-            SELECT c.*, u.username, u.full_name, u.email, u.role
-            FROM Cases c
-            LEFT JOIN Users u ON c.user_id = u.user_id
+            SELECT c.*, u.full_name 
+            FROM Cases c 
+            LEFT JOIN Users u ON c.user_id = u.user_id 
             WHERE c.case_id = ?
         """
         return self.fetch_one(query, (case_id,))
+
+    def get_all_cases_details(self) -> List[Dict]:
+        """
+        Lấy tất cả các case với thông tin chi tiết: tên investigator, số lượng evidence, và đường dẫn.
+        Sử dụng một câu lệnh JOIN hiệu quả.
+        """
+        query = """
+            SELECT 
+                c.case_id, 
+                c.title, 
+                c.status, 
+                c.created_at,
+                c.archive_path, 
+                u.full_name AS investigator_name,
+                (SELECT COUNT(a.artefact_id) FROM Artefacts a WHERE a.case_id = c.case_id) AS evidence_count
+            FROM 
+                Cases c
+            LEFT JOIN 
+                Users u ON c.user_id = u.user_id
+            ORDER BY 
+                c.created_at DESC;
+        """
+        return self.fetch_all(query)
 
     # ==================== ARTIFACT MANAGEMENT ====================
 
