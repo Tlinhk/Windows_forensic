@@ -247,7 +247,8 @@ class Ui_MemoryAnalysisWindow(object):
         self.gridLayout_3 = QtWidgets.QGridLayout(self.centralwidget)
         self.gridLayout_3.setObjectName("gridLayout_3")
         self.frame = QtWidgets.QFrame(self.centralwidget)
-        self.frame.setMinimumSize(QtCore.QSize(0, 30))
+        self.frame.setMinimumSize(QtCore.QSize(0, 20))
+        self.frame.setMaximumSize(QtCore.QSize(16777215, 40))
         self.frame.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.frame.setFrameShadow(QtWidgets.QFrame.Raised)
         self.frame.setObjectName("frame")
@@ -476,21 +477,9 @@ class Ui_MemoryAnalysisWindow(object):
         self.statusGroupBox.setFont(font)
         self.statusGroupBox.setObjectName("statusGroupBox")
         self.gridLayout_6 = QtWidgets.QGridLayout(self.statusGroupBox)
+        self.gridLayout_6.setContentsMargins(-1, 0, -1, 0)
+        self.gridLayout_6.setVerticalSpacing(2)
         self.gridLayout_6.setObjectName("gridLayout_6")
-        self.progressBar = QtWidgets.QProgressBar(self.statusGroupBox)
-        self.progressBar.setStyleSheet("/* QProgressBar */\n"
-"QProgressBar {\n"
-"    border: 1px solid #a0a4a8;\n"
-"    border-radius: 6px;\n"
-"    text-align: center;\n"
-"}\n"
-"QProgressBar::chunk {\n"
-"    background-color: #4a90e2;\n"
-"    border-radius: 6px;\n"
-"}")
-        self.progressBar.setProperty("value", 0)
-        self.progressBar.setObjectName("progressBar")
-        self.gridLayout_6.addWidget(self.progressBar, 0, 0, 1, 1)
         self.splitter = QtWidgets.QSplitter(self.statusGroupBox)
         self.splitter.setOrientation(QtCore.Qt.Horizontal)
         self.splitter.setObjectName("splitter")
@@ -537,7 +526,24 @@ class Ui_MemoryAnalysisWindow(object):
         self.pushButton_2.setObjectName("pushButton_2")
         self.pushButton = QtWidgets.QPushButton(self.splitter)
         self.pushButton.setObjectName("pushButton")
-        self.gridLayout_6.addWidget(self.splitter, 1, 0, 1, 1)
+        self.gridLayout_6.addWidget(self.splitter, 2, 0, 1, 1)
+        self.progressBar = QtWidgets.QProgressBar(self.statusGroupBox)
+        self.progressBar.setStyleSheet("/* QProgressBar */\n"
+"QProgressBar {\n"
+"    border: 1px solid #a0a4a8;\n"
+"    border-radius: 6px;\n"
+"    text-align: center;\n"
+"}\n"
+"QProgressBar::chunk {\n"
+"    background-color: #4a90e2;\n"
+"    border-radius: 6px;\n"
+"}")
+        self.progressBar.setProperty("value", 0)
+        self.progressBar.setObjectName("progressBar")
+        self.gridLayout_6.addWidget(self.progressBar, 1, 0, 1, 1)
+        self.statusLabel = QtWidgets.QLabel(self.statusGroupBox)
+        self.statusLabel.setObjectName("statusLabel")
+        self.gridLayout_6.addWidget(self.statusLabel, 0, 0, 1, 1)
         self.headerLayout.addWidget(self.statusGroupBox)
         self.gridLayout_3.addWidget(self.headerFrame, 1, 0, 1, 1)
         self.mainTabWidget = QtWidgets.QTabWidget(self.centralwidget)
@@ -1756,7 +1762,7 @@ class Ui_MemoryAnalysisWindow(object):
 
         self.retranslateUi(MemoryAnalysisWindow)
         self.mainTabWidget.setCurrentIndex(0)
-        self.rawMemoryTabWidget.setCurrentIndex(6)
+        self.rawMemoryTabWidget.setCurrentIndex(0)
         self.processTabWidget.setCurrentIndex(2)
         self.crashAnalysisTabWidget.setCurrentIndex(0)
         self.browseButton.clicked.connect(MemoryAnalysisWindow.browse_evidence_file) # type: ignore
@@ -1787,6 +1793,7 @@ class Ui_MemoryAnalysisWindow(object):
         self.stopButton.setText(_translate("MemoryAnalysisWindow", "Stop Analysis"))
         self.pushButton_2.setText(_translate("MemoryAnalysisWindow", "Save Results"))
         self.pushButton.setText(_translate("MemoryAnalysisWindow", "Export Report"))
+        self.statusLabel.setText(_translate("MemoryAnalysisWindow", "Status"))
         self.osVersionLabel.setText(_translate("MemoryAnalysisWindow", "OS Version:"))
         self.osVersionValue.setText(_translate("MemoryAnalysisWindow", "-"))
         self.architectureLabel.setText(_translate("MemoryAnalysisWindow", "Architecture:"))

@@ -252,7 +252,13 @@ QComboBox QAbstractItemView QScrollBar::sub-line {
       <property name="minimumSize">
        <size>
         <width>0</width>
-        <height>30</height>
+        <height>20</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>16777215</width>
+        <height>40</height>
        </size>
       </property>
       <property name="frameShape">
@@ -614,26 +620,16 @@ QPushButton:pressed {
           <string>Analysis Status</string>
          </property>
          <layout class="QGridLayout" name="gridLayout_6">
-          <item row="0" column="0">
-           <widget class="QProgressBar" name="progressBar">
-            <property name="styleSheet">
-             <string notr="true">/* QProgressBar */
-QProgressBar {
-    border: 1px solid #a0a4a8;
-    border-radius: 6px;
-    text-align: center;
-}
-QProgressBar::chunk {
-    background-color: #4a90e2;
-    border-radius: 6px;
-}</string>
-            </property>
-            <property name="value">
-             <number>0</number>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0">
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
+          <property name="verticalSpacing">
+           <number>2</number>
+          </property>
+          <item row="2" column="0">
            <widget class="QSplitter" name="splitter">
             <property name="orientation">
              <enum>Qt::Horizontal</enum>
@@ -715,6 +711,32 @@ QPushButton:pressed {
             </widget>
            </widget>
           </item>
+          <item row="1" column="0">
+           <widget class="QProgressBar" name="progressBar">
+            <property name="styleSheet">
+             <string notr="true">/* QProgressBar */
+QProgressBar {
+    border: 1px solid #a0a4a8;
+    border-radius: 6px;
+    text-align: center;
+}
+QProgressBar::chunk {
+    background-color: #4a90e2;
+    border-radius: 6px;
+}</string>
+            </property>
+            <property name="value">
+             <number>0</number>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <widget class="QLabel" name="statusLabel">
+            <property name="text">
+             <string>Status</string>
+            </property>
+           </widget>
+          </item>
          </layout>
         </widget>
        </item>
@@ -755,7 +777,7 @@ QPushButton:pressed {
         <item>
          <widget class="QTabWidget" name="rawMemoryTabWidget">
           <property name="currentIndex">
-           <number>6</number>
+           <number>0</number>
           </property>
           <widget class="QWidget" name="systemContextTab">
            <attribute name="title">

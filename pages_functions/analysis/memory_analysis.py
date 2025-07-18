@@ -12,6 +12,66 @@ import os
 from PyQt5.QtWidgets import QSizePolicy
 import glob
 import importlib.util
+import sys
+import io
+from contextlib import redirect_stdout
+
+# Đường dẫn tuyệt đối hoặc tương đối đến thư mục volatility3 (chứa __init__.py)
+vol3_path = os.path.abspath(
+    os.path.join(os.path.dirname(__file__), "../../tools/volatility3")
+)
+if vol3_path not in sys.path:
+    sys.path.insert(0, vol3_path)
+
+from volatility3.framework import contexts, interfaces, exceptions
+from volatility3.framework.configuration import requirements
+from volatility3.framework import automagic
+from volatility3.framework import plugins
+from volatility3.framework import constants
+from volatility3.framework import renderers
+from volatility3.framework import layers
+from volatility3.framework import symbols
+from volatility3.framework import configuration
+from volatility3.framework.automagic import stacker
+from volatility3 import cli
+
+import logging
+
+
+def run_volatility3_pslist(memory_path):
+    sys.argv = ["vol.py", "-f", memory_path, "windows.pslist"]
+    buf = io.StringIO()
+    with redirect_stdout(buf):
+        try:
+            cli.main()
+        except SystemExit:
+            pass
+    output = buf.getvalue()
+    return output  # Đảm bảo có dòng này!
+
+
+def fill_process_table_from_pslist(table_widget, output):
+    lines = output.splitlines()
+    headers = []
+    data_started = False
+    for line in lines:
+        # Bỏ các dòng đầu không phải bảng
+        if not data_started and line.strip() and line.strip().startswith("PID"):
+            headers = [h.strip() for h in line.split()]
+            table_widget.setColumnCount(len(headers))
+            table_widget.setHorizontalHeaderLabels(headers)
+            data_started = True
+            continue
+        if data_started and line.strip() and not line.startswith("------"):
+            values = line.split()
+            row = table_widget.rowCount()
+            table_widget.insertRow(row)
+            for col, value in enumerate(values):
+                table_widget.setItem(row, col, QTableWidgetItem(value))
+
+
+# Gọi hàm
+# run_volatility3_pslist("path/to/your/memdump.raw")
 
 
 class MemoryAnalysisWindow(QMainWindow):
@@ -48,6 +108,12 @@ class MemoryAnalysisWindow(QMainWindow):
         # Kết nối tìm kiếm plugin
         if hasattr(self.ui, "pluginSearchEdit"):
             self.ui.pluginSearchEdit.textChanged.connect(self.filter_plugin_table)
+
+    def make_item(self, text: str) -> QTableWidgetItem:
+        item = QTableWidgetItem(text)
+        # ví dụ: canh giữa
+        item.setTextAlignment(Qt.AlignCenter)
+        return item
 
     def setup_connections(self):
         self.ui.browseButton.clicked.connect(self.browse_evidence_file)
@@ -189,7 +255,7 @@ class MemoryAnalysisWindow(QMainWindow):
     def evidence_type_changed(self, type_text):
         self.switch_tab_by_type(type_text)
 
-    #        self.ui.statusLabel.setText(f"Status: Evidence type set to {type_text}")
+        self.ui.statusLabel.setText(f"Status: Evidence type set to {type_text}")
 
     def switch_tab_by_type(self, type_text):
         tab_map = {
@@ -212,26 +278,9 @@ class MemoryAnalysisWindow(QMainWindow):
         if not file_path or not os.path.exists(file_path):
             QMessageBox.warning(self, "No File", "Please select a valid evidence file.")
             return
-        type_text = self.ui.evidenceTypeCombo.currentText()
-        self.ui.statusLabel.setText(
-            f"Status: Analyzing {os.path.basename(file_path)}..."
-        )
-        self.ui.progressBar.setValue(10)
-        self.analysis_running = True
-        # Mock logic for each type
-        if type_text.startswith("Raw Memory"):
-            self.mock_show_raw_memory_result()
-        elif type_text.startswith("Hibernation"):
-            self.mock_show_hibernation_result()
-        elif type_text.startswith("Page File"):
-            self.mock_show_pagefile_result()
-        elif type_text.startswith("Crash Dump"):
-            self.mock_show_crashdump_result()
-        self.ui.progressBar.setValue(100)
-        self.ui.statusLabel.setText(
-            f"Status: Analysis complete for {os.path.basename(file_path)}"
-        )
-        self.append_log(f"Analysis complete for {os.path.basename(file_path)}")
+        # Chạy pslist thật
+        self.analyze_pslist(file_path)
+        self.ui.statusLabel.setText("Status: Đã phân tích tiến trình (pslist)")
 
     def stop_analysis(self):
         if self.analysis_running:
@@ -263,7 +312,7 @@ class MemoryAnalysisWindow(QMainWindow):
         self.ui.volatilityCrashText.clear()
         self.ui.aiResultsText.clear()
         self.ui.progressBar.setValue(0)
-        #        self.ui.statusLabel.setText("Status: Ready")
+        self.ui.statusLabel.setText("Status: Ready")
         self.ui.logTextEdit.clear()
 
     def mock_show_raw_memory_result(self):
@@ -359,6 +408,26 @@ class MemoryAnalysisWindow(QMainWindow):
     def run_ai_analysis(self):
         # Dummy slot for UI connection
         self.append_log("AI analysis started (mock).")
+
+    def load_case_data(self, case_id):
+        """Set case name in the Case name QLineEdit and disable it."""
+        try:
+            from database.db_manager import DatabaseManager
+
+            db = DatabaseManager()
+            db.connect()
+            case_info = db.get_case_with_investigator(case_id)
+            if case_info and "title" in case_info:
+                self.ui.lineEdit.setText(case_info["title"])
+            else:
+                self.ui.lineEdit.setText("-")
+        except Exception as e:
+            self.ui.lineEdit.setText("-")
+        self.ui.lineEdit.setDisabled(True)
+
+    def analyze_pslist(self, memory_path):
+        output = run_volatility3_pslist(memory_path)
+        fill_process_table_from_pslist(self.ui.processTable, output)
 
 
 # Để sử dụng: tạo instance MemoryAnalysisWindow() và show() trong main app
