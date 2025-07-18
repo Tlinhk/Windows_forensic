@@ -1,139 +1,119 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>MemoryAnalysisWidget</class>
- <widget class="QWidget" name="MemoryAnalysisWidget">
+ <class>MemoryAnalysisWindow</class>
+ <widget class="QMainWindow" name="MemoryAnalysisWindow">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1280</width>
-    <height>765</height>
+    <width>1200</width>
+    <height>800</height>
    </rect>
   </property>
-  <layout class="QHBoxLayout" name="mainLayout">
-   <item>
-    <widget class="QSplitter" name="splitter">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-     <widget class="QFrame" name="sidebar">
+  <property name="windowTitle">
+   <string>Memory Analysis System - Digital Forensics</string>
+  </property>
+  <property name="windowIcon">
+   <iconset>
+    <normaloff>.</normaloff>.</iconset>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <widget class="QFrame" name="headerFrame">
+      <property name="maximumSize">
+       <size>
+        <width>16777215</width>
+        <height>120</height>
+       </size>
+      </property>
       <property name="frameShape">
        <enum>QFrame::StyledPanel</enum>
       </property>
-      <layout class="QVBoxLayout" name="sidebarLayout">
+      <property name="frameShadow">
+       <enum>QFrame::Raised</enum>
+      </property>
+      <layout class="QHBoxLayout" name="headerLayout">
        <item>
-        <widget class="QLabel" name="label_case_info">
-         <property name="styleSheet">
-          <string>font-weight: bold; font-size: 15px; color: #1976d2; margin-bottom: 8px;</string>
-         </property>
-         <property name="text">
-          <string>Case: [Chưa chọn]</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QGroupBox" name="groupBoxMemoryFile">
-         <property name="font">
-          <font>
-           <pointsize>10</pointsize>
-           <weight>75</weight>
-           <bold>true</bold>
-          </font>
-         </property>
-         <property name="styleSheet">
-          <string>QGroupBox { font-weight: bold; }</string>
-         </property>
+        <widget class="QGroupBox" name="evidenceGroupBox">
          <property name="title">
-          <string>Memory File Selection</string>
+          <string>Evidence Selection</string>
          </property>
-         <layout class="QVBoxLayout" name="memoryFileLayout">
-          <item>
-           <widget class="QLabel" name="labelEvidence">
-            <property name="font">
-             <font>
-              <pointsize>9</pointsize>
-             </font>
-            </property>
+         <layout class="QGridLayout" name="evidenceGridLayout">
+          <item row="0" column="0">
+           <widget class="QLabel" name="evidenceTypeLabel">
             <property name="text">
-             <string>Available Memory Files:</string>
+             <string>Evidence Type:</string>
             </property>
            </widget>
           </item>
-          <item>
-           <widget class="QListWidget" name="listWidgetMemoryFiles">
-            <property name="styleSheet">
-             <string>font-size: 12px;</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLabel" name="labelFileInfo">
-            <property name="styleSheet">
-             <string notr="true">font-size: 12px; color: #666; font-style: italic;</string>
-            </property>
-            <property name="text">
-             <string>File info: Select a file from the list</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-       </item>
-       <item>
-        <widget class="QGroupBox" name="groupBoxVolatilityPlugins">
-         <property name="font">
-          <font>
-           <pointsize>10</pointsize>
-           <weight>75</weight>
-           <bold>true</bold>
-          </font>
-         </property>
-         <property name="styleSheet">
-          <string>QGroupBox { font-weight: bold; }</string>
-         </property>
-         <property name="title">
-          <string>Volatility Plugins</string>
-         </property>
-         <layout class="QVBoxLayout" name="pluginsLayout">
-          <item>
-           <widget class="QLineEdit" name="lineEditPluginSearch">
-            <property name="styleSheet">
-             <string>background: #e3f2fd; border-radius: 5px; padding: 4px 8px; font-size: 12px; margin-bottom: 4px;</string>
-            </property>
-            <property name="placeholderText">
-             <string>Search plugins...</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QListWidget" name="listWidgetPlugins">
+          <item row="0" column="1">
+           <widget class="QComboBox" name="evidenceTypeCombo">
             <property name="minimumSize">
              <size>
-              <width>0</width>
-              <height>140</height>
+              <width>200</width>
+              <height>0</height>
              </size>
             </property>
-            <property name="styleSheet">
-             <string>font-size: 12px;</string>
-            </property>
-            <property name="selectionMode">
-             <enum>QAbstractItemView::MultiSelection</enum>
+            <item>
+             <property name="text">
+              <string>Raw Memory (.raw, .mem, .vmem)</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Hibernation File (hiberfil.sys)</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Page File (pagefile.sys)</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Crash Dump (.dmp)</string>
+             </property>
+            </item>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="filePathLabel">
+            <property name="text">
+             <string>File Path:</string>
             </property>
            </widget>
           </item>
-          <item>
-           <widget class="QLabel" name="labelPluginSuggestion">
-            <property name="font">
-             <font>
-              <pointsize>-1</pointsize>
-              <italic>true</italic>
-             </font>
+          <item row="1" column="1">
+           <widget class="QLineEdit" name="filePathEdit">
+            <property name="placeholderText">
+             <string>Select evidence file...</string>
             </property>
-            <property name="styleSheet">
-             <string notr="true">font-size: 12px; color: #1976d2; font-style: italic;</string>
+           </widget>
+          </item>
+          <item row="1" column="2">
+           <widget class="QPushButton" name="browseButton">
+            <property name="maximumSize">
+             <size>
+              <width>80</width>
+              <height>16777215</height>
+             </size>
             </property>
             <property name="text">
-             <string>💡 Suggested: Select a memory file first</string>
+             <string>Browse</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="2">
+           <widget class="QPushButton" name="startAnalysisButton">
+            <property name="maximumSize">
+             <size>
+              <width>120</width>
+              <height>16777215</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>Start Analysis</string>
             </property>
            </widget>
           </item>
@@ -141,72 +121,38 @@
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="btnStart">
-         <property name="styleSheet">
-          <string notr="true">font-size: 15px; font-weight: bold; background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #1976d2, stop:1 #42a5f5); color: white; border-radius: 6px; padding: 10px 0; margin-top: 8px; margin-bottom: 4px;</string>
-         </property>
-         <property name="text">
-          <string>▶️ Analyze Selected File</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="btnExport">
-         <property name="styleSheet">
-          <string notr="true">font-size: 15px; background: #e3f2fd; color: #1976d2; border-radius: 6px; padding: 6px 0; margin-bottom: 4px;</string>
-         </property>
-         <property name="text">
-          <string>💾 Export Results</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QProgressBar" name="progressBar">
-         <property name="font">
-          <font>
-           <pointsize>9</pointsize>
-          </font>
-         </property>
-         <property name="styleSheet">
-          <string>border-radius: 5px; height: 18px; background: #f5f5f5; color: #1976d2;</string>
-         </property>
-         <property name="minimum">
-          <number>0</number>
-         </property>
-         <property name="maximum">
-          <number>100</number>
-         </property>
-         <property name="value">
-          <number>0</number>
-         </property>
-         <property name="textVisible">
-          <bool>true</bool>
-         </property>
-         <property name="format">
-          <string>Analysis progress: %p%</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QGroupBox" name="groupBoxLog">
-         <property name="font">
-          <font>
-           <pointsize>10</pointsize>
-           <weight>75</weight>
-           <bold>true</bold>
-          </font>
-         </property>
-         <property name="styleSheet">
-          <string>QGroupBox { font-weight: bold; }</string>
+        <widget class="QGroupBox" name="statusGroupBox">
+         <property name="maximumSize">
+          <size>
+           <width>300</width>
+           <height>16777215</height>
+          </size>
          </property>
          <property name="title">
-          <string>Analysis Log</string>
+          <string>Analysis Status</string>
          </property>
-         <layout class="QVBoxLayout" name="logLayout">
+         <layout class="QVBoxLayout" name="statusLayout">
           <item>
-           <widget class="QListWidget" name="listWidget_log">
-            <property name="styleSheet">
-             <string notr="true">background: #f5f5f5; font-size: 12px; border-radius: 5px;</string>
+           <widget class="QLabel" name="statusLabel">
+            <property name="text">
+             <string>Status: Ready</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QProgressBar" name="progressBar">
+            <property name="value">
+             <number>0</number>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="stopButton">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="text">
+             <string>Stop Analysis</string>
             </property>
            </widget>
           </item>
@@ -215,47 +161,1430 @@
        </item>
       </layout>
      </widget>
-     <widget class="QTabWidget" name="tabWidget">
-      <property name="styleSheet">
-       <string notr="true">QTabBar::tab {
-    min-width: 220px; /* Increased width to ensure full text visibility */
-    padding: 5px 15px; /* Adjust padding for better spacing */
-    text-align: left; /* Align text to the left */
-    font-size: 16px; /* Explicit font size */
-}
-
-QTabBar::tab:selected {
-    background-color: #2a82da;
-    color: white;
-    border: 1px solid #2a82da;
-    border-bottom-color: #2a82da; /* same as background color */
-}
-
-QTabBar::tab:!selected {
-    background-color: #f0f0f0;
-    border: 1px solid #dcdcdc;
-    border-bottom-color: #dcdcdc; /* same as border color */
-}
-
-QTabBar::close-button {
-    image: url(:/icons/icons8-close-30.png); /* Ensure you have this icon in your resources */
-    subcontrol-position: right;
-}
-
-QTabBar::close-button:hover {
-    background: #ff7878;}</string>
-      </property>
+    </item>
+    <item>
+     <widget class="QTabWidget" name="mainTabWidget">
       <property name="currentIndex">
-       <number>-1</number>
+       <number>6</number>
       </property>
-      <property name="tabsClosable">
-       <bool>true</bool>
-      </property>
+      <widget class="QWidget" name="rawMemoryTab">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <attribute name="title">
+        <string>Raw Memory Analysis</string>
+       </attribute>
+       <layout class="QVBoxLayout" name="rawMemoryLayout">
+        <item>
+         <widget class="QSplitter" name="rawMemorySplitter">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <widget class="QWidget" name="rawMemoryLeftWidget">
+           <layout class="QVBoxLayout" name="rawMemoryLeftLayout">
+            <item>
+             <widget class="QGroupBox" name="systemContextGroup">
+              <property name="maximumSize">
+               <size>
+                <width>16777215</width>
+                <height>150</height>
+               </size>
+              </property>
+              <property name="title">
+               <string>System Context</string>
+              </property>
+              <layout class="QGridLayout" name="systemContextLayout">
+               <item row="0" column="0">
+                <widget class="QLabel" name="osVersionLabel">
+                 <property name="text">
+                  <string>OS Version:</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="1">
+                <widget class="QLabel" name="osVersionValue">
+                 <property name="text">
+                  <string>-</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="0">
+                <widget class="QLabel" name="architectureLabel">
+                 <property name="text">
+                  <string>Architecture:</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="1">
+                <widget class="QLabel" name="architectureValue">
+                 <property name="text">
+                  <string>-</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="2" column="0">
+                <widget class="QLabel" name="timestampLabel">
+                 <property name="text">
+                  <string>Capture Time:</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="2" column="1">
+                <widget class="QLabel" name="timestampValue">
+                 <property name="text">
+                  <string>-</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item>
+             <widget class="QGroupBox" name="processAnalysisGroup">
+              <property name="title">
+               <string>Process Analysis</string>
+              </property>
+              <layout class="QVBoxLayout" name="processAnalysisLayout">
+               <item>
+                <widget class="QTabWidget" name="processTabWidget">
+                 <property name="currentIndex">
+                  <number>0</number>
+                 </property>
+                 <widget class="QWidget" name="processListTab">
+                  <attribute name="title">
+                   <string>Process List</string>
+                  </attribute>
+                  <layout class="QVBoxLayout" name="processListLayout">
+                   <item>
+                    <widget class="QTableWidget" name="processTable">
+                     <property name="alternatingRowColors">
+                      <bool>true</bool>
+                     </property>
+                     <property name="selectionBehavior">
+                      <enum>QAbstractItemView::SelectRows</enum>
+                     </property>
+                     <property name="sortingEnabled">
+                      <bool>true</bool>
+                     </property>
+                     <column>
+                      <property name="text">
+                       <string>PID</string>
+                      </property>
+                     </column>
+                     <column>
+                      <property name="text">
+                       <string>Process Name</string>
+                      </property>
+                     </column>
+                     <column>
+                      <property name="text">
+                       <string>Threads</string>
+                      </property>
+                     </column>
+                     <column>
+                      <property name="text">
+                       <string>Handles</string>
+                      </property>
+                     </column>
+                     <column>
+                      <property name="text">
+                       <string>Status</string>
+                      </property>
+                     </column>
+                    </widget>
+                   </item>
+                  </layout>
+                 </widget>
+                 <widget class="QWidget" name="malwareDetectionTab">
+                  <attribute name="title">
+                   <string>Malware Detection</string>
+                  </attribute>
+                  <layout class="QVBoxLayout" name="malwareDetectionLayout">
+                   <item>
+                    <widget class="QTextEdit" name="malwareResultsText">
+                     <property name="readOnly">
+                      <bool>true</bool>
+                     </property>
+                     <property name="placeholderText">
+                      <string>Malware detection results will appear here...</string>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </widget>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+          <widget class="QWidget" name="rawMemoryRightWidget">
+           <layout class="QVBoxLayout" name="rawMemoryRightLayout">
+            <item>
+             <widget class="QGroupBox" name="networkAnalysisGroup">
+              <property name="maximumSize">
+               <size>
+                <width>16777215</width>
+                <height>250</height>
+               </size>
+              </property>
+              <property name="title">
+               <string>Network Analysis</string>
+              </property>
+              <layout class="QVBoxLayout" name="networkAnalysisLayout">
+               <item>
+                <widget class="QTableWidget" name="networkTable">
+                 <property name="alternatingRowColors">
+                  <bool>true</bool>
+                 </property>
+                 <column>
+                  <property name="text">
+                   <string>Local Address</string>
+                  </property>
+                 </column>
+                 <column>
+                  <property name="text">
+                   <string>Remote Address</string>
+                  </property>
+                 </column>
+                 <column>
+                  <property name="text">
+                   <string>State</string>
+                  </property>
+                 </column>
+                 <column>
+                  <property name="text">
+                   <string>PID</string>
+                  </property>
+                 </column>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item>
+             <widget class="QGroupBox" name="fileSystemGroup">
+              <property name="title">
+               <string>File System &amp; Registry</string>
+              </property>
+              <layout class="QVBoxLayout" name="fileSystemLayout">
+               <item>
+                <widget class="QTabWidget" name="fileSystemTabWidget">
+                 <property name="currentIndex">
+                  <number>0</number>
+                 </property>
+                 <widget class="QWidget" name="filescanTab">
+                  <attribute name="title">
+                   <string>File Scan</string>
+                  </attribute>
+                  <layout class="QVBoxLayout" name="filescanLayout">
+                   <item>
+                    <widget class="QTreeWidget" name="filescanTree">
+                     <property name="alternatingRowColors">
+                      <bool>true</bool>
+                     </property>
+                     <column>
+                      <property name="text">
+                       <string>File Path</string>
+                      </property>
+                     </column>
+                     <column>
+                      <property name="text">
+                       <string>Size</string>
+                      </property>
+                     </column>
+                     <column>
+                      <property name="text">
+                       <string>Modified</string>
+                      </property>
+                     </column>
+                    </widget>
+                   </item>
+                  </layout>
+                 </widget>
+                 <widget class="QWidget" name="registryTab">
+                  <attribute name="title">
+                   <string>Registry</string>
+                  </attribute>
+                  <layout class="QVBoxLayout" name="registryLayout">
+                   <item>
+                    <widget class="QTreeWidget" name="registryTree">
+                     <property name="alternatingRowColors">
+                      <bool>true</bool>
+                     </property>
+                     <column>
+                      <property name="text">
+                       <string>Key</string>
+                      </property>
+                     </column>
+                     <column>
+                      <property name="text">
+                       <string>Value</string>
+                      </property>
+                     </column>
+                     <column>
+                      <property name="text">
+                       <string>Type</string>
+                      </property>
+                     </column>
+                    </widget>
+                   </item>
+                  </layout>
+                 </widget>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="hibernationTab">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <attribute name="title">
+        <string>Hibernation Analysis</string>
+       </attribute>
+       <layout class="QVBoxLayout" name="hibernationLayout">
+        <item>
+         <widget class="QGroupBox" name="hibernationInfoGroup">
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>150</height>
+           </size>
+          </property>
+          <property name="title">
+           <string>Hibernation Information</string>
+          </property>
+          <layout class="QGridLayout" name="hibernationInfoLayout">
+           <item row="0" column="0">
+            <widget class="QLabel" name="hibernationTypeLabel">
+             <property name="text">
+              <string>Hibernation Type:</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QLabel" name="hibernationTypeValue">
+             <property name="text">
+              <string>-</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="0">
+            <widget class="QLabel" name="compressedSizeLabel">
+             <property name="text">
+              <string>Compressed Size:</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="1">
+            <widget class="QLabel" name="compressedSizeValue">
+             <property name="text">
+              <string>-</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="0">
+            <widget class="QLabel" name="originalSizeLabel">
+             <property name="text">
+              <string>Original Size:</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="1">
+            <widget class="QLabel" name="originalSizeValue">
+             <property name="text">
+              <string>-</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
+         <widget class="QGroupBox" name="hibernationResultsGroup">
+          <property name="title">
+           <string>Analysis Results</string>
+          </property>
+          <layout class="QVBoxLayout" name="hibernationResultsLayout">
+           <item>
+            <widget class="QTextEdit" name="hibernationResultsText">
+             <property name="readOnly">
+              <bool>true</bool>
+             </property>
+             <property name="placeholderText">
+              <string>Hibernation analysis results will appear here...</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="pageFileTab">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <attribute name="title">
+        <string>Page File Analysis</string>
+       </attribute>
+       <layout class="QVBoxLayout" name="pageFileLayout">
+        <item>
+         <widget class="QSplitter" name="pageFileSplitter">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <widget class="QWidget" name="pageFileLeftWidget">
+           <layout class="QVBoxLayout" name="pageFileLeftLayout">
+            <item>
+             <widget class="QGroupBox" name="pageFileScanGroup">
+              <property name="title">
+               <string>Page File Scan Results</string>
+              </property>
+              <layout class="QVBoxLayout" name="pageFileScanLayout">
+               <item>
+                <widget class="QTableWidget" name="pageFileScanTable">
+                 <property name="alternatingRowColors">
+                  <bool>true</bool>
+                 </property>
+                 <column>
+                  <property name="text">
+                   <string>Offset</string>
+                  </property>
+                 </column>
+                 <column>
+                  <property name="text">
+                   <string>Type</string>
+                  </property>
+                 </column>
+                 <column>
+                  <property name="text">
+                   <string>Content</string>
+                  </property>
+                 </column>
+                 <column>
+                  <property name="text">
+                   <string>Size</string>
+                  </property>
+                 </column>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+          <widget class="QWidget" name="pageFileRightWidget">
+           <layout class="QVBoxLayout" name="pageFileRightLayout">
+            <item>
+             <widget class="QGroupBox" name="yaraResultsGroup">
+              <property name="title">
+               <string>YARA Scan Results</string>
+              </property>
+              <layout class="QVBoxLayout" name="yaraResultsLayout">
+               <item>
+                <widget class="QTextEdit" name="yaraResultsText">
+                 <property name="readOnly">
+                  <bool>true</bool>
+                 </property>
+                 <property name="placeholderText">
+                  <string>YARA scan results will appear here...</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="crashDumpTab">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <attribute name="title">
+        <string>Crash Dump Analysis</string>
+       </attribute>
+       <layout class="QVBoxLayout" name="crashDumpLayout">
+        <item>
+         <widget class="QGroupBox" name="crashInfoGroup">
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>150</height>
+           </size>
+          </property>
+          <property name="title">
+           <string>Crash Information</string>
+          </property>
+          <layout class="QGridLayout" name="crashInfoLayout">
+           <item row="0" column="0">
+            <widget class="QLabel" name="crashReasonLabel">
+             <property name="text">
+              <string>Crash Reason:</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QLabel" name="crashReasonValue">
+             <property name="text">
+              <string>-</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="0">
+            <widget class="QLabel" name="bugCheckLabel">
+             <property name="text">
+              <string>Bug Check Code:</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="1">
+            <widget class="QLabel" name="bugCheckValue">
+             <property name="text">
+              <string>-</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="0">
+            <widget class="QLabel" name="faultingDriverLabel">
+             <property name="text">
+              <string>Faulting Driver:</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="1">
+            <widget class="QLabel" name="faultingDriverValue">
+             <property name="text">
+              <string>-</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
+         <widget class="QGroupBox" name="crashAnalysisGroup">
+          <property name="title">
+           <string>Detailed Analysis</string>
+          </property>
+          <layout class="QVBoxLayout" name="crashAnalysisLayout">
+           <item>
+            <widget class="QTabWidget" name="crashAnalysisTabWidget">
+             <property name="currentIndex">
+              <number>1</number>
+             </property>
+             <widget class="QWidget" name="windbgTab">
+              <attribute name="title">
+               <string>WinDbg Analysis</string>
+              </attribute>
+              <layout class="QVBoxLayout" name="windbgLayout">
+               <item>
+                <widget class="QTextEdit" name="windbgResultsText">
+                 <property name="readOnly">
+                  <bool>true</bool>
+                 </property>
+                 <property name="placeholderText">
+                  <string>WinDbg analysis results will appear here...</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+             <widget class="QWidget" name="volatilityCrashTab">
+              <attribute name="title">
+               <string>Volatility Analysis</string>
+              </attribute>
+              <layout class="QVBoxLayout" name="volatilityCrashLayout">
+               <item>
+                <widget class="QTextEdit" name="volatilityCrashText">
+                 <property name="readOnly">
+                  <bool>true</bool>
+                 </property>
+                 <property name="placeholderText">
+                  <string>Volatility crash analysis results will appear here...</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="aiAnalysisTab">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <attribute name="title">
+        <string>AI Analysis</string>
+       </attribute>
+       <layout class="QVBoxLayout" name="aiAnalysisLayout">
+        <item>
+         <widget class="QGroupBox" name="aiSettingsGroup">
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>100</height>
+           </size>
+          </property>
+          <property name="title">
+           <string>AI Analysis Settings</string>
+          </property>
+          <layout class="QHBoxLayout" name="aiSettingsLayout">
+           <item>
+            <widget class="QCheckBox" name="enableAICheckbox">
+             <property name="text">
+              <string>Enable AI Analysis</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="aiModelLabel">
+             <property name="text">
+              <string>Model:</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QComboBox" name="aiModelCombo">
+             <item>
+              <property name="text">
+               <string>Volmemlyzer ML</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Custom Model</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="runAIAnalysisButton">
+             <property name="text">
+              <string>Run AI Analysis</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
+         <widget class="QGroupBox" name="aiResultsGroup">
+          <property name="title">
+           <string>AI Analysis Results</string>
+          </property>
+          <layout class="QVBoxLayout" name="aiResultsLayout">
+           <item>
+            <widget class="QTextEdit" name="aiResultsText">
+             <property name="readOnly">
+              <bool>true</bool>
+             </property>
+             <property name="placeholderText">
+              <string>AI analysis results will appear here...</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="analysisOptionsTab">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <attribute name="title">
+        <string>Analysis Options</string>
+       </attribute>
+       <layout class="QVBoxLayout" name="analysisOptionsLayout">
+        <item>
+         <widget class="QGroupBox" name="volatilityOptionsGroup">
+          <property name="title">
+           <string>Volatility Options</string>
+          </property>
+          <layout class="QGridLayout" name="volatilityOptionsLayout">
+           <item row="0" column="0">
+            <widget class="QCheckBox" name="pslistCheckbox">
+             <property name="text">
+              <string>Process List (pslist)</string>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QCheckBox" name="pstreeCheckbox">
+             <property name="text">
+              <string>Process Tree (pstree)</string>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="0">
+            <widget class="QCheckBox" name="psscanCheckbox">
+             <property name="text">
+              <string>Process Scan (psscan)</string>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="1">
+            <widget class="QCheckBox" name="malfindCheckbox">
+             <property name="text">
+              <string>Malware Find (malfind)</string>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="0">
+            <widget class="QCheckBox" name="netscanCheckbox">
+             <property name="text">
+              <string>Network Scan (netscan)</string>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="1">
+            <widget class="QCheckBox" name="filescanCheckbox">
+             <property name="text">
+              <string>File Scan (filescan)</string>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="0">
+            <widget class="QCheckBox" name="registryCheckbox">
+             <property name="text">
+              <string>Registry Analysis</string>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="1">
+            <widget class="QCheckBox" name="hashdumpCheckbox">
+             <property name="text">
+              <string>Hash Dump (hashdump)</string>
+             </property>
+             <property name="checked">
+              <bool>false</bool>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
+         <widget class="QGroupBox" name="outputOptionsGroup">
+          <property name="title">
+           <string>Output Options</string>
+          </property>
+          <layout class="QGridLayout" name="outputOptionsLayout">
+           <item row="0" column="0">
+            <widget class="QLabel" name="outputFormatLabel">
+             <property name="text">
+              <string>Output Format:</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QComboBox" name="outputFormatCombo">
+             <item>
+              <property name="text">
+               <string>JSON</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>CSV</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>XML</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Text</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+           <item row="1" column="0">
+            <widget class="QLabel" name="outputDirLabel">
+             <property name="text">
+              <string>Output Directory:</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="1">
+            <widget class="QLineEdit" name="outputDirEdit">
+             <property name="placeholderText">
+              <string>Select output directory...</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="2">
+            <widget class="QPushButton" name="outputDirButton">
+             <property name="text">
+              <string>Browse</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="0">
+            <widget class="QCheckBox" name="saveRawOutputCheckbox">
+             <property name="text">
+              <string>Save Raw Output</string>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="1">
+            <widget class="QCheckBox" name="generateReportCheckbox">
+             <property name="text">
+              <string>Generate HTML Report</string>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
+         <widget class="QGroupBox" name="advancedOptionsGroup">
+          <property name="title">
+           <string>Advanced Options</string>
+          </property>
+          <layout class="QGridLayout" name="advancedOptionsLayout">
+           <item row="0" column="0">
+            <widget class="QLabel" name="threadsLabel">
+             <property name="text">
+              <string>Analysis Threads:</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QSpinBox" name="threadsSpinBox">
+             <property name="minimum">
+              <number>1</number>
+             </property>
+             <property name="maximum">
+              <number>16</number>
+             </property>
+             <property name="value">
+              <number>4</number>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="0">
+            <widget class="QLabel" name="timeoutLabel">
+             <property name="text">
+              <string>Timeout (minutes):</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="1">
+            <widget class="QSpinBox" name="timeoutSpinBox">
+             <property name="minimum">
+              <number>5</number>
+             </property>
+             <property name="maximum">
+              <number>180</number>
+             </property>
+             <property name="value">
+              <number>60</number>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="0">
+            <widget class="QCheckBox" name="verboseCheckbox">
+             <property name="text">
+              <string>Verbose Output</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="1">
+            <widget class="QCheckBox" name="debugCheckbox">
+             <property name="text">
+              <string>Debug Mode</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
+         <spacer name="verticalSpacer">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="logTab">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <attribute name="title">
+        <string>Analysis Log</string>
+       </attribute>
+       <layout class="QVBoxLayout" name="logLayout">
+        <item>
+         <widget class="QFrame" name="logControlFrame">
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>50</height>
+           </size>
+          </property>
+          <property name="frameShape">
+           <enum>QFrame::StyledPanel</enum>
+          </property>
+          <layout class="QHBoxLayout" name="logControlLayout">
+           <item>
+            <widget class="QLabel" name="logLevelLabel">
+             <property name="text">
+              <string>Log Level:</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QComboBox" name="logLevelCombo">
+             <item>
+              <property name="text">
+               <string>Debug</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Info</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Warning</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Error</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+           <item>
+            <spacer name="horizontalSpacer">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item>
+            <widget class="QPushButton" name="clearLogButton">
+             <property name="text">
+              <string>Clear Log</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="saveLogButton">
+             <property name="text">
+              <string>Save Log</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
+         <widget class="QTextEdit" name="logTextEdit">
+          <property name="font">
+           <font>
+            <family>Courier New</family>
+            <pointsize>9</pointsize>
+           </font>
+          </property>
+          <property name="readOnly">
+           <bool>true</bool>
+          </property>
+          <property name="placeholderText">
+           <string>Analysis log will appear here...</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
      </widget>
-    </widget>
-   </item>
-  </layout>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1200</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>File</string>
+    </property>
+    <addaction name="actionOpen_Evidence"/>
+    <addaction name="actionRecent_Files"/>
+    <addaction name="separator"/>
+    <addaction name="actionSave_Results"/>
+    <addaction name="actionExport_Report"/>
+    <addaction name="separator"/>
+    <addaction name="actionExit"/>
+   </widget>
+   <widget class="QMenu" name="menuTools">
+    <property name="title">
+     <string>Tools</string>
+    </property>
+    <addaction name="actionVolatility_Settings"/>
+    <addaction name="actionYARA_Rules"/>
+    <addaction name="separator"/>
+    <addaction name="actionPreferences"/>
+   </widget>
+   <widget class="QMenu" name="menuAnalysis">
+    <property name="title">
+     <string>Analysis</string>
+    </property>
+    <addaction name="actionStart_Analysis"/>
+    <addaction name="actionStop_Analysis"/>
+    <addaction name="separator"/>
+    <addaction name="actionQuick_Analysis"/>
+    <addaction name="actionFull_Analysis"/>
+    <addaction name="separator"/>
+    <addaction name="actionCustom_Plugin"/>
+   </widget>
+   <widget class="QMenu" name="menuView">
+    <property name="title">
+     <string>View</string>
+    </property>
+    <addaction name="actionShow_System_Info"/>
+    <addaction name="actionShow_Process_Tree"/>
+    <addaction name="actionShow_Network_Connections"/>
+    <addaction name="separator"/>
+    <addaction name="actionRefresh"/>
+   </widget>
+   <widget class="QMenu" name="menuHelp">
+    <property name="title">
+     <string>Help</string>
+    </property>
+    <addaction name="actionUser_Manual"/>
+    <addaction name="actionVolatility_Documentation"/>
+    <addaction name="separator"/>
+    <addaction name="actionAbout"/>
+   </widget>
+   <addaction name="menuFile"/>
+   <addaction name="menuAnalysis"/>
+   <addaction name="menuTools"/>
+   <addaction name="menuView"/>
+   <addaction name="menuHelp"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar">
+   <property name="sizeGripEnabled">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QToolBar" name="mainToolBar">
+   <property name="windowTitle">
+    <string>toolBar</string>
+   </property>
+   <property name="toolButtonStyle">
+    <enum>Qt::ToolButtonTextBesideIcon</enum>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionOpen_Evidence"/>
+   <addaction name="actionStart_Analysis"/>
+   <addaction name="actionStop_Analysis"/>
+   <addaction name="separator"/>
+   <addaction name="actionSave_Results"/>
+   <addaction name="actionExport_Report"/>
+   <addaction name="separator"/>
+   <addaction name="actionPreferences"/>
+  </widget>
+  <action name="actionOpen_Evidence">
+   <property name="text">
+    <string>Open Evidence</string>
+   </property>
+   <property name="toolTip">
+    <string>Open evidence file for analysis</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+O</string>
+   </property>
+  </action>
+  <action name="actionRecent_Files">
+   <property name="text">
+    <string>Recent Files</string>
+   </property>
+  </action>
+  <action name="actionSave_Results">
+   <property name="text">
+    <string>Save Results</string>
+   </property>
+   <property name="toolTip">
+    <string>Save analysis results</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+S</string>
+   </property>
+  </action>
+  <action name="actionExport_Report">
+   <property name="text">
+    <string>Export Report</string>
+   </property>
+   <property name="toolTip">
+    <string>Export analysis report</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+E</string>
+   </property>
+  </action>
+  <action name="actionExit">
+   <property name="text">
+    <string>Exit</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Q</string>
+   </property>
+  </action>
+  <action name="actionStart_Analysis">
+   <property name="text">
+    <string>Start Analysis</string>
+   </property>
+   <property name="toolTip">
+    <string>Start memory analysis</string>
+   </property>
+   <property name="shortcut">
+    <string>F5</string>
+   </property>
+  </action>
+  <action name="actionStop_Analysis">
+   <property name="text">
+    <string>Stop Analysis</string>
+   </property>
+   <property name="toolTip">
+    <string>Stop running analysis</string>
+   </property>
+   <property name="shortcut">
+    <string>F6</string>
+   </property>
+  </action>
+  <action name="actionQuick_Analysis">
+   <property name="text">
+    <string>Quick Analysis</string>
+   </property>
+   <property name="toolTip">
+    <string>Run quick analysis with basic plugins</string>
+   </property>
+  </action>
+  <action name="actionFull_Analysis">
+   <property name="text">
+    <string>Full Analysis</string>
+   </property>
+   <property name="toolTip">
+    <string>Run comprehensive analysis with all plugins</string>
+   </property>
+  </action>
+  <action name="actionCustom_Plugin">
+   <property name="text">
+    <string>Custom Plugin</string>
+   </property>
+   <property name="toolTip">
+    <string>Run custom Volatility plugin</string>
+   </property>
+  </action>
+  <action name="actionVolatility_Settings">
+   <property name="text">
+    <string>Volatility Settings</string>
+   </property>
+  </action>
+  <action name="actionYARA_Rules">
+   <property name="text">
+    <string>YARA Rules</string>
+   </property>
+  </action>
+  <action name="actionPreferences">
+   <property name="text">
+    <string>Preferences</string>
+   </property>
+   <property name="toolTip">
+    <string>Application preferences</string>
+   </property>
+  </action>
+  <action name="actionShow_System_Info">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>System Info</string>
+   </property>
+  </action>
+  <action name="actionShow_Process_Tree">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Process Tree</string>
+   </property>
+  </action>
+  <action name="actionShow_Network_Connections">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Network Connections</string>
+   </property>
+  </action>
+  <action name="actionRefresh">
+   <property name="text">
+    <string>Refresh</string>
+   </property>
+   <property name="shortcut">
+    <string>F5</string>
+   </property>
+  </action>
+  <action name="actionUser_Manual">
+   <property name="text">
+    <string>User Manual</string>
+   </property>
+  </action>
+  <action name="actionVolatility_Documentation">
+   <property name="text">
+    <string>Volatility Documentation</string>
+   </property>
+  </action>
+  <action name="actionAbout">
+   <property name="text">
+    <string>About</string>
+   </property>
+  </action>
  </widget>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>browseButton</sender>
+   <signal>clicked()</signal>
+   <receiver>MemoryAnalysisWindow</receiver>
+   <slot>browse_evidence_file()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1090</x>
+     <y>85</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>600</x>
+     <y>400</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>startAnalysisButton</sender>
+   <signal>clicked()</signal>
+   <receiver>MemoryAnalysisWindow</receiver>
+   <slot>start_analysis()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1090</x>
+     <y>55</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>600</x>
+     <y>400</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>stopButton</sender>
+   <signal>clicked()</signal>
+   <receiver>MemoryAnalysisWindow</receiver>
+   <slot>stop_analysis()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1090</x>
+     <y>115</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>600</x>
+     <y>400</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>evidenceTypeCombo</sender>
+   <signal>currentTextChanged(QString)</signal>
+   <receiver>MemoryAnalysisWindow</receiver>
+   <slot>evidence_type_changed(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>400</x>
+     <y>55</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>600</x>
+     <y>400</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>outputDirButton</sender>
+   <signal>clicked()</signal>
+   <receiver>MemoryAnalysisWindow</receiver>
+   <slot>browse_output_directory()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>950</x>
+     <y>700</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>600</x>
+     <y>400</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>clearLogButton</sender>
+   <signal>clicked()</signal>
+   <receiver>MemoryAnalysisWindow</receiver>
+   <slot>clear_log()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1000</x>
+     <y>750</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>600</x>
+     <y>400</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>saveLogButton</sender>
+   <signal>clicked()</signal>
+   <receiver>MemoryAnalysisWindow</receiver>
+   <slot>save_log()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1100</x>
+     <y>750</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>600</x>
+     <y>400</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>runAIAnalysisButton</sender>
+   <signal>clicked()</signal>
+   <receiver>MemoryAnalysisWindow</receiver>
+   <slot>run_ai_analysis()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>800</x>
+     <y>650</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>600</x>
+     <y>400</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>browse_evidence_file()</slot>
+  <slot>start_analysis()</slot>
+  <slot>stop_analysis()</slot>
+  <slot>evidence_type_changed(QString)</slot>
+  <slot>browse_output_directory()</slot>
+  <slot>clear_log()</slot>
+  <slot>save_log()</slot>
+  <slot>run_ai_analysis()</slot>
+ </slots>
 </ui>

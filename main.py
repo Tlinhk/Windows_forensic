@@ -11,7 +11,7 @@ from pages_functions.case_management import Case
 from pages_functions.user_management import UserManagement
 from pages_functions.collect.volatile.volatile import Volatile
 from pages_functions.collect.nonvolatile.nonvolatile import NonVolatilePage
-from pages_functions.analysis.memory_analysis import MemoryAnalysisPage
+from pages_functions.analysis.memory_analysis import MemoryAnalysisWindow
 from pages_functions.analysis.registry_analysis import RegistryAnalysis
 from pages_functions.analysis.browser_analysis import BrowserAnalysis
 from pages_functions.analysis.file_analysis import FileAnalysis
@@ -72,7 +72,7 @@ class MyWindow(QMainWindow):
             self.nonvolatile_btn: ("Non-Volatile", lambda: NonVolatilePage()),
             self.memory_btn: (
                 "Phân tích bộ nhớ",
-                lambda: MemoryAnalysisPage(parent=self),
+                lambda: MemoryAnalysisWindow(),
             ),
             self.registry_btn: ("Registry", lambda: RegistryAnalysis()),
             self.browser_btn: ("Browser", lambda: BrowserAnalysis()),
@@ -121,7 +121,7 @@ class MyWindow(QMainWindow):
                 # Check if the widget is an instance of MemoryAnalysisPage and has the load_case_data method
                 if (
                     current_widget
-                    and isinstance(current_widget, MemoryAnalysisPage)
+                    and isinstance(current_widget, MemoryAnalysisWindow)
                     and hasattr(current_widget, "load_case_data")
                 ):
                     if case_id:
