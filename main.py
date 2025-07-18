@@ -1,4 +1,3 @@
-
 from PyQt5.QtWidgets import QApplication, QMainWindow, QMessageBox, QPushButton, QMenu
 from PyQt5.QtCore import pyqtSignal, QTimer, Qt
 from datetime import datetime
@@ -60,7 +59,6 @@ class MyWindow(QMainWindow):
         self.update_timestamp()
         self.update_user_info()
 
-
         # Use a dictionary to store created instances to avoid re-creation
         self.opened_windows = {}
 
@@ -71,7 +69,7 @@ class MyWindow(QMainWindow):
             self.case_btn: ("Quản lý vụ án", lambda: Case(main_window=self)),
             self.user_management_btn: ("User Management", lambda: UserManagement()),
             self.volatile_btn: ("Volatile", lambda: Volatile()),
-            self.nonvolatile_btn: ("Non-Volatile", lambda: NonvolatilePage()),
+            self.nonvolatile_btn: ("Non-Volatile", lambda: NonVolatilePage()),
             self.memory_btn: (
                 "Phân tích bộ nhớ",
                 lambda: MemoryAnalysisPage(parent=self),
@@ -104,7 +102,6 @@ class MyWindow(QMainWindow):
 
         self.user_label.mousePressEvent = self.user_label_clicked
         # self.logout_btn.clicked.connect(self.confirm_logout)
-
 
     def get_or_create_window(self, key, widget_factory):
         if key not in self.opened_windows:
@@ -329,7 +326,6 @@ class MyWindow(QMainWindow):
             else:
                 button.setChecked(True)
 
-
     def open_tab_flag(self, tab_title):
         """
         Check if tab is already open
@@ -338,7 +334,6 @@ class MyWindow(QMainWindow):
             if self.ui.tabWidget.tabText(i) == tab_title:
                 return True, i
         return False, -1
-
 
     def user_label_clicked(self, ev):
         """

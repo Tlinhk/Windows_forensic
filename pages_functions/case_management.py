@@ -9,7 +9,8 @@ from PyQt5.QtWidgets import (
     QPushButton,
     QHBoxLayout,
 )
-from PyQt5.QtCore import Qt, QDateTime
+from PyQt5.QtCore import Qt, QDateTime, QTimer
+from PyQt5.QtGui import QIcon
 from database.db_manager import db
 import os
 import hashlib
@@ -623,7 +624,7 @@ class ImportEvidenceDialog(QDialog):
                 f"Calculating hash for {filename}...", "Cancel", 0, 100, self
             )
             progress.setWindowTitle("Calculating Hash")
-            progress.setWindowModality(Qt.WindowModal)
+            progress.setWindowModality(Qt.WindowModality.WindowModal)
             progress.show()
 
             hash_md5 = hashlib.md5()
@@ -914,13 +915,12 @@ class Case(QWidget):
         # Load data
         self.load_cases()
 
-
     def load_specific_case(self, case_id, case_data):
         """Load specific case"""
         self.current_case_id = case_id
         for r in range(self.ui.casesTable.rowCount()):
             item = self.ui.casesTable.item(r, 0)
-            if item and item.data(Qt.UserRole) == case_id:
+            if item and item.data(Qt.ItemDataRole.UserRole) == case_id:
                 self.ui.casesTable.selectRow(r)
                 break
         title = case_data.get("title", "N/A")
@@ -931,7 +931,8 @@ class Case(QWidget):
         """Cấu hình tables"""
         # Cases table
         cases_header = self.ui.casesTable.horizontalHeader()
-        cases_header.setSectionResizeMode(QHeaderView.ResizeToContents)
+        if cases_header:
+            cases_header.setSectionResizeMode(QHeaderView.ResizeToContents)
         self.ui.casesTable.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.ui.casesTable.setSelectionMode(QAbstractItemView.SingleSelection)
 
@@ -940,11 +941,14 @@ class Case(QWidget):
         self.ui.casesTable.setAlternatingRowColors(True)
 
         # Set row height cho table
-        self.ui.casesTable.verticalHeader().setDefaultSectionSize(40)
+        vertical_header = self.ui.casesTable.verticalHeader()
+        if vertical_header:
+            vertical_header.setDefaultSectionSize(40)
 
         # Evidence table
         evidence_header = self.ui.evidenceTable.horizontalHeader()
-        evidence_header.setSectionResizeMode(QHeaderView.ResizeToContents)
+        if evidence_header:
+            evidence_header.setSectionResizeMode(QHeaderView.ResizeToContents)
         self.ui.evidenceTable.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.ui.evidenceTable.setSelectionMode(QAbstractItemView.SingleSelection)
 
@@ -1007,7 +1011,7 @@ class Case(QWidget):
                 # Cột 0: Tên Case
                 title_item = QTableWidgetItem(title)
                 # Lưu case_id vào item này để các chức năng khác sử dụng
-                title_item.setData(Qt.UserRole, case_id)
+                title_item.setData(Qt.ItemDataRole.UserRole, case_id)
                 self.ui.casesTable.setItem(row, 0, title_item)
 
                 # Cột 1: Điều tra viên
@@ -1034,7 +1038,7 @@ class Case(QWidget):
         if current_row >= 0:
             item = self.ui.casesTable.item(current_row, 0)
             if item:
-                self.current_case_id = item.data(Qt.UserRole)
+                self.current_case_id = item.data(Qt.ItemDataRole.UserRole)
 
                 if self.main_window:
                     self.main_window.current_case_id = self.current_case_id
@@ -1083,9 +1087,11 @@ class Case(QWidget):
                 self.ui.evidenceTable.setItem(row, 5, QTableWidgetItem(mime_type))
 
                 # Store evidence_id
-                self.ui.evidenceTable.item(row, 0).setData(
-                    Qt.UserRole, evidence["artefact_id"]
-                )
+                evidence_item = self.ui.evidenceTable.item(row, 0)
+                if evidence_item:
+                    evidence_item.setData(
+                        Qt.ItemDataRole.UserRole, evidence["artefact_id"]
+                    )
 
         except Exception as e:
             QMessageBox.critical(self, "Lỗi", f"Không thể load evidence: {str(e)}")
@@ -1093,9 +1099,11 @@ class Case(QWidget):
     def filter_cases(self, text):
         """Lọc cases theo text search"""
         for row in range(self.ui.casesTable.rowCount()):
-            case_name = self.ui.casesTable.item(row, 0).text()
-            match = text.lower() in case_name.lower()
-            self.ui.casesTable.setRowHidden(row, not match)
+            item = self.ui.casesTable.item(row, 0)
+            if item:
+                case_name = item.text()
+                match = text.lower() in case_name.lower()
+                self.ui.casesTable.setRowHidden(row, not match)
 
     def edit_selected_case(self):
         """Sửa case được chọn trong table"""
@@ -1106,7 +1114,7 @@ class Case(QWidget):
 
         item = self.ui.casesTable.item(current_row, 0)
         if item:
-            case_id = item.data(Qt.UserRole)
+            case_id = item.data(Qt.ItemDataRole.UserRole)
             self.edit_case(case_id)
 
     def edit_case(self, case_id):
@@ -1124,7 +1132,7 @@ class Case(QWidget):
 
         item = self.ui.casesTable.item(current_row, 0)
         if item:
-            case_id = item.data(Qt.UserRole)
+            case_id = item.data(Qt.ItemDataRole.UserRole)
             self.delete_case_by_id(case_id)
 
     def delete_case_by_id(self, case_id):
@@ -1169,28 +1177,29 @@ class Case(QWidget):
             return
 
         evidence_item = self.ui.evidenceTable.item(current_row, 0)
-        evidence_id = evidence_item.data(Qt.UserRole)
-        evidence_name = evidence_item.text()
+        if evidence_item:
+            evidence_id = evidence_item.data(Qt.ItemDataRole.UserRole)
+            evidence_name = evidence_item.text()
 
-        reply = QMessageBox.question(
-            self,
-            "Xác nhận xóa",
-            f"Bạn có chắc chắn muốn xóa evidence '{evidence_name}'?",
-            QMessageBox.Yes | QMessageBox.No,
-        )
+            reply = QMessageBox.question(
+                self,
+                "Xác nhận xóa",
+                f"Bạn có chắc chắn muốn xóa evidence '{evidence_name}'?",
+                QMessageBox.Yes | QMessageBox.No,
+            )
 
-        if reply == QMessageBox.Yes:
-            try:
-                if db.delete_artifact(evidence_id):
-                    QMessageBox.information(
-                        self, "Thành công", "Đã xóa evidence thành công!"
-                    )
-                    self.load_evidence()
-                    self.load_cases()  # Refresh case table để cập nhật số lượng evidence
-                else:
-                    QMessageBox.critical(self, "Lỗi", "Không thể xóa evidence!")
-            except Exception as e:
-                QMessageBox.critical(self, "Lỗi", f"Lỗi khi xóa evidence: {str(e)}")
+            if reply == QMessageBox.Yes:
+                try:
+                    if db.delete_artifact(evidence_id):
+                        QMessageBox.information(
+                            self, "Thành công", "Đã xóa evidence thành công!"
+                        )
+                        self.load_evidence()
+                        self.load_cases()  # Refresh case table để cập nhật số lượng evidence
+                    else:
+                        QMessageBox.critical(self, "Lỗi", "Không thể xóa evidence!")
+                except Exception as e:
+                    QMessageBox.critical(self, "Lỗi", f"Lỗi khi xóa evidence: {str(e)}")
 
     def show_collect_dialog(self):
         """Hiển thị dialog chọn loại thu thập dữ liệu"""
@@ -1266,31 +1275,37 @@ class Case(QWidget):
         Bắt đầu workflow phân tích bằng cách chuyển sang tab phân tích
         cho case đang được chọn.
         """
-        selected_rows = self.ui.casesTable.selectionModel().selectedRows()
-        if not selected_rows:
-            QMessageBox.warning(
-                self, "Lỗi", "Vui lòng chọn một case để bắt đầu phân tích!"
-            )
-            return
+        selection_model = self.ui.casesTable.selectionModel()
+        if selection_model:
+            selected_rows = selection_model.selectedRows()
+            if not selected_rows:
+                QMessageBox.warning(
+                    self, "Lỗi", "Vui lòng chọn một case để bắt đầu phân tích!"
+                )
+                return
 
-        # Lấy case ID từ data role của item ở cột 0 (Tên Case)
-        selected_row = selected_rows[0].row()
-        case_item = self.ui.casesTable.item(selected_row, 0)
-        if case_item:
-            case_id = case_item.data(Qt.UserRole)
+            # Lấy case ID từ data role của item ở cột 0 (Tên Case)
+            selected_row = selected_rows[0].row()
+            case_item = self.ui.casesTable.item(selected_row, 0)
+            if case_item:
+                case_id = case_item.data(Qt.ItemDataRole.UserRole)
 
-            if self.main_window and hasattr(
-                self.main_window, "switch_to_memory_analysis_tab"
-            ):
-                self.main_window.switch_to_memory_analysis_tab(case_id)
+                if self.main_window and hasattr(
+                    self.main_window, "switch_to_memory_analysis_tab"
+                ):
+                    self.main_window.switch_to_memory_analysis_tab(case_id)
+                else:
+                    QMessageBox.critical(
+                        self,
+                        "Lỗi Tích Hợp",
+                        "Không thể gọi đến cửa sổ chính để chuyển tab phân tích.",
+                    )
             else:
-                QMessageBox.critical(
-                    self,
-                    "Lỗi Tích Hợp",
-                    "Không thể gọi đến cửa sổ chính để chuyển tab phân tích.",
+                QMessageBox.warning(
+                    self, "Lỗi", "Không thể xác định ID của case đã chọn."
                 )
         else:
-            QMessageBox.warning(self, "Lỗi", "Không thể xác định ID của case đã chọn.")
+            QMessageBox.warning(self, "Lỗi", "Không thể truy cập selection model.")
 
     def format_file_size(self, size_bytes):
         """Format kích thước file"""
