@@ -1,8 +1,17 @@
-from PyQt5.QtWidgets import QMainWindow, QFileDialog, QMessageBox
+from PyQt5.QtWidgets import (
+    QMainWindow,
+    QFileDialog,
+    QMessageBox,
+    QSizePolicy,
+    QTableWidgetItem,
+)
 from PyQt5 import QtCore
+from PyQt5.QtCore import Qt
 from ui.pages.analysis_ui.memory_analysis_ui import Ui_MemoryAnalysisWindow
 import os
 from PyQt5.QtWidgets import QSizePolicy
+import glob
+import importlib.util
 
 
 class MemoryAnalysisWindow(QMainWindow):
@@ -14,7 +23,6 @@ class MemoryAnalysisWindow(QMainWindow):
         # —————————————— TabBar: Không cắt chữ, không dàn đều, đủ rộng cho tiêu đề ——————————————
         tabbar = self.ui.mainTabWidget.tabBar()
         if tabbar is not None:
-            tabbar.setElideMode(QtCore.Qt.ElideNone)
             tabbar.setExpanding(False)
             tabbar.setUsesScrollButtons(True)
         self.ui.mainTabWidget.setStyleSheet(
@@ -36,12 +44,121 @@ class MemoryAnalysisWindow(QMainWindow):
             gb.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
         self.analysis_running = False
         self.mock_reset_ui()
+        self.load_volatility_plugins()
+        # Kết nối tìm kiếm plugin
+        if hasattr(self.ui, "pluginSearchEdit"):
+            self.ui.pluginSearchEdit.textChanged.connect(self.filter_plugin_table)
 
     def setup_connections(self):
         self.ui.browseButton.clicked.connect(self.browse_evidence_file)
         self.ui.startAnalysisButton.clicked.connect(self.start_analysis)
         self.ui.stopButton.clicked.connect(self.stop_analysis)
         self.ui.evidenceTypeCombo.currentTextChanged.connect(self.evidence_type_changed)
+        if hasattr(self.ui, "pluginSearchEdit"):
+            self.ui.pluginSearchEdit.textChanged.connect(self.filter_plugin_list)
+
+    def load_volatility_plugins(self):
+        plugin_dir = r"E:/DATN/Windows_forensic/tools/volatility3/volatility3/framework/plugins/windows"
+        import glob, os
+
+        plugin_files = glob.glob(os.path.join(plugin_dir, "*.py"))
+        plugins = []
+        for pf in plugin_files:
+            name = os.path.splitext(os.path.basename(pf))[0]
+            if name.startswith("_") or name == "init":
+                continue
+            doc = ""
+            try:
+                with open(pf, "r", encoding="utf-8") as f:
+                    lines = f.readlines()
+                    for line in lines:
+                        if line.strip().startswith('"""') or line.strip().startswith(
+                            "'''"
+                        ):
+                            doc = line.strip().strip("\"'")
+                            break
+            except Exception:
+                pass
+            # Gán loại plugin đơn giản dựa trên tên
+            if name in {"pslist", "pstree", "psscan"}:
+                ptype = "Process"
+            elif name in {"netscan"}:
+                ptype = "Network"
+            elif name in {"malfind", "hashdump"}:
+                ptype = "Malware"
+            elif name in {"filescan"}:
+                ptype = "File"
+            elif name in {"registry"}:
+                ptype = "Registry"
+            else:
+                ptype = "Khác"
+            plugins.append({"name": name, "desc": doc, "type": ptype})
+        self.all_plugins = plugins
+        self.populate_plugin_table()
+
+    def populate_plugin_table(self, filter_text=""):
+        if not hasattr(self.ui, "pluginTableWidget"):
+            print(
+                "Bạn cần thêm QTableWidget tên pluginTableWidget vào file .ui để hiển thị danh sách plugin Volatility."
+            )
+            return
+        table = self.ui.pluginTableWidget
+        table.setRowCount(0)
+        default_plugins = {
+            "pslist",
+            "pstree",
+            "psscan",
+            "netscan",
+            "malfind",
+            "filescan",
+            "registry",
+            "hashdump",
+        }
+        for p in self.all_plugins:
+            if (
+                filter_text
+                and filter_text.lower() not in p["name"].lower()
+                and filter_text.lower() not in p.get("desc", "").lower()
+            ):
+                continue
+            row = table.rowCount()
+            table.insertRow(row)
+            # Checkbox
+            chk = QTableWidgetItem()
+            chk.setFlags(QtCore.Qt.ItemIsUserCheckable | QtCore.Qt.ItemIsEnabled)
+            if p["name"] in default_plugins:
+                chk.setCheckState(QtCore.Qt.Checked)
+            else:
+                chk.setCheckState(QtCore.Qt.Unchecked)
+            table.setItem(row, 0, chk)
+            # Name
+            table.setItem(row, 1, QTableWidgetItem(p["name"]))
+            # Type
+            table.setItem(row, 2, QTableWidgetItem(p.get("type", "")))
+            # Description
+            desc_item = QTableWidgetItem(p.get("desc", ""))
+            desc_item.setToolTip(p.get("desc", ""))
+            table.setItem(row, 3, desc_item)
+        table.resizeColumnsToContents()
+        if table.horizontalHeader() is not None:
+            try:
+                table.horizontalHeader().setStretchLastSection(True)
+            except Exception:
+                pass
+
+    def filter_plugin_table(self, text):
+        self.populate_plugin_table(filter_text=text)
+
+    def get_selected_plugins(self):
+        table = self.ui.pluginTableWidget
+        selected = []
+        for row in range(table.rowCount()):
+            item0 = table.item(row, 0)
+            item1 = table.item(row, 1)
+            if item0 is not None and item0.checkState() == QtCore.Qt.Checked:
+                if item1 is not None:
+                    selected.append(item1.text())
+        return selected
 
     def browse_evidence_file(self):
         file_path, _ = QFileDialog.getOpenFileName(
@@ -71,7 +188,8 @@ class MemoryAnalysisWindow(QMainWindow):
 
     def evidence_type_changed(self, type_text):
         self.switch_tab_by_type(type_text)
-        self.ui.statusLabel.setText(f"Status: Evidence type set to {type_text}")
+
+    #        self.ui.statusLabel.setText(f"Status: Evidence type set to {type_text}")
 
     def switch_tab_by_type(self, type_text):
         tab_map = {
@@ -145,7 +263,7 @@ class MemoryAnalysisWindow(QMainWindow):
         self.ui.volatilityCrashText.clear()
         self.ui.aiResultsText.clear()
         self.ui.progressBar.setValue(0)
-        self.ui.statusLabel.setText("Status: Ready")
+        #        self.ui.statusLabel.setText("Status: Ready")
         self.ui.logTextEdit.clear()
 
     def mock_show_raw_memory_result(self):
