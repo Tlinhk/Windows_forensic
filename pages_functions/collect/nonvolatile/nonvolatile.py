@@ -448,6 +448,14 @@ class NonVolatilePage(QtWidgets.QWidget, Ui_CollectNonvolatileForm):
             # Thêm label này vào layout thông tin thiết bị
             if hasattr(self, 'gridLayout_device_info'):
                 self.gridLayout_device_info.addWidget(self.label_source_size, 2, 1)
+
+        # Tạo label hiển thị đường dẫn xem trước nếu chưa có
+        if not hasattr(self, 'label_preview_path'):
+            self.label_preview_path = QtWidgets.QLabel(self)
+            self.label_preview_path.setText("")
+            # Thêm label này vào layout phù hợp
+            if hasattr(self, 'verticalLayout_image_config'):
+                self.verticalLayout_image_config.addWidget(self.label_preview_path)
         
         # Đặt các giá trị mặc định cho các ô nhập liệu
         # Tạo mã vụ việc mặc định dựa trên ngày giờ hiện tại
@@ -472,7 +480,7 @@ class NonVolatilePage(QtWidgets.QWidget, Ui_CollectNonvolatileForm):
         self.checkBox_md5.setChecked(True)
         self.checkBox_sha1.setChecked(True)
         self.checkBox_sha256.setChecked(True)
-        
+
     def connect_signals(self):
         """Kết nối tất cả các tín hiệu (signals) từ các widget trên UI tới các khe cắm (slots) xử lý tương ứng."""
         # Nút điều hướng
@@ -919,8 +927,22 @@ class NonVolatilePage(QtWidgets.QWidget, Ui_CollectNonvolatileForm):
         self.device_worker.moveToThread(self.device_thread)
         # Khi worker quét xong, tín hiệu 'devicesFound' sẽ gọi hàm 'update_device_list'
         self.device_worker.devicesFound.connect(self.update_device_list)
-        self.device_thread.started.connect(self.device_worker.scan)
+        self.device_thread.started.connect(lambda: self.initialize_wmi_and_scan())
         self.device_thread.start()
+    
+    def initialize_wmi_and_scan(self):
+        """Initialize WMI in the worker thread and start scanning."""
+        try:
+            import pythoncom
+            pythoncom.CoInitialize()  # Initialize COM for this thread
+            self.device_worker.scan()
+        except Exception as e:
+            print(f"Error initializing WMI in thread: {e}")
+        finally:
+            try:
+                pythoncom.CoUninitialize()  # Clean up COM
+            except:
+                pass
         
     def on_kape_data_loaded(self, targets, modules):
         """
