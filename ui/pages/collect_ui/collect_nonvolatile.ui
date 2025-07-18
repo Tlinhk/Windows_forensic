@@ -124,7 +124,7 @@
    <item>
     <widget class="QStackedWidget" name="stackedWidget">
      <property name="currentIndex">
-      <number>2</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="page_step1_setup">
       <layout class="QVBoxLayout" name="verticalLayout_step1">
@@ -200,17 +200,17 @@
             </column>
             <column>
              <property name="text">
-              <string>Chuẩn kết nối</string>
+              <string>Hệ thống file</string>
              </property>
             </column>
             <column>
              <property name="text">
-              <string>Dung lượng</string>
+              <string>Dung lượng ổ cứng</string>
              </property>
             </column>
             <column>
              <property name="text">
-              <string>Phân vùng</string>
+              <string>Phân vùng ổ cứng</string>
              </property>
             </column>
             <column>

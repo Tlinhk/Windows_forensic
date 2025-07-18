@@ -1,0 +1,10 @@
+
+dc3dd 7.2.641 started at 2025-07-18 08:08:26 +0700
+command line: /dc3dd/dc3dd if=\\.\PHYSICALDRIVE1 of=E:/CT1000P3SSD8__OK__20250718-0808.dd log=stderr verb=on hof=on mlog=on rec=on bs=4M hash=md5,sha1,sha256 ssz=2048M mlog=case_number:Case-20250718-0808 mlog=examiner:Unknown mlog=description:Unknown
+dc3dd aborted at 2025-07-18 08:08:26 +0700
+
+
+dc3dd 7.2.641 started at 2025-07-18 08:17:46 +0700
+command line: /dc3dd/dc3dd if=\\.\PHYSICALDRIVE0 of=E:/SAMSUNG_MZVL2512HCJQ-00B00__OK___Windows_OS__20250718-0817.dd log=stderr verb=on hof=on mlog=on rec=on bs=4M hash=sha256 ssz=2048M mlog=case_number:Case-20250718-0817 mlog=examiner:Unknown mlog=description:Unknown
+dc3dd aborted at 2025-07-18 08:17:46 +0700
+

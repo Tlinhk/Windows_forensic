@@ -554,7 +554,7 @@ class Ui_CollectNonvolatileForm(object):
         self.mainLayout.addWidget(self.frame_navigation)
 
         self.retranslateUi(CollectNonvolatileForm)
-        self.stackedWidget.setCurrentIndex(2)
+        self.stackedWidget.setCurrentIndex(0)
         self.stackedWidget_config.setCurrentIndex(1)
         QtCore.QMetaObject.connectSlotsByName(CollectNonvolatileForm)
 
@@ -577,11 +577,11 @@ class Ui_CollectNonvolatileForm(object):
         item = self.tableWidget_devices.horizontalHeaderItem(0)
         item.setText(_translate("CollectNonvolatileForm", "Model"))
         item = self.tableWidget_devices.horizontalHeaderItem(1)
-        item.setText(_translate("CollectNonvolatileForm", "Chuẩn kết nối"))
+        item.setText(_translate("CollectNonvolatileForm", "Hệ thống file"))
         item = self.tableWidget_devices.horizontalHeaderItem(2)
-        item.setText(_translate("CollectNonvolatileForm", "Dung lượng"))
+        item.setText(_translate("CollectNonvolatileForm", "Dung lượng ổ cứng"))
         item = self.tableWidget_devices.horizontalHeaderItem(3)
-        item.setText(_translate("CollectNonvolatileForm", "Phân vùng"))
+        item.setText(_translate("CollectNonvolatileForm", "Phân vùng ổ cứng"))
         item = self.tableWidget_devices.horizontalHeaderItem(4)
         item.setText(_translate("CollectNonvolatileForm", "Trạng thái mã hóa"))
         self.pushButton_refresh_devices.setText(_translate("CollectNonvolatileForm", "🔄 Làm mới"))

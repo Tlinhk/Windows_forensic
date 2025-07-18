@@ -1,0 +1,15 @@
+
+dc3dd 7.2.641 started at 2025-07-18 08:19:29 +0700
+command line: /dc3dd/dc3dd if=//./PHYSICALDRIVE0 of=E:/CT1000P3SSD8__OK__20250718-0819.dd log=stderr verb=on hof=on mlog=on rec=on ibs=4M obs=4M hash=sha256 split=2048MiB mlog=case_number:Case-20250718-0819 mlog=examiner:Unknown mlog=description:Unknown
+dc3dd aborted at 2025-07-18 08:19:31 +0700
+
+
+dc3dd 7.2.641 started at 2025-07-18 08:23:06 +0700
+command line: /dc3dd/dc3dd if=/dev/sdb of=/cygdrive/d/CT1000P3SSD8__OK__20250718-0822.dd log=stderr verb=on hof=on mlog=on rec=on ibs=4M obs=4M hash=sha256 split=2048MiB mlog=case_number:Case-20250718-0822 mlog=examiner:Unknown mlog=description:Unknown
+dc3dd aborted at 2025-07-18 08:23:06 +0700
+
+
+dc3dd 7.2.641 started at 2025-07-18 08:23:25 +0700
+command line: /dc3dd/dc3dd if=/dev/sdb of=/cygdrive/d/CT1000P3SSD8__OK__20250718-0822.dd log=stderr verb=on hof=on mlog=on rec=on ibs=4M obs=4M hash=sha256 split=2048MiB mlog=case_number:Case-20250718-0822 mlog=examiner:Unknown mlog=description:Unknown
+dc3dd aborted at 2025-07-18 08:23:25 +0700
+
