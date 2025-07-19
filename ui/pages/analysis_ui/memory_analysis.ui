@@ -746,7 +746,7 @@ QProgressBar::chunk {
     <item row="2" column="0">
      <widget class="QTabWidget" name="mainTabWidget">
       <property name="currentIndex">
-       <number>5</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="rawMemoryTab">
        <property name="sizePolicy">
@@ -777,7 +777,7 @@ QProgressBar::chunk {
         <item>
          <widget class="QTabWidget" name="rawMemoryTabWidget">
           <property name="currentIndex">
-           <number>0</number>
+           <number>1</number>
           </property>
           <widget class="QWidget" name="systemContextTab">
            <attribute name="title">
@@ -972,19 +972,19 @@ QPushButton:pressed {
                 </item>
                </layout>
               </widget>
-              <widget class="QWidget" name="dllDriverTab">
+              <widget class="QWidget" name="dllTab">
                <attribute name="title">
-                <string>DLL/Driver List</string>
+                <string>DLL List</string>
                </attribute>
                <layout class="QVBoxLayout" name="dllDriverLayout">
                 <item>
-                 <widget class="QTableWidget" name="dllDriverTable"/>
+                 <widget class="QTableWidget" name="dllTable"/>
                 </item>
                </layout>
               </widget>
               <widget class="QWidget" name="malwareDetectionTab">
                <attribute name="title">
-                <string>Malware Detection</string>
+                <string>Malfind</string>
                </attribute>
                <layout class="QVBoxLayout" name="malwareDetectionLayout">
                 <item>
@@ -1013,16 +1013,53 @@ QPushButton:pressed {
            <layout class="QVBoxLayout" name="fileRegistryLayout">
             <item>
              <widget class="QTabWidget" name="fileRegistrySubTabWidget">
+              <property name="currentIndex">
+               <number>1</number>
+              </property>
               <widget class="QWidget" name="fileScanTab">
                <attribute name="title">
                 <string>File Scan</string>
                </attribute>
                <layout class="QVBoxLayout" name="fileScanLayout">
                 <item>
-                 <widget class="QTreeWidget" name="filescanTree">
+                 <widget class="QTableWidget" name="filescanTable">
+                  <property name="alternatingRowColors">
+                   <bool>true</bool>
+                  </property>
+                  <property name="selectionBehavior">
+                   <enum>QAbstractItemView::SelectRows</enum>
+                  </property>
+                  <property name="sortingEnabled">
+                   <bool>true</bool>
+                  </property>
                   <column>
                    <property name="text">
-                    <string notr="true">1</string>
+                    <string>File Path</string>
+                   </property>
+                  </column>
+                  <column>
+                   <property name="text">
+                    <string>Size</string>
+                   </property>
+                  </column>
+                  <column>
+                   <property name="text">
+                    <string>Offset</string>
+                   </property>
+                  </column>
+                  <column>
+                   <property name="text">
+                    <string>Access Time</string>
+                   </property>
+                  </column>
+                  <column>
+                   <property name="text">
+                    <string>Created</string>
+                   </property>
+                  </column>
+                  <column>
+                   <property name="text">
+                    <string>Modified</string>
                    </property>
                   </column>
                  </widget>
@@ -1035,10 +1072,34 @@ QPushButton:pressed {
                </attribute>
                <layout class="QVBoxLayout" name="registryLayout">
                 <item>
-                 <widget class="QTreeWidget" name="registryTree">
+                 <widget class="QTableWidget" name="registryTable">
+                  <property name="alternatingRowColors">
+                   <bool>true</bool>
+                  </property>
+                  <property name="selectionBehavior">
+                   <enum>QAbstractItemView::SelectRows</enum>
+                  </property>
+                  <property name="sortingEnabled">
+                   <bool>true</bool>
+                  </property>
                   <column>
                    <property name="text">
-                    <string notr="true">1</string>
+                    <string>Key</string>
+                   </property>
+                  </column>
+                  <column>
+                   <property name="text">
+                    <string>Value</string>
+                   </property>
+                  </column>
+                  <column>
+                   <property name="text">
+                    <string>Type</string>
+                   </property>
+                  </column>
+                  <column>
+                   <property name="text">
+                    <string>Data</string>
                    </property>
                   </column>
                  </widget>
