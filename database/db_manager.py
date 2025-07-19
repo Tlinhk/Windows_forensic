@@ -763,6 +763,149 @@ class DatabaseManager:
 
         return stats
 
+    def save_memory_analysis_result(
+        self,
+        file_path: str,
+        evidence_type: str,
+        result_path: str,
+        summary: str = "Memory analysis completed",
+    ) -> Optional[int]:
+        """Lưu thông tin kết quả phân tích memory"""
+        try:
+            # Tạo hoặc lấy artifact
+            artifact_id = self._get_or_create_artifact(file_path, evidence_type)
+            if not artifact_id:
+                return None
+
+            # Lưu kết quả
+            result_id = self.add_analysis_result(
+                artifact_id=artifact_id,
+                tool_used="Memory Analysis",
+                summary=summary,
+                result_path=result_path,
+            )
+
+            return result_id
+
+        except Exception as e:
+            print(f"Error saving memory analysis result: {e}")
+            return None
+
+    def get_latest_analysis_result(
+        self, file_path: str, evidence_type: str
+    ) -> Optional[Dict]:
+        """Lấy kết quả phân tích mới nhất cho file và evidence type"""
+        try:
+            # Tìm artifact theo file path và evidence type
+            query = """
+                SELECT a.artefact_id 
+                FROM Artefacts a 
+                WHERE a.source_path = ? AND a.evidence_type = ? AND a.is_deleted = 0
+            """
+            artifact = self.fetch_one(query, (file_path, evidence_type))
+
+            if not artifact:
+                return None
+
+            # Lấy kết quả phân tích mới nhất
+            query = """
+                SELECT * 
+                FROM Results 
+                WHERE artefact_id = ? AND tool_used = 'Memory Analysis'
+                ORDER BY run_at DESC 
+                LIMIT 1
+            """
+            result = self.fetch_one(query, (artifact["artefact_id"],))
+
+            return result
+
+        except Exception as e:
+            print(f"Error getting latest analysis result: {e}")
+            return None
+
+    def _get_or_create_artifact(
+        self, file_path: str, evidence_type: str, case_id: int = None
+    ) -> Optional[int]:
+        """Tạo hoặc lấy artifact ID cho file path"""
+        try:
+            # Kiểm tra xem artifact đã tồn tại chưa
+            query = """
+                SELECT artefact_id 
+                FROM Artefacts 
+                WHERE source_path = ? AND evidence_type = ? AND is_deleted = 0
+            """
+            existing = self.fetch_one(query, (file_path, evidence_type))
+
+            if existing:
+                return existing["artefact_id"]
+
+            # Tạo artifact mới nếu chưa có
+            file_name = os.path.basename(file_path)
+            file_size = os.path.getsize(file_path) if os.path.exists(file_path) else 0
+
+            # Nếu không có case_id, tạo case mặc định
+            if not case_id:
+                case_id = self._get_or_create_default_case()
+
+            artifact_id = self.add_artifact(
+                case_id=case_id,
+                name=file_name,
+                source_path=file_path,
+                evidence_type=evidence_type,
+                size=file_size,
+            )
+
+            return artifact_id
+
+        except Exception as e:
+            print(f"Error getting/creating artifact: {e}")
+            return None
+
+    def _get_or_create_default_case(self) -> int:
+        """Tạo hoặc lấy case mặc định cho memory analysis"""
+        try:
+            # Tìm case mặc định
+            query = "SELECT case_id FROM Cases WHERE title = 'Memory Analysis Default'"
+            existing = self.fetch_one(query)
+
+            if existing:
+                return existing["case_id"]
+
+            # Tạo case mặc định
+            case_id = self.create_case(title="Memory Analysis Default", status="OPEN")
+
+            return case_id if case_id else 1  # Fallback to case 1
+
+        except Exception as e:
+            print(f"Error getting/creating default case: {e}")
+            return 1  # Fallback to case 1
+
+    def get_memory_analysis_history(self, file_path: str = None) -> List[Dict]:
+        """Lấy lịch sử phân tích memory"""
+        try:
+            if file_path:
+                query = """
+                    SELECT r.*, a.source_path, a.evidence_type, a.name
+                    FROM Results r
+                    JOIN Artefacts a ON r.artefact_id = a.artefact_id
+                    WHERE a.source_path = ? AND r.tool_used = 'Memory Analysis'
+                    ORDER BY r.run_at DESC
+                """
+                return self.fetch_all(query, (file_path,))
+            else:
+                query = """
+                    SELECT r.*, a.source_path, a.evidence_type, a.name
+                    FROM Results r
+                    JOIN Artefacts a ON r.artefact_id = a.artefact_id
+                    WHERE r.tool_used = 'Memory Analysis'
+                    ORDER BY r.run_at DESC
+                """
+                return self.fetch_all(query)
+
+        except Exception as e:
+            print(f"Error getting memory analysis history: {e}")
+            return []
+
 
 # Global database instance
 db = DatabaseManager()

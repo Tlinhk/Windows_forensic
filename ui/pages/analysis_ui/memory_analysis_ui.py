@@ -1893,15 +1893,15 @@ class Ui_MemoryAnalysisWindow(object):
         self.fileRegistrySubTabWidget.setCurrentIndex(1)
         self.crashAnalysisTabWidget.setCurrentIndex(0)
 
-    #       self.browseButton.clicked.connect(MemoryAnalysisWindow.browse_evidence_file) # type: ignore
-    #       self.startAnalysisButton.clicked.connect(MemoryAnalysisWindow.start_analysis) # type: ignore
-    #       self.stopButton.clicked.connect(MemoryAnalysisWindow.stop_analysis) # type: ignore
-    #       self.evidenceTypeCombo.currentTextChanged['QString'].connect(MemoryAnalysisWindow.evidence_type_changed) # type: ignore
-    #      self.outputDirButton.clicked.connect(MemoryAnalysisWindow.browse_output_directory) # type: ignore
-    #       self.clearLogButton.clicked.connect(MemoryAnalysisWindow.clear_log) # type: ignore
-    #       self.saveLogButton.clicked.connect(MemoryAnalysisWindow.save_log) # type: ignore
-    #      self.runAIAnalysisButton.clicked.connect(MemoryAnalysisWindow.run_ai_analysis) # type: ignore
-    #      QtCore.QMetaObject.connectSlotsByName(MemoryAnalysisWindow)
+        self.browseButton.clicked.connect(MemoryAnalysisWindow.browse_evidence_file)  # type: ignore
+        self.startAnalysisButton.clicked.connect(MemoryAnalysisWindow.start_analysis)  # type: ignore
+        self.stopButton.clicked.connect(MemoryAnalysisWindow.stop_analysis)  # type: ignore
+        self.evidenceTypeCombo.currentTextChanged["QString"].connect(MemoryAnalysisWindow.evidence_type_changed)  # type: ignore
+        self.outputDirButton.clicked.connect(MemoryAnalysisWindow.browse_output_directory)  # type: ignore
+        self.clearLogButton.clicked.connect(MemoryAnalysisWindow.clear_log)  # type: ignore
+        self.saveLogButton.clicked.connect(MemoryAnalysisWindow.save_log)  # type: ignore
+        self.runAIAnalysisButton.clicked.connect(MemoryAnalysisWindow.run_ai_analysis)  # type: ignore
+        QtCore.QMetaObject.connectSlotsByName(MemoryAnalysisWindow)
 
     def retranslateUi(self, MemoryAnalysisWindow):
         _translate = QtCore.QCoreApplication.translate

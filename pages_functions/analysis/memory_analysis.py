@@ -12,8 +12,7 @@ import os
 from PyQt5.QtWidgets import QSizePolicy
 import glob
 import importlib.util
-import sys
-import io
+import json, io, sys
 from contextlib import redirect_stdout
 
 # Đường dẫn tuyệt đối hoặc tương đối đến thư mục volatility3 (chứa __init__.py)
@@ -38,36 +37,42 @@ from volatility3 import cli
 import logging
 
 
-def run_volatility3_pslist(memory_path):
-    sys.argv = ["vol.py", "-f", memory_path, "windows.pslist"]
+def run_volatility3_plugin(memory_path: str, plugin_name: str) -> dict:
+    """
+    Chạy vol.py với JSON renderer, trả về dict parsed từ JSON.
+    Nếu không parse được JSON thì fallback: đưa text thành list of {"line":…, "content":…}.
+    """
+    # 1) Gán lại sys.argv và capture stdout
+    sys.argv = ["vol.py", "-f", memory_path, "-r", "json", f"windows.{plugin_name}"]
     buf = io.StringIO()
     with redirect_stdout(buf):
         try:
             cli.main()
         except SystemExit:
             pass
-    output = buf.getvalue()
-    return output  # Đảm bảo có dòng này!
+    out = buf.getvalue().strip()
+
+    # 2) Thử parse JSON
+    try:
+        return json.loads(out)
+    except json.JSONDecodeError:
+        # fallback: mỗi dòng non-empty thành một record
+        lines = out.splitlines()
+        data = [{"line": i + 1, "content": l} for i, l in enumerate(lines) if l.strip()]
+        return {"data": data, "total": len(data), "plugin": plugin_name}
 
 
-def fill_process_table_from_pslist(table_widget, output):
-    lines = output.splitlines()
-    headers = []
-    data_started = False
-    for line in lines:
-        # Bỏ các dòng đầu không phải bảng
-        if not data_started and line.strip() and line.strip().startswith("PID"):
-            headers = [h.strip() for h in line.split()]
-            table_widget.setColumnCount(len(headers))
-            table_widget.setHorizontalHeaderLabels(headers)
-            data_started = True
-            continue
-        if data_started and line.strip() and not line.startswith("------"):
-            values = line.split()
-            row = table_widget.rowCount()
-            table_widget.insertRow(row)
-            for col, value in enumerate(values):
-                table_widget.setItem(row, col, QTableWidgetItem(value))
+def run_pslist_plugin(self, file_path: str) -> dict:
+    """Chạy pslist và hiển thị ra table bằng parse_json_to_table"""
+    self.append_log("🔍 Running pslist plugin...")
+    json_data = run_volatility3_plugin(file_path, "pslist")
+
+    # đây là hàm chung bạn đã có sẵn ở class: tự động tạo cột & đổ dữ liệu
+    if hasattr(self.ui, "processTable"):
+        self.parse_json_to_table(json_data, self.ui.processTable)
+        self.append_log("✅ pslist results displayed in Process tab")
+
+    return json_data
 
 
 # Gọi hàm
@@ -129,6 +134,103 @@ class MemoryAnalysisWindow(QMainWindow):
         # ví dụ: canh giữa
         item.setTextAlignment(Qt.AlignCenter)
         return item
+
+    def parse_json_to_table(self, json_data, table_widget):
+        """
+        Tự động dò header và data từ JSON trả về của bất kỳ plugin nào,
+        sau đó hiển thị lên QTableWidget mà không cần khai báo cột cố định.
+        """
+        table_widget.clear()
+        table_widget.setRowCount(0)
+
+        # Trường hợp lỗi hoặc không có data
+        if not json_data or (isinstance(json_data, dict) and "error" in json_data):
+            msg = (
+                json_data.get("error", "Unknown error")
+                if isinstance(json_data, dict)
+                else "No data"
+            )
+            table_widget.setColumnCount(2)
+            table_widget.setHorizontalHeaderLabels(["Status", "Message"])
+            table_widget.insertRow(0)
+            table_widget.setItem(0, 0, self.make_item("Error"))
+            table_widget.setItem(0, 1, self.make_item(msg))
+            return
+
+        # Nếu là dict chứa list ở một trong các key tiêu chuẩn
+        if isinstance(json_data, dict):
+            # Các key có thể mang list data
+            for key in (
+                "processes",
+                "connections",
+                "files",
+                "hashes",
+                "findings",
+                "data",
+            ):
+                if key in json_data and isinstance(json_data[key], list):
+                    data_list = json_data[key]
+                    # Đặc biệt filescan vẫn dùng riêng nếu cần
+                    if key == "files":
+                        self._setup_filescan_table(table_widget, data_list)
+                    else:
+                        self._setup_generic_table(table_widget, data_list)
+                    return
+            # Không tìm thấy list: hiển thị toàn bộ key-value
+            self._setup_key_value_table(table_widget, json_data)
+            return
+
+        # Nếu JSON là list ngay từ đầu
+        if isinstance(json_data, list):
+            self._setup_generic_table(table_widget, json_data)
+            return
+
+    def _setup_generic_table(self, table_widget, data_list: list):
+        """
+        Hiển thị bất kỳ list-of-dict nào:
+          - Lấy headers từ dict đầu tiên
+          - Tạo column và insert từng row
+        """
+        if not data_list:
+            table_widget.setColumnCount(1)
+            table_widget.setHorizontalHeaderLabels(["Message"])
+            table_widget.insertRow(0)
+            table_widget.setItem(0, 0, self.make_item("No items"))
+            return
+
+        # Lấy tất cả keys từ phần tử đầu (giả sử dict)
+        first = data_list[0] if isinstance(data_list[0], dict) else {}
+        headers = list(first.keys()) if isinstance(first, dict) else ["Value"]
+        table_widget.setColumnCount(len(headers))
+        table_widget.setHorizontalHeaderLabels(headers)
+
+        for item in data_list:
+            row = table_widget.rowCount()
+            table_widget.insertRow(row)
+            if isinstance(item, dict):
+                for col, key in enumerate(headers):
+                    val = item.get(key, "")
+                    table_widget.setItem(row, col, self.make_item(str(val)))
+            else:
+                table_widget.setItem(row, 0, self.make_item(str(item)))
+
+        table_widget.resizeColumnsToContents()
+
+    def _setup_key_value_table(self, table_widget, json_dict: dict):
+        """
+        Hiển thị dict thuần thành 2 cột Key / Value.
+        """
+        table_widget.setColumnCount(2)
+        table_widget.setHorizontalHeaderLabels(["Key", "Value"])
+        for k, v in json_dict.items():
+            row = table_widget.rowCount()
+            table_widget.insertRow(row)
+            table_widget.setItem(row, 0, self.make_item(str(k)))
+            if isinstance(v, list):
+                table_widget.setItem(row, 1, self.make_item(f"{len(v)} items"))
+            else:
+                table_widget.setItem(row, 1, self.make_item(str(v)))
+        table_widget.resizeColumnsToContents()
 
     def setup_connections(self):
         self.ui.browseButton.clicked.connect(self.browse_evidence_file)
@@ -320,8 +422,8 @@ class MemoryAnalysisWindow(QMainWindow):
         self.ui.processTable.setRowCount(0)
         self.ui.malwareResultsText.clear()
         self.ui.networkTable.setRowCount(0)
-        self.ui.filescanTree.clear()
-        self.ui.registryTree.clear()
+        self.ui.filescanTable.clear()
+        self.ui.registryTable.clear()
         self.ui.hibernationTypeValue.setText("-")
         self.ui.compressedSizeValue.setText("-")
         self.ui.originalSizeValue.setText("-")
@@ -449,8 +551,8 @@ class MemoryAnalysisWindow(QMainWindow):
         self.ui.lineEdit.setDisabled(True)
 
     def analyze_pslist(self, memory_path):
-        output = run_volatility3_pslist(memory_path)
-        fill_process_table_from_pslist(self.ui.processTable, output)
+        json_data = run_volatility3_plugin(memory_path, "pslist")
+        self.parse_json_to_table(json_data, self.ui.processTable)
 
     def update_tabs_for_evidence(self, type_text):
         """Ẩn/hiện tab thay vì xóa để giữ nguyên dữ liệu"""
