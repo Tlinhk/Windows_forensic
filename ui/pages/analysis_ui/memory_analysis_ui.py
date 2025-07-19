@@ -1761,7 +1761,7 @@ class Ui_MemoryAnalysisWindow(object):
         self.actionAbout.setObjectName("actionAbout")
 
         self.retranslateUi(MemoryAnalysisWindow)
-        self.mainTabWidget.setCurrentIndex(0)
+        self.mainTabWidget.setCurrentIndex(5)
         self.rawMemoryTabWidget.setCurrentIndex(0)
         self.processTabWidget.setCurrentIndex(2)
         self.crashAnalysisTabWidget.setCurrentIndex(0)

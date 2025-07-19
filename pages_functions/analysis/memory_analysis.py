@@ -109,6 +109,21 @@ class MemoryAnalysisWindow(QMainWindow):
         if hasattr(self.ui, "pluginSearchEdit"):
             self.ui.pluginSearchEdit.textChanged.connect(self.filter_plugin_table)
 
+        # Lưu lại thông tin các tab (widget, tiêu đề)
+        self.all_tabs = [
+            (self.ui.rawMemoryTab, "Raw Memory Analysis"),
+            (self.ui.hibernationTab, "Hibernation Analysis"),
+            (self.ui.pageFileTab, "Page File Analysis"),
+            (self.ui.crashDumpTab, "Crash Dump Analysis"),
+            (self.ui.aiAnalysisTab, "AI Analysis"),
+            (self.ui.analysisOptionsTab, "Analysis Options"),
+            (self.ui.logTab, "Analysis Log"),
+        ]
+
+        # Gọi cập nhật tab ngay khi mở trang
+        default_type = self.ui.evidenceTypeCombo.currentText()
+        self.update_tabs_for_evidence(default_type)
+
     def make_item(self, text: str) -> QTableWidgetItem:
         item = QTableWidgetItem(text)
         # ví dụ: canh giữa
@@ -253,25 +268,33 @@ class MemoryAnalysisWindow(QMainWindow):
         return "Raw Memory (.raw, .mem, .vmem)"
 
     def evidence_type_changed(self, type_text):
+        self.update_tabs_for_evidence(type_text)
         self.switch_tab_by_type(type_text)
 
         self.ui.statusLabel.setText(f"Status: Evidence type set to {type_text}")
 
     def switch_tab_by_type(self, type_text):
-        tab_map = {
-            "Raw Memory (.raw, .mem, .vmem)": self.ui.mainTabWidget.indexOf(
-                self.ui.rawMemoryTab
-            ),
-            "Hibernation File (hiberfil.sys)": self.ui.mainTabWidget.indexOf(
-                self.ui.hibernationTab
-            ),
-            "Page File (pagefile.sys)": self.ui.mainTabWidget.indexOf(
-                self.ui.pageFileTab
-            ),
-            "Crash Dump (.dmp)": self.ui.mainTabWidget.indexOf(self.ui.crashDumpTab),
-        }
-        idx = tab_map.get(type_text, 0)
-        self.ui.mainTabWidget.setCurrentIndex(idx)
+        """Chuyển đến tab phù hợp với loại evidence"""
+        if type_text.startswith("Raw Memory"):
+            # Với Raw Memory, active tab "Analysis Options"
+            for i in range(self.ui.mainTabWidget.count()):
+                if (
+                    self.ui.mainTabWidget.isTabVisible(i)
+                    and self.ui.mainTabWidget.tabText(i) == "Analysis Options"
+                ):
+                    self.ui.mainTabWidget.setCurrentIndex(i)
+                    return
+            # Fallback nếu không tìm thấy Analysis Options
+            for i in range(self.ui.mainTabWidget.count()):
+                if self.ui.mainTabWidget.isTabVisible(i):
+                    self.ui.mainTabWidget.setCurrentIndex(i)
+                    return
+        else:
+            # Với các loại evidence khác, active tab đầu tiên visible
+            for i in range(self.ui.mainTabWidget.count()):
+                if self.ui.mainTabWidget.isTabVisible(i):
+                    self.ui.mainTabWidget.setCurrentIndex(i)
+                    return
 
     def start_analysis(self):
         file_path = self.ui.filePathEdit.text().strip()
@@ -428,6 +451,73 @@ class MemoryAnalysisWindow(QMainWindow):
     def analyze_pslist(self, memory_path):
         output = run_volatility3_pslist(memory_path)
         fill_process_table_from_pslist(self.ui.processTable, output)
+
+    def update_tabs_for_evidence(self, type_text):
+        """Ẩn/hiện tab thay vì xóa để giữ nguyên dữ liệu"""
+
+        # Định nghĩa các tab cần hiển thị cho từng loại evidence
+        tab_visibility_rules = {
+            "Raw Memory": [
+                "Raw Memory Analysis",
+                "AI Analysis",
+                "Analysis Options",
+                "Analysis Log",
+            ],
+            "Hibernation": ["Hibernation Analysis", "Analysis Log"],
+            "Page File": ["Page File Analysis", "Analysis Log"],
+            "Crash Dump": [
+                "Crash Dump Analysis",
+                "AI Analysis",
+                "Analysis Options",
+                "Analysis Log",
+            ],
+        }
+
+        # Xác định loại evidence
+        evidence_type = None
+        if type_text.startswith("Raw Memory"):
+            evidence_type = "Raw Memory"
+        elif type_text.startswith("Hibernation"):
+            evidence_type = "Hibernation"
+        elif type_text.startswith("Page File"):
+            evidence_type = "Page File"
+        elif type_text.startswith("Crash Dump"):
+            evidence_type = "Crash Dump"
+        else:
+            evidence_type = "Raw Memory"  # Default
+
+        # Lấy danh sách tab cần hiển thị
+        tabs_to_show = tab_visibility_rules.get(evidence_type, ["Analysis Log"])
+
+        # Ẩn/hiện tab dựa trên quy tắc
+        for i in range(self.ui.mainTabWidget.count()):
+            tab_title = self.ui.mainTabWidget.tabText(i)
+            should_show = tab_title in tabs_to_show
+
+            # Ẩn/hiện tab
+            self.ui.mainTabWidget.setTabVisible(i, should_show)
+
+        # Đảm bảo có ít nhất 1 tab visible và active tab phù hợp
+        visible_tabs = [
+            i
+            for i in range(self.ui.mainTabWidget.count())
+            if self.ui.mainTabWidget.isTabVisible(i)
+        ]
+
+        if visible_tabs:
+            # Với Raw Memory, ưu tiên active tab "Analysis Options"
+            if evidence_type == "Raw Memory":
+                analysis_options_index = None
+                for i in visible_tabs:
+                    if self.ui.mainTabWidget.tabText(i) == "Analysis Options":
+                        analysis_options_index = i
+                        break
+                if analysis_options_index is not None:
+                    self.ui.mainTabWidget.setCurrentIndex(analysis_options_index)
+                else:
+                    self.ui.mainTabWidget.setCurrentIndex(visible_tabs[0])
+            else:
+                self.ui.mainTabWidget.setCurrentIndex(visible_tabs[0])
 
 
 # Để sử dụng: tạo instance MemoryAnalysisWindow() và show() trong main app
