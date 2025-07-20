@@ -777,7 +777,7 @@ QProgressBar::chunk {
         <item>
          <widget class="QTabWidget" name="rawMemoryTabWidget">
           <property name="currentIndex">
-           <number>1</number>
+           <number>6</number>
           </property>
           <widget class="QWidget" name="systemContextTab">
            <attribute name="title">
@@ -960,7 +960,7 @@ QPushButton:pressed {
             <item>
              <widget class="QTabWidget" name="processTabWidget">
               <property name="currentIndex">
-               <number>2</number>
+               <number>1</number>
               </property>
               <widget class="QWidget" name="processListTab">
                <attribute name="title">
@@ -968,7 +968,7 @@ QPushButton:pressed {
                </attribute>
                <layout class="QVBoxLayout" name="processListLayout">
                 <item>
-                 <widget class="QTableWidget" name="processTable"/>
+                 <widget class="QTableWidget" name="pslistTable"/>
                 </item>
                </layout>
               </widget>
@@ -978,7 +978,7 @@ QPushButton:pressed {
                </attribute>
                <layout class="QVBoxLayout" name="dllDriverLayout">
                 <item>
-                 <widget class="QTableWidget" name="dllTable"/>
+                 <widget class="QTableWidget" name="dlllistTable"/>
                 </item>
                </layout>
               </widget>
@@ -988,7 +988,7 @@ QPushButton:pressed {
                </attribute>
                <layout class="QVBoxLayout" name="malwareDetectionLayout">
                 <item>
-                 <widget class="QTextEdit" name="malwareResultsText"/>
+                 <widget class="QTextEdit" name="malfindText"/>
                 </item>
                </layout>
               </widget>
@@ -996,25 +996,25 @@ QPushButton:pressed {
             </item>
            </layout>
           </widget>
-          <widget class="QWidget" name="networkAnalysisTab">
+          <widget class="QWidget" name="networkTabWidget">
            <attribute name="title">
             <string>Network Analysis</string>
            </attribute>
            <layout class="QVBoxLayout" name="networkAnalysisLayout">
             <item>
-             <widget class="QTableWidget" name="networkTable"/>
+             <widget class="QTableWidget" name="netscanTable"/>
             </item>
            </layout>
           </widget>
           <widget class="QWidget" name="fileRegistryTab">
            <attribute name="title">
-            <string>File/Registry Analysis</string>
+            <string>File Analysis</string>
            </attribute>
            <layout class="QVBoxLayout" name="fileRegistryLayout">
             <item>
-             <widget class="QTabWidget" name="fileRegistrySubTabWidget">
+             <widget class="QTabWidget" name="fileTabWidget">
               <property name="currentIndex">
-               <number>1</number>
+               <number>0</number>
               </property>
               <widget class="QWidget" name="fileScanTab">
                <attribute name="title">
@@ -1066,46 +1066,6 @@ QPushButton:pressed {
                 </item>
                </layout>
               </widget>
-              <widget class="QWidget" name="registryTab">
-               <attribute name="title">
-                <string>Registry</string>
-               </attribute>
-               <layout class="QVBoxLayout" name="registryLayout">
-                <item>
-                 <widget class="QTableWidget" name="registryTable">
-                  <property name="alternatingRowColors">
-                   <bool>true</bool>
-                  </property>
-                  <property name="selectionBehavior">
-                   <enum>QAbstractItemView::SelectRows</enum>
-                  </property>
-                  <property name="sortingEnabled">
-                   <bool>true</bool>
-                  </property>
-                  <column>
-                   <property name="text">
-                    <string>Key</string>
-                   </property>
-                  </column>
-                  <column>
-                   <property name="text">
-                    <string>Value</string>
-                   </property>
-                  </column>
-                  <column>
-                   <property name="text">
-                    <string>Type</string>
-                   </property>
-                  </column>
-                  <column>
-                   <property name="text">
-                    <string>Data</string>
-                   </property>
-                  </column>
-                 </widget>
-                </item>
-               </layout>
-              </widget>
              </widget>
             </item>
            </layout>
@@ -1116,24 +1076,17 @@ QPushButton:pressed {
            </attribute>
            <layout class="QVBoxLayout" name="userActivityLayout">
             <item>
-             <widget class="QTabWidget" name="userActivitySubTabWidget">
+             <widget class="QTabWidget" name="commandTabWidget">
+              <property name="currentIndex">
+               <number>0</number>
+              </property>
               <widget class="QWidget" name="commandHistoryTab">
                <attribute name="title">
                 <string>Command History</string>
                </attribute>
                <layout class="QVBoxLayout" name="commandHistoryLayout">
                 <item>
-                 <widget class="QTextEdit" name="commandHistoryText"/>
-                </item>
-               </layout>
-              </widget>
-              <widget class="QWidget" name="clipboardTab">
-               <attribute name="title">
-                <string>Clipboard</string>
-               </attribute>
-               <layout class="QVBoxLayout" name="clipboardLayout">
-                <item>
-                 <widget class="QTextEdit" name="clipboardText"/>
+                 <widget class="QTextEdit" name="cmdscanText"/>
                 </item>
                </layout>
               </widget>
@@ -1147,24 +1100,17 @@ QPushButton:pressed {
            </attribute>
            <layout class="QVBoxLayout" name="credentialsLayout">
             <item>
-             <widget class="QTabWidget" name="credentialsSubTabWidget">
+             <widget class="QTabWidget" name="credentialTabWidget">
+              <property name="currentIndex">
+               <number>0</number>
+              </property>
               <widget class="QWidget" name="passwordHashesTab">
                <attribute name="title">
                 <string>Password Hashes</string>
                </attribute>
                <layout class="QVBoxLayout" name="passwordHashesLayout">
                 <item>
-                 <widget class="QTextEdit" name="passwordHashesText"/>
-                </item>
-               </layout>
-              </widget>
-              <widget class="QWidget" name="bitlockerTab">
-               <attribute name="title">
-                <string>Bitlocker Keys</string>
-               </attribute>
-               <layout class="QVBoxLayout" name="bitlockerLayout">
-                <item>
-                 <widget class="QTextEdit" name="bitlockerText"/>
+                 <widget class="QTextEdit" name="hashdumpText"/>
                 </item>
                </layout>
               </widget>
@@ -1178,7 +1124,7 @@ QPushButton:pressed {
            </attribute>
            <layout class="QVBoxLayout" name="customPluginLayout">
             <item>
-             <widget class="QTabWidget" name="customPluginTabWidget"/>
+             <widget class="QTabWidget" name="otherTabWidget"/>
             </item>
            </layout>
           </widget>

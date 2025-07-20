@@ -4,6 +4,10 @@ from PyQt5.QtWidgets import (
     QMessageBox,
     QSizePolicy,
     QTableWidgetItem,
+    QWidget,
+    QVBoxLayout,
+    QTableWidget,
+    QTabWidget,
 )
 from PyQt5 import QtCore
 from PyQt5.QtCore import Qt
@@ -60,23 +64,6 @@ def run_volatility3_plugin(memory_path: str, plugin_name: str) -> dict:
         lines = out.splitlines()
         data = [{"line": i + 1, "content": l} for i, l in enumerate(lines) if l.strip()]
         return {"data": data, "total": len(data), "plugin": plugin_name}
-
-
-def run_pslist_plugin(self, file_path: str) -> dict:
-    """Chạy pslist và hiển thị ra table bằng parse_json_to_table"""
-    self.append_log("🔍 Running pslist plugin...")
-    json_data = run_volatility3_plugin(file_path, "pslist")
-
-    # đây là hàm chung bạn đã có sẵn ở class: tự động tạo cột & đổ dữ liệu
-    if hasattr(self.ui, "processTable"):
-        self.parse_json_to_table(json_data, self.ui.processTable)
-        self.append_log("✅ pslist results displayed in Process tab")
-
-    return json_data
-
-
-# Gọi hàm
-# run_volatility3_pslist("path/to/your/memdump.raw")
 
 
 class MemoryAnalysisWindow(QMainWindow):
@@ -232,6 +219,27 @@ class MemoryAnalysisWindow(QMainWindow):
                 table_widget.setItem(row, 1, self.make_item(str(v)))
         table_widget.resizeColumnsToContents()
 
+    def format_json_output(self, json_data, title: str = "") -> str:
+        """
+        Format JSON data để hiển thị trong QTextEdit (hoặc QTextBrowser).
+        """
+        import json
+
+        # Nếu là lỗi
+        if isinstance(json_data, dict) and "error" in json_data:
+            return f"{title}\nError: {json_data['error']}"
+
+        # Cố gắng stringify đẹp
+        try:
+            pretty = json.dumps(json_data, ensure_ascii=False, indent=2)
+        except Exception:
+            pretty = str(json_data)
+
+        if title:
+            return f"{title}\n\n{pretty}"
+        else:
+            return pretty
+
     def setup_connections(self):
         self.ui.browseButton.clicked.connect(self.browse_evidence_file)
         self.ui.startAnalysisButton.clicked.connect(self.start_analysis)
@@ -263,20 +271,65 @@ class MemoryAnalysisWindow(QMainWindow):
             except Exception:
                 pass
             # Gán loại plugin đơn giản dựa trên tên
-            if name in {"pslist", "pstree", "psscan"}:
+            # Process plugins
+            if name in {
+                "pslist",
+                "pstree",
+                "psscan",
+                "psxview",
+                "processghosting",
+                "hollowprocesses",
+                "threads",
+                "thrdscan",
+                "suspended_threads",
+                "suspicious_threads",
+                "memmap",
+                "pedump",
+                "envars",
+                "privileges",
+                "handles",
+                "dlllist",
+                "ldrmodules",
+                "getsids",
+                "malfind",
+                "iat",
+                "pe_symbols",
+                "svcscan",
+                "svclist",
+                "getservicesids",
+                "callbacks",
+                "mutantscan",
+                "sessions",
+                "modules",
+                "modscan",
+                "unloadedmodules",
+                "driverscan",
+                "driverirp",
+                "drivermodule",
+                "direct_system_calls",
+                "indirect_system_calls",
+                "unhooked_system_calls",
+                "orphan_kernel_threads",
+            }:
                 ptype = "Process"
-            elif name in {"netscan"}:
+            # Network plugins
+            elif name in {"netscan", "netstat"}:
                 ptype = "Network"
-            elif name in {"malfind", "hashdump"}:
-                ptype = "Malware"
-            elif name in {"filescan"}:
+            # File plugins
+            elif name in {"filescan", "dumpfiles", "mbrscan", "mftscan"}:
                 ptype = "File"
-            elif name in {"registry"}:
+            # Registry plugins
+            elif name in {"registry", "hivelist", "hivescan"}:
                 ptype = "Registry"
+            elif name in {"hashdump", "lsadump", "cachedump"}:
+                ptype = "Credential"
+            elif name in {"cmdscan", "cmdline", "consoles"}:
+                ptype = "Command"
             else:
-                ptype = "Khác"
+                ptype = "Other"
             plugins.append({"name": name, "desc": doc, "type": ptype})
         self.all_plugins = plugins
+        self.plugin_types = {p["name"]: p["type"] for p in plugins}
         self.populate_plugin_table()
 
     def populate_plugin_table(self, filter_text=""):
@@ -288,14 +341,26 @@ class MemoryAnalysisWindow(QMainWindow):
         table = self.ui.pluginTableWidget
         table.setRowCount(0)
         default_plugins = {
+            # Process plugins
             "pslist",
             "pstree",
             "psscan",
-            "netscan",
+            "psxview",
+            "dlllist",
             "malfind",
+            # Network plugins
+            "netscan",
+            "netstat",
+            # File plugins
             "filescan",
-            "registry",
+            "dumpfiles",
+            # Credential plugins
             "hashdump",
+            "lsadump",
+            "cachedump",
+            # Command plugins
+            "cmdline",
+            "cmdscan",
         }
         for p in self.all_plugins:
             if (
@@ -398,14 +463,60 @@ class MemoryAnalysisWindow(QMainWindow):
                     self.ui.mainTabWidget.setCurrentIndex(i)
                     return
 
+    def run_and_display_plugin(self, plugin_name, memory_path):
+        """
+        Chạy bất kỳ plugin windows.{plugin_name} nào và đổ output lên UI.
+        Tự tìm widget: TableWidget, TreeWidget, TextEdit theo tên chuẩn:
+        <plugin_name>Table, <plugin_name>Tree, <plugin_name>Text, ...
+        Nếu không có sẵn, tạo tab mới với QTableWidget và parse_json_to_table.
+        """
+        # 1) Chạy plugin
+        json_data = run_volatility3_plugin(memory_path, plugin_name)
+
+        # 2) Xác định widget đã được define trong .ui
+        cat = self.plugin_types.get(
+            plugin_name, "Khác"
+        )  # e.g. "Process", "Network", ...
+        cat_lower = cat.lower()  # "process", "network", ...
+        container_tabwidget_name = f"{cat_lower}TabWidget"
+
+        # 3) Nếu UI đã có widget riêng (Table/Tree/Text), fill vào luôn
+        for suffix in ("Table", "Tree", "Text"):
+            attr = plugin_name + suffix
+            if hasattr(self.ui, attr):
+                w = getattr(self.ui, attr)
+                if suffix == "Table":
+                    self.parse_json_to_table(json_data, w)
+                elif suffix == "Tree":
+                    self.parse_json_to_tree(json_data, w)
+                elif suffix == "Text":
+                    w.setText(self.format_json_output(json_data, plugin_name))
+                return
+
+        # 4) Fallback: tự sinh 1 tab con trong đúng category
+        if hasattr(self.ui, container_tabwidget_name):
+            tabs: QTabWidget = getattr(self.ui, container_tabwidget_name)
+        else:
+            # nếu lỗi, đẩy vào customTabWidget
+            tabs = getattr(self.ui, "customTabWidget")
+
+        # tạo 1 bảng chung
+        tab = QWidget()
+        layout = QVBoxLayout(tab)
+        table = QTableWidget()
+        layout.addWidget(table)
+        self.parse_json_to_table(json_data, table)
+        tabs.addTab(tab, plugin_name)
+
     def start_analysis(self):
         file_path = self.ui.filePathEdit.text().strip()
         if not file_path or not os.path.exists(file_path):
             QMessageBox.warning(self, "No File", "Please select a valid evidence file.")
             return
-        # Chạy pslist thật
-        self.analyze_pslist(file_path)
-        self.ui.statusLabel.setText("Status: Đã phân tích tiến trình (pslist)")
+        selected = self.get_selected_plugins()
+        for plugin in selected:
+            self.run_and_display_plugin(plugin, file_path)
+        self.ui.statusLabel.setText("Status: Đã phân tích xong")
 
     def stop_analysis(self):
         if self.analysis_running:
@@ -419,11 +530,12 @@ class MemoryAnalysisWindow(QMainWindow):
         self.ui.osVersionValue.setText("-")
         self.ui.architectureValue.setText("-")
         self.ui.timestampValue.setText("-")
-        self.ui.processTable.setRowCount(0)
-        self.ui.malwareResultsText.clear()
-        self.ui.networkTable.setRowCount(0)
+        self.ui.pslistTable.setRowCount(0)
+        self.ui.malfindText.clear()
+        self.ui.netscanTable.setRowCount(0)
         self.ui.filescanTable.clear()
-        self.ui.registryTable.clear()
+        # self.ui.hivelistTable.clear()
+        self.ui.dlllistTable.clear()
         self.ui.hibernationTypeValue.setText("-")
         self.ui.compressedSizeValue.setText("-")
         self.ui.originalSizeValue.setText("-")
@@ -446,26 +558,26 @@ class MemoryAnalysisWindow(QMainWindow):
         self.ui.architectureValue.setText("x64")
         self.ui.timestampValue.setText("2024-06-01 10:00:00")
         # Process Table
-        self.ui.processTable.setRowCount(2)
-        self.ui.processTable.setItem(0, 0, self.make_item("4"))
-        self.ui.processTable.setItem(0, 1, self.make_item("System"))
-        self.ui.processTable.setItem(0, 2, self.make_item("80"))
-        self.ui.processTable.setItem(0, 3, self.make_item("200"))
-        self.ui.processTable.setItem(0, 4, self.make_item("Running"))
-        self.ui.processTable.setItem(1, 0, self.make_item("5012"))
-        self.ui.processTable.setItem(1, 1, self.make_item("explorer.exe"))
-        self.ui.processTable.setItem(1, 2, self.make_item("30"))
-        self.ui.processTable.setItem(1, 3, self.make_item("100"))
-        self.ui.processTable.setItem(1, 4, self.make_item("Running"))
-        self.ui.malwareResultsText.setText(
+        self.ui.pslistTable.setRowCount(2)
+        self.ui.pslistTable.setItem(0, 0, self.make_item("4"))
+        self.ui.pslistTable.setItem(0, 1, self.make_item("System"))
+        self.ui.pslistTable.setItem(0, 2, self.make_item("80"))
+        self.ui.pslistTable.setItem(0, 3, self.make_item("200"))
+        self.ui.pslistTable.setItem(0, 4, self.make_item("Running"))
+        self.ui.pslistTable.setItem(1, 0, self.make_item("5012"))
+        self.ui.pslistTable.setItem(1, 1, self.make_item("explorer.exe"))
+        self.ui.pslistTable.setItem(1, 2, self.make_item("30"))
+        self.ui.pslistTable.setItem(1, 3, self.make_item("100"))
+        self.ui.pslistTable.setItem(1, 4, self.make_item("Running"))
+        self.ui.malfindText.setText(
             "No malware detected.\nRWX region found in explorer.exe PID 5012."
         )
         # Network Table
-        self.ui.networkTable.setRowCount(1)
-        self.ui.networkTable.setItem(0, 0, self.make_item("127.0.0.1:1234"))
-        self.ui.networkTable.setItem(0, 1, self.make_item("8.8.8.8:80"))
-        self.ui.networkTable.setItem(0, 2, self.make_item("ESTABLISHED"))
-        self.ui.networkTable.setItem(0, 3, self.make_item("5012"))
+        self.ui.netscanTable.setRowCount(1)
+        self.ui.netscanTable.setItem(0, 0, self.make_item("127.0.0.1:1234"))
+        self.ui.netscanTable.setItem(0, 1, self.make_item("8.8.8.8:80"))
+        self.ui.netscanTable.setItem(0, 2, self.make_item("ESTABLISHED"))
+        self.ui.netscanTable.setItem(0, 3, self.make_item("5012"))
         # FileScan Tree
         from PyQt5.QtWidgets import QTreeWidgetItem
 
@@ -549,10 +661,6 @@ class MemoryAnalysisWindow(QMainWindow):
         except Exception as e:
             self.ui.lineEdit.setText("-")
         self.ui.lineEdit.setDisabled(True)
-
-    def analyze_pslist(self, memory_path):
-        json_data = run_volatility3_plugin(memory_path, "pslist")
-        self.parse_json_to_table(json_data, self.ui.processTable)
 
     def update_tabs_for_evidence(self, type_text):
         """Ẩn/hiện tab thay vì xóa để giữ nguyên dữ liệu"""
