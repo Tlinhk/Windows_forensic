@@ -18,6 +18,7 @@ import glob
 import importlib.util
 import json, io, sys
 from contextlib import redirect_stdout
+from datetime import datetime
 
 # Đường dẫn tuyệt đối hoặc tương đối đến thư mục volatility3 (chứa __init__.py)
 vol3_path = os.path.abspath(
@@ -37,6 +38,7 @@ from volatility3.framework import symbols
 from volatility3.framework import configuration
 from volatility3.framework.automagic import stacker
 from volatility3 import cli
+from database.db_manager import DatabaseManager
 
 import logging
 
@@ -71,7 +73,13 @@ class MemoryAnalysisWindow(QMainWindow):
         super().__init__(parent)
         self.ui = Ui_MemoryAnalysisWindow()
         self.ui.setupUi(self)
-
+        self.db = DatabaseManager()
+        logging.info(f"Using SQLite DB at: {os.path.abspath(self.db.db_path)}")
+        print("DEBUG: DB path =", os.path.abspath(self.db.db_path))
+        connected = self.db.connect()
+        print("DEBUG: Connected?", connected)
+        self.current_results_dir: str = ""
+        self.curren_evidence_type: str = ""
         # —————————————— TabBar: Không cắt chữ, không dàn đều, đủ rộng cho tiêu đề ——————————————
         tabbar = self.ui.mainTabWidget.tabBar()
         if tabbar is not None:
@@ -345,22 +353,12 @@ class MemoryAnalysisWindow(QMainWindow):
             "pslist",
             "pstree",
             "psscan",
-            "psxview",
             "dlllist",
             "malfind",
             # Network plugins
             "netscan",
-            "netstat",
             # File plugins
             "filescan",
-            "dumpfiles",
-            # Credential plugins
-            "hashdump",
-            "lsadump",
-            "cachedump",
-            # Command plugins
-            "cmdline",
-            "cmdscan",
         }
         for p in self.all_plugins:
             if (
@@ -413,11 +411,30 @@ class MemoryAnalysisWindow(QMainWindow):
             self, "Select Memory Evidence File", "", "All Files (*.*)"
         )
         if file_path:
+            import os
+
             self.ui.filePathEdit.setText(file_path)
             # Auto-detect type
             detected_type = self.detect_evidence_type(file_path)
+            self.curren_evidence_type = detected_type
             self.ui.evidenceTypeCombo.setCurrentText(detected_type)
             self.switch_tab_by_type(detected_type)
+            # Thử load kết quả cũ nếu có
+            fp = os.path.normpath(file_path)
+            latest = self.db.get_latest_analysis_result(fp, detected_type)
+            if latest:
+                rp = latest["result_path"]
+                if not os.path.isabs(rp):
+                    rp = os.path.abspath(rp)
+                if os.path.isdir(rp):
+                    self.current_results_dir = rp
+                    self.load_all_plugin_results(rp)
+                    self.ui.statusLabel.setText(
+                        f"Status: Loaded previous analysis results from {rp}"
+                    )
+                    return
+
+            # Nếu chưa có file kết quả, chỉ báo Selected
             self.ui.statusLabel.setText(
                 f"Status: Selected {os.path.basename(file_path)}"
             )
@@ -508,15 +525,97 @@ class MemoryAnalysisWindow(QMainWindow):
         self.parse_json_to_table(json_data, table)
         tabs.addTab(tab, plugin_name)
 
+    def load_all_plugin_results(self, results_dir: str):
+        import os, json
+
+        for fname in os.listdir(results_dir):
+            print(
+                f"DEBUG: load_all_plugin_results called, results_dir={results_dir}"
+            )  # <- kiểm tra có chạy vào đây không
+            print("DEBUG: files in dir:", os.listdir(results_dir))
+            if not fname.endswith(".json") or fname == "analysis_info.json":
+                continue
+            print(f"DEBUG: processing file: {fname}")
+            plugin = fname[:-5]  # bỏ ".json"
+            print(
+                f"DEBUG: plugin='{plugin}' → sẽ tìm widget '{plugin}Table', '{plugin}Tree' hoặc '{plugin}Text'"
+            )
+            path = os.path.join(results_dir, fname)
+            with open(path, "r", encoding="utf-8") as f:
+                data = json.load(f)
+
+            # điền vào widget có sẵn hoặc tạo tab mới
+            filled = False
+            for suffix, filler in (
+                ("Table", self.parse_json_to_table),
+                ("Text", lambda d, w: w.setText(self.format_json_output(d, plugin))),
+            ):
+                available = [a for a in dir(self.ui) if plugin.lower() in a.lower()]
+                print(f"DEBUG: available UI attrs matching '{plugin}':", available)
+                attr = plugin + suffix
+                print(f"DEBUG: plugin '{plugin}' filled? {filled}")
+                if hasattr(self.ui, attr):
+                    widget = getattr(self.ui, attr)
+                    filler(data, widget)
+                    filled = True
+                    break
+            if not filled:
+                # fallback: tạo tab mới trong container tương ứng
+                cat = self.plugin_types.get(plugin, "Other").lower()
+                tabw = (
+                    getattr(self.ui, f"{cat}TabWidget", None) or self.ui.customTabWidget
+                )
+
+                page = QWidget()
+                layout = QVBoxLayout(page)
+                tbl = QTableWidget()
+                layout.addWidget(tbl)
+                self.parse_json_to_table(data, tbl)
+                tabw.addTab(page, plugin)
+                tabw.setCurrentIndex(tabw.count() - 1)
+
     def start_analysis(self):
+        import os
+        import json
+        from datetime import datetime
+
         file_path = self.ui.filePathEdit.text().strip()
         if not file_path or not os.path.exists(file_path):
             QMessageBox.warning(self, "No File", "Please select a valid evidence file.")
             return
+        file_path = os.path.normpath(file_path)
+
+        # Nếu chưa phân tích, chạy plugin
+        ev_type = self.detect_evidence_type(file_path)
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        results_dir = os.path.abspath(
+            os.path.join(
+                "analysis_results", f"{os.path.basename(file_path)}_{timestamp}"
+            )
+        )
+        os.makedirs(results_dir, exist_ok=True)
+        self.current_results_dir = results_dir
         selected = self.get_selected_plugins()
+        if not selected:
+            QMessageBox.warning(
+                self, "No Plugins", "Please select at least one plugin."
+            )
+            return
+        # chạy từng plugin và hiển thị lên UI
         for plugin in selected:
+            json_data = run_volatility3_plugin(file_path, plugin)
             self.run_and_display_plugin(plugin, file_path)
-        self.ui.statusLabel.setText("Status: Đã phân tích xong")
+            out_put = os.path.join(results_dir, f"{plugin}.json")
+            with open(out_put, "w", encoding="utf-8") as f:
+                json.dump(json_data, f, ensure_ascii=False, indent=2)
+        # lưu kết quả vào db
+        self.db.save_memory_analysis_result(
+            file_path,
+            ev_type,
+            result_path=results_dir,
+            summary=f"Analysis of {os.path.basename(file_path)}",
+        )
+        self.ui.statusLabel.setText("Status: Hoàn thành phân tích")
 
     def stop_analysis(self):
         if self.analysis_running:
