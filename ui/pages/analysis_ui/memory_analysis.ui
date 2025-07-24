@@ -746,7 +746,7 @@ QProgressBar::chunk {
     <item row="2" column="0">
      <widget class="QTabWidget" name="mainTabWidget">
       <property name="currentIndex">
-       <number>0</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="rawMemoryTab">
        <property name="sizePolicy">
@@ -1345,110 +1345,7 @@ QPushButton:pressed {
                 <number>5</number>
                </property>
                <item>
-                <widget class="QTableWidget" name="pageFileScanTable">
-                 <property name="styleSheet">
-                  <string notr="true">/* ==== QTableWidget / QTableView ==== */
-QTableWidget,
-QTableView {
-    background-color: #ffffff;           /* nền trắng */
-    border: 1px solid #c0c4c8;           /* viền xám nhạt */
-    gridline-color: #e0e3e6;             /* màu lưới */
-    border-radius: 6px;                  /* bo góc toàn widget */
-    selection-background-color: #cce4f7; /* màu nền khi chọn */
-    selection-color: #000000;            /* màu chữ khi chọn */
-}
-
-/* Alternating row colors */
-QTableWidget {
-    alternate-background-color: #f9fbfc;
-}
-QTableWidget::item:alternate,
-QTableView::item:alternate {
-    background-color: #f9fbfc;
-}
-
-/* Header (cột và hàng) */
-QHeaderView::section {
-    background-color: #e1e5ea;
-    padding: 6px;
-    border: none;
-    border-bottom: 1px solid #c0c4c8;
-    border-right: 1px solid #c0c4c8;
-    font-weight: bold;
-}
-QHeaderView::section:last,
-QHeaderView::section:last {
-    border-right: none;
-}
-
-/* Cell hover */
-QTableWidget::item:hover,
-QTableView::item:hover {
-    background-color: #e8f1fb;
-}
-
-/* Remove focus rectangle */
-QTableWidget::item:focus,
-QTableView::item:focus {
-    outline: none;
-}
-
-/* Scrollbar trong table */
-QTableWidget QScrollBar:vertical,
-QTableView QScrollBar:vertical {
-    background: transparent;
-    width: 8px;
-    margin: 0px;
-}
-QTableWidget QScrollBar::handle:vertical,
-QTableView QScrollBar::handle:vertical {
-    background: #c0c4c8;
-    min-height: 20px;
-    border-radius: 4px;
-}
-QTableWidget QScrollBar::add-line,
-QTableWidget QScrollBar::sub-line,
-QTableView QScrollBar::add-line,
-QTableView QScrollBar::sub-line {
-    height: 0;
-}
-
-/* Focused cell viền xanh nhẹ */
-QTableWidget::item:selected:active,
-QTableView::item:selected:active {
-    border: 1px solid #4a90e2;
-}
-
-/* Header hover (nếu muốn) */
-QHeaderView::section:hover {
-    background-color: #d7dae0;
-}
-</string>
-                 </property>
-                 <property name="alternatingRowColors">
-                  <bool>true</bool>
-                 </property>
-                 <column>
-                  <property name="text">
-                   <string>Offset</string>
-                  </property>
-                 </column>
-                 <column>
-                  <property name="text">
-                   <string>Type</string>
-                  </property>
-                 </column>
-                 <column>
-                  <property name="text">
-                   <string>Content</string>
-                  </property>
-                 </column>
-                 <column>
-                  <property name="text">
-                   <string>Size</string>
-                  </property>
-                 </column>
-                </widget>
+                <widget class="QTreeWidget" name="pagefiletreeWidget"/>
                </item>
               </layout>
              </widget>
@@ -1461,7 +1358,7 @@ QHeaderView::section:hover {
              <number>0</number>
             </property>
             <item>
-             <widget class="QGroupBox" name="yaraResultsGroup">
+             <widget class="QGroupBox" name="ResultsGroup">
               <property name="font">
                <font>
                 <weight>75</weight>
@@ -1469,7 +1366,7 @@ QHeaderView::section:hover {
                </font>
               </property>
               <property name="title">
-               <string>YARA Scan Results</string>
+               <string>Analysis Results</string>
               </property>
               <layout class="QVBoxLayout" name="yaraResultsLayout">
                <property name="spacing">
@@ -1488,47 +1385,35 @@ QHeaderView::section:hover {
                 <number>5</number>
                </property>
                <item>
-                <widget class="QTextEdit" name="yaraResultsText">
-                 <property name="styleSheet">
-                  <string notr="true">/* ==== CHUNG CHO CÁC TEXT INPUT / TEXT EDIT ==== */
-QTextEdit {
-    background-color: #ffffff;
-    border: 1px solid #c0c4c8;      /* viền xám nhạt */
-    border-radius: 4px;             /* bo góc mềm */
-    padding: 4px 6px;               /* khoảng đệm bên trong */
-    selection-background-color: #cce4f7;
-    selection-color: #000;
-}
-
-/* Khi focus chuyển viền sang xanh */
-QTextEdit:focus {
-    border: 1px solid #4a90e2;
-}
-
-
-
-/* Thanh cuộn bên trong QTextEdit bo góc &amp; nhỏ gọn */
-QTextEdit QScrollBar:vertical {
-    background: transparent;
-    width: 8px;
-    margin: 0px;
-}
-QTextEdit QScrollBar::handle:vertical {
-    background: #c0c4c8;
-    min-height: 20px;
-    border-radius: 4px;
-}
-QTextEdit QScrollBar::add-line, QTextEdit QScrollBar::sub-line {
-    height: 0;
-}
-</string>
-                 </property>
-                 <property name="readOnly">
-                  <bool>true</bool>
-                 </property>
-                 <property name="placeholderText">
-                  <string>YARA scan results will appear here...</string>
-                 </property>
+                <widget class="QStackedWidget" name="stackedWidget">
+                 <widget class="QWidget" name="pageExtractStrings">
+                  <layout class="QGridLayout" name="gridLayout_7">
+                   <item row="0" column="0">
+                    <widget class="QLineEdit" name="lineEdit_2">
+                     <property name="placeholderText">
+                      <string>Search something</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="1" column="0">
+                    <widget class="QTableWidget" name="tableStrings"/>
+                   </item>
+                  </layout>
+                 </widget>
+                 <widget class="QWidget" name="pageYaraDetails">
+                  <layout class="QGridLayout" name="gridLayout_8">
+                   <item row="0" column="0">
+                    <widget class="QPlainTextEdit" name="txtYaraMatches"/>
+                   </item>
+                  </layout>
+                 </widget>
+                 <widget class="QWidget" name="pageCarveFiles">
+                  <layout class="QGridLayout" name="gridLayout_9">
+                   <item row="0" column="0">
+                    <widget class="QListWidget" name="lstCarved"/>
+                   </item>
+                  </layout>
+                 </widget>
                 </widget>
                </item>
               </layout>

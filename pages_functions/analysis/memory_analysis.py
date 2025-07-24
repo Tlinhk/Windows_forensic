@@ -8,6 +8,8 @@ from PyQt5.QtWidgets import (
     QVBoxLayout,
     QTableWidget,
     QTabWidget,
+    QTreeWidgetItem,
+    QHeaderView,
 )
 from PyQt5 import QtCore
 from PyQt5.QtCore import Qt
@@ -19,6 +21,7 @@ import importlib.util
 import json, io, sys
 from contextlib import redirect_stdout
 from datetime import datetime
+import subprocess
 
 # Đường dẫn tuyệt đối hoặc tương đối đến thư mục volatility3 (chứa __init__.py)
 vol3_path = os.path.abspath(
@@ -73,6 +76,7 @@ class MemoryAnalysisWindow(QMainWindow):
         super().__init__(parent)
         self.ui = Ui_MemoryAnalysisWindow()
         self.ui.setupUi(self)
+        self.setup_connections()
         self.db = DatabaseManager()
         logging.info(f"Using SQLite DB at: {os.path.abspath(self.db.db_path)}")
         print("DEBUG: DB path =", os.path.abspath(self.db.db_path))
@@ -253,8 +257,18 @@ class MemoryAnalysisWindow(QMainWindow):
         self.ui.startAnalysisButton.clicked.connect(self.start_analysis)
         self.ui.stopButton.clicked.connect(self.stop_analysis)
         self.ui.evidenceTypeCombo.currentTextChanged.connect(self.evidence_type_changed)
+        self.ui.lineEdit_2.textChanged.connect(self.on_search_strings)
         if hasattr(self.ui, "pluginSearchEdit"):
-            self.ui.pluginSearchEdit.textChanged.connect(self.filter_plugin_list)
+            self.ui.pluginSearchEdit.textChanged.connect(self.filter_plugin_table)
+        # Kết nối tree block click
+        if hasattr(self.ui, "pagefiletreeWidget"):
+            # self.ui.pagefiletreeWidget.itemClicked.connect(
+            #    self.on_pagefile_block_clicked
+            # )
+            self.ui.pagefiletreeWidget.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+            self.ui.pagefiletreeWidget.customContextMenuRequested.connect(
+                self.show_pagefiletree_context_menu
+            )
 
     def load_volatility_plugins(self):
         plugin_dir = r"E:/DATN/Windows_forensic/tools/volatility3/volatility3/framework/plugins/windows"
@@ -585,7 +599,6 @@ class MemoryAnalysisWindow(QMainWindow):
             return
         file_path = os.path.normpath(file_path)
 
-        # Nếu chưa phân tích, chạy plugin
         ev_type = self.detect_evidence_type(file_path)
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         results_dir = os.path.abspath(
@@ -595,6 +608,15 @@ class MemoryAnalysisWindow(QMainWindow):
         )
         os.makedirs(results_dir, exist_ok=True)
         self.current_results_dir = results_dir
+
+        if ev_type.startswith("Page File"):
+            # Chạy page-brute
+            self.run_page_brute(file_path, results_dir)
+            self.load_page_brute_tree(results_dir)
+            self.ui.statusLabel.setText("Status: Page-brute analysis completed")
+            return
+
+        # Nếu chưa phân tích, chạy plugin
         selected = self.get_selected_plugins()
         if not selected:
             QMessageBox.warning(
@@ -639,8 +661,8 @@ class MemoryAnalysisWindow(QMainWindow):
         self.ui.compressedSizeValue.setText("-")
         self.ui.originalSizeValue.setText("-")
         self.ui.hibernationResultsText.clear()
-        self.ui.pageFileScanTable.setRowCount(0)
-        self.ui.yaraResultsText.clear()
+        #        self.ui.pageFileScanTable.setRowCount(0)
+        # self.ui.yaraResultsText.clear()
         self.ui.crashReasonValue.setText("-")
         self.ui.bugCheckValue.setText("-")
         self.ui.faultingDriverValue.setText("-")
@@ -827,6 +849,231 @@ class MemoryAnalysisWindow(QMainWindow):
                     self.ui.mainTabWidget.setCurrentIndex(visible_tabs[0])
             else:
                 self.ui.mainTabWidget.setCurrentIndex(visible_tabs[0])
+
+    def run_page_brute(self, pagefile_path, output_dir, yara_rule=None):
+        import subprocess
+
+        cmd = ["page-brute", "-f", pagefile_path, "-o", output_dir]
+        if yara_rule:
+            cmd += ["-r", yara_rule]
+        subprocess.run(cmd, check=True)
+
+    def load_page_brute_tree(self, result_dir):
+        from PyQt5.QtWidgets import QTreeWidgetItem
+        from PyQt5 import QtCore
+        import os
+
+        tree_widget = self.ui.pagefiletreeWidget
+        tree_widget.clear()
+        tree_widget.setColumnCount(3)
+        tree_widget.setHeaderLabels(["Type/Rule", "Block/Offset", "Size (bytes)"])
+        for category in os.listdir(result_dir):
+            cat_path = os.path.join(result_dir, category)
+            if os.path.isdir(cat_path):
+                cat_item = QTreeWidgetItem([category, "", ""])
+                block_files = [f for f in os.listdir(cat_path) if f.endswith(".block")]
+                print(f"Rule {category} có {len(block_files)} block")  # DEBUG
+                for fname in sorted(block_files, key=lambda x: int(x.split(".")[0])):
+                    block_id = int(fname.split(".")[0])
+                    offset = block_id * 4096
+                    block_path = os.path.join(cat_path, fname)
+                    size = os.path.getsize(block_path)
+                    child = QTreeWidgetItem(
+                        ["Block", f"{fname} (0x{offset:X})", str(size)]
+                    )
+                    child.setData(0, QtCore.Qt.UserRole, block_path)
+                    cat_item.addChild(child)
+                tree_widget.addTopLevelItem(cat_item)
+        tree_widget.expandToDepth(0)
+        header = tree_widget.header()
+        header.setSectionResizeMode(0, QHeaderView.ResizeToContents)
+        header.setSectionResizeMode(1, QHeaderView.Stretch)
+        header.setSectionResizeMode(2, QHeaderView.Stretch)
+
+    def open_with_hxd(self, file_path):
+        import subprocess
+        import os
+
+        hxd_path = os.path.abspath(
+            os.path.join(os.path.dirname(__file__), "../../tools/HxD/HxD.exe")
+        )
+        si = subprocess.STARTUPINFO()
+        si.dwFlags |= 1
+        si.wShowWindow = 1
+
+        try:
+            subprocess.Popen([hxd_path, file_path], startupinfo=si)
+        except Exception as e:
+            QMessageBox.warning(self, "HxD Error", f"Không mở được HxD: {e}")
+
+    def on_pagefile_block_clicked(self, item, column):
+        # Nếu là block (item.text(0) == 'Block')
+        if item.text(0) == "Block":
+            file_path = item.data(0, QtCore.Qt.UserRole)
+            print(f"Click block: {file_path}")  # DEBUG
+            if file_path:
+                self.open_with_hxd(file_path)
+
+    def on_extract_strings(self, file_path):
+        import re
+        from PyQt5 import QtCore, QtWidgets
+
+        # 1) Đọc block
+        with open(file_path, "rb") as f:
+            data = f.read()
+
+        # 2) Tìm tất cả chuỗi ASCII ≥4 ký tự
+        pattern = re.compile(b"[\x20-\x7E]{4,}")
+        matches = [
+            (m.start(), m.group().decode("ascii")) for m in pattern.finditer(data)
+        ]
+
+        # 3) Đổ vào QTableWidget tableStrings (2 cột Offset / String)
+        tbl = self.ui.tableStrings
+        tbl.clearContents()
+        tbl.setRowCount(0)
+        tbl.setColumnCount(2)
+        tbl.setHorizontalHeaderLabels(["Offset", "String"])
+        tbl.setRowCount(len(matches))
+
+        for row, (off, s) in enumerate(matches):
+            item_off = QtWidgets.QTableWidgetItem(hex(off))
+            item_off.setFlags(item_off.flags() ^ QtCore.Qt.ItemIsEditable)
+            item_str = QtWidgets.QTableWidgetItem(s)
+            item_str.setFlags(item_str.flags() ^ QtCore.Qt.ItemIsEditable)
+            item_off.setTextAlignment(QtCore.Qt.AlignCenter)
+            tbl.setItem(row, 0, item_off)
+            tbl.setItem(row, 1, item_str)
+
+        tbl.resizeColumnsToContents()
+        hdr = tbl.horizontalHeader()
+        # hdr.setSectionResizeMode(0, QHeaderView.ResizeToContents)
+        # hdr.setSectionResizeMode(1, QHeaderView.Stretch)
+        hdr.setSectionResizeMode(QHeaderView.Stretch)
+
+        # 4) Chuyển qua tab chứa tableStrings (nếu bạn xài QTabWidget)
+        self.ui.stackedWidget.setCurrentWidget(self.ui.pageExtractStrings)
+
+    def on_search_strings(self, text: str):
+        """Lọc tableStrings theo text gõ vào:
+        - ẩn row không có chuỗi chứa substring `text`
+        """
+        tbl = self.ui.tableStrings
+        # Duyệt tất cả hàng
+        for row in range(tbl.rowCount()):
+            item = tbl.item(row, 1)  # cột 1 là String
+            if not item:
+                tbl.setRowHidden(row, True)
+                continue
+
+            # So sánh không phân biệt hoa thường
+            cell_text = item.text().lower()
+            query = text.lower()
+            hide = bool(query) and (query not in cell_text)
+            tbl.setRowHidden(row, hide)
+
+    def on_show_yara_details(self, file_path):
+        from PyQt5 import QtWidgets
+
+        # Giả sử bạn đã lưu kết quả YARA scan của từng file_path trong dict:
+        #   self.yara_matches: { path_str: [(rule_name, [(sig_name, offset, text),...]), ...] }
+        matches = getattr(self, "yara_matches", {}).get(file_path, [])
+
+        # 1) Build text
+        lines = []
+        for rule, items in matches:
+            lines.append(f"Rule: {rule}")
+            for name, off, txt in items:
+                lines.append(f"  {name} @ {hex(off)}: {txt}")
+        text = "\n".join(lines) or "(No matches)"
+
+        # 2) Show lên QTextEdit txtYaraMatches
+        self.ui.txtYaraMatches.setPlainText(text)
+        # 3) Switch tab
+        self.ui.stackedAnalysis.setCurrentWidget(self.ui.pageYaraDetails)
+
+    def on_carve_files(self, file_path):
+        import subprocess, tempfile, os
+        from PyQt5.QtWidgets import QMessageBox
+
+        # 1) Tạo thư mục tạm
+        tmpdir = tempfile.mkdtemp(prefix="block_carve_")
+
+        # 2) Gọi foremost để carve
+        try:
+            subprocess.run(
+                ["foremost", "-i", file_path, "-o", tmpdir],
+                check=True,
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+            )
+        except Exception as e:
+            QMessageBox.warning(self, "Carve Error", f"Không carve được: {e}")
+            return
+
+        # 3) Đọc file carved
+        carved_dir = os.path.join(tmpdir, "carved")
+        items = []
+        if os.path.isdir(carved_dir):
+            items = sorted(os.listdir(carved_dir))
+
+        # 4) Show lên QListWidget lstCarved
+        lst = self.ui.lstCarved
+        lst.clear()
+        if not items:
+            lst.addItem("(No files found)")
+        else:
+            for name in items:
+                lst.addItem(name)
+
+        # 5) Switch tab
+        self.ui.stackedAnalysis.setCurrentWidget(self.ui.pageCarveFiles)
+
+    def show_pagefiletree_context_menu(self, pos):
+        print("Right click at:", pos)
+        tree = self.ui.pagefiletreeWidget
+        item = tree.itemAt(pos)
+        if not item or item.text(0) != "Block":
+            return
+
+        from PyQt5.QtWidgets import QMenu
+        from PyQt5 import QtCore
+
+        menu = QMenu(tree)
+        menu.setStyleSheet(
+            """
+        QMenu {
+            background-color: white;
+            color: black;
+            border: 1px solid #dee2e6;
+        }
+        QMenu::item:selected {
+            background-color: #3399DB;
+            color: white;
+        }
+    """
+        )
+        action_hxd = menu.addAction("Mở bằng HxD")
+        action_extract = menu.addAction("Extract Strings")
+        action_yara = menu.addAction("Show YARA Details")
+        action_carve = menu.addAction("Carve Files")
+
+        chosen = menu.exec_(tree.viewport().mapToGlobal(pos))
+        if not chosen:
+            return
+
+        file_path = item.data(0, QtCore.Qt.UserRole)
+        if not file_path:
+            return
+
+        if chosen == action_hxd:
+            self.open_with_hxd(file_path)
+        elif chosen == action_extract:
+            self.on_extract_strings(file_path)
+        elif chosen == action_yara:
+            self.on_show_yara_details(file_path)
+        elif chosen == action_carve:
+            self.on_carve_files(file_path)
 
 
 # Để sử dụng: tạo instance MemoryAnalysisWindow() và show() trong main app
