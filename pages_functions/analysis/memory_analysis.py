@@ -434,8 +434,18 @@ class MemoryAnalysisWindow(QMainWindow):
             self.ui.evidenceTypeCombo.setCurrentText(detected_type)
             self.switch_tab_by_type(detected_type)
             # Thử load kết quả cũ nếu có
+            """
             fp = os.path.normpath(file_path)
-            latest = self.db.get_latest_analysis_result(fp, detected_type)
+            latest = self.db.get_latest_analysis_result(
+                fp, detected_type, "Volatility 3"
+            )
+            """
+            fp = os.path.normpath(file_path)
+            if detected_type.startswith("Page File"):
+                tool = "Page-brute"
+            else:
+                tool = "Volatility 3"
+            latest = self.db.get_latest_analysis_result(fp, detected_type, tool)
             if latest:
                 rp = latest["result_path"]
                 if not os.path.isabs(rp):
@@ -443,6 +453,10 @@ class MemoryAnalysisWindow(QMainWindow):
                 if os.path.isdir(rp):
                     self.current_results_dir = rp
                     self.load_all_plugin_results(rp)
+                    if detected_type.startswith("Page File"):
+                        self.load_page_brute_tree(rp)
+                    else:
+                        self.load_all_plugin_results(rp)
                     self.ui.statusLabel.setText(
                         f"Status: Loaded previous analysis results from {rp}"
                     )
@@ -612,6 +626,13 @@ class MemoryAnalysisWindow(QMainWindow):
         if ev_type.startswith("Page File"):
             # Chạy page-brute
             self.run_page_brute(file_path, results_dir)
+            self.db.save_analysis_result(
+                file_path,
+                ev_type,
+                tool_used="Page-brute",
+                result_path=results_dir,
+                summary=f"Analysis of {os.path.basename(file_path)}",
+            )
             self.load_page_brute_tree(results_dir)
             self.ui.statusLabel.setText("Status: Page-brute analysis completed")
             return
@@ -631,9 +652,10 @@ class MemoryAnalysisWindow(QMainWindow):
             with open(out_put, "w", encoding="utf-8") as f:
                 json.dump(json_data, f, ensure_ascii=False, indent=2)
         # lưu kết quả vào db
-        self.db.save_memory_analysis_result(
+        self.db.save_analysis_result(
             file_path,
             ev_type,
+            tool_used="Volatility 3",
             result_path=results_dir,
             summary=f"Analysis of {os.path.basename(file_path)}",
         )

@@ -763,24 +763,26 @@ class DatabaseManager:
 
         return stats
 
-    def save_memory_analysis_result(
+    def save_analysis_result(
         self,
         file_path: str,
         evidence_type: str,
+        tool_used: str,
         result_path: str,
-        summary: str = "Memory analysis completed",
+        summary: Optional[str] = None,
     ) -> Optional[int]:
-        """Lưu thông tin kết quả phân tích memory"""
+
         try:
             # Tạo hoặc lấy artifact
             artifact_id = self._get_or_create_artifact(file_path, evidence_type)
             if not artifact_id:
                 return None
-
+            if summary is None:
+                summary = f"{tool_used} completed for {os.path.basename(file_path)}"
             # Lưu kết quả
             result_id = self.add_analysis_result(
                 artifact_id=artifact_id,
-                tool_used="Memory Analysis",
+                tool_used=tool_used,
                 summary=summary,
                 result_path=result_path,
             )
@@ -788,11 +790,11 @@ class DatabaseManager:
             return result_id
 
         except Exception as e:
-            print(f"Error saving memory analysis result: {e}")
+            print(f"Error saving analysis result ({tool_used}): {e}")
             return None
 
     def get_latest_analysis_result(
-        self, file_path: str, evidence_type: str
+        self, file_path: str, evidence_type: str, tool_used: str
     ) -> Optional[Dict]:
         """Lấy kết quả phân tích mới nhất cho file và evidence type"""
         try:
@@ -811,14 +813,13 @@ class DatabaseManager:
             query = """
                 SELECT * 
                 FROM Results 
-                WHERE artefact_id = ? AND tool_used = 'Memory Analysis'
+                WHERE artefact_id = ? AND tool_used = ?
                 ORDER BY run_at DESC 
                 LIMIT 1
             """
-            result = self.fetch_one(query, (artifact["artefact_id"],))
+            result = self.fetch_one(query, (artifact["artefact_id"], tool_used))
 
             return result
-
         except Exception as e:
             print(f"Error getting latest analysis result: {e}")
             return None
