@@ -957,7 +957,7 @@ class AddEvidenceWizard(QDialog):
                 else "volatile_collection.zip"
             )
 
-            self.ui.volatileStatusLabel.setText(
+            self.ui.volatileInfoLabel.setText(
                 f"✅ HOÀN THÀNH THU THẬP VOLATILE DATA\n\n"
                 f"📦 Package: {package_name}\n"
                 f"📁 Đường dẫn: {output_path}\n"
@@ -965,7 +965,7 @@ class AddEvidenceWizard(QDialog):
                 f"📋 Chain of custody đã được ghi lại\n\n"
                 f"➡️ Bấm Next để tiếp tục thu thập Non-volatile data"
             )
-            self.ui.volatileStatusLabel.setStyleSheet(
+            self.ui.volatileInfoLabel.setStyleSheet(
                 """
                 QLabel {
                     font-size: 13px;

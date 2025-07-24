@@ -777,7 +777,7 @@ QProgressBar::chunk {
         <item>
          <widget class="QTabWidget" name="rawMemoryTabWidget">
           <property name="currentIndex">
-           <number>6</number>
+           <number>1</number>
           </property>
           <widget class="QWidget" name="systemContextTab">
            <attribute name="title">
@@ -960,7 +960,7 @@ QPushButton:pressed {
             <item>
              <widget class="QTabWidget" name="processTabWidget">
               <property name="currentIndex">
-               <number>1</number>
+               <number>0</number>
               </property>
               <widget class="QWidget" name="processListTab">
                <attribute name="title">
