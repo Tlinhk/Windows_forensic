@@ -1345,7 +1345,13 @@ QPushButton:pressed {
                 <number>5</number>
                </property>
                <item>
-                <widget class="QTreeWidget" name="pagefiletreeWidget"/>
+                <widget class="QTreeWidget" name="pagefiletreeWidget">
+                 <column>
+                  <property name="text">
+                   <string notr="true">1</string>
+                  </property>
+                 </column>
+                </widget>
                </item>
               </layout>
              </widget>
