@@ -483,6 +483,7 @@ class MemoryAnalysisWindow(QMainWindow):
             self.ui.statusLabel.setText(
                 f"Status: Selected {os.path.basename(file_path)}"
             )
+            self.ui.progressBar.setValue(0)
 
     def detect_evidence_type(self, file_path):
         fname = os.path.basename(file_path).lower()
@@ -618,11 +619,13 @@ class MemoryAnalysisWindow(QMainWindow):
                 self.parse_json_to_table(data, tbl)
                 tabw.addTab(page, plugin)
                 tabw.setCurrentIndex(tabw.count() - 1)
+        self.ui.progressBar.setValue(100)
 
     def start_analysis(self):
         import os
         import json
         from datetime import datetime
+        from PyQt5.QtWidgets import QApplication
 
         file_path = self.ui.filePathEdit.text().strip()
         if not file_path or not os.path.exists(file_path):
@@ -640,8 +643,11 @@ class MemoryAnalysisWindow(QMainWindow):
         os.makedirs(results_dir, exist_ok=True)
         self.current_results_dir = results_dir
 
+        self.ui.statusLabel.setText("Status: Starting analysis...")
+        self.ui.progressBar.setValue(0)
+        QApplication.processEvents()
+
         if ev_type.startswith("Page File"):
-            # Chạy page-brute
             self.run_page_brute(file_path, results_dir)
             self.db.save_analysis_result(
                 file_path,
@@ -652,27 +658,32 @@ class MemoryAnalysisWindow(QMainWindow):
             )
             self.load_page_brute_tree(results_dir)
             self.ui.statusLabel.setText("Status: Page-brute analysis completed")
+            self.ui.progressBar.setValue(100)
             return
         elif ev_type.startswith("Crash Dump"):
-            # Với crash dump, chạy CDB analysis tự động
             self.run_basic_cdb_analysis()
+            self.ui.progressBar.setValue(100)
             return
 
-        # Nếu chưa phân tích, chạy plugin Volatility
         selected = self.get_selected_plugins()
         if not selected:
             QMessageBox.warning(
                 self, "No Plugins", "Please select at least one plugin."
             )
             return
-        # chạy từng plugin và hiển thị lên UI
-        for plugin in selected:
+
+        total = len(selected)
+        for idx, plugin in enumerate(selected):
+            self.ui.statusLabel.setText(f"Status: Running {plugin} ({idx+1}/{total})")
+            QApplication.processEvents()
             json_data = run_volatility3_plugin(file_path, plugin)
             self.run_and_display_plugin(plugin, file_path)
             out_put = os.path.join(results_dir, f"{plugin}.json")
             with open(out_put, "w", encoding="utf-8") as f:
                 json.dump(json_data, f, ensure_ascii=False, indent=2)
-        # lưu kết quả vào db
+            percent = int(((idx + 1) / total) * 100)
+            self.ui.progressBar.setValue(percent)
+            QApplication.processEvents()
         self.db.save_analysis_result(
             file_path,
             ev_type,
@@ -681,6 +692,8 @@ class MemoryAnalysisWindow(QMainWindow):
             summary=f"Analysis of {os.path.basename(file_path)}",
         )
         self.ui.statusLabel.setText("Status: Hoàn thành phân tích")
+        self.ui.progressBar.setValue(100)
+        QApplication.processEvents()
 
     def stop_analysis(self):
         if self.analysis_running:
@@ -927,6 +940,14 @@ class MemoryAnalysisWindow(QMainWindow):
         header.setSectionResizeMode(0, QHeaderView.ResizeToContents)
         header.setSectionResizeMode(1, QHeaderView.Stretch)
         header.setSectionResizeMode(2, QHeaderView.Stretch)
+        # Chỉ set 100% nếu thực sự có kết quả phân tích
+        if os.path.exists(result_dir) and any(
+            os.path.isdir(os.path.join(result_dir, cat))
+            for cat in os.listdir(result_dir)
+        ):
+            self.ui.progressBar.setValue(100)
+        else:
+            self.ui.progressBar.setValue(0)
 
     def open_with_hxd(self, file_path):
         import subprocess
@@ -1648,6 +1669,12 @@ class MemoryAnalysisWindow(QMainWindow):
             print(f"DEBUG: Set current tab to index 0")
         else:
             print(f"DEBUG: No CDB tabs created")
+
+        # Chỉ set 100% nếu thực sự có kết quả phân tích
+        if files_found:
+            self.ui.progressBar.setValue(100)
+        else:
+            self.ui.progressBar.setValue(0)
 
 
 # Để sử dụng: tạo instance MemoryAnalysisWindow() và show() trong main app

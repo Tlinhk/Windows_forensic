@@ -587,7 +587,7 @@ class Ui_MemoryAnalysisWindow(object):
             "    text-align: center;\n"
             "}\n"
             "QProgressBar::chunk {\n"
-            "    background-color: #4a90e2;\n"
+            "    background-color: #28a745;\n"
             "    border-radius: 6px;\n"
             "}"
         )
@@ -1946,7 +1946,7 @@ class Ui_MemoryAnalysisWindow(object):
         #  self.startAnalysisButton.clicked.connect(MemoryAnalysisWindow.start_analysis) # type: ignore
         #  self.stopButton.clicked.connect(MemoryAnalysisWindow.stop_analysis) # type: ignore
         # self.evidenceTypeCombo.currentTextChanged['QString'].connect(MemoryAnalysisWindow.evidence_type_changed) # type: ignore
-        # self.outputDirButton.clicked.connect(MemoryAnalysisWindow.browse_output_directory) # type: ignore
+        #  self.outputDirButton.clicked.connect(MemoryAnalysisWindow.browse_output_directory) # type: ignore
         self.clearLogButton.clicked.connect(MemoryAnalysisWindow.clear_log)  # type: ignore
         self.saveLogButton.clicked.connect(MemoryAnalysisWindow.save_log)  # type: ignore
         self.runAIAnalysisButton.clicked.connect(MemoryAnalysisWindow.run_ai_analysis)  # type: ignore

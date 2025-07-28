@@ -86,6 +86,8 @@ class MyWindow(QMainWindow):
 
         self.ui.tabWidget.setTabsClosable(True)
         self.ui.tabWidget.tabCloseRequested.connect(self.close_tab)
+        # Kết nối signal currentChanged để cập nhật menu khi tab thay đổi
+        self.ui.tabWidget.currentChanged.connect(self.on_tab_changed)
 
         self.dashboard_btn.clicked.connect(self.show_selected_window)
         self.case_btn.clicked.connect(self.show_selected_window)
@@ -265,6 +267,7 @@ class MyWindow(QMainWindow):
         Function for showing the selected window
         """
         sender_btn = self.sender()
+
         # Danh sách các nút cần phải có case trước khi sử dụng
         require_case = {
             self.volatile_btn,
@@ -312,6 +315,8 @@ class MyWindow(QMainWindow):
 
         if self.ui.tabWidget.count() == 0:
             self.ui.toolBox.setCurrentIndex(0)
+            # Cập nhật menu khi đóng tab cuối cùng
+            self.set_btn_checked(self.case_btn)
             self.show_case_management_window()
 
     def set_btn_checked(self, btn):
@@ -334,6 +339,46 @@ class MyWindow(QMainWindow):
             if self.ui.tabWidget.tabText(i) == tab_title:
                 return True, i
         return False, -1
+
+    def on_tab_changed(self, index):
+        """
+        Xử lý khi tab thay đổi - cập nhật menu button tương ứng
+        """
+        if index < 0 or index >= self.ui.tabWidget.count():
+            return
+
+        current_tab_title = self.ui.tabWidget.tabText(index)
+
+        # Tìm button tương ứng với tab title
+        button_found = False
+        for button, (title, _) in self.menu_btns_list.items():
+            if title == current_tab_title:
+                self.set_btn_checked(button)
+                button_found = True
+
+                # Tự động expand section chứa button này
+                self.expand_section_for_button(button)
+                break
+
+        # Nếu không tìm thấy button tương ứng, uncheck tất cả buttons
+        if not button_found:
+            for button in self.menu_btns_list.keys():
+                button.setChecked(False)
+
+    def expand_section_for_button(self, target_button):
+        """
+        Tự động expand section chứa button được highlight
+        """
+        # Tìm section chứa button này
+        for i in range(self.ui.toolBox.count()):
+            page = self.ui.toolBox.widget(i)
+            if page:
+                # Tìm button trong page này
+                for child in page.findChildren(QtWidgets.QPushButton):
+                    if child == target_button:
+                        # Expand section này
+                        self.ui.toolBox.setCurrentIndex(i)
+                        return
 
     def user_label_clicked(self, ev):
         """
