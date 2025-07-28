@@ -84,6 +84,13 @@ class MemoryAnalysisWindow(QMainWindow):
         print("DEBUG: Connected?", connected)
         self.current_results_dir: str = ""
         self.curren_evidence_type: str = ""
+
+        # Thêm CDB UI setup
+        self.setup_cdb_ui()
+
+        # Lưu danh sách custom commands
+        self.custom_commands = []
+
         # —————————————— TabBar: Không cắt chữ, không dàn đều, đủ rộng cho tiêu đề ——————————————
         tabbar = self.ui.mainTabWidget.tabBar()
         if tabbar is not None:
@@ -443,6 +450,8 @@ class MemoryAnalysisWindow(QMainWindow):
             fp = os.path.normpath(file_path)
             if detected_type.startswith("Page File"):
                 tool = "Page-brute"
+            elif detected_type.startswith("Crash Dump"):
+                tool = "CDB"
             else:
                 tool = "Volatility 3"
             latest = self.db.get_latest_analysis_result(fp, detected_type, tool)
@@ -452,9 +461,10 @@ class MemoryAnalysisWindow(QMainWindow):
                     rp = os.path.abspath(rp)
                 if os.path.isdir(rp):
                     self.current_results_dir = rp
-                    self.load_all_plugin_results(rp)
                     if detected_type.startswith("Page File"):
                         self.load_page_brute_tree(rp)
+                    elif detected_type.startswith("Crash Dump"):
+                        self.load_cdb_results(rp)
                     else:
                         self.load_all_plugin_results(rp)
                     self.ui.statusLabel.setText(
@@ -636,8 +646,12 @@ class MemoryAnalysisWindow(QMainWindow):
             self.load_page_brute_tree(results_dir)
             self.ui.statusLabel.setText("Status: Page-brute analysis completed")
             return
+        elif ev_type.startswith("Crash Dump"):
+            # Với crash dump, chạy CDB analysis tự động
+            self.run_basic_cdb_analysis()
+            return
 
-        # Nếu chưa phân tích, chạy plugin
+        # Nếu chưa phân tích, chạy plugin Volatility
         selected = self.get_selected_plugins()
         if not selected:
             QMessageBox.warning(
@@ -688,12 +702,14 @@ class MemoryAnalysisWindow(QMainWindow):
         self.ui.crashReasonValue.setText("-")
         self.ui.bugCheckValue.setText("-")
         self.ui.faultingDriverValue.setText("-")
-        self.ui.windbgResultsText.clear()
-        self.ui.volatilityCrashText.clear()
         self.ui.aiResultsText.clear()
         self.ui.progressBar.setValue(0)
         self.ui.statusLabel.setText("Status: Ready")
         self.ui.logTextEdit.clear()
+
+        # Clear CDB results tabs
+        if hasattr(self, "cdb_results_tabwidget") and self.cdb_results_tabwidget:
+            self.cdb_results_tabwidget.clear()
 
     def mock_show_raw_memory_result(self):
         self.mock_reset_ui()
@@ -1096,6 +1112,433 @@ class MemoryAnalysisWindow(QMainWindow):
             self.on_show_yara_details(file_path)
         elif chosen == action_carve:
             self.on_carve_files(file_path)
+
+    def setup_cdb_ui(self):
+        """
+        Setup CDB UI và kết nối signals
+        """
+        # Kết nối button Add Custom
+        if hasattr(self.ui, "addCustomCommandButton"):
+            self.ui.addCustomCommandButton.clicked.connect(self.add_custom_cdb_command)
+
+        # Kết nối Enter key trong custom command edit
+        if hasattr(self.ui, "customCommandEdit"):
+            self.ui.customCommandEdit.returnPressed.connect(self.add_custom_cdb_command)
+
+    def add_custom_cdb_command(self):
+        """Thêm lệnh CDB tùy chỉnh"""
+        if not hasattr(self.ui, "customCommandEdit"):
+            return
+
+        command = self.ui.customCommandEdit.text().strip()
+        if not command:
+            return
+
+        # Thêm vào danh sách custom commands
+        if command not in self.custom_commands:
+            self.custom_commands.append(command)
+
+        # Clear input
+        self.ui.customCommandEdit.clear()
+
+        # Chạy command ngay lập tức nếu có file
+        file_path = self.ui.filePathEdit.text().strip()
+        if file_path and os.path.exists(file_path):
+            self.run_single_cdb_command(command)
+
+    def create_cdb_result_tab(self, command, tab_title):
+        """Tạo tab mới để hiển thị kết quả CDB"""
+        from PyQt5.QtWidgets import QTextEdit, QTabWidget
+
+        # Luôn sử dụng cdb_results_tabwidget nếu đã có
+        if hasattr(self, "cdb_results_tabwidget") and self.cdb_results_tabwidget:
+            target_tabwidget = self.cdb_results_tabwidget
+        else:
+            # Sử dụng crashAnalysisTabWidget từ UI file
+            if hasattr(self.ui, "crashAnalysisTabWidget"):
+                target_tabwidget = self.ui.crashAnalysisTabWidget
+                # Đặt tab position thành ngang
+                target_tabwidget.setTabPosition(QTabWidget.North)
+                print(
+                    f"DEBUG: Using existing crashAnalysisTabWidget with horizontal tabs"
+                )
+            else:
+                # Fallback: tạo mới QTabWidget với tab ngang
+                target_tabwidget = QTabWidget()
+                target_tabwidget.setTabPosition(QTabWidget.North)  # Tab ngang ở trên
+                print(f"DEBUG: Created new QTabWidget with horizontal tabs")
+
+                # Thêm vào crashDumpLayout nếu có
+                if hasattr(self.ui, "crashDumpLayout"):
+                    self.ui.crashDumpLayout.addWidget(target_tabwidget)
+                    print(f"DEBUG: Added to crashDumpLayout")
+                else:
+                    # Fallback: thêm vào window chính
+                    self.layout().addWidget(target_tabwidget)
+                    print(f"DEBUG: Added to main layout")
+
+        # Kiểm tra tab đã tồn tại chưa
+        for i in range(target_tabwidget.count()):
+            if target_tabwidget.tabText(i) == tab_title:
+                target_tabwidget.setCurrentIndex(i)
+                print(f"DEBUG: Tab '{tab_title}' already exists, switching to it")
+                return i  # Tab đã tồn tại, return index
+
+        # Tạo tab mới
+        text_edit = QTextEdit()
+        text_edit.setReadOnly(True)
+        text_edit.setStyleSheet(
+            """
+            QTextEdit {
+                background-color: #ffffff;
+                border: 1px solid #cccccc;
+                font-family: 'Consolas', 'Monaco', monospace;
+                font-size: 12px;
+                padding: 5px;
+            }
+        """
+        )
+
+        # Thêm tab
+        tab_index = target_tabwidget.addTab(text_edit, tab_title)
+        target_tabwidget.setCurrentIndex(tab_index)
+        print(f"DEBUG: Created new tab '{tab_title}' at index {tab_index}")
+
+        # Lưu reference đến TabWidget
+        self.cdb_results_tabwidget = target_tabwidget
+
+        return tab_index
+
+    def run_basic_cdb_analysis(self):
+        """Chạy phân tích CDB cơ bản với các lệnh mặc định"""
+        # Sửa lệnh - thêm dấu ! cho analyze
+        basic_commands = ["version", "lm", "k", "!analyze -v", "vertarget"]
+
+        file_path = self.ui.filePathEdit.text().strip()
+        if not file_path or not os.path.exists(file_path):
+            QMessageBox.warning(
+                self, "No File", "Please select a valid crash dump file."
+            )
+            return
+
+        # Tạo thư mục kết quả
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        results_dir = os.path.abspath(
+            os.path.join(
+                "analysis_results", f"{os.path.basename(file_path)}_{timestamp}"
+            )
+        )
+        os.makedirs(results_dir, exist_ok=True)
+        self.current_results_dir = results_dir
+
+        try:
+            self.ui.statusLabel.setText("Status: Running basic CDB analysis...")
+            self.append_log("Starting basic CDB analysis...")
+            print("DEBUG: Starting CDB analysis with commands:", basic_commands)
+
+            # Chạy từng lệnh và hiển thị kết quả
+            for i, command in enumerate(basic_commands):
+                print(f"DEBUG: Running command {i+1}/{len(basic_commands)}: {command}")
+                self.run_single_cdb_command(command, results_dir)
+                print(f"DEBUG: Completed command {i+1}: {command}")
+
+            # Lưu vào database
+            ev_type = self.detect_evidence_type(file_path)
+            self.db.save_analysis_result(
+                file_path,
+                ev_type,
+                tool_used="CDB",
+                result_path=results_dir,
+                summary="Basic CDB analysis completed",
+            )
+
+            self.ui.statusLabel.setText("Status: Basic CDB analysis completed")
+            self.append_log("Basic CDB analysis completed.")
+            print("DEBUG: CDB analysis completed successfully")
+
+        except Exception as e:
+            error_msg = f"CDB analysis failed: {str(e)}"
+            self.ui.statusLabel.setText(f"Status: {error_msg}")
+            self.append_log(error_msg)
+            print(f"DEBUG: CDB analysis failed: {error_msg}")
+            QMessageBox.warning(self, "CDB Analysis Error", error_msg)
+
+    def run_single_cdb_command(self, command, results_dir=None):
+        """Chạy 1 lệnh CDB và hiển thị kết quả"""
+        print(f"DEBUG: run_single_cdb_command called with: {command}")
+
+        file_path = self.ui.filePathEdit.text().strip()
+        if not file_path or not os.path.exists(file_path):
+            print(f"DEBUG: File not found: {file_path}")
+            return
+
+        if not results_dir:
+            results_dir = self.current_results_dir or os.path.abspath(
+                "analysis_results"
+            )
+
+        try:
+            print(f"DEBUG: Creating tab for command: {command}")
+
+            # Tạo tab title
+            if command == "!analyze -v":
+                tab_title = "Basic Analysis"
+            elif command == "version":
+                tab_title = "Version"
+            elif command == "lm":
+                tab_title = "Loaded Modules"
+            elif command == "k":
+                tab_title = "Kernel Info"
+            elif command == "vertarget":
+                tab_title = "Vertical Target"
+            else:
+                tab_title = command
+
+            # Tạo tab nếu chưa có
+            tab_index = self.create_cdb_result_tab(command, tab_title)
+            print(f"DEBUG: Tab created with index: {tab_index}")
+
+            # Lấy text edit widget
+            if hasattr(self, "cdb_results_tabwidget") and self.cdb_results_tabwidget:
+                text_edit = self.cdb_results_tabwidget.widget(tab_index)
+
+                # Hiển thị "Running..."
+                text_edit.setText(f"Running command: {command}\nPlease wait...")
+                self.cdb_results_tabwidget.setCurrentIndex(tab_index)
+                print(f"DEBUG: Set 'Running...' message for command: {command}")
+
+                # Chạy command
+                print(f"DEBUG: About to call run_cdb_single_command for: {command}")
+                result = self.run_cdb_single_command(file_path, command)
+                print(
+                    f"DEBUG: run_cdb_single_command returned, length: {len(result) if result else 0}"
+                )
+
+                # Hiển thị kết quả
+                text_edit.setText(result)
+                print(f"DEBUG: Set result text for command: {command}")
+
+                # Lưu kết quả vào file
+                safe_command = command.replace("!", "").replace(" ", "_")
+                result_file = os.path.join(results_dir, f"cdb_{safe_command}.txt")
+                with open(result_file, "w", encoding="utf-8") as f:
+                    f.write(result)
+                print(f"DEBUG: Saved result to file: {result_file}")
+
+                self.append_log(f"Completed command: {command}")
+
+        except Exception as e:
+            error_msg = f"Error running {command}: {str(e)}"
+            print(f"DEBUG: Exception in run_single_cdb_command: {error_msg}")
+            if hasattr(self, "cdb_results_tabwidget") and self.cdb_results_tabwidget:
+                text_edit = self.cdb_results_tabwidget.widget(tab_index)
+                text_edit.setText(f"Error: {error_msg}")
+            self.append_log(error_msg)
+
+    def run_cdb_single_command(self, crash_dump_path: str, command: str) -> str:
+        """Chạy 1 lệnh CDB và trả về kết quả dạng string"""
+        import subprocess
+        import os
+
+        print(f"DEBUG: run_cdb_single_command called with: {command}")
+
+        # Đường dẫn đến CDB.exe trong thư mục tools
+        cdb_path = os.path.abspath(
+            os.path.join(os.path.dirname(__file__), "../../tools/debuggers/x64/cdb.exe")
+        )
+
+        print(f"DEBUG: CDB path: {cdb_path}")
+
+        if not os.path.exists(cdb_path):
+            print(f"DEBUG: CDB not found at {cdb_path}")
+            # Thử tìm CDB trong Windows SDK hoặc WinDbg
+            possible_paths = [
+                r"C:\Program Files (x86)\Windows Kits\10\Debuggers\x64\cdb.exe",
+                r"C:\Program Files (x86)\Windows Kits\10\Debuggers\x86\cdb.exe",
+                r"C:\Program Files\Windows Kits\10\Debuggers\x64\cdb.exe",
+                r"C:\Program Files\Windows Kits\10\Debuggers\x86\cdb.exe",
+            ]
+
+            for path in possible_paths:
+                if os.path.exists(path):
+                    cdb_path = path
+                    print(f"DEBUG: Found CDB at: {cdb_path}")
+                    break
+            else:
+                error_msg = (
+                    f"Error: CDB.exe not found. Please install Windows SDK or WinDbg."
+                )
+                print(f"DEBUG: {error_msg}")
+                return error_msg
+
+        if not os.path.exists(crash_dump_path):
+            error_msg = f"Error: Crash dump file not found: {crash_dump_path}"
+            print(f"DEBUG: {error_msg}")
+            return error_msg
+
+        try:
+            print(f"DEBUG: Starting CDB execution...")
+
+            # Set working directory to debuggers folder để CDB tìm được DLLs
+            debuggers_dir = os.path.dirname(cdb_path)
+
+            # Chạy CDB trực tiếp
+            cmd = [
+                cdb_path,
+                "-z",
+                crash_dump_path,  # -z để mở crash dump
+                "-c",
+                f"{command};q",
+            ]
+
+            print(f"DEBUG: Running CDB command: {' '.join(cmd)}")
+            print(f"DEBUG: Working directory: {debuggers_dir}")
+            print(f"DEBUG: CDB path exists: {os.path.exists(cdb_path)}")
+            print(f"DEBUG: Crash dump exists: {os.path.exists(crash_dump_path)}")
+
+            print(f"DEBUG: About to call subprocess.run...")
+            result = subprocess.run(
+                cmd,
+                capture_output=True,
+                text=True,
+                cwd=debuggers_dir,  # Set working directory
+            )
+            print(f"DEBUG: subprocess.run completed!")
+
+            print(f"DEBUG: CDB return code: {result.returncode}")
+            print(f"DEBUG: CDB stdout length: {len(result.stdout)}")
+            print(f"DEBUG: CDB stderr length: {len(result.stderr)}")
+
+            # Kết hợp stdout và stderr
+            output = result.stdout + "\n" + result.stderr
+            print(f"DEBUG: Combined output length: {len(output)}")
+
+            # Clean up output
+            lines = output.split("\n")
+            cleaned_lines = []
+
+            # Bỏ qua các dòng không cần thiết
+            skip_patterns = [
+                "Copyright (c) Microsoft Corporation",
+                "Loading Dump File",
+                "Symbol search path is:",
+                "Executable search path is:",
+                "Loading Kernel Symbols",
+                "Loading User Symbols",
+                "PEB is paged out",
+                "Loading unloaded module list",
+                "For analysis of this file, run !analyze -v",
+                "cdb: Reading initial command",
+                "quit:",
+                "NatVis script unloaded",
+                "************* Preparing the environment",
+                ">>>>>>>>>>>>> Preparing the environment",
+                "************* Waiting for Debugger Extensions",
+                ">>>>>>>>>>>>> Waiting for Debugger Extensions",
+                "ExtensionRepository :",
+                "UseExperimentalFeatureForNugetShare :",
+                "AllowNugetExeUpdate :",
+                "NonInteractiveNuget :",
+                "AllowNugetMSCredentialProviderInstall :",
+                "AllowParallelInitializationOfLocalRepositories :",
+                "EnableRedirectToV8JsProvider :",
+                "-- Configuring repositories",
+                "-----> Repository :",
+                "Packages count:",
+                "Extension DLL search Path:",
+                "Extension DLL chain:",
+                "wdfkd: image",
+                "ELFBinComposition: image",
+                "dbghelp: image",
+                "exts: image",
+                "kext: image",
+                "kdexts: image",
+            ]
+
+            for line in lines:
+                # Kiểm tra xem dòng có chứa pattern cần bỏ không
+                should_skip = False
+                for pattern in skip_patterns:
+                    if pattern in line:
+                        should_skip = True
+                        break
+
+                # Nếu không phải dòng cần bỏ thì thêm vào
+                if not should_skip and line.strip():
+                    cleaned_lines.append(line)
+
+            # Trả về output đã clean up
+            final_output = "\n".join(cleaned_lines)
+            print(f"DEBUG: Final cleaned output length: {len(final_output)}")
+
+            # Nếu không có output sau khi clean up, trả về debug info
+            if not final_output.strip():
+                final_output = f"DEBUG INFO:\nCDB Path: {cdb_path}\nCrash Dump: {crash_dump_path}\nCommand: {command}\nReturn Code: {result.returncode}\nSTDOUT:\n{result.stdout}\nSTDERR:\n{result.stderr}"
+                print(f"DEBUG: No output after cleanup, returning debug info")
+
+            print(f"DEBUG: Returning final output")
+            return final_output
+
+        except subprocess.TimeoutExpired:
+            error_msg = f"Error: Command '{command}' timed out. CDB may need more time to analyze large crash dumps."
+            print(f"DEBUG: {error_msg}")
+            return error_msg
+        except Exception as e:
+            error_msg = f"Error running command '{command}': {str(e)}\n\nDEBUG INFO:\nCDB Path: {cdb_path}\nCrash Dump: {crash_dump_path}"
+            print(f"DEBUG: Exception: {error_msg}")
+            return error_msg
+
+    def load_cdb_results(self, results_dir: str):
+        """Load kết quả CDB từ thư mục results"""
+        import os
+
+        # Tìm tất cả file .txt trong thư mục results
+        for filename in os.listdir(results_dir):
+            if filename.startswith("cdb_") and filename.endswith(".txt"):
+                # Extract command name từ filename
+                command = filename[4:-4].replace(
+                    "_", " "
+                )  # Remove "cdb_" prefix and ".txt" suffix
+
+                # Đọc nội dung file
+                file_path = os.path.join(results_dir, filename)
+                try:
+                    with open(file_path, "r", encoding="utf-8") as f:
+                        content = f.read()
+
+                    # Tạo tab title
+                    if command == "analyze -v":
+                        tab_title = "Basic Analysis"
+                    elif command == "version":
+                        tab_title = "Version"
+                    elif command == "lm":
+                        tab_title = "Loaded Modules"
+                    elif command == "k":
+                        tab_title = "Kernel Info"
+                    elif command == "vertarget":
+                        tab_title = "Vertical Target"
+                    else:
+                        tab_title = command
+
+                    # Tạo tab và hiển thị kết quả
+                    tab_index = self.create_cdb_result_tab(command, tab_title)
+                    if (
+                        hasattr(self, "cdb_results_tabwidget")
+                        and self.cdb_results_tabwidget
+                    ):
+                        text_edit = self.cdb_results_tabwidget.widget(tab_index)
+                        text_edit.setText(content)
+
+                except Exception as e:
+                    print(f"Error loading CDB result {filename}: {e}")
+
+        # Hiển thị tab đầu tiên nếu có
+        if (
+            hasattr(self, "cdb_results_tabwidget")
+            and self.cdb_results_tabwidget
+            and self.cdb_results_tabwidget.count() > 0
+        ):
+            self.cdb_results_tabwidget.setCurrentIndex(0)
 
 
 # Để sử dụng: tạo instance MemoryAnalysisWindow() và show() trong main app

@@ -282,6 +282,11 @@ QComboBox QAbstractItemView QScrollBar::sub-line {
        </property>
        <item row="0" column="0">
         <widget class="QLabel" name="label">
+         <property name="font">
+          <font>
+           <pointsize>10</pointsize>
+          </font>
+         </property>
          <property name="text">
           <string>Case name:</string>
          </property>
@@ -391,6 +396,7 @@ QPlainTextEdit QScrollBar::add-line, QPlainTextEdit QScrollBar::sub-line {
         <widget class="QGroupBox" name="evidenceGroupBox">
          <property name="font">
           <font>
+           <pointsize>10</pointsize>
            <weight>75</weight>
            <bold>true</bold>
           </font>
@@ -416,6 +422,11 @@ QPlainTextEdit QScrollBar::add-line, QPlainTextEdit QScrollBar::sub-line {
           </property>
           <item row="0" column="0">
            <widget class="QLabel" name="evidenceTypeLabel">
+            <property name="font">
+             <font>
+              <pointsize>10</pointsize>
+             </font>
+            </property>
             <property name="text">
              <string>Evidence Type:</string>
             </property>
@@ -428,6 +439,11 @@ QPlainTextEdit QScrollBar::add-line, QPlainTextEdit QScrollBar::sub-line {
               <width>200</width>
               <height>34</height>
              </size>
+            </property>
+            <property name="font">
+             <font>
+              <pointsize>10</pointsize>
+             </font>
             </property>
             <property name="styleSheet">
              <string notr="true">/* ==== QComboBox ==== */
@@ -508,6 +524,11 @@ QComboBox QAbstractItemView QScrollBar::sub-line {
           </item>
           <item row="1" column="0">
            <widget class="QLabel" name="filePathLabel">
+            <property name="font">
+             <font>
+              <pointsize>10</pointsize>
+             </font>
+            </property>
             <property name="text">
              <string>File Path:</string>
             </property>
@@ -515,6 +536,11 @@ QComboBox QAbstractItemView QScrollBar::sub-line {
           </item>
           <item row="1" column="1">
            <widget class="QLineEdit" name="filePathEdit">
+            <property name="font">
+             <font>
+              <pointsize>10</pointsize>
+             </font>
+            </property>
             <property name="styleSheet">
              <string notr="true">/* ==== CHUNG CHO CÁC TEXT INPUT / TEXT EDIT ==== */
 QLineEdit,
@@ -578,6 +604,11 @@ QPlainTextEdit QScrollBar::add-line, QPlainTextEdit QScrollBar::sub-line {
               <height>16777215</height>
              </size>
             </property>
+            <property name="font">
+             <font>
+              <pointsize>10</pointsize>
+             </font>
+            </property>
             <property name="styleSheet">
              <string notr="true">/* QPushButton */
 QPushButton {
@@ -612,6 +643,7 @@ QPushButton:pressed {
          </property>
          <property name="font">
           <font>
+           <pointsize>10</pointsize>
            <weight>75</weight>
            <bold>true</bold>
           </font>
@@ -637,9 +669,14 @@ QPushButton:pressed {
             <widget class="QPushButton" name="startAnalysisButton">
              <property name="maximumSize">
               <size>
-               <width>120</width>
+               <width>130</width>
                <height>16777215</height>
               </size>
+             </property>
+             <property name="font">
+              <font>
+               <pointsize>10</pointsize>
+              </font>
              </property>
              <property name="styleSheet">
               <string notr="true">/* QPushButton */
@@ -673,6 +710,7 @@ QPushButton:pressed {
              </property>
              <property name="font">
               <font>
+               <pointsize>10</pointsize>
                <underline>false</underline>
               </font>
              </property>
@@ -700,11 +738,21 @@ QPushButton:pressed {
              </property>
             </widget>
             <widget class="QPushButton" name="pushButton_2">
+             <property name="font">
+              <font>
+               <pointsize>10</pointsize>
+              </font>
+             </property>
              <property name="text">
               <string>Save Results</string>
              </property>
             </widget>
             <widget class="QPushButton" name="pushButton">
+             <property name="font">
+              <font>
+               <pointsize>10</pointsize>
+              </font>
+             </property>
              <property name="text">
               <string>Export Report</string>
              </property>
@@ -713,6 +761,11 @@ QPushButton:pressed {
           </item>
           <item row="1" column="0">
            <widget class="QProgressBar" name="progressBar">
+            <property name="font">
+             <font>
+              <pointsize>10</pointsize>
+             </font>
+            </property>
             <property name="styleSheet">
              <string notr="true">/* QProgressBar */
 QProgressBar {
@@ -732,6 +785,11 @@ QProgressBar::chunk {
           </item>
           <item row="0" column="0">
            <widget class="QLabel" name="statusLabel">
+            <property name="font">
+             <font>
+              <pointsize>10</pointsize>
+             </font>
+            </property>
             <property name="text">
              <string>Status</string>
             </property>
@@ -745,8 +803,13 @@ QProgressBar::chunk {
     </item>
     <item row="2" column="0">
      <widget class="QTabWidget" name="mainTabWidget">
+      <property name="font">
+       <font>
+        <pointsize>11</pointsize>
+       </font>
+      </property>
       <property name="currentIndex">
-       <number>2</number>
+       <number>6</number>
       </property>
       <widget class="QWidget" name="rawMemoryTab">
        <property name="sizePolicy">
@@ -776,8 +839,13 @@ QProgressBar::chunk {
         </property>
         <item>
          <widget class="QTabWidget" name="rawMemoryTabWidget">
+          <property name="font">
+           <font>
+            <pointsize>10</pointsize>
+           </font>
+          </property>
           <property name="currentIndex">
-           <number>1</number>
+           <number>6</number>
           </property>
           <widget class="QWidget" name="systemContextTab">
            <attribute name="title">
@@ -794,6 +862,11 @@ QProgressBar::chunk {
               </property>
               <item row="0" column="0">
                <widget class="QLabel" name="osVersionLabel">
+                <property name="font">
+                 <font>
+                  <pointsize>10</pointsize>
+                 </font>
+                </property>
                 <property name="text">
                  <string>OS Version:</string>
                 </property>
@@ -801,6 +874,11 @@ QProgressBar::chunk {
               </item>
               <item row="0" column="1">
                <widget class="QLabel" name="osVersionValue">
+                <property name="font">
+                 <font>
+                  <pointsize>10</pointsize>
+                 </font>
+                </property>
                 <property name="text">
                  <string>-</string>
                 </property>
@@ -808,6 +886,11 @@ QProgressBar::chunk {
               </item>
               <item row="1" column="0">
                <widget class="QLabel" name="architectureLabel">
+                <property name="font">
+                 <font>
+                  <pointsize>10</pointsize>
+                 </font>
+                </property>
                 <property name="text">
                  <string>Architecture:</string>
                 </property>
@@ -815,6 +898,11 @@ QProgressBar::chunk {
               </item>
               <item row="1" column="1">
                <widget class="QLabel" name="architectureValue">
+                <property name="font">
+                 <font>
+                  <pointsize>10</pointsize>
+                 </font>
+                </property>
                 <property name="text">
                  <string>-</string>
                 </property>
@@ -822,6 +910,11 @@ QProgressBar::chunk {
               </item>
               <item row="2" column="0">
                <widget class="QLabel" name="timestampLabel">
+                <property name="font">
+                 <font>
+                  <pointsize>10</pointsize>
+                 </font>
+                </property>
                 <property name="text">
                  <string>Capture Time:</string>
                 </property>
@@ -829,6 +922,11 @@ QProgressBar::chunk {
               </item>
               <item row="2" column="1">
                <widget class="QLabel" name="timestampValue">
+                <property name="font">
+                 <font>
+                  <pointsize>10</pointsize>
+                 </font>
+                </property>
                 <property name="text">
                  <string>-</string>
                 </property>
@@ -836,6 +934,11 @@ QProgressBar::chunk {
               </item>
               <item row="3" column="0">
                <widget class="QLabel" name="profileLabel">
+                <property name="font">
+                 <font>
+                  <pointsize>10</pointsize>
+                 </font>
+                </property>
                 <property name="text">
                  <string>Profile:</string>
                 </property>
@@ -843,6 +946,11 @@ QProgressBar::chunk {
               </item>
               <item row="3" column="1">
                <widget class="QLabel" name="profileValue">
+                <property name="font">
+                 <font>
+                  <pointsize>10</pointsize>
+                 </font>
+                </property>
                 <property name="text">
                  <string>-</string>
                 </property>
@@ -850,6 +958,11 @@ QProgressBar::chunk {
               </item>
               <item row="4" column="0">
                <widget class="QLabel" name="kernelBaseLabel">
+                <property name="font">
+                 <font>
+                  <pointsize>10</pointsize>
+                 </font>
+                </property>
                 <property name="text">
                  <string>Kernel Base:</string>
                 </property>
@@ -857,6 +970,11 @@ QProgressBar::chunk {
               </item>
               <item row="4" column="1">
                <widget class="QLabel" name="kernelBaseValue">
+                <property name="font">
+                 <font>
+                  <pointsize>10</pointsize>
+                 </font>
+                </property>
                 <property name="text">
                  <string>-</string>
                 </property>
@@ -868,6 +986,11 @@ QProgressBar::chunk {
              <layout class="QHBoxLayout" name="pluginDetailButtonLayout">
               <item>
                <widget class="QPushButton" name="btnKdbgscanDetail">
+                <property name="font">
+                 <font>
+                  <pointsize>10</pointsize>
+                 </font>
+                </property>
                 <property name="styleSheet">
                  <string notr="true">/* QPushButton */
 QPushButton {
@@ -891,6 +1014,11 @@ QPushButton:pressed {
               </item>
               <item>
                <widget class="QPushButton" name="btnImageinfoDetail">
+                <property name="font">
+                 <font>
+                  <pointsize>10</pointsize>
+                 </font>
+                </property>
                 <property name="styleSheet">
                  <string notr="true">/* QPushButton */
 QPushButton {
@@ -914,6 +1042,11 @@ QPushButton:pressed {
               </item>
               <item>
                <widget class="QPushButton" name="btnWindowsInfoDetail">
+                <property name="font">
+                 <font>
+                  <pointsize>10</pointsize>
+                 </font>
+                </property>
                 <property name="styleSheet">
                  <string notr="true">/* QPushButton */
 QPushButton {
@@ -959,6 +1092,11 @@ QPushButton:pressed {
            <layout class="QVBoxLayout" name="processAnalysisLayout">
             <item>
              <widget class="QTabWidget" name="processTabWidget">
+              <property name="font">
+               <font>
+                <pointsize>9</pointsize>
+               </font>
+              </property>
               <property name="currentIndex">
                <number>0</number>
               </property>
@@ -1013,6 +1151,11 @@ QPushButton:pressed {
            <layout class="QVBoxLayout" name="fileRegistryLayout">
             <item>
              <widget class="QTabWidget" name="fileTabWidget">
+              <property name="font">
+               <font>
+                <pointsize>9</pointsize>
+               </font>
+              </property>
               <property name="currentIndex">
                <number>0</number>
               </property>
@@ -1077,6 +1220,11 @@ QPushButton:pressed {
            <layout class="QVBoxLayout" name="userActivityLayout">
             <item>
              <widget class="QTabWidget" name="commandTabWidget">
+              <property name="font">
+               <font>
+                <pointsize>9</pointsize>
+               </font>
+              </property>
               <property name="currentIndex">
                <number>0</number>
               </property>
@@ -1101,6 +1249,11 @@ QPushButton:pressed {
            <layout class="QVBoxLayout" name="credentialsLayout">
             <item>
              <widget class="QTabWidget" name="credentialTabWidget">
+              <property name="font">
+               <font>
+                <pointsize>9</pointsize>
+               </font>
+              </property>
               <property name="currentIndex">
                <number>0</number>
               </property>
@@ -1168,6 +1321,7 @@ QPushButton:pressed {
           </property>
           <property name="font">
            <font>
+            <pointsize>10</pointsize>
             <weight>75</weight>
             <bold>true</bold>
            </font>
@@ -1196,6 +1350,11 @@ QPushButton:pressed {
            </property>
            <item row="0" column="0">
             <widget class="QLabel" name="hibernationTypeLabel">
+             <property name="font">
+              <font>
+               <pointsize>10</pointsize>
+              </font>
+             </property>
              <property name="text">
               <string>Hibernation Type:</string>
              </property>
@@ -1210,6 +1369,11 @@ QPushButton:pressed {
            </item>
            <item row="1" column="0">
             <widget class="QLabel" name="compressedSizeLabel">
+             <property name="font">
+              <font>
+               <pointsize>10</pointsize>
+              </font>
+             </property>
              <property name="text">
               <string>Compressed Size:</string>
              </property>
@@ -1224,6 +1388,11 @@ QPushButton:pressed {
            </item>
            <item row="2" column="0">
             <widget class="QLabel" name="originalSizeLabel">
+             <property name="font">
+              <font>
+               <pointsize>10</pointsize>
+              </font>
+             </property>
              <property name="text">
               <string>Original Size:</string>
              </property>
@@ -1243,6 +1412,7 @@ QPushButton:pressed {
          <widget class="QGroupBox" name="hibernationResultsGroup">
           <property name="font">
            <font>
+            <pointsize>10</pointsize>
             <weight>75</weight>
             <bold>true</bold>
            </font>
@@ -1321,6 +1491,7 @@ QPushButton:pressed {
              <widget class="QGroupBox" name="pageFileScanGroup">
               <property name="font">
                <font>
+                <pointsize>9</pointsize>
                 <weight>75</weight>
                 <bold>true</bold>
                </font>
@@ -1367,6 +1538,7 @@ QPushButton:pressed {
              <widget class="QGroupBox" name="ResultsGroup">
               <property name="font">
                <font>
+                <pointsize>9</pointsize>
                 <weight>75</weight>
                 <bold>true</bold>
                </font>
@@ -1396,6 +1568,11 @@ QPushButton:pressed {
                   <layout class="QGridLayout" name="gridLayout_7">
                    <item row="0" column="0">
                     <widget class="QLineEdit" name="lineEdit_2">
+                     <property name="font">
+                      <font>
+                       <pointsize>9</pointsize>
+                      </font>
+                     </property>
                      <property name="placeholderText">
                       <string>Search something</string>
                      </property>
@@ -1467,6 +1644,7 @@ QPushButton:pressed {
           </property>
           <property name="font">
            <font>
+            <pointsize>10</pointsize>
             <weight>75</weight>
             <bold>true</bold>
            </font>
@@ -1495,6 +1673,11 @@ QPushButton:pressed {
            </property>
            <item row="0" column="0">
             <widget class="QLabel" name="crashReasonLabel">
+             <property name="font">
+              <font>
+               <pointsize>10</pointsize>
+              </font>
+             </property>
              <property name="text">
               <string>Crash Reason:</string>
              </property>
@@ -1509,13 +1692,18 @@ QPushButton:pressed {
            </item>
            <item row="1" column="0">
             <widget class="QLabel" name="bugCheckLabel">
+             <property name="font">
+              <font>
+               <pointsize>10</pointsize>
+              </font>
+             </property>
              <property name="text">
               <string>Bug Check Code:</string>
              </property>
             </widget>
            </item>
-           <item row="1" column="1">
-            <widget class="QLabel" name="bugCheckValue">
+           <item row="2" column="1">
+            <widget class="QLabel" name="faultingDriverValue">
              <property name="text">
               <string>-</string>
              </property>
@@ -1523,13 +1711,18 @@ QPushButton:pressed {
            </item>
            <item row="2" column="0">
             <widget class="QLabel" name="faultingDriverLabel">
+             <property name="font">
+              <font>
+               <pointsize>10</pointsize>
+              </font>
+             </property>
              <property name="text">
               <string>Faulting Driver:</string>
              </property>
             </widget>
            </item>
-           <item row="2" column="1">
-            <widget class="QLabel" name="faultingDriverValue">
+           <item row="1" column="1">
+            <widget class="QLabel" name="bugCheckValue">
              <property name="text">
               <string>-</string>
              </property>
@@ -1542,6 +1735,7 @@ QPushButton:pressed {
          <widget class="QGroupBox" name="crashAnalysisGroup">
           <property name="font">
            <font>
+            <pointsize>10</pointsize>
             <weight>75</weight>
             <bold>true</bold>
            </font>
@@ -1566,71 +1760,108 @@ QPushButton:pressed {
             <number>5</number>
            </property>
            <item>
-            <widget class="QTabWidget" name="crashAnalysisTabWidget">
-             <property name="currentIndex">
-              <number>0</number>
+            <widget class="QFrame" name="cdbControlsFrame">
+             <property name="maximumSize">
+              <size>
+               <width>16777215</width>
+               <height>80</height>
+              </size>
              </property>
-             <widget class="QWidget" name="windbgTab">
-              <attribute name="title">
-               <string>WinDbg Analysis</string>
-              </attribute>
-              <layout class="QVBoxLayout" name="windbgLayout">
-               <property name="spacing">
-                <number>0</number>
-               </property>
-               <property name="leftMargin">
-                <number>0</number>
-               </property>
-               <property name="topMargin">
-                <number>0</number>
-               </property>
-               <property name="rightMargin">
-                <number>0</number>
-               </property>
-               <property name="bottomMargin">
-                <number>0</number>
-               </property>
-               <item>
-                <widget class="QTextEdit" name="windbgResultsText">
-                 <property name="readOnly">
-                  <bool>true</bool>
-                 </property>
-                 <property name="placeholderText">
-                  <string>WinDbg analysis results will appear here...</string>
-                 </property>
-                </widget>
-               </item>
-              </layout>
-             </widget>
-             <widget class="QWidget" name="volatilityCrashTab">
-              <attribute name="title">
-               <string>Volatility Analysis</string>
-              </attribute>
-              <layout class="QVBoxLayout" name="volatilityCrashLayout">
-               <property name="spacing">
-                <number>0</number>
-               </property>
-               <property name="leftMargin">
-                <number>0</number>
-               </property>
-               <property name="rightMargin">
-                <number>0</number>
-               </property>
-               <property name="bottomMargin">
-                <number>0</number>
-               </property>
-               <item>
-                <widget class="QTextEdit" name="volatilityCrashText">
-                 <property name="readOnly">
-                  <bool>true</bool>
-                 </property>
-                 <property name="placeholderText">
-                  <string>Volatility crash analysis results will appear here...</string>
-                 </property>
-                </widget>
-               </item>
-              </layout>
-             </widget>
+             <property name="font">
+              <font>
+               <pointsize>10</pointsize>
+              </font>
+             </property>
+             <property name="frameShape">
+              <enum>QFrame::StyledPanel</enum>
+             </property>
+             <property name="frameShadow">
+              <enum>QFrame::Raised</enum>
+             </property>
+             <layout class="QVBoxLayout" name="cdbControlsLayout">
+              <property name="spacing">
+               <number>5</number>
+              </property>
+              <property name="leftMargin">
+               <number>10</number>
+              </property>
+              <property name="topMargin">
+               <number>5</number>
+              </property>
+              <property name="rightMargin">
+               <number>10</number>
+              </property>
+              <property name="bottomMargin">
+               <number>5</number>
+              </property>
+              <item>
+               <layout class="QHBoxLayout" name="cdbHeaderLayout"/>
+              </item>
+              <item>
+               <layout class="QHBoxLayout" name="cdbCustomLayout">
+                <item>
+                 <widget class="QLabel" name="customCommandLabel">
+                  <property name="font">
+                   <font>
+                    <pointsize>10</pointsize>
+                   </font>
+                  </property>
+                  <property name="text">
+                   <string>Custom Command:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLineEdit" name="customCommandEdit">
+                  <property name="font">
+                   <font>
+                    <pointsize>10</pointsize>
+                   </font>
+                  </property>
+                  <property name="placeholderText">
+                   <string>Enter CDB command (e.g., !analyze -v, k, lm, etc.)</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="addCustomCommandButton">
+                  <property name="font">
+                   <font>
+                    <pointsize>10</pointsize>
+                   </font>
+                  </property>
+                  <property name="styleSheet">
+                   <string notr="true">QPushButton {
+    background-color: #3498db;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+}
+QPushButton:hover {
+    background-color: #2980b9;
+}</string>
+                  </property>
+                  <property name="text">
+                   <string>➕ Add Custom</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
+            <widget class="QTabWidget" name="crashAnalysisTabWidget">
+             <property name="font">
+              <font>
+               <pointsize>10</pointsize>
+              </font>
+             </property>
+             <property name="currentIndex">
+              <number>-1</number>
+             </property>
             </widget>
            </item>
           </layout>
@@ -1674,6 +1905,7 @@ QPushButton:pressed {
           </property>
           <property name="font">
            <font>
+            <pointsize>10</pointsize>
             <weight>75</weight>
             <bold>true</bold>
            </font>
@@ -1699,6 +1931,11 @@ QPushButton:pressed {
            </property>
            <item>
             <widget class="QCheckBox" name="enableAICheckbox">
+             <property name="font">
+              <font>
+               <pointsize>10</pointsize>
+              </font>
+             </property>
              <property name="text">
               <string>Enable AI Analysis</string>
              </property>
@@ -1706,6 +1943,11 @@ QPushButton:pressed {
            </item>
            <item>
             <widget class="QLabel" name="aiModelLabel">
+             <property name="font">
+              <font>
+               <pointsize>10</pointsize>
+              </font>
+             </property>
              <property name="text">
               <string>Model:</string>
              </property>
@@ -1713,6 +1955,11 @@ QPushButton:pressed {
            </item>
            <item>
             <widget class="QComboBox" name="aiModelCombo">
+             <property name="font">
+              <font>
+               <pointsize>10</pointsize>
+              </font>
+             </property>
              <item>
               <property name="text">
                <string>Volmemlyzer ML</string>
@@ -1727,6 +1974,11 @@ QPushButton:pressed {
            </item>
            <item>
             <widget class="QPushButton" name="runAIAnalysisButton">
+             <property name="font">
+              <font>
+               <pointsize>10</pointsize>
+              </font>
+             </property>
              <property name="text">
               <string>Run AI Analysis</string>
              </property>
@@ -1764,6 +2016,11 @@ QPushButton:pressed {
            </property>
            <item>
             <widget class="QTextEdit" name="aiResultsText">
+             <property name="font">
+              <font>
+               <pointsize>10</pointsize>
+              </font>
+             </property>
              <property name="readOnly">
               <bool>true</bool>
              </property>
@@ -1792,6 +2049,7 @@ QPushButton:pressed {
          <widget class="QGroupBox" name="volatilityOptionsGroup">
           <property name="font">
            <font>
+            <pointsize>10</pointsize>
             <weight>75</weight>
             <bold>true</bold>
            </font>
@@ -2020,6 +2278,7 @@ QHeaderView::section:hover {
             </property>
             <property name="font">
              <font>
+              <pointsize>9</pointsize>
               <weight>75</weight>
               <bold>true</bold>
              </font>
@@ -2040,6 +2299,7 @@ QHeaderView::section:hover {
               <widget class="QLabel" name="outputFormatLabel">
                <property name="font">
                 <font>
+                 <pointsize>9</pointsize>
                  <weight>50</weight>
                  <bold>false</bold>
                 </font>
@@ -2053,6 +2313,7 @@ QHeaderView::section:hover {
               <widget class="QComboBox" name="outputFormatCombo">
                <property name="font">
                 <font>
+                 <pointsize>9</pointsize>
                  <weight>50</weight>
                  <bold>false</bold>
                 </font>
@@ -2154,6 +2415,7 @@ QComboBox QAbstractItemView QScrollBar::sub-line {
               <widget class="QLabel" name="outputDirLabel">
                <property name="font">
                 <font>
+                 <pointsize>9</pointsize>
                  <weight>50</weight>
                  <bold>false</bold>
                 </font>
@@ -2167,6 +2429,7 @@ QComboBox QAbstractItemView QScrollBar::sub-line {
               <widget class="QLineEdit" name="outputDirEdit">
                <property name="font">
                 <font>
+                 <pointsize>9</pointsize>
                  <weight>50</weight>
                  <bold>false</bold>
                 </font>
@@ -2259,6 +2522,7 @@ QPushButton:pressed {
               <widget class="QCheckBox" name="saveRawOutputCheckbox">
                <property name="font">
                 <font>
+                 <pointsize>9</pointsize>
                  <weight>50</weight>
                  <bold>false</bold>
                 </font>
@@ -2275,6 +2539,7 @@ QPushButton:pressed {
               <widget class="QCheckBox" name="generateReportCheckbox">
                <property name="font">
                 <font>
+                 <pointsize>9</pointsize>
                  <weight>50</weight>
                  <bold>false</bold>
                 </font>
@@ -2306,6 +2571,7 @@ QPushButton:pressed {
             </property>
             <property name="font">
              <font>
+              <pointsize>9</pointsize>
               <weight>75</weight>
               <bold>true</bold>
              </font>
@@ -2326,6 +2592,7 @@ QPushButton:pressed {
               <widget class="QLabel" name="threadsLabel">
                <property name="font">
                 <font>
+                 <pointsize>9</pointsize>
                  <weight>50</weight>
                  <bold>false</bold>
                 </font>
@@ -2340,6 +2607,7 @@ QPushButton:pressed {
                <property name="font">
                 <font>
                  <family>Segoe UI</family>
+                 <pointsize>9</pointsize>
                 </font>
                </property>
                <property name="styleSheet">
@@ -2392,6 +2660,7 @@ QDoubleSpinBox:disabled {
               <widget class="QLabel" name="timeoutLabel">
                <property name="font">
                 <font>
+                 <pointsize>9</pointsize>
                  <weight>50</weight>
                  <bold>false</bold>
                 </font>
@@ -2406,6 +2675,7 @@ QDoubleSpinBox:disabled {
                <property name="font">
                 <font>
                  <family>Segoe UI</family>
+                 <pointsize>9</pointsize>
                 </font>
                </property>
                <property name="styleSheet">
@@ -2458,6 +2728,7 @@ QDoubleSpinBox:disabled {
               <widget class="QCheckBox" name="verboseCheckbox">
                <property name="font">
                 <font>
+                 <pointsize>9</pointsize>
                  <weight>50</weight>
                  <bold>false</bold>
                 </font>
@@ -2471,6 +2742,7 @@ QDoubleSpinBox:disabled {
               <widget class="QCheckBox" name="debugCheckbox">
                <property name="font">
                 <font>
+                 <pointsize>9</pointsize>
                  <weight>50</weight>
                  <bold>false</bold>
                 </font>
@@ -2518,7 +2790,7 @@ QDoubleSpinBox:disabled {
           <property name="maximumSize">
            <size>
             <width>16777215</width>
-            <height>50</height>
+            <height>60</height>
            </size>
           </property>
           <property name="frameShape">
@@ -2527,6 +2799,11 @@ QDoubleSpinBox:disabled {
           <layout class="QHBoxLayout" name="logControlLayout">
            <item>
             <widget class="QLabel" name="logLevelLabel">
+             <property name="font">
+              <font>
+               <pointsize>10</pointsize>
+              </font>
+             </property>
              <property name="text">
               <string>Log Level:</string>
              </property>
@@ -2534,6 +2811,11 @@ QDoubleSpinBox:disabled {
            </item>
            <item>
             <widget class="QComboBox" name="logLevelCombo">
+             <property name="font">
+              <font>
+               <pointsize>10</pointsize>
+              </font>
+             </property>
              <item>
               <property name="text">
                <string>Debug</string>
@@ -2571,6 +2853,11 @@ QDoubleSpinBox:disabled {
            </item>
            <item>
             <widget class="QPushButton" name="clearLogButton">
+             <property name="font">
+              <font>
+               <pointsize>10</pointsize>
+              </font>
+             </property>
              <property name="text">
               <string>Clear Log</string>
              </property>
@@ -2578,6 +2865,11 @@ QDoubleSpinBox:disabled {
            </item>
            <item>
             <widget class="QPushButton" name="saveLogButton">
+             <property name="font">
+              <font>
+               <pointsize>10</pointsize>
+              </font>
+             </property>
              <property name="text">
               <string>Save Log</string>
              </property>
@@ -2591,7 +2883,7 @@ QDoubleSpinBox:disabled {
           <property name="font">
            <font>
             <family>Courier New</family>
-            <pointsize>9</pointsize>
+            <pointsize>10</pointsize>
            </font>
           </property>
           <property name="readOnly">
