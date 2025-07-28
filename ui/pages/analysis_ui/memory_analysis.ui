@@ -809,7 +809,7 @@ QProgressBar::chunk {
        </font>
       </property>
       <property name="currentIndex">
-       <number>6</number>
+       <number>3</number>
       </property>
       <widget class="QWidget" name="rawMemoryTab">
        <property name="sizePolicy">
@@ -1635,103 +1635,6 @@ QPushButton:pressed {
          <number>0</number>
         </property>
         <item>
-         <widget class="QGroupBox" name="crashInfoGroup">
-          <property name="maximumSize">
-           <size>
-            <width>16777215</width>
-            <height>150</height>
-           </size>
-          </property>
-          <property name="font">
-           <font>
-            <pointsize>10</pointsize>
-            <weight>75</weight>
-            <bold>true</bold>
-           </font>
-          </property>
-          <property name="title">
-           <string>Crash Information</string>
-          </property>
-          <layout class="QGridLayout" name="crashInfoLayout">
-           <property name="leftMargin">
-            <number>30</number>
-           </property>
-           <property name="topMargin">
-            <number>10</number>
-           </property>
-           <property name="rightMargin">
-            <number>5</number>
-           </property>
-           <property name="bottomMargin">
-            <number>10</number>
-           </property>
-           <property name="horizontalSpacing">
-            <number>0</number>
-           </property>
-           <property name="verticalSpacing">
-            <number>10</number>
-           </property>
-           <item row="0" column="0">
-            <widget class="QLabel" name="crashReasonLabel">
-             <property name="font">
-              <font>
-               <pointsize>10</pointsize>
-              </font>
-             </property>
-             <property name="text">
-              <string>Crash Reason:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="1">
-            <widget class="QLabel" name="crashReasonValue">
-             <property name="text">
-              <string>-</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="0">
-            <widget class="QLabel" name="bugCheckLabel">
-             <property name="font">
-              <font>
-               <pointsize>10</pointsize>
-              </font>
-             </property>
-             <property name="text">
-              <string>Bug Check Code:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="1">
-            <widget class="QLabel" name="faultingDriverValue">
-             <property name="text">
-              <string>-</string>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="0">
-            <widget class="QLabel" name="faultingDriverLabel">
-             <property name="font">
-              <font>
-               <pointsize>10</pointsize>
-              </font>
-             </property>
-             <property name="text">
-              <string>Faulting Driver:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="1">
-            <widget class="QLabel" name="bugCheckValue">
-             <property name="text">
-              <string>-</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </widget>
-        </item>
-        <item>
          <widget class="QGroupBox" name="crashAnalysisGroup">
           <property name="font">
            <font>
@@ -1741,7 +1644,7 @@ QPushButton:pressed {
            </font>
           </property>
           <property name="title">
-           <string>Detailed Analysis</string>
+           <string/>
           </property>
           <layout class="QVBoxLayout" name="crashAnalysisLayout">
            <property name="spacing">
@@ -1764,7 +1667,7 @@ QPushButton:pressed {
              <property name="maximumSize">
               <size>
                <width>16777215</width>
-               <height>80</height>
+               <height>100</height>
               </size>
              </property>
              <property name="font">
@@ -1807,7 +1710,7 @@ QPushButton:pressed {
                    </font>
                   </property>
                   <property name="text">
-                   <string>Custom Command:</string>
+                   <string>Advanced Command:</string>
                   </property>
                  </widget>
                 </item>
@@ -1843,7 +1746,48 @@ QPushButton:hover {
 }</string>
                   </property>
                   <property name="text">
-                   <string>➕ Add Custom</string>
+                   <string>Run command</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+              <item>
+               <layout class="QHBoxLayout" name="runningCommandLayout">
+                <item>
+                 <widget class="QLabel" name="runningCommandLabel">
+                  <property name="font">
+                   <font>
+                    <pointsize>10</pointsize>
+                   </font>
+                  </property>
+                  <property name="text">
+                   <string>Running CDB command:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLineEdit" name="runningCommandEdit">
+                  <property name="enabled">
+                   <bool>false</bool>
+                  </property>
+                  <property name="font">
+                   <font>
+                    <pointsize>10</pointsize>
+                   </font>
+                  </property>
+                  <property name="styleSheet">
+                   <string notr="true">QLineEdit:disabled {
+    background-color: #f5f5f5;
+    color: #666666;
+    border: 1px solid #cccccc;
+    border-radius: 4px;
+    padding: 4px 8px;
+    font-family: 'Consolas', 'Monaco', monospace;
+}</string>
+                  </property>
+                  <property name="placeholderText">
+                   <string>Ready to run CDB commands...</string>
                   </property>
                  </widget>
                 </item>
@@ -1856,7 +1800,7 @@ QPushButton:hover {
             <widget class="QTabWidget" name="crashAnalysisTabWidget">
              <property name="font">
               <font>
-               <pointsize>10</pointsize>
+               <pointsize>12</pointsize>
               </font>
              </property>
              <property name="currentIndex">

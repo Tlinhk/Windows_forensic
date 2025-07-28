@@ -1101,60 +1101,20 @@ class Ui_MemoryAnalysisWindow(object):
         self.crashDumpLayout.setContentsMargins(0, 0, 0, 0)
         self.crashDumpLayout.setSpacing(0)
         self.crashDumpLayout.setObjectName("crashDumpLayout")
-        self.crashInfoGroup = QtWidgets.QGroupBox(self.crashDumpTab)
-        self.crashInfoGroup.setMaximumSize(QtCore.QSize(16777215, 150))
-        font = QtGui.QFont()
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.crashInfoGroup.setFont(font)
-        self.crashInfoGroup.setObjectName("crashInfoGroup")
-        self.crashInfoLayout = QtWidgets.QGridLayout(self.crashInfoGroup)
-        self.crashInfoLayout.setContentsMargins(30, 10, 5, 10)
-        self.crashInfoLayout.setHorizontalSpacing(0)
-        self.crashInfoLayout.setVerticalSpacing(10)
-        self.crashInfoLayout.setObjectName("crashInfoLayout")
-        self.crashReasonLabel = QtWidgets.QLabel(self.crashInfoGroup)
-        font = QtGui.QFont()
-        font.setPointSize(10)
-        self.crashReasonLabel.setFont(font)
-        self.crashReasonLabel.setObjectName("crashReasonLabel")
-        self.crashInfoLayout.addWidget(self.crashReasonLabel, 0, 0, 1, 1)
-        self.crashReasonValue = QtWidgets.QLabel(self.crashInfoGroup)
-        self.crashReasonValue.setObjectName("crashReasonValue")
-        self.crashInfoLayout.addWidget(self.crashReasonValue, 0, 1, 1, 1)
-        self.bugCheckLabel = QtWidgets.QLabel(self.crashInfoGroup)
-        font = QtGui.QFont()
-        font.setPointSize(10)
-        self.bugCheckLabel.setFont(font)
-        self.bugCheckLabel.setObjectName("bugCheckLabel")
-        self.crashInfoLayout.addWidget(self.bugCheckLabel, 1, 0, 1, 1)
-        self.faultingDriverValue = QtWidgets.QLabel(self.crashInfoGroup)
-        self.faultingDriverValue.setObjectName("faultingDriverValue")
-        self.crashInfoLayout.addWidget(self.faultingDriverValue, 2, 1, 1, 1)
-        self.faultingDriverLabel = QtWidgets.QLabel(self.crashInfoGroup)
-        font = QtGui.QFont()
-        font.setPointSize(10)
-        self.faultingDriverLabel.setFont(font)
-        self.faultingDriverLabel.setObjectName("faultingDriverLabel")
-        self.crashInfoLayout.addWidget(self.faultingDriverLabel, 2, 0, 1, 1)
-        self.bugCheckValue = QtWidgets.QLabel(self.crashInfoGroup)
-        self.bugCheckValue.setObjectName("bugCheckValue")
-        self.crashInfoLayout.addWidget(self.bugCheckValue, 1, 1, 1, 1)
-        self.crashDumpLayout.addWidget(self.crashInfoGroup)
         self.crashAnalysisGroup = QtWidgets.QGroupBox(self.crashDumpTab)
         font = QtGui.QFont()
         font.setPointSize(10)
         font.setBold(True)
         font.setWeight(75)
         self.crashAnalysisGroup.setFont(font)
+        self.crashAnalysisGroup.setTitle("")
         self.crashAnalysisGroup.setObjectName("crashAnalysisGroup")
         self.crashAnalysisLayout = QtWidgets.QVBoxLayout(self.crashAnalysisGroup)
         self.crashAnalysisLayout.setContentsMargins(5, 5, 5, 5)
         self.crashAnalysisLayout.setSpacing(5)
         self.crashAnalysisLayout.setObjectName("crashAnalysisLayout")
         self.cdbControlsFrame = QtWidgets.QFrame(self.crashAnalysisGroup)
-        self.cdbControlsFrame.setMaximumSize(QtCore.QSize(16777215, 80))
+        self.cdbControlsFrame.setMaximumSize(QtCore.QSize(16777215, 100))
         font = QtGui.QFont()
         font.setPointSize(10)
         self.cdbControlsFrame.setFont(font)
@@ -1201,10 +1161,36 @@ class Ui_MemoryAnalysisWindow(object):
         self.addCustomCommandButton.setObjectName("addCustomCommandButton")
         self.cdbCustomLayout.addWidget(self.addCustomCommandButton)
         self.cdbControlsLayout.addLayout(self.cdbCustomLayout)
+        self.runningCommandLayout = QtWidgets.QHBoxLayout()
+        self.runningCommandLayout.setObjectName("runningCommandLayout")
+        self.runningCommandLabel = QtWidgets.QLabel(self.cdbControlsFrame)
+        font = QtGui.QFont()
+        font.setPointSize(10)
+        self.runningCommandLabel.setFont(font)
+        self.runningCommandLabel.setObjectName("runningCommandLabel")
+        self.runningCommandLayout.addWidget(self.runningCommandLabel)
+        self.runningCommandEdit = QtWidgets.QLineEdit(self.cdbControlsFrame)
+        self.runningCommandEdit.setEnabled(False)
+        font = QtGui.QFont()
+        font.setPointSize(10)
+        self.runningCommandEdit.setFont(font)
+        self.runningCommandEdit.setStyleSheet(
+            "QLineEdit:disabled {\n"
+            "    background-color: #f5f5f5;\n"
+            "    color: #666666;\n"
+            "    border: 1px solid #cccccc;\n"
+            "    border-radius: 4px;\n"
+            "    padding: 4px 8px;\n"
+            "    font-family: 'Consolas', 'Monaco', monospace;\n"
+            "}"
+        )
+        self.runningCommandEdit.setObjectName("runningCommandEdit")
+        self.runningCommandLayout.addWidget(self.runningCommandEdit)
+        self.cdbControlsLayout.addLayout(self.runningCommandLayout)
         self.crashAnalysisLayout.addWidget(self.cdbControlsFrame)
         self.crashAnalysisTabWidget = QtWidgets.QTabWidget(self.crashAnalysisGroup)
         font = QtGui.QFont()
-        font.setPointSize(10)
+        font.setPointSize(12)
         self.crashAnalysisTabWidget.setFont(font)
         self.crashAnalysisTabWidget.setObjectName("crashAnalysisTabWidget")
         self.crashAnalysisLayout.addWidget(self.crashAnalysisTabWidget)
@@ -1949,18 +1935,18 @@ class Ui_MemoryAnalysisWindow(object):
         self.actionAbout.setObjectName("actionAbout")
 
         self.retranslateUi(MemoryAnalysisWindow)
-        self.mainTabWidget.setCurrentIndex(6)
+        self.mainTabWidget.setCurrentIndex(3)
         self.rawMemoryTabWidget.setCurrentIndex(6)
         self.processTabWidget.setCurrentIndex(0)
         self.fileTabWidget.setCurrentIndex(0)
         self.commandTabWidget.setCurrentIndex(0)
         self.credentialTabWidget.setCurrentIndex(0)
         self.crashAnalysisTabWidget.setCurrentIndex(-1)
-        #    self.browseButton.clicked.connect(MemoryAnalysisWindow.browse_evidence_file) # type: ignore
-        #   self.startAnalysisButton.clicked.connect(MemoryAnalysisWindow.start_analysis) # type: ignore
-        #   self.stopButton.clicked.connect(MemoryAnalysisWindow.stop_analysis) # type: ignore
-        #   self.evidenceTypeCombo.currentTextChanged['QString'].connect(MemoryAnalysisWindow.evidence_type_changed) # type: ignore
-        #   self.outputDirButton.clicked.connect(MemoryAnalysisWindow.browse_output_directory) # type: ignore
+        #  self.browseButton.clicked.connect(MemoryAnalysisWindow.browse_evidence_file) # type: ignore
+        #  self.startAnalysisButton.clicked.connect(MemoryAnalysisWindow.start_analysis) # type: ignore
+        #  self.stopButton.clicked.connect(MemoryAnalysisWindow.stop_analysis) # type: ignore
+        # self.evidenceTypeCombo.currentTextChanged['QString'].connect(MemoryAnalysisWindow.evidence_type_changed) # type: ignore
+        # self.outputDirButton.clicked.connect(MemoryAnalysisWindow.browse_output_directory) # type: ignore
         self.clearLogButton.clicked.connect(MemoryAnalysisWindow.clear_log)  # type: ignore
         self.saveLogButton.clicked.connect(MemoryAnalysisWindow.save_log)  # type: ignore
         self.runAIAnalysisButton.clicked.connect(MemoryAnalysisWindow.run_ai_analysis)  # type: ignore
@@ -2139,26 +2125,8 @@ class Ui_MemoryAnalysisWindow(object):
             self.mainTabWidget.indexOf(self.pageFileTab),
             _translate("MemoryAnalysisWindow", "Page File Analysis"),
         )
-        self.crashInfoGroup.setTitle(
-            _translate("MemoryAnalysisWindow", "Crash Information")
-        )
-        self.crashReasonLabel.setText(
-            _translate("MemoryAnalysisWindow", "Crash Reason:")
-        )
-        self.crashReasonValue.setText(_translate("MemoryAnalysisWindow", "-"))
-        self.bugCheckLabel.setText(
-            _translate("MemoryAnalysisWindow", "Bug Check Code:")
-        )
-        self.faultingDriverValue.setText(_translate("MemoryAnalysisWindow", "-"))
-        self.faultingDriverLabel.setText(
-            _translate("MemoryAnalysisWindow", "Faulting Driver:")
-        )
-        self.bugCheckValue.setText(_translate("MemoryAnalysisWindow", "-"))
-        self.crashAnalysisGroup.setTitle(
-            _translate("MemoryAnalysisWindow", "Detailed Analysis")
-        )
         self.customCommandLabel.setText(
-            _translate("MemoryAnalysisWindow", "Custom Command:")
+            _translate("MemoryAnalysisWindow", "Advanced Command:")
         )
         self.customCommandEdit.setPlaceholderText(
             _translate(
@@ -2167,7 +2135,13 @@ class Ui_MemoryAnalysisWindow(object):
             )
         )
         self.addCustomCommandButton.setText(
-            _translate("MemoryAnalysisWindow", "➕ Add Custom")
+            _translate("MemoryAnalysisWindow", "Run command")
+        )
+        self.runningCommandLabel.setText(
+            _translate("MemoryAnalysisWindow", "Running CDB command:")
+        )
+        self.runningCommandEdit.setPlaceholderText(
+            _translate("MemoryAnalysisWindow", "Ready to run CDB commands...")
         )
         self.mainTabWidget.setTabText(
             self.mainTabWidget.indexOf(self.crashDumpTab),

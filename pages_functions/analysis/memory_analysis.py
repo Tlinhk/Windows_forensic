@@ -434,24 +434,24 @@ class MemoryAnalysisWindow(QMainWindow):
         if file_path:
             import os
 
+            # Clear kết quả cũ trước khi load file mới
+            self.clear_previous_results()
+
             self.ui.filePathEdit.setText(file_path)
             # Auto-detect type
             detected_type = self.detect_evidence_type(file_path)
             self.curren_evidence_type = detected_type
             self.ui.evidenceTypeCombo.setCurrentText(detected_type)
             self.switch_tab_by_type(detected_type)
-            # Thử load kết quả cũ nếu có
-            """
-            fp = os.path.normpath(file_path)
-            latest = self.db.get_latest_analysis_result(
-                fp, detected_type, "Volatility 3"
-            )
-            """
             fp = os.path.normpath(file_path)
             if detected_type.startswith("Page File"):
                 tool = "Page-brute"
             elif detected_type.startswith("Crash Dump"):
                 tool = "CDB"
+                # Debug chỉ cho Crash Dump
+                print(f"DEBUG: Crash Dump detected, looking for previous results...")
+                print(f"DEBUG: File path: {fp}")
+                print(f"DEBUG: Tool: {tool}")
             else:
                 tool = "Volatility 3"
             latest = self.db.get_latest_analysis_result(fp, detected_type, tool)
@@ -464,6 +464,7 @@ class MemoryAnalysisWindow(QMainWindow):
                     if detected_type.startswith("Page File"):
                         self.load_page_brute_tree(rp)
                     elif detected_type.startswith("Crash Dump"):
+                        print(f"DEBUG: Found previous CDB results at: {rp}")
                         self.load_cdb_results(rp)
                     else:
                         self.load_all_plugin_results(rp)
@@ -471,6 +472,12 @@ class MemoryAnalysisWindow(QMainWindow):
                         f"Status: Loaded previous analysis results from {rp}"
                     )
                     return
+                else:
+                    if detected_type.startswith("Crash Dump"):
+                        print(f"DEBUG: CDB result directory does not exist: {rp}")
+            else:
+                if detected_type.startswith("Crash Dump"):
+                    print(f"DEBUG: No previous CDB results found in database")
 
             # Nếu chưa có file kết quả, chỉ báo Selected
             self.ui.statusLabel.setText(
@@ -697,11 +704,6 @@ class MemoryAnalysisWindow(QMainWindow):
         self.ui.compressedSizeValue.setText("-")
         self.ui.originalSizeValue.setText("-")
         self.ui.hibernationResultsText.clear()
-        #        self.ui.pageFileScanTable.setRowCount(0)
-        # self.ui.yaraResultsText.clear()
-        self.ui.crashReasonValue.setText("-")
-        self.ui.bugCheckValue.setText("-")
-        self.ui.faultingDriverValue.setText("-")
         self.ui.aiResultsText.clear()
         self.ui.progressBar.setValue(0)
         self.ui.statusLabel.setText("Status: Ready")
@@ -836,8 +838,6 @@ class MemoryAnalysisWindow(QMainWindow):
             "Page File": ["Page File Analysis", "Analysis Log"],
             "Crash Dump": [
                 "Crash Dump Analysis",
-                "AI Analysis",
-                "Analysis Options",
                 "Analysis Log",
             ],
         }
@@ -1125,6 +1125,12 @@ class MemoryAnalysisWindow(QMainWindow):
         if hasattr(self.ui, "customCommandEdit"):
             self.ui.customCommandEdit.returnPressed.connect(self.add_custom_cdb_command)
 
+        # Kết nối textChanged để real-time update command display
+        if hasattr(self.ui, "customCommandEdit"):
+            self.ui.customCommandEdit.textChanged.connect(
+                self.on_custom_command_text_changed
+            )
+
     def add_custom_cdb_command(self):
         """Thêm lệnh CDB tùy chỉnh"""
         if not hasattr(self.ui, "customCommandEdit"):
@@ -1145,6 +1151,71 @@ class MemoryAnalysisWindow(QMainWindow):
         file_path = self.ui.filePathEdit.text().strip()
         if file_path and os.path.exists(file_path):
             self.run_single_cdb_command(command)
+
+    def on_custom_command_text_changed(self, text: str):
+        """Handle khi text trong custom command edit thay đổi"""
+        print(f"DEBUG: Custom command text changed: '{text}'")
+        self.update_running_command_display(text)
+
+    def update_running_command_display(self, command: str):
+        """Cập nhật hiển thị command đang chạy"""
+        print(f"DEBUG: update_running_command_display called with: {command}")
+
+        if not hasattr(self.ui, "runningCommandEdit"):
+            print(f"DEBUG: runningCommandEdit not found in UI")
+            return
+
+        print(f"DEBUG: Found runningCommandEdit widget")
+
+        file_path = self.ui.filePathEdit.text().strip()
+        if not file_path:
+            print(f"DEBUG: No file path found")
+            self.ui.runningCommandEdit.setText("No file selected")
+            return
+
+        print(f"DEBUG: File path: {file_path}")
+
+        # Tạo command line string
+        cdb_path = os.path.abspath(
+            os.path.join(os.path.dirname(__file__), "../../tools/debuggers/x64/cdb.exe")
+        )
+        command_line = f"{cdb_path} -z {file_path} -c {command};q"
+
+        print(f"DEBUG: Command line: {command_line}")
+
+        # Cập nhật QLineEdit
+        self.ui.runningCommandEdit.setText(command_line)
+        print(f"DEBUG: Updated running command display: {command_line}")
+
+    def clear_running_command_display(self):
+        """Xóa hiển thị command đang chạy"""
+        if hasattr(self.ui, "runningCommandEdit"):
+            self.ui.runningCommandEdit.setText("Ready to run CDB commands...")
+
+    def clear_previous_results(self):
+
+        print("DEBUG: Clearing UI for new file...")
+
+        # Clear CDB result tabs (chỉ UI, không xóa files)
+        if hasattr(self, "cdb_results_tabwidget") and self.cdb_results_tabwidget:
+            self.cdb_results_tabwidget.clear()
+            print("DEBUG: Cleared CDB result tabs")
+
+        # Clear running command display
+        self.clear_running_command_display()
+
+        # Clear custom command input
+        if hasattr(self.ui, "customCommandEdit"):
+            self.ui.customCommandEdit.clear()
+            print("DEBUG: Cleared custom command input")
+
+        # Clear custom commands list
+        self.custom_commands = []
+
+        # KHÔNG clear current_results_dir - để giữ reference đến files cũ
+        # self.current_results_dir = None  # BỎ DÒNG NÀY
+
+        print("DEBUG: UI cleared successfully (files preserved)")
 
     def create_cdb_result_tab(self, command, tab_title):
         """Tạo tab mới để hiển thị kết quả CDB"""
@@ -1193,8 +1264,9 @@ class MemoryAnalysisWindow(QMainWindow):
                 background-color: #ffffff;
                 border: 1px solid #cccccc;
                 font-family: 'Consolas', 'Monaco', monospace;
-                font-size: 12px;
-                padding: 5px;
+                font-size: 16px;
+                padding: 10px;
+                line-height: 1.4;
             }
         """
         )
@@ -1244,13 +1316,19 @@ class MemoryAnalysisWindow(QMainWindow):
 
             # Lưu vào database
             ev_type = self.detect_evidence_type(file_path)
+            # Normalize file path để tránh path mismatch
+            normalized_file_path = os.path.normpath(file_path)
+            print(
+                f"DEBUG: Saving to database - File: {normalized_file_path}, Type: {ev_type}, Tool: CDB, Result: {results_dir}"
+            )
             self.db.save_analysis_result(
-                file_path,
+                normalized_file_path,
                 ev_type,
                 tool_used="CDB",
                 result_path=results_dir,
                 summary="Basic CDB analysis completed",
             )
+            print(f"DEBUG: Database save completed")
 
             self.ui.statusLabel.setText("Status: Basic CDB analysis completed")
             self.append_log("Basic CDB analysis completed.")
@@ -1280,9 +1358,12 @@ class MemoryAnalysisWindow(QMainWindow):
         try:
             print(f"DEBUG: Creating tab for command: {command}")
 
+            # Cập nhật hiển thị command đang chạy
+            self.update_running_command_display(command)
+
             # Tạo tab title
             if command == "!analyze -v":
-                tab_title = "Basic Analysis"
+                tab_title = "Crash Information"
             elif command == "version":
                 tab_title = "Version"
             elif command == "lm":
@@ -1318,6 +1399,9 @@ class MemoryAnalysisWindow(QMainWindow):
                 text_edit.setText(result)
                 print(f"DEBUG: Set result text for command: {command}")
 
+                # Xóa hiển thị command đang chạy
+                self.clear_running_command_display()
+
                 # Lưu kết quả vào file
                 safe_command = command.replace("!", "").replace(" ", "_")
                 result_file = os.path.join(results_dir, f"cdb_{safe_command}.txt")
@@ -1334,6 +1418,8 @@ class MemoryAnalysisWindow(QMainWindow):
                 text_edit = self.cdb_results_tabwidget.widget(tab_index)
                 text_edit.setText(f"Error: {error_msg}")
             self.append_log(error_msg)
+            # Xóa hiển thị command đang chạy khi có lỗi
+            self.clear_running_command_display()
 
     def run_cdb_single_command(self, crash_dump_path: str, command: str) -> str:
         """Chạy 1 lệnh CDB và trả về kết quả dạng string"""
@@ -1492,23 +1578,38 @@ class MemoryAnalysisWindow(QMainWindow):
         """Load kết quả CDB từ thư mục results"""
         import os
 
+        print(f"DEBUG: load_cdb_results called with: {results_dir}")
+        print(f"DEBUG: Directory exists: {os.path.exists(results_dir)}")
+
+        if not os.path.exists(results_dir):
+            print(f"DEBUG: CDB results directory does not exist!")
+            return
+
         # Tìm tất cả file .txt trong thư mục results
+        files_found = []
         for filename in os.listdir(results_dir):
             if filename.startswith("cdb_") and filename.endswith(".txt"):
+                files_found.append(filename)
+                print(f"DEBUG: Found CDB file: {filename}")
+
                 # Extract command name từ filename
                 command = filename[4:-4].replace(
                     "_", " "
                 )  # Remove "cdb_" prefix and ".txt" suffix
+                print(f"DEBUG: Extracted command: {command}")
 
                 # Đọc nội dung file
                 file_path = os.path.join(results_dir, filename)
                 try:
                     with open(file_path, "r", encoding="utf-8") as f:
                         content = f.read()
+                    print(
+                        f"DEBUG: Read file {filename}, content length: {len(content)}"
+                    )
 
                     # Tạo tab title
                     if command == "analyze -v":
-                        tab_title = "Basic Analysis"
+                        tab_title = "Crash Information"
                     elif command == "version":
                         tab_title = "Version"
                     elif command == "lm":
@@ -1520,6 +1621,8 @@ class MemoryAnalysisWindow(QMainWindow):
                     else:
                         tab_title = command
 
+                    print(f"DEBUG: Tab title: {tab_title}")
+
                     # Tạo tab và hiển thị kết quả
                     tab_index = self.create_cdb_result_tab(command, tab_title)
                     if (
@@ -1528,9 +1631,12 @@ class MemoryAnalysisWindow(QMainWindow):
                     ):
                         text_edit = self.cdb_results_tabwidget.widget(tab_index)
                         text_edit.setText(content)
+                        print(f"DEBUG: Set content to tab {tab_index}")
 
                 except Exception as e:
                     print(f"Error loading CDB result {filename}: {e}")
+
+        print(f"DEBUG: Total CDB files found: {len(files_found)}")
 
         # Hiển thị tab đầu tiên nếu có
         if (
@@ -1539,6 +1645,9 @@ class MemoryAnalysisWindow(QMainWindow):
             and self.cdb_results_tabwidget.count() > 0
         ):
             self.cdb_results_tabwidget.setCurrentIndex(0)
+            print(f"DEBUG: Set current tab to index 0")
+        else:
+            print(f"DEBUG: No CDB tabs created")
 
 
 # Để sử dụng: tạo instance MemoryAnalysisWindow() và show() trong main app
