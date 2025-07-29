@@ -260,13 +260,27 @@ class MemoryAnalysisWindow(QMainWindow):
             return pretty
 
     def setup_connections(self):
-        self.ui.browseButton.clicked.connect(self.browse_evidence_file)
+        # Removed browse button connection - no browse button needed
         self.ui.startAnalysisButton.clicked.connect(self.start_analysis)
         self.ui.stopButton.clicked.connect(self.stop_analysis)
         self.ui.evidenceTypeCombo.currentTextChanged.connect(self.evidence_type_changed)
         self.ui.lineEdit_2.textChanged.connect(self.on_search_strings)
         if hasattr(self.ui, "pluginSearchEdit"):
             self.ui.pluginSearchEdit.textChanged.connect(self.filter_plugin_table)
+
+        # Connect evidence combo selection
+        if hasattr(self.ui, "evidencecombo"):
+            self.ui.evidencecombo.currentIndexChanged.connect(self.on_evidence_selected)
+        else:
+            print("DEBUG: evidencecombo not found in UI during setup_connections")
+
+        # Add refresh shortcut (Ctrl+R)
+        from PyQt5.QtWidgets import QShortcut
+        from PyQt5.QtGui import QKeySequence
+
+        refresh_shortcut = QShortcut(QKeySequence("Ctrl+R"), self)
+        refresh_shortcut.activated.connect(self.refresh_evidence_combo)
+
         # Kết nối tree block click
         if hasattr(self.ui, "pagefiletreeWidget"):
             # self.ui.pagefiletreeWidget.itemClicked.connect(
@@ -428,11 +442,33 @@ class MemoryAnalysisWindow(QMainWindow):
         return selected
 
     def browse_evidence_file(self):
+        # Check if case is selected - if so, use case-based evidence selection
+        if self.is_case_mode():
+            self.show_case_mode_message()
+            return
+
         file_path, _ = QFileDialog.getOpenFileName(
-            self, "Select Memory Evidence File", "", "All Files (*.*)"
+            self,
+            "Select Memory Evidence File",
+            "",
+            "Memory Files (*.raw *.mem *.vmem *.dmp);;System Files (*.sys);;All Files (*.*)",
         )
         if file_path:
             import os
+
+            # Validate that selected file is a memory file
+            if not self.is_memory_file(file_path):
+                from PyQt5.QtWidgets import QMessageBox
+
+                QMessageBox.warning(
+                    self,
+                    "Invalid File Type",
+                    "Vui lòng chọn file bộ nhớ hợp lệ:\n"
+                    "• .raw, .mem, .vmem (Raw Memory)\n"
+                    "• .dmp (Crash Dump)\n"
+                    "• hiberfil.sys, pagefile.sys (System Files)",
+                )
+                return
 
             # Clear kết quả cũ trước khi load file mới
             self.clear_previous_results()
@@ -448,10 +484,6 @@ class MemoryAnalysisWindow(QMainWindow):
                 tool = "Page-brute"
             elif detected_type.startswith("Crash Dump"):
                 tool = "CDB"
-                # Debug chỉ cho Crash Dump
-                print(f"DEBUG: Crash Dump detected, looking for previous results...")
-                print(f"DEBUG: File path: {fp}")
-                print(f"DEBUG: Tool: {tool}")
             else:
                 tool = "Volatility 3"
             latest = self.db.get_latest_analysis_result(fp, detected_type, tool)
@@ -464,7 +496,6 @@ class MemoryAnalysisWindow(QMainWindow):
                     if detected_type.startswith("Page File"):
                         self.load_page_brute_tree(rp)
                     elif detected_type.startswith("Crash Dump"):
-                        print(f"DEBUG: Found previous CDB results at: {rp}")
                         self.load_cdb_results(rp)
                     else:
                         self.load_all_plugin_results(rp)
@@ -473,17 +504,26 @@ class MemoryAnalysisWindow(QMainWindow):
                     )
                     return
                 else:
-                    if detected_type.startswith("Crash Dump"):
-                        print(f"DEBUG: CDB result directory does not exist: {rp}")
+                    pass
             else:
-                if detected_type.startswith("Crash Dump"):
-                    print(f"DEBUG: No previous CDB results found in database")
+                pass
 
             # Nếu chưa có file kết quả, chỉ báo Selected
             self.ui.statusLabel.setText(
                 f"Status: Selected {os.path.basename(file_path)}"
             )
             self.ui.progressBar.setValue(0)
+
+    def is_memory_file(self, file_path):
+        """Check if file is a memory dump file"""
+        if not file_path:
+            return False
+
+        fname = os.path.basename(file_path).lower()
+        memory_extensions = [".raw", ".mem", ".vmem", ".dmp"]
+        memory_files = ["hiberfil.sys", "pagefile.sys"]
+
+        return fname.endswith(tuple(memory_extensions)) or fname in memory_files
 
     def detect_evidence_type(self, file_path):
         fname = os.path.basename(file_path).lower()
@@ -627,10 +667,34 @@ class MemoryAnalysisWindow(QMainWindow):
         from datetime import datetime
         from PyQt5.QtWidgets import QApplication
 
-        file_path = self.ui.filePathEdit.text().strip()
-        if not file_path or not os.path.exists(file_path):
-            QMessageBox.warning(self, "No File", "Please select a valid evidence file.")
-            return
+        # Check if case is selected and evidence is chosen from case
+        if self.is_case_mode():
+            current_index = self.ui.evidencecombo.currentIndex()
+            if current_index <= 0:  # First item is placeholder
+                QMessageBox.warning(
+                    self,
+                    "Chưa chọn Evidence",
+                    "Vui lòng chọn evidence từ dropdown 'Evidence' để phân tích.",
+                )
+                return
+            evidence_path = self.ui.evidencecombo.itemData(current_index)
+            if not evidence_path or not os.path.exists(evidence_path):
+                QMessageBox.warning(
+                    self,
+                    "Evidence không tồn tại",
+                    "Evidence file không tồn tại. Vui lòng kiểm tra lại.",
+                )
+                return
+            file_path = evidence_path
+        else:
+            # Fallback to file path edit for non-case analysis
+            file_path = self.ui.filePathEdit.text().strip()
+            if not file_path or not os.path.exists(file_path):
+                QMessageBox.warning(
+                    self, "No File", "Please select a valid evidence file."
+                )
+                return
+
         file_path = os.path.normpath(file_path)
 
         ev_type = self.detect_evidence_type(file_path)
@@ -721,6 +785,27 @@ class MemoryAnalysisWindow(QMainWindow):
         self.ui.progressBar.setValue(0)
         self.ui.statusLabel.setText("Status: Ready")
         self.ui.logTextEdit.clear()
+
+        # Reset case-related UI elements
+        if hasattr(self, "current_case_id"):
+            self.current_case_id = None
+        self.ui.lineEdit.setText("")
+        self.ui.lineEdit.setEnabled(True)
+
+        # Reset evidence dropdown to default
+        self.ui.evidenceTypeCombo.clear()
+        self.ui.evidenceTypeCombo.addItem("Raw Memory (.raw, .mem, .vmem)")
+        self.ui.evidenceTypeCombo.addItem("Hibernation File (hiberfil.sys)")
+        self.ui.evidenceTypeCombo.addItem("Page File (pagefile.sys)")
+        self.ui.evidenceTypeCombo.addItem("Crash Dump (.dmp)")
+
+        # Reset evidence selection combobox
+        if hasattr(self.ui, "evidencecombo"):
+            self.ui.evidencecombo.clear()
+            self.ui.evidencecombo.addItem("-- Chọn evidence --", None)
+
+        # Clear file path
+        self.ui.filePathEdit.clear()
 
         # Clear CDB results tabs
         if hasattr(self, "cdb_results_tabwidget") and self.cdb_results_tabwidget:
@@ -821,20 +906,161 @@ class MemoryAnalysisWindow(QMainWindow):
         self.append_log("AI analysis started (mock).")
 
     def load_case_data(self, case_id):
-        """Set case name in the Case name QLineEdit and disable it."""
+        """Load case data and populate evidence dropdown from case."""
+        print(f"DEBUG: load_case_data called with case_id: {case_id}")
         try:
             from database.db_manager import DatabaseManager
 
+            self.current_case_id = case_id
             db = DatabaseManager()
             db.connect()
+
+            # Load case info
             case_info = db.get_case_with_investigator(case_id)
+            print(f"DEBUG: case_info: {case_info}")
             if case_info and "title" in case_info:
                 self.ui.lineEdit.setText(case_info["title"])
+                print(f"DEBUG: Set case name: {case_info['title']}")
             else:
                 self.ui.lineEdit.setText("-")
+                print("DEBUG: No case info found")
+            self.ui.lineEdit.setDisabled(True)
+
+            # Load evidence from case
+            evidence_list = db.get_artifacts_by_case(case_id)
+
+            # Populate evidence dropdown (using evidencecombo)
+            if hasattr(self.ui, "evidencecombo"):
+
+                self.ui.evidencecombo.clear()
+                self.ui.evidencecombo.addItem("-- Chọn evidence --", None)
+
+                for evidence in evidence_list:
+                    evidence_name = evidence.get("name", "Unknown")
+                    evidence_path = evidence.get("source_path", "")
+                    evidence_type = evidence.get("evidence_type", "")
+
+                    # Only add evidence that can be analyzed for memory analysis
+                    # File MUST be a memory file (check extension first)
+                    is_memory_file = self.is_memory_file(evidence_path)
+
+                    # Also check evidence_type for additional validation
+                    is_memory_type = any(
+                        keyword in evidence_type.upper()
+                        for keyword in [
+                            "MEMORY",
+                            "DMP",
+                            "RAW",
+                            "VMEM",
+                            "PAGEFILE",
+                            "HIBERFIL",
+                        ]
+                    )
+
+                    # Only add if it's actually a memory file (extension check is primary)
+                    if is_memory_file:
+                        display_text = f"{evidence_name} ({evidence_type})"
+                        self.ui.evidencecombo.addItem(display_text, evidence_path)
+
+                # Check if any memory files were added
+                if self.ui.evidencecombo.count() <= 1:  # Only placeholder item
+                    self.ui.evidencecombo.addItem(
+                        "-- Không có file bộ nhớ nào --", None
+                    )
+
+                # Evidence combo connection is now handled in setup_connections()
+            else:
+                print("DEBUG: evidencecombo not found in UI!")
+
         except Exception as e:
+            print(f"Error loading case data: {e}")
+            import traceback
+
+            traceback.print_exc()
             self.ui.lineEdit.setText("-")
-        self.ui.lineEdit.setDisabled(True)
+            self.ui.lineEdit.setDisabled(True)
+
+    def on_evidence_selected(self, index):
+        """Handle evidence selection from dropdown"""
+        if index <= 0:  # First item is placeholder
+            self.ui.filePathEdit.clear()
+            self.ui.statusLabel.setText("Status: Ready")
+            self.ui.progressBar.setValue(0)
+            return
+
+        evidence_path = self.ui.evidencecombo.itemData(index)
+        if evidence_path:
+            # Clear previous results
+            self.clear_previous_results()
+
+            # Set file path
+            self.ui.filePathEdit.setText(evidence_path)
+
+            # Auto-detect type
+            detected_type = self.detect_evidence_type(evidence_path)
+            self.curren_evidence_type = detected_type
+            self.ui.evidenceTypeCombo.setCurrentText(detected_type)
+            self.switch_tab_by_type(detected_type)
+
+            # Check for previous analysis results
+            fp = os.path.normpath(evidence_path)
+            if detected_type.startswith("Page File"):
+                tool = "Page-brute"
+            elif detected_type.startswith("Crash Dump"):
+                tool = "CDB"
+            else:
+                tool = "Volatility 3"
+
+            latest = self.db.get_latest_analysis_result(fp, detected_type, tool)
+            if latest:
+                rp = latest["result_path"]
+                if not os.path.isabs(rp):
+                    rp = os.path.abspath(rp)
+                if os.path.isdir(rp):
+                    self.current_results_dir = rp
+                    if detected_type.startswith("Page File"):
+                        self.load_page_brute_tree(rp)
+                    elif detected_type.startswith("Crash Dump"):
+                        self.load_cdb_results(rp)
+                    else:
+                        self.load_all_plugin_results(rp)
+                    self.ui.statusLabel.setText(
+                        f"Status: Loaded previous analysis results"
+                    )
+                    self.ui.progressBar.setValue(100)
+                    return
+
+            self.ui.statusLabel.setText(
+                f"Status: Selected {os.path.basename(evidence_path)}"
+            )
+            self.ui.progressBar.setValue(0)
+        else:
+            self.ui.statusLabel.setText("Status: No evidence path available")
+
+    def is_case_mode(self):
+        """Check if currently in case-based analysis mode"""
+        return hasattr(self, "current_case_id") and self.current_case_id is not None
+
+    def refresh_evidence_combo(self):
+        """Force refresh evidence combo with memory files only"""
+        if hasattr(self, "current_case_id") and self.current_case_id is not None:
+            # Reload case data to apply memory file filtering
+            self.load_case_data(self.current_case_id)
+
+    def show_case_mode_message(self):
+        """Show message about case-based analysis mode"""
+        from PyQt5.QtWidgets import QMessageBox
+
+        QMessageBox.information(
+            self,
+            "Chế độ phân tích Case",
+            "Bạn đang trong chế độ phân tích case.\n\n"
+            "📋 Cách sử dụng:\n"
+            "1. Chọn evidence từ dropdown 'Evidence'\n"
+            "2. Evidence sẽ được tự động load\n"
+            "3. Bắt đầu phân tích\n\n"
+            "💡 Để thoát chế độ case, hãy quay lại Case Management.",
+        )
 
     def update_tabs_for_evidence(self, type_text):
         """Ẩn/hiện tab thay vì xóa để giữ nguyên dữ liệu"""

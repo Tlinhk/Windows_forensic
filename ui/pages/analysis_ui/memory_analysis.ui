@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1296</width>
-    <height>886</height>
+    <width>1167</width>
+    <height>708</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -247,560 +247,6 @@ QComboBox QAbstractItemView QScrollBar::sub-line {
 </string>
    </property>
    <layout class="QGridLayout" name="gridLayout_3">
-    <item row="0" column="0">
-     <widget class="QFrame" name="frame">
-      <property name="minimumSize">
-       <size>
-        <width>0</width>
-        <height>20</height>
-       </size>
-      </property>
-      <property name="maximumSize">
-       <size>
-        <width>16777215</width>
-        <height>40</height>
-       </size>
-      </property>
-      <property name="frameShape">
-       <enum>QFrame::StyledPanel</enum>
-      </property>
-      <property name="frameShadow">
-       <enum>QFrame::Raised</enum>
-      </property>
-      <layout class="QGridLayout" name="gridLayout">
-       <property name="leftMargin">
-        <number>15</number>
-       </property>
-       <property name="rightMargin">
-        <number>0</number>
-       </property>
-       <property name="bottomMargin">
-        <number>0</number>
-       </property>
-       <property name="spacing">
-        <number>0</number>
-       </property>
-       <item row="0" column="0">
-        <widget class="QLabel" name="label">
-         <property name="font">
-          <font>
-           <pointsize>10</pointsize>
-          </font>
-         </property>
-         <property name="text">
-          <string>Case name:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="1">
-        <widget class="QLineEdit" name="lineEdit">
-         <property name="styleSheet">
-          <string notr="true">/* ==== CHUNG CHO CÁC TEXT INPUT / TEXT EDIT ==== */
-QLineEdit,
-QTextEdit,
-QPlainTextEdit {
-    background-color: #ffffff;
-    border: 1px solid #c0c4c8;      /* viền xám nhạt */
-    border-radius: 4px;             /* bo góc mềm */
-    padding: 4px 6px;               /* khoảng đệm bên trong */
-    selection-background-color: #cce4f7;
-    selection-color: #000;
-}
-
-/* Khi focus chuyển viền sang xanh */
-QLineEdit:focus,
-QTextEdit:focus,
-QPlainTextEdit:focus {
-    border: 1px solid #4a90e2;
-}
-
-/* Placeholder màu nhạt (chỉ với QLineEdit) */
-QLineEdit[placeholderText] {
-    color: #999999;
-}
-
-/* ReadOnly thì nền hơi xám */
-QLineEdit[readOnly=&quot;true&quot;],
-QTextEdit[readOnly=&quot;true&quot;] {
-    background-color: #f0f2f5;
-}
-
-/* Thanh cuộn bên trong QTextEdit bo góc &amp; nhỏ gọn */
-QTextEdit QScrollBar:vertical,
-QPlainTextEdit QScrollBar:vertical {
-    background: transparent;
-    width: 8px;
-    margin: 0px;
-}
-QTextEdit QScrollBar::handle:vertical,
-QPlainTextEdit QScrollBar::handle:vertical {
-    background: #c0c4c8;
-    min-height: 20px;
-    border-radius: 4px;
-}
-QTextEdit QScrollBar::add-line, QTextEdit QScrollBar::sub-line,
-QPlainTextEdit QScrollBar::add-line, QPlainTextEdit QScrollBar::sub-line {
-    height: 0;
-}
-</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="2">
-        <spacer name="horizontalSpacer_2">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>995</width>
-           <height>3</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-      </layout>
-     </widget>
-    </item>
-    <item row="1" column="0">
-     <widget class="QFrame" name="headerFrame">
-      <property name="maximumSize">
-       <size>
-        <width>16777215</width>
-        <height>100</height>
-       </size>
-      </property>
-      <property name="frameShape">
-       <enum>QFrame::StyledPanel</enum>
-      </property>
-      <property name="frameShadow">
-       <enum>QFrame::Raised</enum>
-      </property>
-      <layout class="QHBoxLayout" name="headerLayout">
-       <property name="spacing">
-        <number>0</number>
-       </property>
-       <property name="leftMargin">
-        <number>0</number>
-       </property>
-       <property name="topMargin">
-        <number>0</number>
-       </property>
-       <property name="rightMargin">
-        <number>0</number>
-       </property>
-       <property name="bottomMargin">
-        <number>0</number>
-       </property>
-       <item>
-        <widget class="QGroupBox" name="evidenceGroupBox">
-         <property name="font">
-          <font>
-           <pointsize>10</pointsize>
-           <weight>75</weight>
-           <bold>true</bold>
-          </font>
-         </property>
-         <property name="title">
-          <string>Evidence</string>
-         </property>
-         <layout class="QGridLayout" name="evidenceGridLayout">
-          <property name="leftMargin">
-           <number>15</number>
-          </property>
-          <property name="topMargin">
-           <number>0</number>
-          </property>
-          <property name="rightMargin">
-           <number>5</number>
-          </property>
-          <property name="bottomMargin">
-           <number>5</number>
-          </property>
-          <property name="spacing">
-           <number>5</number>
-          </property>
-          <item row="0" column="0">
-           <widget class="QLabel" name="evidenceTypeLabel">
-            <property name="font">
-             <font>
-              <pointsize>10</pointsize>
-             </font>
-            </property>
-            <property name="text">
-             <string>Evidence Type:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="1">
-           <widget class="QComboBox" name="evidenceTypeCombo">
-            <property name="minimumSize">
-             <size>
-              <width>200</width>
-              <height>34</height>
-             </size>
-            </property>
-            <property name="font">
-             <font>
-              <pointsize>10</pointsize>
-             </font>
-            </property>
-            <property name="styleSheet">
-             <string notr="true">/* ==== QComboBox ==== */
-QComboBox {
-    /* nền trắng, bo góc và viền xám nhạt giống QLineEdit */
-    background-color: #ffffff;
-    border: 1px solid #c0c4c8;
-    border-radius: 4px;
-    padding: 4px 30px 4px 8px; /* để chừa chỗ cho mũi tên */
-    min-height: 24px;
-    /* font đã định ở đầu styles.qss sẽ áp dụng */
-}
-
-/* Khi hover đổi nhẹ viền */
-QComboBox:hover {
-    border: 1px solid #a0a4a8;
-}
-
-/* Khi focus (đang chọn) đổi viền xanh */
-QComboBox:focus {
-    border: 1px solid #4a90e2;
-}
-
-/* Popup list (QAbstractItemView) */
-QComboBox QAbstractItemView {
-    background-color: #ffffff;
-    border: 1px solid #c0c4c8;
-    border-radius: 4px;
-    padding: 4px;
-    outline: none;
-    selection-background-color: #cce4f7;
-    selection-color: #000;
-}
-
-/* Các item trong list khi hover */
-QComboBox QAbstractItemView::item:hover {
-    background-color: #e8f1fb;
-}
-
-/* Scrollbar nhỏ gọn trong popup */
-QComboBox QAbstractItemView QScrollBar:vertical {
-    background: transparent;
-    width: 8px;
-    margin: 0px;
-}
-QComboBox QAbstractItemView QScrollBar::handle:vertical {
-    background: #c0c4c8;
-    min-height: 20px;
-    border-radius: 4px;
-}
-QComboBox QAbstractItemView QScrollBar::add-line,
-QComboBox QAbstractItemView QScrollBar::sub-line {
-    height: 0;
-}
-</string>
-            </property>
-            <item>
-             <property name="text">
-              <string>Raw Memory (.raw, .mem, .vmem)</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>Hibernation File (hiberfil.sys)</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>Page File (pagefile.sys)</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>Crash Dump (.dmp)</string>
-             </property>
-            </item>
-           </widget>
-          </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="filePathLabel">
-            <property name="font">
-             <font>
-              <pointsize>10</pointsize>
-             </font>
-            </property>
-            <property name="text">
-             <string>File Path:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="1">
-           <widget class="QLineEdit" name="filePathEdit">
-            <property name="font">
-             <font>
-              <pointsize>10</pointsize>
-             </font>
-            </property>
-            <property name="styleSheet">
-             <string notr="true">/* ==== CHUNG CHO CÁC TEXT INPUT / TEXT EDIT ==== */
-QLineEdit,
-QTextEdit,
-QPlainTextEdit {
-    background-color: #ffffff;
-    border: 1px solid #c0c4c8;      /* viền xám nhạt */
-    border-radius: 4px;             /* bo góc mềm */
-    padding: 4px 6px;               /* khoảng đệm bên trong */
-    selection-background-color: #cce4f7;
-    selection-color: #000;
-}
-
-/* Khi focus chuyển viền sang xanh */
-QLineEdit:focus,
-QTextEdit:focus,
-QPlainTextEdit:focus {
-    border: 1px solid #4a90e2;
-}
-
-/* Placeholder màu nhạt (chỉ với QLineEdit) */
-QLineEdit[placeholderText] {
-    color: #999999;
-}
-
-/* ReadOnly thì nền hơi xám */
-QLineEdit[readOnly=&quot;true&quot;],
-QTextEdit[readOnly=&quot;true&quot;] {
-    background-color: #f0f2f5;
-}
-
-/* Thanh cuộn bên trong QTextEdit bo góc &amp; nhỏ gọn */
-QTextEdit QScrollBar:vertical,
-QPlainTextEdit QScrollBar:vertical {
-    background: transparent;
-    width: 8px;
-    margin: 0px;
-}
-QTextEdit QScrollBar::handle:vertical,
-QPlainTextEdit QScrollBar::handle:vertical {
-    background: #c0c4c8;
-    min-height: 20px;
-    border-radius: 4px;
-}
-QTextEdit QScrollBar::add-line, QTextEdit QScrollBar::sub-line,
-QPlainTextEdit QScrollBar::add-line, QPlainTextEdit QScrollBar::sub-line {
-    height: 0;
-}
-</string>
-            </property>
-            <property name="placeholderText">
-             <string>Select evidence file...</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="2">
-           <widget class="QPushButton" name="browseButton">
-            <property name="maximumSize">
-             <size>
-              <width>80</width>
-              <height>16777215</height>
-             </size>
-            </property>
-            <property name="font">
-             <font>
-              <pointsize>10</pointsize>
-             </font>
-            </property>
-            <property name="styleSheet">
-             <string notr="true">/* QPushButton */
-QPushButton {
-    background-color: #4a90e2;
-    border: none;
-    border-radius: 4px;
-    padding: 6px 12px;
-    color: #fff;
-}
-QPushButton:hover {
-    background-color: #5aa0f2;
-}
-QPushButton:pressed {
-    background-color: #3a7fcc;
-}</string>
-            </property>
-            <property name="text">
-             <string>Browse</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-       </item>
-       <item>
-        <widget class="QGroupBox" name="statusGroupBox">
-         <property name="maximumSize">
-          <size>
-           <width>600</width>
-           <height>16777215</height>
-          </size>
-         </property>
-         <property name="font">
-          <font>
-           <pointsize>10</pointsize>
-           <weight>75</weight>
-           <bold>true</bold>
-          </font>
-         </property>
-         <property name="title">
-          <string>Analysis Status</string>
-         </property>
-         <layout class="QGridLayout" name="gridLayout_6">
-          <property name="topMargin">
-           <number>0</number>
-          </property>
-          <property name="bottomMargin">
-           <number>0</number>
-          </property>
-          <property name="verticalSpacing">
-           <number>2</number>
-          </property>
-          <item row="2" column="0">
-           <widget class="QSplitter" name="splitter">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-            <widget class="QPushButton" name="startAnalysisButton">
-             <property name="maximumSize">
-              <size>
-               <width>130</width>
-               <height>16777215</height>
-              </size>
-             </property>
-             <property name="font">
-              <font>
-               <pointsize>10</pointsize>
-              </font>
-             </property>
-             <property name="styleSheet">
-              <string notr="true">/* QPushButton */
-QPushButton {
-    background-color: #4a90e2;
-    border: none;
-    border-radius: 4px;
-    padding: 6px 12px;
-    color: #fff;
-}
-QPushButton:hover {
-    background-color: #5aa0f2;
-}
-QPushButton:pressed {
-    background-color: #3a7fcc;
-}</string>
-             </property>
-             <property name="text">
-              <string>Start Analysis</string>
-             </property>
-            </widget>
-            <widget class="QPushButton" name="stopButton">
-             <property name="enabled">
-              <bool>false</bool>
-             </property>
-             <property name="maximumSize">
-              <size>
-               <width>150</width>
-               <height>16777215</height>
-              </size>
-             </property>
-             <property name="font">
-              <font>
-               <pointsize>10</pointsize>
-               <underline>false</underline>
-              </font>
-             </property>
-             <property name="layoutDirection">
-              <enum>Qt::LeftToRight</enum>
-             </property>
-             <property name="styleSheet">
-              <string notr="true">/* QPushButton */
-QPushButton {
-    background-color: #4a90e2;
-    border: none;
-    border-radius: 4px;
-    padding: 6px 12px;
-    color: #fff;
-}
-QPushButton:hover {
-    background-color: #5aa0f2;
-}
-QPushButton:pressed {
-    background-color: #3a7fcc;
-}</string>
-             </property>
-             <property name="text">
-              <string>Stop Analysis</string>
-             </property>
-            </widget>
-            <widget class="QPushButton" name="pushButton_2">
-             <property name="font">
-              <font>
-               <pointsize>10</pointsize>
-              </font>
-             </property>
-             <property name="text">
-              <string>Save Results</string>
-             </property>
-            </widget>
-            <widget class="QPushButton" name="pushButton">
-             <property name="font">
-              <font>
-               <pointsize>10</pointsize>
-              </font>
-             </property>
-             <property name="text">
-              <string>Export Report</string>
-             </property>
-            </widget>
-           </widget>
-          </item>
-          <item row="1" column="0">
-           <widget class="QProgressBar" name="progressBar">
-            <property name="font">
-             <font>
-              <pointsize>10</pointsize>
-             </font>
-            </property>
-            <property name="styleSheet">
-             <string notr="true">/* QProgressBar */
-QProgressBar {
-    border: 1px solid #a0a4a8;
-    border-radius: 6px;
-    text-align: center;
-}
-QProgressBar::chunk {
-    background-color: #28a745;
-    border-radius: 6px;
-}</string>
-            </property>
-            <property name="value">
-             <number>0</number>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="0">
-           <widget class="QLabel" name="statusLabel">
-            <property name="font">
-             <font>
-              <pointsize>10</pointsize>
-             </font>
-            </property>
-            <property name="text">
-             <string>Status</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-    </item>
     <item row="2" column="0">
      <widget class="QTabWidget" name="mainTabWidget">
       <property name="font">
@@ -809,7 +255,7 @@ QProgressBar::chunk {
        </font>
       </property>
       <property name="currentIndex">
-       <number>3</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="rawMemoryTab">
        <property name="sizePolicy">
@@ -1667,7 +1113,7 @@ QPushButton:pressed {
              <property name="maximumSize">
               <size>
                <width>16777215</width>
-               <height>100</height>
+               <height>80</height>
               </size>
              </property>
              <property name="font">
@@ -1710,7 +1156,7 @@ QPushButton:pressed {
                    </font>
                   </property>
                   <property name="text">
-                   <string>Advanced Command:</string>
+                   <string>Advance Command:</string>
                   </property>
                  </widget>
                 </item>
@@ -1800,7 +1246,7 @@ QPushButton:hover {
             <widget class="QTabWidget" name="crashAnalysisTabWidget">
              <property name="font">
               <font>
-               <pointsize>12</pointsize>
+               <pointsize>10</pointsize>
               </font>
              </property>
              <property name="currentIndex">
@@ -1935,6 +1381,7 @@ QPushButton:hover {
          <widget class="QGroupBox" name="aiResultsGroup">
           <property name="font">
            <font>
+            <pointsize>10</pointsize>
             <weight>75</weight>
             <bold>true</bold>
            </font>
@@ -2842,6 +2289,572 @@ QDoubleSpinBox:disabled {
       </widget>
      </widget>
     </item>
+    <item row="0" column="0">
+     <widget class="QFrame" name="frame">
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>20</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>16777215</width>
+        <height>40</height>
+       </size>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
+      </property>
+      <property name="frameShape">
+       <enum>QFrame::StyledPanel</enum>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Raised</enum>
+      </property>
+      <layout class="QGridLayout" name="gridLayout">
+       <property name="leftMargin">
+        <number>15</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+       <property name="spacing">
+        <number>0</number>
+       </property>
+       <item row="0" column="0">
+        <widget class="QLabel" name="label">
+         <property name="font">
+          <font>
+           <pointsize>10</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>Case name:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QLineEdit" name="lineEdit">
+         <property name="font">
+          <font>
+           <pointsize>10</pointsize>
+          </font>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">/* ==== CHUNG CHO CÁC TEXT INPUT / TEXT EDIT ==== */
+QLineEdit,
+QTextEdit,
+QPlainTextEdit {
+    background-color: #ffffff;
+    border: 1px solid #c0c4c8;      /* viền xám nhạt */
+    border-radius: 4px;             /* bo góc mềm */
+    padding: 4px 6px;               /* khoảng đệm bên trong */
+    selection-background-color: #cce4f7;
+    selection-color: #000;
+}
+
+/* Khi focus chuyển viền sang xanh */
+QLineEdit:focus,
+QTextEdit:focus,
+QPlainTextEdit:focus {
+    border: 1px solid #4a90e2;
+}
+
+/* Placeholder màu nhạt (chỉ với QLineEdit) */
+QLineEdit[placeholderText] {
+    color: #999999;
+}
+
+/* ReadOnly thì nền hơi xám */
+QLineEdit[readOnly=&quot;true&quot;],
+QTextEdit[readOnly=&quot;true&quot;] {
+    background-color: #f0f2f5;
+}
+
+/* Thanh cuộn bên trong QTextEdit bo góc &amp; nhỏ gọn */
+QTextEdit QScrollBar:vertical,
+QPlainTextEdit QScrollBar:vertical {
+    background: transparent;
+    width: 8px;
+    margin: 0px;
+}
+QTextEdit QScrollBar::handle:vertical,
+QPlainTextEdit QScrollBar::handle:vertical {
+    background: #c0c4c8;
+    min-height: 20px;
+    border-radius: 4px;
+}
+QTextEdit QScrollBar::add-line, QTextEdit QScrollBar::sub-line,
+QPlainTextEdit QScrollBar::add-line, QPlainTextEdit QScrollBar::sub-line {
+    height: 0;
+}
+</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="2">
+        <spacer name="horizontalSpacer_2">
+         <property name="font">
+          <font>
+           <pointsize>10</pointsize>
+          </font>
+         </property>
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>995</width>
+           <height>3</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item row="1" column="0">
+     <widget class="QFrame" name="headerFrame">
+      <property name="maximumSize">
+       <size>
+        <width>16777215</width>
+        <height>130</height>
+       </size>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
+      </property>
+      <property name="frameShape">
+       <enum>QFrame::StyledPanel</enum>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Raised</enum>
+      </property>
+      <layout class="QHBoxLayout" name="headerLayout">
+       <property name="spacing">
+        <number>0</number>
+       </property>
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+       <item>
+        <widget class="QGroupBox" name="evidenceGroupBox">
+         <property name="font">
+          <font>
+           <pointsize>10</pointsize>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="title">
+          <string>Evidence</string>
+         </property>
+         <layout class="QGridLayout" name="evidenceGridLayout">
+          <property name="leftMargin">
+           <number>15</number>
+          </property>
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <property name="rightMargin">
+           <number>5</number>
+          </property>
+          <property name="bottomMargin">
+           <number>5</number>
+          </property>
+          <property name="spacing">
+           <number>5</number>
+          </property>
+          <item row="0" column="0">
+           <widget class="QLabel" name="evidenceTypeLabel">
+            <property name="font">
+             <font>
+              <pointsize>10</pointsize>
+             </font>
+            </property>
+            <property name="text">
+             <string>Evidence Type:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QComboBox" name="evidenceTypeCombo">
+            <property name="minimumSize">
+             <size>
+              <width>200</width>
+              <height>34</height>
+             </size>
+            </property>
+            <property name="font">
+             <font>
+              <pointsize>10</pointsize>
+             </font>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">/* ==== QComboBox ==== */
+QComboBox {
+    /* nền trắng, bo góc và viền xám nhạt giống QLineEdit */
+    background-color: #ffffff;
+    border: 1px solid #c0c4c8;
+    border-radius: 4px;
+    padding: 4px 30px 4px 8px; /* để chừa chỗ cho mũi tên */
+    min-height: 24px;
+    /* font đã định ở đầu styles.qss sẽ áp dụng */
+}
+
+/* Khi hover đổi nhẹ viền */
+QComboBox:hover {
+    border: 1px solid #a0a4a8;
+}
+
+/* Khi focus (đang chọn) đổi viền xanh */
+QComboBox:focus {
+    border: 1px solid #4a90e2;
+}
+
+/* Popup list (QAbstractItemView) */
+QComboBox QAbstractItemView {
+    background-color: #ffffff;
+    border: 1px solid #c0c4c8;
+    border-radius: 4px;
+    padding: 4px;
+    outline: none;
+    selection-background-color: #cce4f7;
+    selection-color: #000;
+}
+
+/* Các item trong list khi hover */
+QComboBox QAbstractItemView::item:hover {
+    background-color: #e8f1fb;
+}
+
+/* Scrollbar nhỏ gọn trong popup */
+QComboBox QAbstractItemView QScrollBar:vertical {
+    background: transparent;
+    width: 8px;
+    margin: 0px;
+}
+QComboBox QAbstractItemView QScrollBar::handle:vertical {
+    background: #c0c4c8;
+    min-height: 20px;
+    border-radius: 4px;
+}
+QComboBox QAbstractItemView QScrollBar::add-line,
+QComboBox QAbstractItemView QScrollBar::sub-line {
+    height: 0;
+}
+</string>
+            </property>
+            <item>
+             <property name="text">
+              <string>Raw Memory (.raw, .mem, .vmem)</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Hibernation File (hiberfil.sys)</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Page File (pagefile.sys)</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Crash Dump (.dmp)</string>
+             </property>
+            </item>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="QLineEdit" name="filePathEdit">
+            <property name="font">
+             <font>
+              <pointsize>10</pointsize>
+             </font>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">/* ==== CHUNG CHO CÁC TEXT INPUT / TEXT EDIT ==== */
+QLineEdit,
+QTextEdit,
+QPlainTextEdit {
+    background-color: #ffffff;
+    border: 1px solid #c0c4c8;      /* viền xám nhạt */
+    border-radius: 4px;             /* bo góc mềm */
+    padding: 4px 6px;               /* khoảng đệm bên trong */
+    selection-background-color: #cce4f7;
+    selection-color: #000;
+}
+
+/* Khi focus chuyển viền sang xanh */
+QLineEdit:focus,
+QTextEdit:focus,
+QPlainTextEdit:focus {
+    border: 1px solid #4a90e2;
+}
+
+/* Placeholder màu nhạt (chỉ với QLineEdit) */
+QLineEdit[placeholderText] {
+    color: #999999;
+}
+
+/* ReadOnly thì nền hơi xám */
+QLineEdit[readOnly=&quot;true&quot;],
+QTextEdit[readOnly=&quot;true&quot;] {
+    background-color: #f0f2f5;
+}
+
+/* Thanh cuộn bên trong QTextEdit bo góc &amp; nhỏ gọn */
+QTextEdit QScrollBar:vertical,
+QPlainTextEdit QScrollBar:vertical {
+    background: transparent;
+    width: 8px;
+    margin: 0px;
+}
+QTextEdit QScrollBar::handle:vertical,
+QPlainTextEdit QScrollBar::handle:vertical {
+    background: #c0c4c8;
+    min-height: 20px;
+    border-radius: 4px;
+}
+QTextEdit QScrollBar::add-line, QTextEdit QScrollBar::sub-line,
+QPlainTextEdit QScrollBar::add-line, QPlainTextEdit QScrollBar::sub-line {
+    height: 0;
+}
+</string>
+            </property>
+            <property name="placeholderText">
+             <string>Select evidence file...</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="filePathLabel">
+            <property name="font">
+             <font>
+              <pointsize>10</pointsize>
+             </font>
+            </property>
+            <property name="text">
+             <string>File Path:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_2">
+            <property name="font">
+             <font>
+              <pointsize>10</pointsize>
+             </font>
+            </property>
+            <property name="text">
+             <string>Evidence</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QComboBox" name="evidencecombo">
+            <property name="font">
+             <font>
+              <pointsize>10</pointsize>
+             </font>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="statusGroupBox">
+         <property name="maximumSize">
+          <size>
+           <width>600</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="font">
+          <font>
+           <pointsize>10</pointsize>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="title">
+          <string>Analysis Status</string>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_6">
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
+          <property name="verticalSpacing">
+           <number>2</number>
+          </property>
+          <item row="2" column="0">
+           <widget class="QSplitter" name="splitter">
+            <property name="font">
+             <font>
+              <pointsize>10</pointsize>
+             </font>
+            </property>
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <widget class="QPushButton" name="startAnalysisButton">
+             <property name="maximumSize">
+              <size>
+               <width>130</width>
+               <height>16777215</height>
+              </size>
+             </property>
+             <property name="font">
+              <font>
+               <pointsize>10</pointsize>
+              </font>
+             </property>
+             <property name="styleSheet">
+              <string notr="true">/* QPushButton */
+QPushButton {
+    background-color: #4a90e2;
+    border: none;
+    border-radius: 4px;
+    padding: 6px 12px;
+    color: #fff;
+}
+QPushButton:hover {
+    background-color: #5aa0f2;
+}
+QPushButton:pressed {
+    background-color: #3a7fcc;
+}</string>
+             </property>
+             <property name="text">
+              <string>Start Analysis</string>
+             </property>
+            </widget>
+            <widget class="QPushButton" name="stopButton">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>150</width>
+               <height>16777215</height>
+              </size>
+             </property>
+             <property name="font">
+              <font>
+               <pointsize>10</pointsize>
+               <underline>false</underline>
+              </font>
+             </property>
+             <property name="layoutDirection">
+              <enum>Qt::LeftToRight</enum>
+             </property>
+             <property name="styleSheet">
+              <string notr="true">/* QPushButton */
+QPushButton {
+    background-color: #4a90e2;
+    border: none;
+    border-radius: 4px;
+    padding: 6px 12px;
+    color: #fff;
+}
+QPushButton:hover {
+    background-color: #5aa0f2;
+}
+QPushButton:pressed {
+    background-color: #3a7fcc;
+}</string>
+             </property>
+             <property name="text">
+              <string>Stop Analysis</string>
+             </property>
+            </widget>
+            <widget class="QPushButton" name="pushButton_2">
+             <property name="font">
+              <font>
+               <pointsize>10</pointsize>
+              </font>
+             </property>
+             <property name="text">
+              <string>Save Results</string>
+             </property>
+            </widget>
+            <widget class="QPushButton" name="pushButton">
+             <property name="font">
+              <font>
+               <pointsize>10</pointsize>
+              </font>
+             </property>
+             <property name="text">
+              <string>Export Report</string>
+             </property>
+            </widget>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QProgressBar" name="progressBar">
+            <property name="font">
+             <font>
+              <pointsize>10</pointsize>
+             </font>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">/* QProgressBar */
+QProgressBar {
+    border: 1px solid #a0a4a8;
+    border-radius: 6px;
+    text-align: center;
+}
+QProgressBar::chunk {
+    background-color: #4a90e2;
+    border-radius: 6px;
+}</string>
+            </property>
+            <property name="value">
+             <number>0</number>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <widget class="QLabel" name="statusLabel">
+            <property name="font">
+             <font>
+              <pointsize>10</pointsize>
+             </font>
+            </property>
+            <property name="text">
+             <string>Status</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
    </layout>
   </widget>
   <action name="actionOpen_Evidence">
@@ -3013,22 +3026,6 @@ QDoubleSpinBox:disabled {
  </widget>
  <resources/>
  <connections>
-  <connection>
-   <sender>browseButton</sender>
-   <signal>clicked()</signal>
-   <receiver>MemoryAnalysisWindow</receiver>
-   <slot>browse_evidence_file()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>1090</x>
-     <y>85</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>600</x>
-     <y>400</y>
-    </hint>
-   </hints>
-  </connection>
   <connection>
    <sender>startAnalysisButton</sender>
    <signal>clicked()</signal>
