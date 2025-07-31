@@ -1,6 +1,12 @@
-PyQt5==5.15.11
-psutil==7.0.0
-pyyaml==6.0.2
+PyQt5>=5.15.0
+python-registry>=1.3.1
+regipy>=3.1.6
+pandas>=1.3.0
+tqdm>=4.62.0
+pywin32>=300; sys_platform == 'win32'
+psutil>=5.8.0
+matplotlib>=3.4.0
+pyewf>=20210625; sys_platform == 'win32'
 
 
 # Database (SQLite3 is built-in with Python)

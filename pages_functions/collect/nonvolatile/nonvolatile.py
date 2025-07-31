@@ -9,6 +9,7 @@ import time
 import glob
 import re
 import math
+import psutil
 from datetime import datetime
 
 # =========================================================
@@ -100,7 +101,7 @@ class KapeDataLoader(QtCore.QObject):
                 # Tìm tất cả các file có đuôi .tkape trong thư mục và các thư mục con
                 target_files = glob.glob(os.path.join(kape_targets_path, "**", "*.tkape"), recursive=True)
                 # Giới hạn số lượng file xử lý để cải thiện hiệu năng khi khởi động
-                for target_file in target_files[:100]:
+                for target_file in target_files:
                     try:
                         # Mở và đọc nội dung file với mã hóa utf-8
                         with open(target_file, 'r', encoding='utf-8') as f:
@@ -370,10 +371,16 @@ class NonVolatilePage(QtWidgets.QWidget, Ui_CollectNonvolatileForm):
         # Thiết lập giao diện người dùng đã được định nghĩa trong Ui_CollectNonvolatileForm
         self.setupUi(self)
         
+        # --- Nhóm 2 radio vào cùng 1 ButtonGroup ---
+        self.strategy_group = QtWidgets.QButtonGroup(self)
+        self.strategy_group.addButton(self.radioButton_triage)
+        self.strategy_group.addButton(self.radioButton_full_image)
+
         # --- Đường dẫn đến thư mục chứa các công cụ pháp lý ---
         self.tools_dir = r"E:\DoAn\Windows_forensic\tools"
         self.edd_exe = os.path.join(self.tools_dir, "EDDv300.exe") # Công cụ kiểm tra mã hóa
         self.kape_exe = os.path.join(self.tools_dir, "KAPE", "kape.exe") # Công cụ triage
+        self.dc3dd_exe = os.path.join(self.tools_dir, "dc3dd", "dc3dd.exe") # Công cụ tạo ảnh RAW
 
         # Khởi tạo các biến trạng thái
         self.current_step = 0 # Bước hiện tại trong quy trình wizard, bắt đầu từ 0
@@ -866,36 +873,28 @@ class NonVolatilePage(QtWidgets.QWidget, Ui_CollectNonvolatileForm):
                         item.setBackground(QtGui.QColor(255, 255, 200))
                         
         self.device_thread.quit() # Dừng luồng sau khi hoàn thành
-
-    def get_interface_type(self, interface_type):
-        """Hàm tiện ích chuyển đổi loại giao tiếp từ mã WMI sang chuỗi dễ đọc."""
-        interface_map = {
-            "IDE": "IDE/PATA",
-            "SCSI": "SCSI",
-            "USB": "USB",
-            "1394": "FireWire",
-            "HDC": "Hard Disk Controller"
-        }
-        return interface_map.get(interface_type, interface_type or "Unknown")
     
-    def check_encryption_status(self, drive_letter):
-        """Kiểm tra trạng thái mã hóa của một ổ đĩa bằng công cụ EDDv300.exe."""
+    def check_encryption_status(self, drive_index):
+        if not os.path.exists(self.edd_exe):
+            return "EDD không tìm thấy"
+
         try:
-            # Chạy EDD với đường dẫn ổ đĩa và yêu cầu output dạng JSON
-            out = subprocess.check_output(
-                [self.edd_exe, "-path", drive_letter, "-json"],
-                stderr=subprocess.DEVNULL, timeout=10, creationflags=subprocess.CREATE_NO_WINDOW
+            cmd = [self.edd_exe, "/batch", f"\\\\.\\PhysicalDrive{drive_index}"]
+            process = subprocess.run(
+                cmd, capture_output=True, text=True, timeout=60, startupinfo=self.get_startup_info()
             )
-            # Phân tích kết quả JSON
-            data = json.loads(out.decode("utf-8", errors="ignore"))
-            # Trả về "Encrypted" nếu khóa "Encrypted" là True, ngược lại là "Unencrypted"
-            return "Encrypted" if data.get("Encrypted") else "Unencrypted"
+            output = process.stdout.lower() + process.stderr.lower()
+
+            # Kiểm tra thông báo không phát hiện mã hóa (dòng có "no ... found")
+            if "no truecrypt" in output and "bitlocker" in output and "veracrypt" in output and "found" in output:
+                return "Không"  # Không phát hiện mã hóa trên ổ đĩa này
+
+            # Nếu không rõ, trả về "Không xác định"
+            return "Không xác định"
         except subprocess.TimeoutExpired:
-            # Nếu lệnh chạy quá thời gian, trả về "Timeout"
-            return "Timeout"
-        except Exception:
-            # Nếu có lỗi khác, trả về "Unknown"
-            return "Unknown"
+            return "EDD timeout: Quá trình kiểm tra ổ đĩa quá lâu, hãy thử tăng timeout hoặc kiểm tra lại trạng thái ổ đĩa."
+        except Exception as e:
+            return f"Lỗi EDD: {e}"
 
     # -----------------------------------------------------
     # 5. XỬ LÝ LOAD VÀ HIỂN THỊ TARGETS/MODULES (KAPE)
@@ -1286,15 +1285,46 @@ class NonVolatilePage(QtWidgets.QWidget, Ui_CollectNonvolatileForm):
         return cmd
         
     def build_dd_command(self, device_id):
-        """Xây dựng dòng lệnh để tạo ảnh RAW bằng công cụ dd."""
+        """Xây dựng dòng lệnh để tạo ảnh RAW bằng công cụ dc3dd."""
+        # Đường dẫn file ảnh đầu ra
         output_path = os.path.join(
             self.lineEdit_destination_folder.text(),
             self.lineEdit_image_filename.text() + ".dd" # Thêm đuôi .dd cho ảnh RAW
         )
         
-        # Lệnh dd cơ bản
-        # if=input file (nguồn), of=output file (đích), bs=block size, status=progress để hiển thị tiến trình
-        cmd = ["dd", f"if={device_id}", f"of={output_path}", "bs=1M", "status=progress"]
+        # Đường dẫn file log
+        log_path = os.path.join(
+            self.lineEdit_destination_folder.text(),
+            self.lineEdit_image_filename.text() + "_dc3dd.log"
+        )
+        
+        # Xây dựng lệnh dc3dd cơ bản
+        cmd = [
+            self.dc3dd_exe,
+            f"if={device_id}",      # Input device
+            f"of={output_path}",    # Output file
+            "bufsz=8M",             # Buffer size 8MB để tối ưu tốc độ
+            "verb=on",              # Verbose reporting
+        ]
+        
+        # Thêm các tùy chọn hash nếu được chọn
+        if self.checkBox_md5.isChecked():
+            cmd.append("hash=md5")
+        if self.checkBox_sha1.isChecked():
+            cmd.append("hash=sha1")
+        if self.checkBox_sha256.isChecked():
+            cmd.append("hash=sha256")
+            
+        # Thêm log file để lưu thông tin
+        cmd.append(f"log={log_path}")
+        
+        # Thêm tùy chọn phân mảnh nếu cần
+        frag_size = self.spinBox_fragment_size.value()
+        if frag_size > 0:
+            # dc3dd sử dụng ofsz= cho output file size khi dùng với ofs=
+            # Nhưng với of= đơn lẻ, ta cần split thủ công sau
+            pass
+            
         return cmd
 
     # -----------------------------------------------------
@@ -1662,86 +1692,167 @@ class NonVolatilePage(QtWidgets.QWidget, Ui_CollectNonvolatileForm):
         self.pushButton_stop.setEnabled(False)
 
     def handle_imaging_stdout(self):
-        """Xử lý output chuẩn (stdout) từ ewfacquire."""
+        """Xử lý output chuẩn (stdout) từ ewfacquire hoặc dc3dd."""
         if hasattr(self, 'imaging_process') and self.imaging_process:
             output = self.imaging_process.readAllStandardOutput().data().decode('utf-8', errors='ignore')
-            # ewfacquire xuất log dạng JSON, tìm các key quan trọng
-            if "acquiry_percentage" in output:
-                match = re.search(r'acquiry_percentage:\s*(\d+)', output)
-                if match: self.progressBar.setValue(int(match.group(1)))
+            
+            # Kiểm tra xem đang dùng công cụ nào
+            if self.radioButton_raw.isChecked():
+                # dc3dd xuất thông tin tiến độ dạng:
+                # dc3dd: Started at 2024-01-20 10:30:00 +0700
+                # dc3dd: Current: 1073741824 bytes (1.0 GB) copied  REM: 00:05:30
+                # Tìm bytes đã copy
+                match = re.search(r'Current:\s*(\d+)\s*bytes.*copied', output)
+                if match:
+                    bytes_copied = int(match.group(1))
+                    total_bytes = self.get_device_size()
+                    if total_bytes > 0:
+                        progress = (bytes_copied / total_bytes) * 100
+                        self.progressBar.setValue(int(progress))
+                        copied_gb = bytes_copied / (1024**3)
+                        total_gb = total_bytes / (1024**3)
+                        self.label_source_progress_val.setText(f"{copied_gb:.1f} GB / {total_gb:.1f} GB")
+                
+                # Ghi log output
+                if output.strip():
+                    self.textBrowser_log.append(output.strip())
+            else:
+                # ewfacquire xuất log dạng JSON, tìm các key quan trọng
+                if "acquiry_percentage" in output:
+                    match = re.search(r'acquiry_percentage:\s*(\d+)', output)
+                    if match: self.progressBar.setValue(int(match.group(1)))
             # Có thể parse thêm các thông tin khác như tốc độ, dung lượng đã đọc...
 
     def handle_imaging_stderr(self):
-        """Xử lý output lỗi (stderr) từ các công cụ. 'dd' thường in tiến độ ra stderr."""
+        """Xử lý output lỗi (stderr) từ các công cụ."""
         if hasattr(self, 'imaging_process') and self.imaging_process:
             error_output = self.imaging_process.readAllStandardError().data().decode('utf-8', errors='ignore')
-            # Dùng regex để phân tích dòng tiến độ của 'dd'
-            # Ví dụ: "1073741824 bytes (1.1 GB, 1.0 GiB) copied, 10.53 s, 102.0 MB/s"
-            match = re.search(r'(\d+)\s+bytes.*copied,.*,\s+([\d\.]+)\s+MB/s', error_output)
-            if match:
-                bytes_copied = int(match.group(1))
-                speed_mbs = float(match.group(2))
-                total_bytes = self.get_device_size()
-                if total_bytes > 0:
-                    progress = (bytes_copied / total_bytes) * 100
-                    self.progressBar.setValue(int(progress))
-                    copied_gb = bytes_copied / (1024**3)
-                    total_gb = total_bytes / (1024**3)
-                    self.label_source_progress_val.setText(f"{copied_gb:.1f} GB / {total_gb:.1f} GB")
+            
+            # dc3dd có thể xuất thông tin tiến độ hoặc lỗi ra stderr
+            if self.radioButton_raw.isChecked():
+                # dc3dd xuất thông tin dạng:
+                # dc3dd 7.2.641 started at 2024-01-20 10:30:00 +0700
+                # input results for device `/dev/sda':
+                #   8323072 sectors in
+                #   4100 MB in
+                # output results for file `output.dd':
+                #   8323072 sectors out
+                #   4100 MB out
+                # dc3dd completed at 2024-01-20 10:35:00 +0700
+                
+                # Tìm sectors đã copy
+                match_in = re.search(r'(\d+)\s+sectors in', error_output)
+                match_mb = re.search(r'(\d+)\s+MB in', error_output)
+                
+                if match_in:
+                    sectors_copied = int(match_in.group(1))
+                    # Giả sử sector size = 512 bytes
+                    bytes_copied = sectors_copied * 512
+                    total_bytes = self.get_device_size()
+                    if total_bytes > 0:
+                        progress = (bytes_copied / total_bytes) * 100
+                        self.progressBar.setValue(int(progress))
+                elif match_mb:
+                    mb_copied = int(match_mb.group(1))
+                    self.label_source_progress_val.setText(f"{mb_copied/1024:.1f} GB copied")
+                
+                # Tìm tốc độ nếu có
+                speed_match = re.search(r'([\d\.]+)\s+MB/s', error_output)
+                if speed_match:
+                    speed_mbs = float(speed_match.group(1))
                     self.label_speed_val.setText(f"{speed_mbs:.1f} MB/s")
-            elif error_output.strip():
-                # Nếu không phải dòng tiến độ, in ra như một lỗi
-                self.textBrowser_log.append(f"<span style='color: red;'>{error_output}</span>")
+                    
+                # Ghi log
+                if error_output.strip():
+                    self.textBrowser_log.append(error_output.strip())
+            else:
+                # Xử lý cho dd thông thường (nếu có)
+                # Dùng regex để phân tích dòng tiến độ của 'dd'
+                # Ví dụ: "1073741824 bytes (1.1 GB, 1.0 GiB) copied, 10.53 s, 102.0 MB/s"
+                match = re.search(r'(\d+)\s+bytes.*copied,.*,\s+([\d\.]+)\s+MB/s', error_output)
+                if match:
+                    bytes_copied = int(match.group(1))
+                    speed_mbs = float(match.group(2))
+                    total_bytes = self.get_device_size()
+                    if total_bytes > 0:
+                        progress = (bytes_copied / total_bytes) * 100
+                        self.progressBar.setValue(int(progress))
+                        copied_gb = bytes_copied / (1024**3)
+                        total_gb = total_bytes / (1024**3)
+                        self.label_source_progress_val.setText(f"{copied_gb:.1f} GB / {total_gb:.1f} GB")
+                        self.label_speed_val.setText(f"{speed_mbs:.1f} MB/s")
+                elif error_output.strip():
+                    # Nếu không phải dòng tiến độ, in ra như một lỗi
+                    self.textBrowser_log.append(f"<span style='color: red;'>{error_output}</span>")
 
     def pause_collection(self):
-        """Tạm dừng hoặc tiếp tục quá trình thu thập."""
-        # TODO: Logic tạm dừng thực sự cho các công cụ dòng lệnh rất phức tạp
-        # và chưa được cài đặt hoàn chỉnh trong đoạn mã này.
-        # Đoạn mã hiện tại chỉ thay đổi giao diện.
-        self.paused = not self.paused
-        if self.paused:
-            self.pushButton_pause.setText("▶️ Tiếp tục")
-            self.textBrowser_log.append("<b>⏸️ Đã tạm dừng thu thập (chức năng demo)</b>")
-            # Trên Windows, có thể dùng `process.suspend()` nhưng cần thư viện ngoài (psutil)
-        else:
-            self.pushButton_pause.setText("⏸️ Tạm dừng")
-            self.textBrowser_log.append("<b>▶️ Tiếp tục thu thập (chức năng demo)</b>")
-            # `process.resume()`
+        """
+        Tạm dừng hoặc tiếp tục quá trình thu thập thực sự bằng psutil.
+        """
+        # Chọn process đúng: imaging hoặc kape
+        process = None
+        if hasattr(self, 'kape_process') and self.kape_process and self.kape_process.state() != QtCore.QProcess.NotRunning:
+            process = self.kape_process
+        elif hasattr(self, 'imaging_process') and self.imaging_process and self.imaging_process.state() != QtCore.QProcess.NotRunning:
+            process = self.imaging_process
+
+        if not process:
+            self.textBrowser_log.append("<b>⚠️ Không tìm thấy tiến trình đang chạy để tạm dừng.</b>")
+            return
+
+        try:
+            pid = process.processId()  # lấy PID của QProcess
+            ps_proc = psutil.Process(pid)
+            if not self.paused:
+                ps_proc.suspend()
+                self.paused = True
+                self.pushButton_pause.setText("▶️ Tiếp tục")
+                self.textBrowser_log.append("<b>⏸️ Đã tạm dừng tiến trình thành công.</b>")
+            else:
+                ps_proc.resume()
+                self.paused = False
+                self.pushButton_pause.setText("⏸️ Tạm dừng")
+                self.textBrowser_log.append("<b>▶️ Đã tiếp tục tiến trình.</b>")
+        except Exception as e:
+            self.textBrowser_log.append(f"<b>❌ Lỗi khi tạm dừng/tiếp tục tiến trình: {e}</b>")
+
 
     def stop_collection(self):
-        """Dừng hoàn toàn quá trình thu thập đang chạy."""
-        process_to_kill = None
-        if hasattr(self, 'kape_process') and self.kape_process.state() != QtCore.QProcess.NotRunning:
-            process_to_kill = self.kape_process
-        elif hasattr(self, 'imaging_process') and self.imaging_process.state() != QtCore.QProcess.NotRunning:
-            process_to_kill = self.imaging_process
+        """
+        Dừng hoàn toàn quá trình thu thập đang chạy, đảm bảo dừng an toàn với psutil.
+        """
+        process = None
+        if hasattr(self, 'kape_process') and self.kape_process and self.kape_process.state() != QtCore.QProcess.NotRunning:
+            process = self.kape_process
+        elif hasattr(self, 'imaging_process') and self.imaging_process and self.imaging_process.state() != QtCore.QProcess.NotRunning:
+            process = self.imaging_process
 
-        if process_to_kill:
-            process_to_kill.kill() # Gửi tín hiệu để kết thúc tiến trình ngay lập tức
-            self.textBrowser_log.append("<b>⏹️ Thu thập đã bị dừng bởi người dùng.</b>")
+        if not process:
+            self.textBrowser_log.append("<b>⚠️ Không có tiến trình nào để dừng.</b>")
+            return
 
-    # ----- CÁC HÀM CÓ THỂ LÀ PHIÊN BẢN CŨ/KHÔNG DÙNG -----
-    
-    def imaging_completed(self, total_bytes, total_size, hash_value):
-        """Hàm xử lý khi imaging hoàn tất (có thể là phiên bản cũ)."""
-        self.progressBar.setValue(100)
-        self.textBrowser_log.append("<b>✅ Thu thập image hoàn tất!</b>")
+        try:
+            pid = process.processId()
+            ps_proc = psutil.Process(pid)
 
-    def imaging_failed(self, error):
-        """Hàm xử lý khi imaging thất bại (có thể là phiên bản cũ)."""
-        self.textBrowser_log.append(f"<span style='color: red;'><b>❌ Lỗi:</b> {error}</span>")
-        
-    def handle_stdout(self):
-        """Hàm xử lý stdout chung (có thể là phiên bản cũ)."""
-        pass
+            # Trước hết gửi terminate (SIGTERM)
+            ps_proc.terminate()
+            gone, alive = psutil.wait_procs([ps_proc], timeout=10)
+            if alive:
+                for p in alive:
+                    p.kill()
+                self.textBrowser_log.append("<b>⚠️ Buộc dừng tiến trình sau 10 giây.</b>")
+            else:
+                self.textBrowser_log.append("<b>✅ Đã dừng tiến trình thành công.</b>")
+        except Exception as e:
+            self.textBrowser_log.append(f"<b>❌ Lỗi khi dừng tiến trình: {e}</b>")
 
-    def handle_stderr(self):
-        """Hàm xử lý stderr chung (có thể là phiên bản cũ)."""
-        pass
-        
-    def collection_finished(self, exit_code, exit_status):
-        """Hàm xử lý kết thúc thu thập chung (có thể là phiên bản cũ)."""
-        pass
+        # Cập nhật lại nút
+        self.pushButton_start.setEnabled(True)
+        self.pushButton_previous.setEnabled(True)
+        self.pushButton_pause.setEnabled(False)
+        self.pushButton_stop.setEnabled(False)
+
 
     # -----------------------------------------------------
     # 9. CẬP NHẬT UI, TIỆN ÍCH NHỎ, HÀNH ĐỘNG PHỤ TRỢ
