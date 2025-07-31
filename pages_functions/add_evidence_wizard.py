@@ -1,7 +1,13 @@
 import os
 import sys
 import hashlib
-from PyQt5.QtWidgets import QDialog, QFileDialog, QMessageBox, QProgressDialog
+from PyQt5.QtWidgets import (
+    QDialog,
+    QFileDialog,
+    QMessageBox,
+    QProgressDialog,
+    QTableWidgetItem,
+)
 from PyQt5.QtCore import QThread, pyqtSignal, Qt
 from ui.pages.add_evidence_wizard_ui import Ui_AddEvidenceWizard
 from database.db_manager import DatabaseManager
@@ -91,6 +97,7 @@ class AddEvidenceWizard(QDialog):
 
         # File selection for import mode
         self.ui.addFilesBtn.clicked.connect(self.add_files)
+        self.ui.addFoldersBtn.clicked.connect(self.add_folders)
         self.ui.removeFileBtn.clicked.connect(self.remove_selected_file)
         self.ui.clearAllBtn.clicked.connect(self.clear_all_files)
 
@@ -295,11 +302,11 @@ class AddEvidenceWizard(QDialog):
         elif self.current_step == 2:
             if is_import_mode:
                 # Import mode Step 3: Check if files are selected
-                if self.ui.fileListWidget.count() == 0:
+                if self.ui.fileListWidget.rowCount() == 0:
                     QMessageBox.warning(
                         self,
                         "Validation Error",
-                        "Please select at least one evidence file.",
+                        "Please select at least one evidence file or folder.",
                     )
                     return False
                 # Verify all files exist
@@ -809,31 +816,87 @@ class AddEvidenceWizard(QDialog):
         for file_path in file_paths:
             if file_path and file_path not in self.get_selected_files():
                 filename = os.path.basename(file_path)
-                item_text = f"{filename} ({file_path})"
-                self.ui.fileListWidget.addItem(item_text)
+
+                # Add to table widget
+                row = self.ui.fileListWidget.rowCount()
+                self.ui.fileListWidget.insertRow(row)
+
+                # Type column (icon)
+                type_item = QTableWidgetItem("📄")
+                type_item.setFlags(
+                    type_item.flags() & ~Qt.ItemIsEditable
+                )  # Make read-only
+                self.ui.fileListWidget.setItem(row, 0, type_item)
+
+                # Name column (editable)
+                name_item = QTableWidgetItem(filename)
+                self.ui.fileListWidget.setItem(row, 1, name_item)
+
+                # Path column (read-only)
+                path_item = QTableWidgetItem(file_path)
+                path_item.setFlags(
+                    path_item.flags() & ~Qt.ItemIsEditable
+                )  # Make read-only
+                self.ui.fileListWidget.setItem(row, 2, path_item)
+
+    def add_folders(self):
+        """Add folders to the list for import mode"""
+        folder_path = QFileDialog.getExistingDirectory(
+            self, "Select Evidence Folder", ""
+        )
+
+        if folder_path and folder_path not in self.get_selected_files():
+            foldername = os.path.basename(folder_path)
+
+            # Add to table widget
+            row = self.ui.fileListWidget.rowCount()
+            self.ui.fileListWidget.insertRow(row)
+
+            # Type column (icon)
+            type_item = QTableWidgetItem("📁")
+            type_item.setFlags(type_item.flags() & ~Qt.ItemIsEditable)  # Make read-only
+            self.ui.fileListWidget.setItem(row, 0, type_item)
+
+            # Name column (editable)
+            name_item = QTableWidgetItem(foldername)
+            self.ui.fileListWidget.setItem(row, 1, name_item)
+
+            # Path column (read-only)
+            path_item = QTableWidgetItem(folder_path)
+            path_item.setFlags(path_item.flags() & ~Qt.ItemIsEditable)  # Make read-only
+            self.ui.fileListWidget.setItem(row, 2, path_item)
 
     def remove_selected_file(self):
         """Remove selected file from list"""
         current_row = self.ui.fileListWidget.currentRow()
         if current_row >= 0:
-            self.ui.fileListWidget.takeItem(current_row)
+            self.ui.fileListWidget.removeRow(current_row)
 
     def clear_all_files(self):
         """Clear all files from list"""
-        self.ui.fileListWidget.clear()
+        self.ui.fileListWidget.setRowCount(0)
 
     def get_selected_files(self):
         """Get list of selected file paths"""
         files = []
-        for i in range(self.ui.fileListWidget.count()):
-            item = self.ui.fileListWidget.item(i)
-            if item:
-                item_text = item.text()
-                # Extract path from "filename (path)" format
-                if " (" in item_text and item_text.endswith(")"):
-                    path = item_text[item_text.rfind("(") + 1 : -1]
-                    files.append(path)
+        for row in range(self.ui.fileListWidget.rowCount()):
+            path_item = self.ui.fileListWidget.item(row, 2)  # Path is in column 2
+            if path_item:
+                files.append(path_item.text())
         return files
+
+    def get_evidence_names(self):
+        """Get custom names for each evidence"""
+        names = {}
+        for row in range(self.ui.fileListWidget.rowCount()):
+            path_item = self.ui.fileListWidget.item(row, 2)  # Path is in column 2
+            name_item = self.ui.fileListWidget.item(row, 1)  # Name is in column 1
+            if path_item and name_item:
+                path = path_item.text()
+                custom_name = name_item.text().strip()
+                if custom_name:
+                    names[path] = custom_name
+        return names
 
     def calculate_file_hash(self, file_path):
         """Calculate SHA256 hash of a file"""
@@ -1100,10 +1163,17 @@ class AddEvidenceWizard(QDialog):
                     file_size = os.path.getsize(file_path)
                     filename = os.path.basename(file_path)
 
+                    # Lấy tên tùy chỉnh cho evidence này (nếu có)
+                    evidence_names = self.get_evidence_names()
+                    if file_path in evidence_names:
+                        evidence_name = evidence_names[file_path]  # Dùng tên tùy chỉnh
+                    else:
+                        evidence_name = filename  # Dùng tên file/folder
+
                     # Add artifact to database using proper parameters
                     artifact_id = self.db_manager.add_artifact(
                         case_id=self.case_id,
-                        name=filename,
+                        name=evidence_name,  # Sử dụng evidence_name
                         source_path=file_path,
                         evidence_type=evidence_data["evidence_type"],
                         size=file_size,
@@ -1149,7 +1219,7 @@ class AddEvidenceWizard(QDialog):
                         evidence_record = {
                             "id": artifact_id,
                             "case_id": self.case_id,
-                            "evidence_name": filename,
+                            "evidence_name": evidence_name,  # Sử dụng evidence_name
                             "evidence_type": evidence_data["evidence_type"],
                             "file_path": file_path,
                             "file_size": file_size,

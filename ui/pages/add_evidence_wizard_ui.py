@@ -174,23 +174,64 @@ class Ui_AddEvidenceWizard(object):
         self.importSourceFrame = QtWidgets.QFrame()
         self.importSourceLayout = QtWidgets.QVBoxLayout(self.importSourceFrame)
 
-        # File list widget
-        self.fileListWidget = QtWidgets.QListWidget()
+        # File list widget - Change from QListWidget to QTableWidget
+        self.fileListWidget = QtWidgets.QTableWidget()
         self.fileListWidget.setMinimumHeight(200)
+        self.fileListWidget.setColumnCount(3)
+        self.fileListWidget.setHorizontalHeaderLabels(["Type", "Name", "Path"])
+        self.fileListWidget.horizontalHeader().setStretchLastSection(True)
+
+        # Set column widths
+        self.fileListWidget.setColumnWidth(0, 50)  # Type column (narrow)
+        self.fileListWidget.setColumnWidth(1, 250)  # Name column (wider for editing)
+        # Path column will stretch to fill remaining space
+
+        # Enable editing for Name column only
+        self.fileListWidget.setEditTriggers(
+            QtWidgets.QAbstractItemView.DoubleClicked
+            | QtWidgets.QAbstractItemView.EditKeyPressed
+        )
+
         self.fileListWidget.setStyleSheet(
             """
-            QListWidget {
+            QTableWidget {
                 border: 2px solid #dee2e6;
                 border-radius: 4px;
                 background-color: white;
                 font-size: 12px;
+                gridline-color: #e9ecef;
             }
-            QListWidget::item {
+            QTableWidget::item {
                 padding: 8px;
                 border-bottom: 1px solid #f1f3f4;
+                color: black;
             }
-            QListWidget::item:selected {
+            QTableWidget::item:selected {
                 background-color: #e3f2fd;
+                color: black;
+            }
+            QTableWidget::item:focus {
+                background-color: #fff3cd;
+                border: 1px solid #ffc107;
+                border-radius: 2px;
+                color: black;
+            }
+            QHeaderView::section {
+                background-color: #f8f9fa;
+                padding: 8px;
+                border: none;
+                border-bottom: 2px solid #dee2e6;
+                font-weight: bold;
+                color: #495057;
+            }
+            QTableWidget QLineEdit {
+                padding: 6px 10px;
+                border: 1px solid #007bff;
+                border-radius: 3px;
+                background-color: white;
+                font-size: 13px;
+                margin: 2px;
+                color: black;
             }
         """
         )
@@ -201,66 +242,31 @@ class Ui_AddEvidenceWizard(object):
         self.fileButtonLayout.setContentsMargins(0, 10, 0, 0)
 
         self.addFilesBtn = QtWidgets.QPushButton("Add Files")
-        self.addFilesBtn.setStyleSheet(
-            """
-            QPushButton {
-                background-color: #4299e1;
-                color: white;
-                border: none;
-                border-radius: 4px;
-                padding: 8px 16px;
-                font-weight: bold;
-            }
-            QPushButton:hover {
-                background-color: #3182ce;
-            }
-        """
-        )
-
+        self.addFoldersBtn = QtWidgets.QPushButton("Add Folders")
         self.removeFileBtn = QtWidgets.QPushButton("Remove Selected")
-        self.removeFileBtn.setStyleSheet(
-            """
-            QPushButton {
-                background-color: #e53e3e;
-                color: white;
-                border: none;
-                border-radius: 4px;
-                padding: 8px 16px;
-                font-weight: bold;
-            }
-            QPushButton:hover {
-                background-color: #c53030;
-            }
-        """
-        )
-
         self.clearAllBtn = QtWidgets.QPushButton("Clear All")
-        self.clearAllBtn.setStyleSheet(
-            """
-            QPushButton {
-                background-color: #718096;
-                color: white;
-                border: none;
-                border-radius: 4px;
-                padding: 8px 16px;
-                font-weight: bold;
-            }
-            QPushButton:hover {
-                background-color: #4a5568;
-            }
-        """
-        )
 
         spacer = QtWidgets.QSpacerItem(
             40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum
         )
 
         self.fileButtonLayout.addWidget(self.addFilesBtn)
+        self.fileButtonLayout.addWidget(self.addFoldersBtn)
         self.fileButtonLayout.addWidget(self.removeFileBtn)
         self.fileButtonLayout.addWidget(self.clearAllBtn)
         self.fileButtonLayout.addItem(spacer)
 
         self.importSourceLayout.addWidget(QtWidgets.QLabel("Selected Evidence Files:"))
+
+        # Add helpful instruction
+        instruction_label = QtWidgets.QLabel(
+            "💡 Tip: Double-click on the 'Name' column to edit individual evidence names"
+        )
+        instruction_label.setStyleSheet(
+            "color: #666; font-size: 11px; font-style: italic; margin-bottom: 5px;"
+        )
+        self.importSourceLayout.addWidget(instruction_label)
+
         self.importSourceLayout.addWidget(self.fileListWidget)
         self.importSourceLayout.addWidget(self.fileButtonFrame)
 

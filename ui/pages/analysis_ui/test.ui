@@ -1,0 +1,1238 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>BrowserAnalysisWindow</class>
+ <widget class="QWidget" name="BrowserAnalysisWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1400</width>
+    <height>900</height>
+   </rect>
+  </property>
+  <property name="font">
+   <font>
+    <pointsize>10</pointsize>
+   </font>
+  </property>
+  <property name="windowTitle">
+   <string>Browser Analysis</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QGroupBox" name="evidenceSelectionGroupBox">
+     <property name="font">
+      <font>
+       <pointsize>10</pointsize>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="title">
+      <string>Select Evidence from Case</string>
+     </property>
+     <layout class="QVBoxLayout" name="evidenceLayout">
+      <item>
+       <layout class="QHBoxLayout" name="evidenceListLayout">
+        <item>
+         <widget class="QLabel" name="evidenceLabel">
+          <property name="text">
+           <string>Available Evidence:</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QComboBox" name="evidenceComboBox">
+          <property name="minimumSize">
+           <size>
+            <width>400</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="styleSheet">
+           <string>QComboBox {
+    border: 2px solid #c0c4c8;
+    border-radius: 6px;
+    padding: 8px 12px;
+    background: white;
+    font-size: 10px;
+}</string>
+          </property>
+          <property name="placeholderText" stdset="0">
+           <string>Select evidence containing browser data...</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="refreshEvidenceButton">
+          <property name="styleSheet">
+           <string>QPushButton {
+    background-color: #4a90e2;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 16px;
+    font-size: 10px;
+    font-weight: bold;
+}
+QPushButton:hover {
+    background-color: #357abd;
+}</string>
+          </property>
+          <property name="text">
+           <string>Refresh</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="browserConfigGroupBox">
+     <property name="font">
+      <font>
+       <pointsize>10</pointsize>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="title">
+      <string>Browser Configuration</string>
+     </property>
+     <layout class="QGridLayout" name="browserConfigLayout">
+      <item row="0" column="1">
+       <widget class="QComboBox" name="browserTypeComboBox">
+        <property name="styleSheet">
+         <string>QComboBox {
+    border: 2px solid #c0c4c8;
+    border-radius: 6px;
+    padding: 8px 12px;
+    background: white;
+    font-size: 10px;
+}</string>
+        </property>
+        <item>
+         <property name="text">
+          <string>Google Chrome</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Microsoft Edge</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Mozilla Firefox</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Internet Explorer</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Opera</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="profilePathLabel">
+        <property name="text">
+         <string>Profile Path:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0">
+       <widget class="QLabel" name="browserTypeLabel">
+        <property name="text">
+         <string>Browser Type:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1" colspan="2">
+       <layout class="QHBoxLayout" name="profilePathLayout">
+        <item>
+         <widget class="QLineEdit" name="profilePathEdit">
+          <property name="styleSheet">
+           <string>QLineEdit {
+    border: 2px solid #c0c4c8;
+    border-radius: 6px;
+    padding: 8px 12px;
+    background: white;
+    font-size: 10px;
+}</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="browseProfileButton">
+          <property name="styleSheet">
+           <string>QPushButton {
+    background-color: #6c757d;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 16px;
+    font-size: 10px;
+    font-weight: bold;
+}
+QPushButton:hover {
+    background-color: #5a6268;
+}</string>
+          </property>
+          <property name="text">
+           <string>Browse</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <!-- Profile Selection -->
+      <item row="2" column="0">
+       <widget class="QLabel" name="profileLabel">
+        <property name="text">
+         <string>Profile:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1" colspan="2">
+       <widget class="QComboBox" name="profileComboBox">
+        <property name="placeholderText">
+         <string>Select profile...</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="3">
+       <widget class="QPushButton" name="detectProfilesButton">
+        <property name="text">
+         <string>Detect Profiles</string>
+        </property>
+        <property name="styleSheet">
+         <string>QPushButton {
+    background-color: #17a2b8;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 16px;
+    font-size: 14px;
+    font-weight: bold;
+}
+QPushButton:hover {
+    background-color: #138496;
+}</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1" colspan="3">
+       <widget class="QScrollArea" name="analysisOptionsScrollArea">
+        <property name="styleSheet">
+         <string>QScrollArea {
+    border: 2px solid #c0c4c8;
+    border-radius: 6px;
+    background: white;
+}</string>
+        </property>
+        <property name="widgetResizable">
+         <bool>true</bool>
+        </property>
+        <widget class="QWidget" name="analysisOptionsWidget">
+         <property name="geometry">
+          <rect>
+           <x>0</x>
+           <y>0</y>
+           <width>1010</width>
+           <height>136</height>
+          </rect>
+         </property>
+         <layout class="QGridLayout" name="analysisOptionsLayout">
+          <item row="0" column="0">
+           <widget class="QCheckBox" name="historyCheckBox">
+            <property name="styleSheet">
+             <string>QCheckBox {
+    font-size: 10px;
+    spacing: 8px;
+}
+QCheckBox::indicator {
+    width: 18px;
+    height: 18px;
+    border: 2px solid #c0c4c8;
+    border-radius: 4px;
+    background: white;
+}
+QCheckBox::indicator:checked {
+    background: #4a90e2;
+    border-color: #4a90e2;
+    image: url(:/icons/checkmark.png);
+}</string>
+            </property>
+            <property name="text">
+             <string>Browsing History</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QCheckBox" name="downloadsCheckBox">
+            <property name="text">
+             <string>Downloads</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="2">
+           <widget class="QCheckBox" name="cookiesCheckBox">
+            <property name="text">
+             <string>Cookies</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QCheckBox" name="cacheCheckBox">
+            <property name="text">
+             <string>Cache</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QCheckBox" name="passwordsCheckBox">
+            <property name="text">
+             <string>Passwords</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="2">
+           <widget class="QCheckBox" name="bookmarksCheckBox">
+            <property name="text">
+             <string>Bookmarks</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QCheckBox" name="extensionsCheckBox">
+            <property name="text">
+             <string>Extensions</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="QCheckBox" name="sessionsCheckBox">
+            <property name="text">
+             <string>Sessions</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="2">
+           <widget class="QCheckBox" name="autofillCheckBox">
+            <property name="text">
+             <string>Autofill Data</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </widget>
+      </item>
+     </layout>
+     <zorder>analysisOptionsScrollArea</zorder>
+     <zorder>browserTypeLabel</zorder>
+     <zorder>browserTypeComboBox</zorder>
+     <zorder>profilePathLabel</zorder>
+     <zorder>analysisOptionsLabel</zorder>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="progressGroupBox">
+     <property name="font">
+      <font>
+       <pointsize>10</pointsize>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="title">
+      <string>Analysis Progress</string>
+     </property>
+     <layout class="QVBoxLayout" name="progressLayout">
+      <item>
+       <widget class="QProgressBar" name="analysisProgressBar">
+        <property name="styleSheet">
+         <string>QProgressBar {
+    border: 2px solid #c0c4c8;
+    border-radius: 6px;
+    text-align: center;
+    font-size: 10px;
+    font-weight: bold;
+}
+QProgressBar::chunk {
+    background-color: #4a90e2;
+    border-radius: 4px;
+}</string>
+        </property>
+        <property name="value">
+         <number>0</number>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="progressLabel">
+        <property name="styleSheet">
+         <string>QLabel {
+    font-size: 10px;
+    color: #6c757d;
+}</string>
+        </property>
+        <property name="text">
+         <string>Ready to start analysis...</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QTabWidget" name="resultsTabWidget">
+     <property name="styleSheet">
+      <string>QTabWidget::pane {
+    border: 2px solid #c0c4c8;
+    border-radius: 6px;
+    background: white;
+}
+QTabBar::tab {
+    background: #f8f9fa;
+    border: 1px solid #c0c4c8;
+    padding: 8px 16px;
+    margin-right: 2px;
+    font-size: 10px;
+    font-weight: bold;
+}
+QTabBar::tab:selected {
+    background: #4a90e2;
+    color: white;
+    border-color: #4a90e2;
+}
+QTabBar::tab:hover:!selected {
+    background: #e9ecef;
+}</string>
+     </property>
+     <widget class="QWidget" name="historyTab">
+      <attribute name="title">
+       <string>Browsing History</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="historyLayout">
+       <item>
+        <layout class="QHBoxLayout" name="historySearchLayout">
+         <item>
+          <widget class="QLabel" name="historySearchLabel">
+           <property name="text">
+            <string>Search:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="historySearchEdit">
+           <property name="styleSheet">
+            <string>QLineEdit {
+    border: 2px solid #c0c4c8;
+    border-radius: 6px;
+    padding: 8px 12px;
+    background: white;
+    font-size: 10px;
+}</string>
+           </property>
+           <property name="placeholderText">
+            <string>Search URLs, titles...</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="historySearchButton">
+           <property name="styleSheet">
+            <string>QPushButton {
+    background-color: #4a90e2;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 16px;
+    font-size: 10px;
+    font-weight: bold;
+}</string>
+           </property>
+           <property name="text">
+            <string>Search</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer_2">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <widget class="QTableWidget" name="historyTable">
+         <property name="styleSheet">
+          <string>QTableWidget {
+    background-color: #ffffff;
+    border: 1px solid #c0c4c8;
+    gridline-color: #e0e3e6;
+    border-radius: 6px;
+    selection-background-color: #cce4f7;
+    selection-color: #000000;
+    font-size: 10px;
+}
+QTableWidget::item:alternate {
+    background-color: #f9fbfc;
+}
+QHeaderView::section {
+    background-color: #f8f9fa;
+    border: 1px solid #c0c4c8;
+    padding: 8px;
+    font-weight: bold;
+    font-size: 10px;
+}</string>
+         </property>
+         <property name="alternatingRowColors">
+          <bool>true</bool>
+         </property>
+         <property name="selectionBehavior">
+          <enum>QAbstractItemView::SelectRows</enum>
+         </property>
+         <property name="sortingEnabled">
+          <bool>true</bool>
+         </property>
+         <column>
+          <property name="text">
+           <string>URL</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Title</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Visit Time</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Visit Count</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Transition Type</string>
+          </property>
+         </column>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="downloadsTab">
+      <attribute name="title">
+       <string>Downloads</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="downloadsLayout">
+       <item>
+        <layout class="QHBoxLayout" name="downloadsSearchLayout">
+         <item>
+          <widget class="QLabel" name="downloadsSearchLabel">
+           <property name="text">
+            <string>Search:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="downloadsSearchEdit">
+           <property name="styleSheet">
+            <string>QLineEdit {
+    border: 2px solid #c0c4c8;
+    border-radius: 6px;
+    padding: 8px 12px;
+    background: white;
+    font-size: 10px;
+}</string>
+           </property>
+           <property name="placeholderText">
+            <string>Search filenames...</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="downloadsSearchButton">
+           <property name="styleSheet">
+            <string>QPushButton {
+    background-color: #4a90e2;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 16px;
+    font-size: 10px;
+    font-weight: bold;
+}</string>
+           </property>
+           <property name="text">
+            <string>Search</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer_3">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <widget class="QTableWidget" name="downloadsTable">
+         <property name="styleSheet">
+          <string>QTableWidget {
+    background-color: #ffffff;
+    border: 1px solid #c0c4c8;
+    gridline-color: #e0e3e6;
+    border-radius: 6px;
+    selection-background-color: #cce4f7;
+    selection-color: #000000;
+    font-size: 10px;
+}
+QTableWidget::item:alternate {
+    background-color: #f9fbfc;
+}
+QHeaderView::section {
+    background-color: #f8f9fa;
+    border: 1px solid #c0c4c8;
+    padding: 8px;
+    font-weight: bold;
+    font-size: 10px;
+}</string>
+         </property>
+         <property name="alternatingRowColors">
+          <bool>true</bool>
+         </property>
+         <property name="selectionBehavior">
+          <enum>QAbstractItemView::SelectRows</enum>
+         </property>
+         <property name="sortingEnabled">
+          <bool>true</bool>
+         </property>
+         <column>
+          <property name="text">
+           <string>Filename</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>URL</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Size</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Download Date</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Status</string>
+          </property>
+         </column>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="cookiesTab">
+      <attribute name="title">
+       <string>Cookies</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="cookiesLayout">
+       <item>
+        <layout class="QHBoxLayout" name="cookiesSearchLayout">
+         <item>
+          <widget class="QLabel" name="cookiesSearchLabel">
+           <property name="text">
+            <string>Search:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="cookiesSearchEdit">
+           <property name="styleSheet">
+            <string>QLineEdit {
+    border: 2px solid #c0c4c8;
+    border-radius: 6px;
+    padding: 8px 12px;
+    background: white;
+    font-size: 10px;
+}</string>
+           </property>
+           <property name="placeholderText">
+            <string>Search domains, names...</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="cookiesSearchButton">
+           <property name="styleSheet">
+            <string>QPushButton {
+    background-color: #4a90e2;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 16px;
+    font-size: 10px;
+    font-weight: bold;
+}</string>
+           </property>
+           <property name="text">
+            <string>Search</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer_4">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <widget class="QTableWidget" name="cookiesTable">
+         <property name="styleSheet">
+          <string>QTableWidget {
+    background-color: #ffffff;
+    border: 1px solid #c0c4c8;
+    gridline-color: #e0e3e6;
+    border-radius: 6px;
+    selection-background-color: #cce4f7;
+    selection-color: #000000;
+    font-size: 10px;
+}
+QTableWidget::item:alternate {
+    background-color: #f9fbfc;
+}
+QHeaderView::section {
+    background-color: #f8f9fa;
+    border: 1px solid #c0c4c8;
+    padding: 8px;
+    font-weight: bold;
+    font-size: 10px;
+}</string>
+         </property>
+         <property name="alternatingRowColors">
+          <bool>true</bool>
+         </property>
+         <property name="selectionBehavior">
+          <enum>QAbstractItemView::SelectRows</enum>
+         </property>
+         <property name="sortingEnabled">
+          <bool>true</bool>
+         </property>
+         <column>
+          <property name="text">
+           <string>Domain</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Name</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Value</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Created</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Expires</string>
+          </property>
+         </column>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="cacheTab">
+      <attribute name="title">
+       <string>Cache</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="cacheLayout">
+       <item>
+        <widget class="QTableWidget" name="cacheTable">
+         <property name="styleSheet">
+          <string>QTableWidget {
+    background-color: #ffffff;
+    border: 1px solid #c0c4c8;
+    gridline-color: #e0e3e6;
+    border-radius: 6px;
+    selection-background-color: #cce4f7;
+    selection-color: #000000;
+    font-size: 10px;
+}
+QTableWidget::item:alternate {
+    background-color: #f9fbfc;
+}
+QHeaderView::section {
+    background-color: #f8f9fa;
+    border: 1px solid #c0c4c8;
+    padding: 8px;
+    font-weight: bold;
+    font-size: 10px;
+}</string>
+         </property>
+         <property name="alternatingRowColors">
+          <bool>true</bool>
+         </property>
+         <property name="selectionBehavior">
+          <enum>QAbstractItemView::SelectRows</enum>
+         </property>
+         <property name="sortingEnabled">
+          <bool>true</bool>
+         </property>
+         <column>
+          <property name="text">
+           <string>URL</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Type</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Size</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Last Accessed</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Expires</string>
+          </property>
+         </column>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="passwordsTab">
+      <attribute name="title">
+       <string>Passwords</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="passwordsLayout">
+       <item>
+        <widget class="QTableWidget" name="passwordsTable">
+         <property name="styleSheet">
+          <string>QTableWidget {
+    background-color: #ffffff;
+    border: 1px solid #c0c4c8;
+    gridline-color: #e0e3e6;
+    border-radius: 6px;
+    selection-background-color: #cce4f7;
+    selection-color: #000000;
+    font-size: 10px;
+}
+QTableWidget::item:alternate {
+    background-color: #f9fbfc;
+}
+QHeaderView::section {
+    background-color: #f8f9fa;
+    border: 1px solid #c0c4c8;
+    padding: 8px;
+    font-weight: bold;
+    font-size: 10px;
+}</string>
+         </property>
+         <property name="alternatingRowColors">
+          <bool>true</bool>
+         </property>
+         <property name="selectionBehavior">
+          <enum>QAbstractItemView::SelectRows</enum>
+         </property>
+         <property name="sortingEnabled">
+          <bool>true</bool>
+         </property>
+         <column>
+          <property name="text">
+           <string>URL</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Username</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Password</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Created</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Last Used</string>
+          </property>
+         </column>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="bookmarksTab">
+      <attribute name="title">
+       <string>Bookmarks</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="bookmarksLayout">
+       <item>
+        <widget class="QTableWidget" name="bookmarksTable">
+         <property name="styleSheet">
+          <string>QTableWidget {
+    background-color: #ffffff;
+    border: 1px solid #c0c4c8;
+    gridline-color: #e0e3e6;
+    border-radius: 6px;
+    selection-background-color: #cce4f7;
+    selection-color: #000000;
+    font-size: 10px;
+}
+QTableWidget::item:alternate {
+    background-color: #f9fbfc;
+}
+QHeaderView::section {
+    background-color: #f8f9fa;
+    border: 1px solid #c0c4c8;
+    padding: 8px;
+    font-weight: bold;
+    font-size: 10px;
+}</string>
+         </property>
+         <property name="alternatingRowColors">
+          <bool>true</bool>
+         </property>
+         <property name="selectionBehavior">
+          <enum>QAbstractItemView::SelectRows</enum>
+         </property>
+         <property name="sortingEnabled">
+          <bool>true</bool>
+         </property>
+         <column>
+          <property name="text">
+           <string>Title</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>URL</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Folder</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Created</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Last Modified</string>
+          </property>
+         </column>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="extensionsTab">
+      <attribute name="title">
+       <string>Extensions &amp; Add-ons</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="extensionsLayout">
+       <item>
+        <widget class="QTableWidget" name="extensionsTable">
+         <property name="styleSheet">
+          <string>QTableWidget {
+    background-color: #ffffff;
+    border: 1px solid #c0c4c8;
+    gridline-color: #e0e3e6;
+    border-radius: 6px;
+    selection-background-color: #cce4f7;
+    selection-color: #000000;
+    font-size: 10px;
+}
+QTableWidget::item:alternate {
+    background-color: #f9fbfc;
+}
+QHeaderView::section {
+    background-color: #f8f9fa;
+    border: 1px solid #c0c4c8;
+    padding: 8px;
+    font-weight: bold;
+    font-size: 10px;
+}</string>
+         </property>
+         <property name="alternatingRowColors">
+          <bool>true</bool>
+         </property>
+         <property name="selectionBehavior">
+          <enum>QAbstractItemView::SelectRows</enum>
+         </property>
+         <property name="sortingEnabled">
+          <bool>true</bool>
+         </property>
+         <column>
+          <property name="text">
+           <string>Name</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>ID</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Version</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Description</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Enabled</string>
+          </property>
+         </column>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="sessionsTab">
+      <attribute name="title">
+       <string>Sessions</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="sessionsLayout">
+       <item>
+        <widget class="QTableWidget" name="sessionsTable">
+         <property name="styleSheet">
+          <string>QTableWidget {
+    background-color: #ffffff;
+    border: 1px solid #c0c4c8;
+    gridline-color: #e0e3e6;
+    border-radius: 6px;
+    selection-background-color: #cce4f7;
+    selection-color: #000000;
+    font-size: 10px;
+}
+QTableWidget::item:alternate {
+    background-color: #f9fbfc;
+}
+QHeaderView::section {
+    background-color: #f8f9fa;
+    border: 1px solid #c0c4c8;
+    padding: 8px;
+    font-weight: bold;
+    font-size: 10px;
+}</string>
+         </property>
+         <property name="alternatingRowColors">
+          <bool>true</bool>
+         </property>
+         <property name="selectionBehavior">
+          <enum>QAbstractItemView::SelectRows</enum>
+         </property>
+         <property name="sortingEnabled">
+          <bool>true</bool>
+         </property>
+         <column>
+          <property name="text">
+           <string>Session ID</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Window Count</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Tab Count</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Last Modified</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Status</string>
+          </property>
+         </column>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="autofillTab">
+      <attribute name="title">
+       <string>Autofill Data</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="autofillLayout">
+       <item>
+        <widget class="QTableWidget" name="autofillTable">
+         <property name="styleSheet">
+          <string>QTableWidget {
+    background-color: #ffffff;
+    border: 1px solid #c0c4c8;
+    gridline-color: #e0e3e6;
+    border-radius: 6px;
+    selection-background-color: #cce4f7;
+    selection-color: #000000;
+    font-size: 10px;
+}
+QTableWidget::item:alternate {
+    background-color: #f9fbfc;
+}
+QHeaderView::section {
+    background-color: #f8f9fa;
+    border: 1px solid #c0c4c8;
+    padding: 8px;
+    font-weight: bold;
+    font-size: 10px;
+}</string>
+         </property>
+         <property name="alternatingRowColors">
+          <bool>true</bool>
+         </property>
+         <property name="selectionBehavior">
+          <enum>QAbstractItemView::SelectRows</enum>
+         </property>
+         <property name="sortingEnabled">
+          <bool>true</bool>
+         </property>
+         <column>
+          <property name="text">
+           <string>Field Name</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Value</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Usage Count</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Last Used</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Type</string>
+          </property>
+         </column>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="statusLabel">
+     <property name="styleSheet">
+      <string>QLabel {
+    background-color: #f8f9fa;
+    border: 1px solid #c0c4c8;
+    border-radius: 4px;
+    padding: 8px;
+    font-size: 10px;
+    color: #6c757d;
+}</string>
+     </property>
+     <property name="text">
+      <string>Ready</string>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

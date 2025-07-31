@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1167</width>
-    <height>708</height>
+    <height>700</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -251,11 +251,11 @@ QComboBox QAbstractItemView QScrollBar::sub-line {
      <widget class="QTabWidget" name="mainTabWidget">
       <property name="font">
        <font>
-        <pointsize>11</pointsize>
+        <pointsize>9</pointsize>
        </font>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>3</number>
       </property>
       <widget class="QWidget" name="rawMemoryTab">
        <property name="sizePolicy">
@@ -287,11 +287,11 @@ QComboBox QAbstractItemView QScrollBar::sub-line {
          <widget class="QTabWidget" name="rawMemoryTabWidget">
           <property name="font">
            <font>
-            <pointsize>10</pointsize>
+            <pointsize>9</pointsize>
            </font>
           </property>
           <property name="currentIndex">
-           <number>6</number>
+           <number>1</number>
           </property>
           <widget class="QWidget" name="systemContextTab">
            <attribute name="title">
@@ -310,7 +310,7 @@ QComboBox QAbstractItemView QScrollBar::sub-line {
                <widget class="QLabel" name="osVersionLabel">
                 <property name="font">
                  <font>
-                  <pointsize>10</pointsize>
+                  <pointsize>9</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -322,7 +322,7 @@ QComboBox QAbstractItemView QScrollBar::sub-line {
                <widget class="QLabel" name="osVersionValue">
                 <property name="font">
                  <font>
-                  <pointsize>10</pointsize>
+                  <pointsize>9</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -334,7 +334,7 @@ QComboBox QAbstractItemView QScrollBar::sub-line {
                <widget class="QLabel" name="architectureLabel">
                 <property name="font">
                  <font>
-                  <pointsize>10</pointsize>
+                  <pointsize>9</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -346,7 +346,7 @@ QComboBox QAbstractItemView QScrollBar::sub-line {
                <widget class="QLabel" name="architectureValue">
                 <property name="font">
                  <font>
-                  <pointsize>10</pointsize>
+                  <pointsize>9</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -358,7 +358,7 @@ QComboBox QAbstractItemView QScrollBar::sub-line {
                <widget class="QLabel" name="timestampLabel">
                 <property name="font">
                  <font>
-                  <pointsize>10</pointsize>
+                  <pointsize>9</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -370,7 +370,7 @@ QComboBox QAbstractItemView QScrollBar::sub-line {
                <widget class="QLabel" name="timestampValue">
                 <property name="font">
                  <font>
-                  <pointsize>10</pointsize>
+                  <pointsize>9</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -382,7 +382,7 @@ QComboBox QAbstractItemView QScrollBar::sub-line {
                <widget class="QLabel" name="profileLabel">
                 <property name="font">
                  <font>
-                  <pointsize>10</pointsize>
+                  <pointsize>9</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -394,7 +394,7 @@ QComboBox QAbstractItemView QScrollBar::sub-line {
                <widget class="QLabel" name="profileValue">
                 <property name="font">
                  <font>
-                  <pointsize>10</pointsize>
+                  <pointsize>9</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -406,7 +406,7 @@ QComboBox QAbstractItemView QScrollBar::sub-line {
                <widget class="QLabel" name="kernelBaseLabel">
                 <property name="font">
                  <font>
-                  <pointsize>10</pointsize>
+                  <pointsize>9</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -418,7 +418,7 @@ QComboBox QAbstractItemView QScrollBar::sub-line {
                <widget class="QLabel" name="kernelBaseValue">
                 <property name="font">
                  <font>
-                  <pointsize>10</pointsize>
+                  <pointsize>9</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -434,7 +434,7 @@ QComboBox QAbstractItemView QScrollBar::sub-line {
                <widget class="QPushButton" name="btnKdbgscanDetail">
                 <property name="font">
                  <font>
-                  <pointsize>10</pointsize>
+                  <pointsize>9</pointsize>
                  </font>
                 </property>
                 <property name="styleSheet">
@@ -462,7 +462,7 @@ QPushButton:pressed {
                <widget class="QPushButton" name="btnImageinfoDetail">
                 <property name="font">
                  <font>
-                  <pointsize>10</pointsize>
+                  <pointsize>9</pointsize>
                  </font>
                 </property>
                 <property name="styleSheet">
@@ -490,7 +490,7 @@ QPushButton:pressed {
                <widget class="QPushButton" name="btnWindowsInfoDetail">
                 <property name="font">
                  <font>
-                  <pointsize>10</pointsize>
+                  <pointsize>9</pointsize>
                  </font>
                 </property>
                 <property name="styleSheet">
@@ -544,7 +544,7 @@ QPushButton:pressed {
                </font>
               </property>
               <property name="currentIndex">
-               <number>0</number>
+               <number>2</number>
               </property>
               <widget class="QWidget" name="processListTab">
                <attribute name="title">
@@ -723,7 +723,13 @@ QPushButton:pressed {
            </attribute>
            <layout class="QVBoxLayout" name="customPluginLayout">
             <item>
-             <widget class="QTabWidget" name="otherTabWidget"/>
+             <widget class="QTabWidget" name="otherTabWidget">
+              <property name="font">
+               <font>
+                <pointsize>9</pointsize>
+               </font>
+              </property>
+             </widget>
             </item>
            </layout>
           </widget>
@@ -767,7 +773,7 @@ QPushButton:pressed {
           </property>
           <property name="font">
            <font>
-            <pointsize>10</pointsize>
+            <pointsize>9</pointsize>
             <weight>75</weight>
             <bold>true</bold>
            </font>
@@ -798,7 +804,7 @@ QPushButton:pressed {
             <widget class="QLabel" name="hibernationTypeLabel">
              <property name="font">
               <font>
-               <pointsize>10</pointsize>
+               <pointsize>9</pointsize>
               </font>
              </property>
              <property name="text">
@@ -817,7 +823,7 @@ QPushButton:pressed {
             <widget class="QLabel" name="compressedSizeLabel">
              <property name="font">
               <font>
-               <pointsize>10</pointsize>
+               <pointsize>9</pointsize>
               </font>
              </property>
              <property name="text">
@@ -836,7 +842,7 @@ QPushButton:pressed {
             <widget class="QLabel" name="originalSizeLabel">
              <property name="font">
               <font>
-               <pointsize>10</pointsize>
+               <pointsize>9</pointsize>
               </font>
              </property>
              <property name="text">
@@ -858,7 +864,7 @@ QPushButton:pressed {
          <widget class="QGroupBox" name="hibernationResultsGroup">
           <property name="font">
            <font>
-            <pointsize>10</pointsize>
+            <pointsize>9</pointsize>
             <weight>75</weight>
             <bold>true</bold>
            </font>
@@ -1118,7 +1124,7 @@ QPushButton:pressed {
              </property>
              <property name="font">
               <font>
-               <pointsize>10</pointsize>
+               <pointsize>9</pointsize>
               </font>
              </property>
              <property name="frameShape">
@@ -1152,7 +1158,7 @@ QPushButton:pressed {
                  <widget class="QLabel" name="customCommandLabel">
                   <property name="font">
                    <font>
-                    <pointsize>10</pointsize>
+                    <pointsize>9</pointsize>
                    </font>
                   </property>
                   <property name="text">
@@ -1164,7 +1170,7 @@ QPushButton:pressed {
                  <widget class="QLineEdit" name="customCommandEdit">
                   <property name="font">
                    <font>
-                    <pointsize>10</pointsize>
+                    <pointsize>9</pointsize>
                    </font>
                   </property>
                   <property name="placeholderText">
@@ -1176,7 +1182,7 @@ QPushButton:pressed {
                  <widget class="QPushButton" name="addCustomCommandButton">
                   <property name="font">
                    <font>
-                    <pointsize>10</pointsize>
+                    <pointsize>9</pointsize>
                    </font>
                   </property>
                   <property name="styleSheet">
@@ -1204,7 +1210,7 @@ QPushButton:hover {
                  <widget class="QLabel" name="runningCommandLabel">
                   <property name="font">
                    <font>
-                    <pointsize>10</pointsize>
+                    <pointsize>9</pointsize>
                    </font>
                   </property>
                   <property name="text">
@@ -1219,7 +1225,7 @@ QPushButton:hover {
                   </property>
                   <property name="font">
                    <font>
-                    <pointsize>10</pointsize>
+                    <pointsize>9</pointsize>
                    </font>
                   </property>
                   <property name="styleSheet">
@@ -1246,7 +1252,7 @@ QPushButton:hover {
             <widget class="QTabWidget" name="crashAnalysisTabWidget">
              <property name="font">
               <font>
-               <pointsize>10</pointsize>
+               <pointsize>9</pointsize>
               </font>
              </property>
              <property name="currentIndex">
@@ -1295,7 +1301,7 @@ QPushButton:hover {
           </property>
           <property name="font">
            <font>
-            <pointsize>10</pointsize>
+            <pointsize>9</pointsize>
             <weight>75</weight>
             <bold>true</bold>
            </font>
@@ -1323,7 +1329,7 @@ QPushButton:hover {
             <widget class="QCheckBox" name="enableAICheckbox">
              <property name="font">
               <font>
-               <pointsize>10</pointsize>
+               <pointsize>9</pointsize>
               </font>
              </property>
              <property name="text">
@@ -1335,7 +1341,7 @@ QPushButton:hover {
             <widget class="QLabel" name="aiModelLabel">
              <property name="font">
               <font>
-               <pointsize>10</pointsize>
+               <pointsize>9</pointsize>
               </font>
              </property>
              <property name="text">
@@ -1347,7 +1353,7 @@ QPushButton:hover {
             <widget class="QComboBox" name="aiModelCombo">
              <property name="font">
               <font>
-               <pointsize>10</pointsize>
+               <pointsize>9</pointsize>
               </font>
              </property>
              <item>
@@ -1366,7 +1372,7 @@ QPushButton:hover {
             <widget class="QPushButton" name="runAIAnalysisButton">
              <property name="font">
               <font>
-               <pointsize>10</pointsize>
+               <pointsize>9</pointsize>
               </font>
              </property>
              <property name="text">
@@ -1381,7 +1387,7 @@ QPushButton:hover {
          <widget class="QGroupBox" name="aiResultsGroup">
           <property name="font">
            <font>
-            <pointsize>10</pointsize>
+            <pointsize>9</pointsize>
             <weight>75</weight>
             <bold>true</bold>
            </font>
@@ -1409,7 +1415,7 @@ QPushButton:hover {
             <widget class="QTextEdit" name="aiResultsText">
              <property name="font">
               <font>
-               <pointsize>10</pointsize>
+               <pointsize>9</pointsize>
               </font>
              </property>
              <property name="readOnly">
@@ -1440,7 +1446,7 @@ QPushButton:hover {
          <widget class="QGroupBox" name="volatilityOptionsGroup">
           <property name="font">
            <font>
-            <pointsize>10</pointsize>
+            <pointsize>9</pointsize>
             <weight>75</weight>
             <bold>true</bold>
            </font>
@@ -1477,6 +1483,7 @@ QPushButton:hover {
             <widget class="QLineEdit" name="pluginSearchEdit">
              <property name="font">
               <font>
+               <pointsize>9</pointsize>
                <weight>50</weight>
                <bold>false</bold>
               </font>
@@ -2192,7 +2199,7 @@ QDoubleSpinBox:disabled {
             <widget class="QLabel" name="logLevelLabel">
              <property name="font">
               <font>
-               <pointsize>10</pointsize>
+               <pointsize>9</pointsize>
               </font>
              </property>
              <property name="text">
@@ -2204,7 +2211,7 @@ QDoubleSpinBox:disabled {
             <widget class="QComboBox" name="logLevelCombo">
              <property name="font">
               <font>
-               <pointsize>10</pointsize>
+               <pointsize>9</pointsize>
               </font>
              </property>
              <item>
@@ -2246,7 +2253,7 @@ QDoubleSpinBox:disabled {
             <widget class="QPushButton" name="clearLogButton">
              <property name="font">
               <font>
-               <pointsize>10</pointsize>
+               <pointsize>9</pointsize>
               </font>
              </property>
              <property name="text">
@@ -2258,7 +2265,7 @@ QDoubleSpinBox:disabled {
             <widget class="QPushButton" name="saveLogButton">
              <property name="font">
               <font>
-               <pointsize>10</pointsize>
+               <pointsize>9</pointsize>
               </font>
              </property>
              <property name="text">
@@ -2274,7 +2281,7 @@ QDoubleSpinBox:disabled {
           <property name="font">
            <font>
             <family>Courier New</family>
-            <pointsize>10</pointsize>
+            <pointsize>9</pointsize>
            </font>
           </property>
           <property name="readOnly">
@@ -2305,7 +2312,7 @@ QDoubleSpinBox:disabled {
       </property>
       <property name="font">
        <font>
-        <pointsize>10</pointsize>
+        <pointsize>9</pointsize>
        </font>
       </property>
       <property name="frameShape">
@@ -2331,7 +2338,7 @@ QDoubleSpinBox:disabled {
         <widget class="QLabel" name="label">
          <property name="font">
           <font>
-           <pointsize>10</pointsize>
+           <pointsize>9</pointsize>
           </font>
          </property>
          <property name="text">
@@ -2343,7 +2350,7 @@ QDoubleSpinBox:disabled {
         <widget class="QLineEdit" name="lineEdit">
          <property name="font">
           <font>
-           <pointsize>10</pointsize>
+           <pointsize>9</pointsize>
           </font>
          </property>
          <property name="styleSheet">
@@ -2402,7 +2409,7 @@ QPlainTextEdit QScrollBar::add-line, QPlainTextEdit QScrollBar::sub-line {
         <spacer name="horizontalSpacer_2">
          <property name="font">
           <font>
-           <pointsize>10</pointsize>
+           <pointsize>9</pointsize>
           </font>
          </property>
          <property name="orientation">
@@ -2429,7 +2436,7 @@ QPlainTextEdit QScrollBar::add-line, QPlainTextEdit QScrollBar::sub-line {
       </property>
       <property name="font">
        <font>
-        <pointsize>10</pointsize>
+        <pointsize>9</pointsize>
        </font>
       </property>
       <property name="frameShape">
@@ -2458,7 +2465,7 @@ QPlainTextEdit QScrollBar::add-line, QPlainTextEdit QScrollBar::sub-line {
         <widget class="QGroupBox" name="evidenceGroupBox">
          <property name="font">
           <font>
-           <pointsize>10</pointsize>
+           <pointsize>9</pointsize>
            <weight>75</weight>
            <bold>true</bold>
           </font>
@@ -2486,7 +2493,7 @@ QPlainTextEdit QScrollBar::add-line, QPlainTextEdit QScrollBar::sub-line {
            <widget class="QLabel" name="evidenceTypeLabel">
             <property name="font">
              <font>
-              <pointsize>10</pointsize>
+              <pointsize>9</pointsize>
              </font>
             </property>
             <property name="text">
@@ -2504,7 +2511,7 @@ QPlainTextEdit QScrollBar::add-line, QPlainTextEdit QScrollBar::sub-line {
             </property>
             <property name="font">
              <font>
-              <pointsize>10</pointsize>
+              <pointsize>9</pointsize>
              </font>
             </property>
             <property name="styleSheet">
@@ -2588,7 +2595,7 @@ QComboBox QAbstractItemView QScrollBar::sub-line {
            <widget class="QLineEdit" name="filePathEdit">
             <property name="font">
              <font>
-              <pointsize>10</pointsize>
+              <pointsize>9</pointsize>
              </font>
             </property>
             <property name="styleSheet">
@@ -2650,7 +2657,7 @@ QPlainTextEdit QScrollBar::add-line, QPlainTextEdit QScrollBar::sub-line {
            <widget class="QLabel" name="filePathLabel">
             <property name="font">
              <font>
-              <pointsize>10</pointsize>
+              <pointsize>9</pointsize>
              </font>
             </property>
             <property name="text">
@@ -2662,7 +2669,7 @@ QPlainTextEdit QScrollBar::add-line, QPlainTextEdit QScrollBar::sub-line {
            <widget class="QLabel" name="label_2">
             <property name="font">
              <font>
-              <pointsize>10</pointsize>
+              <pointsize>9</pointsize>
              </font>
             </property>
             <property name="text">
@@ -2674,7 +2681,7 @@ QPlainTextEdit QScrollBar::add-line, QPlainTextEdit QScrollBar::sub-line {
            <widget class="QComboBox" name="evidencecombo">
             <property name="font">
              <font>
-              <pointsize>10</pointsize>
+              <pointsize>9</pointsize>
              </font>
             </property>
            </widget>
@@ -2692,7 +2699,7 @@ QPlainTextEdit QScrollBar::add-line, QPlainTextEdit QScrollBar::sub-line {
          </property>
          <property name="font">
           <font>
-           <pointsize>10</pointsize>
+           <pointsize>9</pointsize>
            <weight>75</weight>
            <bold>true</bold>
           </font>
@@ -2714,7 +2721,7 @@ QPlainTextEdit QScrollBar::add-line, QPlainTextEdit QScrollBar::sub-line {
            <widget class="QSplitter" name="splitter">
             <property name="font">
              <font>
-              <pointsize>10</pointsize>
+              <pointsize>9</pointsize>
              </font>
             </property>
             <property name="orientation">
@@ -2729,7 +2736,7 @@ QPlainTextEdit QScrollBar::add-line, QPlainTextEdit QScrollBar::sub-line {
              </property>
              <property name="font">
               <font>
-               <pointsize>10</pointsize>
+               <pointsize>9</pointsize>
               </font>
              </property>
              <property name="styleSheet">
@@ -2764,7 +2771,7 @@ QPushButton:pressed {
              </property>
              <property name="font">
               <font>
-               <pointsize>10</pointsize>
+               <pointsize>9</pointsize>
                <underline>false</underline>
               </font>
              </property>
@@ -2794,7 +2801,7 @@ QPushButton:pressed {
             <widget class="QPushButton" name="pushButton_2">
              <property name="font">
               <font>
-               <pointsize>10</pointsize>
+               <pointsize>9</pointsize>
               </font>
              </property>
              <property name="text">
@@ -2804,7 +2811,7 @@ QPushButton:pressed {
             <widget class="QPushButton" name="pushButton">
              <property name="font">
               <font>
-               <pointsize>10</pointsize>
+               <pointsize>9</pointsize>
               </font>
              </property>
              <property name="text">
@@ -2817,7 +2824,7 @@ QPushButton:pressed {
            <widget class="QProgressBar" name="progressBar">
             <property name="font">
              <font>
-              <pointsize>10</pointsize>
+              <pointsize>9</pointsize>
              </font>
             </property>
             <property name="styleSheet">
@@ -2841,7 +2848,7 @@ QProgressBar::chunk {
            <widget class="QLabel" name="statusLabel">
             <property name="font">
              <font>
-              <pointsize>10</pointsize>
+              <pointsize>9</pointsize>
              </font>
             </property>
             <property name="text">

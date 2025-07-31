@@ -75,7 +75,7 @@ class MyWindow(QMainWindow):
                 lambda: MemoryAnalysisWindow(),
             ),
             self.registry_btn: ("Registry", lambda: RegistryAnalysis()),
-            self.browser_btn: ("Browser", lambda: BrowserAnalysis()),
+            self.browser_btn: ("Browser", lambda: BrowserAnalysis(main_window=self)),
             self.file_btn: ("File", lambda: FileAnalysis()),
             self.metadata_btn: ("Metadata", lambda: MetadataAnalysis()),
             self.eventlog_btn: ("Event Log", lambda: EventlogAnalysis()),
