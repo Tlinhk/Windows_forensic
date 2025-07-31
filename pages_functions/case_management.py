@@ -817,7 +817,7 @@ class ImportEvidenceDialog(QDialog):
 
         if main_window:
             if clicked == buttons.get("memory") and hasattr(main_window, "memory_btn"):
-                main_window.memory_btn.click()
+                main_window.switch_to_browser_analysis_tab(self.case_id)
             elif clicked == buttons.get("registry") and hasattr(
                 main_window, "registry_btn"
             ):

@@ -110,6 +110,28 @@ class MyWindow(QMainWindow):
             self.opened_windows[key] = widget_factory()
         return self.opened_windows[key]
 
+    def switch_to_browser_analysis_tab(self, case_id=None):
+        """Switches to the browser analysis tab and sets the case_id."""
+        # Switch to the browser analysis tab by simulating a button click
+        self.browser_btn.click()
+
+        def set_case_data():
+            # Find the browser analysis widget in the current tab
+            current_tab_index = self.ui.tabWidget.currentIndex()
+            if current_tab_index >= 0:
+                current_widget = self.ui.tabWidget.widget(current_tab_index)
+                # Check if the widget is an instance of BrowserAnalysis and has the load_case_data method
+                if (
+                    current_widget
+                    and isinstance(current_widget, BrowserAnalysis)
+                    and hasattr(current_widget, "load_case_data")
+                ):
+                    if case_id:
+                        current_widget.load_case_data(case_id)
+
+        # Delay to ensure the tab has been created before setting data
+        QTimer.singleShot(100, set_case_data)
+
     def switch_to_memory_analysis_tab(self, case_id=None):
         """Switches to the memory analysis tab and sets the case_id."""
         # Switch to the memory analysis tab by simulating a button click
@@ -304,6 +326,13 @@ class MyWindow(QMainWindow):
                 curIndex = self.ui.tabWidget.addTab(widget, title)
                 self.ui.tabWidget.setCurrentIndex(curIndex)
                 self.ui.tabWidget.setVisible(True)
+        if sender_btn == self.browser_btn and self.current_case_id:
+            # Lấy widget của tab hiện tại
+            current_tab_index = self.ui.tabWidget.currentIndex()
+            if current_tab_index >= 0:
+                current_widget = self.ui.tabWidget.widget(current_tab_index)
+                if current_widget and hasattr(current_widget, "load_case_data"):
+                    current_widget.load_case_data(self.current_case_id)
 
     def close_tab(self, index):
         """
