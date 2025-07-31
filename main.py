@@ -71,7 +71,7 @@ class MyWindow(QMainWindow):
             self.case_btn: ("Quản lý vụ án", lambda: Case(main_window=self)),
             self.user_management_btn: ("User Management", lambda: UserManagement()),
             self.volatile_btn: ("Volatile", lambda: Volatile()),
-            self.nonvolatile_btn: ("Non-Volatile", lambda: NonvolatilePage()),
+            self.nonvolatile_btn: ("Non-Volatile", lambda: NonVolatilePage()),
             self.memory_btn: (
                 "Phân tích bộ nhớ",
                 lambda: MemoryAnalysisPage(parent=self),
@@ -152,7 +152,7 @@ class MyWindow(QMainWindow):
                     and hasattr(current_widget, "set_case_data")
                     and case_id
                 ):
-                    # Lấy thông tin case đầy đủ từ database
+                    # Lấy thông tin case đầy đủ từ databasa
                     from database.db_manager import DatabaseManager
 
                     db = DatabaseManager()

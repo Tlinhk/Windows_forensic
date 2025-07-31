@@ -1,0 +1,53 @@
+
+dc3dd 7.2.641 started at 2025-07-18 08:19:29 +0700
+compiled options:
+command line: /dc3dd/dc3dd if=//./PHYSICALDRIVE0 of=E:/CT1000P3SSD8__OK__20250718-0819.dd log=stderr verb=on hof=on mlog=on rec=on ibs=4M obs=4M hash=sha256 split=2048MiB mlog=case_number:Case-20250718-0819 mlog=examiner:Unknown mlog=description:Unknown
+[!!] validation probe of `//./PHYSICALDRIVE0' failed
+dc3dd aborted at 2025-07-18 08:19:31 +0700
+
+
+dc3dd 7.2.641 started at 2025-07-18 08:23:06 +0700
+compiled options:
+command line: /dc3dd/dc3dd if=/dev/sdb of=/cygdrive/d/CT1000P3SSD8__OK__20250718-0822.dd log=stderr verb=on hof=on mlog=on rec=on ibs=4M obs=4M hash=sha256 split=2048MiB mlog=case_number:Case-20250718-0822 mlog=examiner:Unknown mlog=description:Unknown
+[!!] unrecognized option ibs=4M
+dc3dd aborted at 2025-07-18 08:23:06 +0700
+
+
+dc3dd 7.2.641 started at 2025-07-18 08:23:25 +0700
+compiled options:
+command line: /dc3dd/dc3dd if=/dev/sdb of=/cygdrive/d/CT1000P3SSD8__OK__20250718-0822.dd log=stderr verb=on hof=on mlog=on rec=on ibs=4M obs=4M hash=sha256 split=2048MiB mlog=case_number:Case-20250718-0822 mlog=examiner:Unknown mlog=description:Unknown
+[!!] unrecognized option ibs=4M
+dc3dd aborted at 2025-07-18 08:23:25 +0700
+
+
+dc3dd 7.2.641 started at 2025-07-18 08:25:46 +0700
+compiled options:
+command line: /dc3dd/dc3dd if=\\.\PHYSICALDRIVE1 of=D:/CT1000P3SSD8__OK__20250718-0825.dd log=stderr verb=on rec=on ssz=512 bufsz=4M hash=sha256 ofs=D:/CT1000P3SSD8__OK__20250718-0825.0000 ofsz=2048M log=D:/CT1000P3SSD8__OK__20250718-0825_dc3dd.log mlog=D:/CT1000P3SSD8__OK__20250718-0825_dc3dd.mlog
+sector size: 512 bytes (set)
+
+dc3dd 7.2.641 started at 2025-07-18 08:27:56 +0700
+compiled options:
+command line: /dc3dd/dc3dd if=\\.\PHYSICALDRIVE1 of=D:/New folder/CT1000P3SSD8__OK__20250718-0827.dd log=stderr verb=on rec=on ssz=512 bufsz=4M hash=sha1 hash=sha256 ofs=D:/New folder/CT1000P3SSD8__OK__20250718-0827.0000 ofsz=2048M log=D:/New folder/CT1000P3SSD8__OK__20250718-0827_dc3dd.log mlog=D:/New folder/CT1000P3SSD8__OK__20250718-0827_dc3dd.mlog
+sector size: 512 bytes (set)
+
+dc3dd 7.2.641 started at 2025-07-18 08:32:32 +0700
+compiled options:
+command line: /dc3dd/dc3dd if=\\.\PHYSICALDRIVE1 of=D:/New folder/CT1000P3SSD8__OK__20250718-0832.dd log=stderr verb=on rec=on ssz=512 bufsz=4M hash=sha256 log=D:/New folder/CT1000P3SSD8__OK__20250718-0832_dc3dd.log mlog=D:/New folder/CT1000P3SSD8__OK__20250718-0832_dc3dd.mlog
+sector size: 512 bytes (set)
+
+dc3dd 7.2.641 started at 2025-07-18 08:34:43 +0700
+compiled options:
+command line: /dc3dd/dc3dd if=\\.\PHYSICALDRIVE1 of=D:/New folder/CT1000P3SSD8__OK__20250718-0834.dd log=stderr verb=on rec=on ssz=512 bufsz=4M hash=sha256 log=D:/New folder/CT1000P3SSD8__OK__20250718-0834_dc3dd.log mlog=D:/New folder/CT1000P3SSD8__OK__20250718-0834_dc3dd.mlog
+sector size: 512 bytes (set)
+[!!] writing to `D:/New folder/CT1000P3SSD8__OK__20250718-0834.dd': No space left on device
+185392431104 bytes ( 173 G ) copied (  0% ), 806.404 s, 219 M/s
+
+input results for file `\\\\.\\PHYSICALDRIVE1':
+   362094592 sectors in
+   298067b45666af6d030474cfdafc7af64cd3ebe1b0e7f9d3a768459818f9ce58 (sha256)
+
+output results for file `D:/New folder/CT1000P3SSD8__OK__20250718-0834.dd':
+   362086400 sectors out
+
+dc3dd failed at 2025-07-18 08:48:10 +0700
+
