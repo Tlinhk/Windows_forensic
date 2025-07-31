@@ -106,21 +106,30 @@ class DatabaseManager:
             user.pop("password_hash", None)
             return user
         return None
-    
-    def create_user(self, username: str, password: str, email: str, role: str = "ANALYST", 
-                    full_name: str = "", phone_number: str = "") -> bool:
+
+    def create_user(
+        self,
+        username: str,
+        password: str,
+        email: str,
+        role: str = "ANALYST",
+        full_name: str = "",
+        phone_number: str = "",
+    ) -> bool:
 
         hashed_password = self.hash_password(password)
-        
+
         # Nếu không có full_name, dùng username làm mặc định
         if not full_name.strip():
             full_name = username
-        
+
         query = """
             INSERT INTO Users (username, password_hash, full_name, phone_number, email, role)
             VALUES (?, ?, ?, ?, ?, ?)
         """
-        cursor = self.execute_query(query, (username, hashed_password, full_name, phone_number, email, role))
+        cursor = self.execute_query(
+            query, (username, hashed_password, full_name, phone_number, email, role)
+        )
         return cursor is not None
 
     def update_user(
@@ -195,7 +204,7 @@ class DatabaseManager:
     def get_users(self) -> List[Dict]:
         query = "SELECT user_id, username, full_name, phone_number, email, role, is_active, created_at FROM Users"
         return self.fetch_all(query)
-    
+
     def delete_user(self, user_id: int) -> bool:
         """
         Xóa user (soft delete) - chỉ set is_active = 0
@@ -203,40 +212,47 @@ class DatabaseManager:
         """
         try:
             # Kiểm tra user tồn tại
-            user = self.fetch_one("SELECT user_id, username, role, is_active FROM Users WHERE user_id = ?", (user_id,))
+            user = self.fetch_one(
+                "SELECT user_id, username, role, is_active FROM Users WHERE user_id = ?",
+                (user_id,),
+            )
             if not user:
                 print(f"User ID {user_id} không tồn tại")
                 return False
-            
+
             # Kiểm tra nếu đang xóa admin cuối cùng
-            if user['role'] == 'ADMIN':
-                admin_count = self.fetch_one("SELECT COUNT(*) as count FROM Users WHERE role = 'ADMIN' AND is_active = 1")
-                if admin_count['count'] <= 1:
+            if user["role"] == "ADMIN":
+                admin_count = self.fetch_one(
+                    "SELECT COUNT(*) as count FROM Users WHERE role = 'ADMIN' AND is_active = 1"
+                )
+                if admin_count["count"] <= 1:
                     print("Không thể xóa admin cuối cùng trong hệ thống!")
                     return False
-            
+
             # Kiểm tra nếu user đang được assign vào case
-            case_assignments = self.fetch_one("SELECT COUNT(*) as count FROM Case_Assignees WHERE user_id = ?", (user_id,))
-            if case_assignments['count'] > 0:
-                print(f"Không thể xóa user '{user['username']}' vì đang được gán vào {case_assignments['count']} case(s)!")
+            case_assignments = self.fetch_one(
+                "SELECT COUNT(*) as count FROM Case_Assignees WHERE user_id = ?",
+                (user_id,),
+            )
+            if case_assignments["count"] > 0:
+                print(
+                    f"Không thể xóa user '{user['username']}' vì đang được gán vào {case_assignments['count']} case(s)!"
+                )
                 return False
-            
+
             # Soft delete
             success = self.update_user(user_id, is_active=False)
             if success:
                 print(f"Đã xóa user '{user['username']}' thành công")
                 # Log activity
-                self.log_activity(
-                    action="DELETE_USER",
-                    user_id=user_id
-                )
+                self.log_activity(action="DELETE_USER", user_id=user_id)
             return success
-            
+
         except Exception as e:
             print(f"Lỗi khi xóa user: {e}")
             traceback.print_exc()
             return False
-    
+
     def hard_delete_user(self, user_id: int) -> bool:
         """
         Xóa vĩnh viễn user khỏi database (hard delete)
@@ -244,63 +260,84 @@ class DatabaseManager:
         """
         try:
             # Kiểm tra user tồn tại
-            user = self.fetch_one("SELECT user_id, username, role, is_active FROM Users WHERE user_id = ?", (user_id,))
+            user = self.fetch_one(
+                "SELECT user_id, username, role, is_active FROM Users WHERE user_id = ?",
+                (user_id,),
+            )
             if not user:
                 print(f"User ID {user_id} không tồn tại")
                 return False
-            
+
             print(f"🔄 Bắt đầu hard delete user '{user['username']}'...")
-            
+
             # Kiểm tra nếu đang xóa admin cuối cùng
-            if user['role'] == 'ADMIN':
-                admin_count = self.fetch_one("SELECT COUNT(*) as count FROM Users WHERE role = 'ADMIN'")
-                if admin_count['count'] <= 1:
+            if user["role"] == "ADMIN":
+                admin_count = self.fetch_one(
+                    "SELECT COUNT(*) as count FROM Users WHERE role = 'ADMIN'"
+                )
+                if admin_count["count"] <= 1:
                     print("⚠️ KHÔNG THỂ XÓA ADMIN CUỐI CÙNG!")
                     return False
-            
+
             # Kiểm tra nếu user đang được assign vào case
-            case_assignments = self.fetch_one("SELECT COUNT(*) as count FROM Case_Assignees WHERE user_id = ?", (user_id,))
-            if case_assignments['count'] > 0:
-                print(f"⚠️ User '{user['username']}' đang được gán vào {case_assignments['count']} case(s)!")
+            case_assignments = self.fetch_one(
+                "SELECT COUNT(*) as count FROM Case_Assignees WHERE user_id = ?",
+                (user_id,),
+            )
+            if case_assignments["count"] > 0:
+                print(
+                    f"⚠️ User '{user['username']}' đang được gán vào {case_assignments['count']} case(s)!"
+                )
                 print("Cần remove khỏi tất cả cases trước khi hard delete!")
                 return False
-            
+
             # Kiểm tra activity logs trước khi xóa
-            activity_count = self.fetch_one("SELECT COUNT(*) as count FROM Activity_logs WHERE user_id = ?", (user_id,))
-            activity_logs_count = activity_count['count'] if activity_count else 0
-            
+            activity_count = self.fetch_one(
+                "SELECT COUNT(*) as count FROM Activity_logs WHERE user_id = ?",
+                (user_id,),
+            )
+            activity_logs_count = activity_count["count"] if activity_count else 0
+
             if activity_logs_count > 0:
-                print(f"⚠️ User '{user['username']}' có {activity_logs_count} activity logs!")
+                print(
+                    f"⚠️ User '{user['username']}' có {activity_logs_count} activity logs!"
+                )
                 print("Logs sẽ bị mất vĩnh viễn sau khi hard delete!")
-            
+
             # Log trước khi xóa (để ghi lại việc hard delete)
             self.log_activity(
                 action="HARD_DELETE_USER",
                 user_id=user_id,
-                details=f"Hard delete user '{user['username']}' with role '{user['role']}'"
+                details=f"Hard delete user '{user['username']}' with role '{user['role']}'",
             )
-            
+
             # Bắt đầu transaction để đảm bảo tính toàn vẹn
             self.connection.execute("BEGIN TRANSACTION")
-            
+
             try:
                 # 1. Xóa activity logs của user (sửa tên bảng đúng)
                 print(f"🔄 Đang xóa {activity_logs_count} activity logs...")
-                delete_logs_cursor = self.connection.execute("DELETE FROM Activity_logs WHERE user_id = ?", (user_id,))
+                delete_logs_cursor = self.connection.execute(
+                    "DELETE FROM Activity_logs WHERE user_id = ?", (user_id,)
+                )
                 logs_deleted = delete_logs_cursor.rowcount
                 print(f"✅ Đã xóa {logs_deleted} activity logs")
-                
+
                 # 2. Xóa case assignments (nếu có)
                 print("🔄 Đang xóa case assignments...")
-                delete_assignments_cursor = self.connection.execute("DELETE FROM Case_Assignees WHERE user_id = ?", (user_id,))
+                delete_assignments_cursor = self.connection.execute(
+                    "DELETE FROM Case_Assignees WHERE user_id = ?", (user_id,)
+                )
                 assignments_deleted = delete_assignments_cursor.rowcount
                 print(f"✅ Đã xóa {assignments_deleted} case assignments")
-                
+
                 # 3. Xóa user khỏi bảng Users
                 print("🔄 Đang xóa user khỏi Users table...")
-                delete_user_cursor = self.connection.execute("DELETE FROM Users WHERE user_id = ?", (user_id,))
+                delete_user_cursor = self.connection.execute(
+                    "DELETE FROM Users WHERE user_id = ?", (user_id,)
+                )
                 users_deleted = delete_user_cursor.rowcount
-                
+
                 if users_deleted > 0:
                     # Commit transaction
                     self.connection.commit()
@@ -314,15 +351,17 @@ class DatabaseManager:
                 else:
                     # Rollback nếu không xóa được user
                     self.connection.rollback()
-                    print(f"❌ Không thể xóa user '{user['username']}' khỏi Users table")
+                    print(
+                        f"❌ Không thể xóa user '{user['username']}' khỏi Users table"
+                    )
                     return False
-                    
+
             except Exception as e:
                 # Rollback transaction nếu có lỗi
                 self.connection.rollback()
                 print(f"❌ Lỗi trong transaction: {e}")
                 return False
-            
+
         except Exception as e:
             print(f"❌ Lỗi nghiêm trọng khi hard delete user: {e}")
             return False
@@ -455,7 +494,7 @@ class DatabaseManager:
                 c.created_at,
                 c.archive_path, 
                 u.full_name AS investigator_name,
-                (SELECT COUNT(a.artefact_id) FROM Artefacts a WHERE a.case_id = c.case_id) AS evidence_count
+                (SELECT COUNT(a.artefact_id) FROM Artefacts a WHERE a.case_id = c.case_id AND a.is_deleted = 0) AS evidence_count
             FROM 
                 Cases c
             LEFT JOIN 
@@ -634,7 +673,7 @@ class DatabaseManager:
         return self.fetch_all(query, (case_id,))
 
     # ==================== ACTIVITY LOGGING ====================
-  
+
     def log_activity(
         self,
         action: str,
@@ -723,6 +762,150 @@ class DatabaseManager:
         )["count"]
 
         return stats
+
+    def save_analysis_result(
+        self,
+        file_path: str,
+        evidence_type: str,
+        tool_used: str,
+        result_path: str,
+        summary: Optional[str] = None,
+    ) -> Optional[int]:
+
+        try:
+            # Tạo hoặc lấy artifact
+            artifact_id = self._get_or_create_artifact(file_path, evidence_type)
+            if not artifact_id:
+                return None
+            if summary is None:
+                summary = f"{tool_used} completed for {os.path.basename(file_path)}"
+            # Lưu kết quả
+            result_id = self.add_analysis_result(
+                artifact_id=artifact_id,
+                tool_used=tool_used,
+                summary=summary,
+                result_path=result_path,
+            )
+
+            return result_id
+
+        except Exception as e:
+            print(f"Error saving analysis result ({tool_used}): {e}")
+            return None
+
+    def get_latest_analysis_result(
+        self, file_path: str, evidence_type: str, tool_used: str
+    ) -> Optional[Dict]:
+        """Lấy kết quả phân tích mới nhất cho file và evidence type"""
+        try:
+            # Tìm artifact theo file path và evidence type
+            query = """
+                SELECT a.artefact_id 
+                FROM Artefacts a 
+                WHERE a.source_path = ? AND a.evidence_type = ? AND a.is_deleted = 0
+            """
+            artifact = self.fetch_one(query, (file_path, evidence_type))
+
+            if not artifact:
+                return None
+
+            # Lấy kết quả phân tích mới nhất
+            query = """
+                SELECT * 
+                FROM Results 
+                WHERE artefact_id = ? AND tool_used = ?
+                ORDER BY run_at DESC 
+                LIMIT 1
+            """
+            result = self.fetch_one(query, (artifact["artefact_id"], tool_used))
+
+            return result
+        except Exception as e:
+            print(f"Error getting latest analysis result: {e}")
+            return None
+
+    def _get_or_create_artifact(
+        self, file_path: str, evidence_type: str, case_id: int = None
+    ) -> Optional[int]:
+        """Tạo hoặc lấy artifact ID cho file path"""
+        try:
+            # Kiểm tra xem artifact đã tồn tại chưa
+            query = """
+                SELECT artefact_id 
+                FROM Artefacts 
+                WHERE source_path = ? AND evidence_type = ? AND is_deleted = 0
+            """
+            existing = self.fetch_one(query, (file_path, evidence_type))
+
+            if existing:
+                return existing["artefact_id"]
+
+            # Tạo artifact mới nếu chưa có
+            file_name = os.path.basename(file_path)
+            file_size = os.path.getsize(file_path) if os.path.exists(file_path) else 0
+
+            # Nếu không có case_id, tạo case mặc định
+            if not case_id:
+                case_id = self._get_or_create_default_case()
+
+            artifact_id = self.add_artifact(
+                case_id=case_id,
+                name=file_name,
+                source_path=file_path,
+                evidence_type=evidence_type,
+                size=file_size,
+            )
+
+            return artifact_id
+
+        except Exception as e:
+            print(f"Error getting/creating artifact: {e}")
+            return None
+
+    def _get_or_create_default_case(self) -> int:
+        """Tạo hoặc lấy case mặc định cho memory analysis"""
+        try:
+            # Tìm case mặc định
+            query = "SELECT case_id FROM Cases WHERE title = 'Memory Analysis Default'"
+            existing = self.fetch_one(query)
+
+            if existing:
+                return existing["case_id"]
+
+            # Tạo case mặc định
+            case_id = self.create_case(title="Memory Analysis Default", status="OPEN")
+
+            return case_id if case_id else 1  # Fallback to case 1
+
+        except Exception as e:
+            print(f"Error getting/creating default case: {e}")
+            return 1  # Fallback to case 1
+
+    def get_memory_analysis_history(self, file_path: str = None) -> List[Dict]:
+        """Lấy lịch sử phân tích memory"""
+        try:
+            if file_path:
+                query = """
+                    SELECT r.*, a.source_path, a.evidence_type, a.name
+                    FROM Results r
+                    JOIN Artefacts a ON r.artefact_id = a.artefact_id
+                    WHERE a.source_path = ? AND r.tool_used = 'Memory Analysis'
+                    ORDER BY r.run_at DESC
+                """
+                return self.fetch_all(query, (file_path,))
+            else:
+                query = """
+                    SELECT r.*, a.source_path, a.evidence_type, a.name
+                    FROM Results r
+                    JOIN Artefacts a ON r.artefact_id = a.artefact_id
+                    WHERE r.tool_used = 'Memory Analysis'
+                    ORDER BY r.run_at DESC
+                """
+                return self.fetch_all(query)
+
+        except Exception as e:
+            print(f"Error getting memory analysis history: {e}")
+            return []
 
 
 # Global database instance

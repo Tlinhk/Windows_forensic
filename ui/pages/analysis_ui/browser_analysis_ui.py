@@ -11,37 +11,2805 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 
-class Ui_Form(object):
-    def setupUi(self, Form):
-        Form.setObjectName("Form")
-        Form.resize(1038, 597)
+class Ui_BrowserAnalysisWindow(object):
+    def setupUi(self, BrowserAnalysisWindow):
+        BrowserAnalysisWindow.setObjectName("BrowserAnalysisWindow")
+        BrowserAnalysisWindow.resize(1657, 588)
         font = QtGui.QFont()
         font.setPointSize(10)
-        Form.setFont(font)
-        self.gridLayout = QtWidgets.QGridLayout(Form)
-        self.gridLayout.setObjectName("gridLayout")
-        self.label = QtWidgets.QLabel(Form)
+        BrowserAnalysisWindow.setFont(font)
+        self.gridLayout_4 = QtWidgets.QGridLayout(BrowserAnalysisWindow)
+        self.gridLayout_4.setObjectName("gridLayout_4")
+        self.configurationGroupBox = QtWidgets.QGroupBox(BrowserAnalysisWindow)
         font = QtGui.QFont()
-        font.setPointSize(10)
-        self.label.setFont(font)
-        self.label.setAlignment(QtCore.Qt.AlignCenter)
+        font.setPointSize(9)
+        font.setBold(False)
+        font.setWeight(50)
+        self.configurationGroupBox.setFont(font)
+        self.configurationGroupBox.setTitle("")
+        self.configurationGroupBox.setObjectName("configurationGroupBox")
+        self.gridLayout_3 = QtWidgets.QGridLayout(self.configurationGroupBox)
+        self.gridLayout_3.setContentsMargins(50, 0, 10, 0)
+        self.gridLayout_3.setHorizontalSpacing(20)
+        self.gridLayout_3.setVerticalSpacing(5)
+        self.gridLayout_3.setObjectName("gridLayout_3")
+        self.frame = QtWidgets.QFrame(self.configurationGroupBox)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.frame.setFont(font)
+        self.frame.setFrameShape(QtWidgets.QFrame.StyledPanel)
+        self.frame.setFrameShadow(QtWidgets.QFrame.Raised)
+        self.frame.setObjectName("frame")
+        self.verticalLayout = QtWidgets.QVBoxLayout(self.frame)
+        self.verticalLayout.setObjectName("verticalLayout")
+        self.horizontalLayout_3 = QtWidgets.QHBoxLayout()
+        self.horizontalLayout_3.setObjectName("horizontalLayout_3")
+        self.historyCheckBox = QtWidgets.QCheckBox(self.frame)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        font.setBold(False)
+        font.setWeight(50)
+        self.historyCheckBox.setFont(font)
+        self.historyCheckBox.setChecked(True)
+        self.historyCheckBox.setObjectName("historyCheckBox")
+        self.horizontalLayout_3.addWidget(self.historyCheckBox)
+        self.cookiesCheckBox = QtWidgets.QCheckBox(self.frame)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        font.setBold(False)
+        font.setWeight(50)
+        self.cookiesCheckBox.setFont(font)
+        self.cookiesCheckBox.setChecked(True)
+        self.cookiesCheckBox.setObjectName("cookiesCheckBox")
+        self.horizontalLayout_3.addWidget(self.cookiesCheckBox)
+        self.extensionsCheckBox = QtWidgets.QCheckBox(self.frame)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        font.setBold(False)
+        font.setWeight(50)
+        self.extensionsCheckBox.setFont(font)
+        self.extensionsCheckBox.setChecked(False)
+        self.extensionsCheckBox.setObjectName("extensionsCheckBox")
+        self.horizontalLayout_3.addWidget(self.extensionsCheckBox)
+        self.passwordsCheckBox = QtWidgets.QCheckBox(self.frame)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        font.setBold(False)
+        font.setWeight(50)
+        self.passwordsCheckBox.setFont(font)
+        self.passwordsCheckBox.setChecked(False)
+        self.passwordsCheckBox.setObjectName("passwordsCheckBox")
+        self.horizontalLayout_3.addWidget(self.passwordsCheckBox)
+        self.formDataCheckBox = QtWidgets.QCheckBox(self.frame)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        font.setBold(False)
+        font.setWeight(50)
+        self.formDataCheckBox.setFont(font)
+        self.formDataCheckBox.setChecked(False)
+        self.formDataCheckBox.setObjectName("formDataCheckBox")
+        self.horizontalLayout_3.addWidget(self.formDataCheckBox)
+        self.verticalLayout.addLayout(self.horizontalLayout_3)
+        self.horizontalLayout_4 = QtWidgets.QHBoxLayout()
+        self.horizontalLayout_4.setObjectName("horizontalLayout_4")
+        self.downloadsCheckBox = QtWidgets.QCheckBox(self.frame)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        font.setBold(False)
+        font.setWeight(50)
+        self.downloadsCheckBox.setFont(font)
+        self.downloadsCheckBox.setChecked(True)
+        self.downloadsCheckBox.setObjectName("downloadsCheckBox")
+        self.horizontalLayout_4.addWidget(self.downloadsCheckBox)
+        self.cacheCheckBox = QtWidgets.QCheckBox(self.frame)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        font.setBold(False)
+        font.setWeight(50)
+        self.cacheCheckBox.setFont(font)
+        self.cacheCheckBox.setChecked(True)
+        self.cacheCheckBox.setObjectName("cacheCheckBox")
+        self.horizontalLayout_4.addWidget(self.cacheCheckBox)
+        self.sessionsCheckBox = QtWidgets.QCheckBox(self.frame)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        font.setBold(False)
+        font.setWeight(50)
+        self.sessionsCheckBox.setFont(font)
+        self.sessionsCheckBox.setChecked(False)
+        self.sessionsCheckBox.setObjectName("sessionsCheckBox")
+        self.horizontalLayout_4.addWidget(self.sessionsCheckBox)
+        self.bookmarksCheckBox = QtWidgets.QCheckBox(self.frame)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        font.setBold(False)
+        font.setWeight(50)
+        self.bookmarksCheckBox.setFont(font)
+        self.bookmarksCheckBox.setChecked(False)
+        self.bookmarksCheckBox.setObjectName("bookmarksCheckBox")
+        self.horizontalLayout_4.addWidget(self.bookmarksCheckBox)
+        self.checkBox = QtWidgets.QCheckBox(self.frame)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.checkBox.setFont(font)
+        self.checkBox.setObjectName("checkBox")
+        self.horizontalLayout_4.addWidget(self.checkBox)
+        self.verticalLayout.addLayout(self.horizontalLayout_4)
+        self.gridLayout_3.addWidget(self.frame, 3, 2, 1, 4)
+        self.profilePathEdit = QtWidgets.QLineEdit(self.configurationGroupBox)
+        self.profilePathEdit.setEnabled(False)
+        self.profilePathEdit.setMinimumSize(QtCore.QSize(300, 0))
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.profilePathEdit.setFont(font)
+        self.profilePathEdit.setStyleSheet("/* ==== CHUNG CHO CÁC TEXT INPUT / TEXT EDIT ==== */\n"
+"QLineEdit,\n"
+"QTextEdit,\n"
+"QPlainTextEdit {\n"
+"    background-color: #ffffff;\n"
+"    border: 1px solid #c0c4c8;      /* viền xám nhạt */\n"
+"    border-radius: 4px;             /* bo góc mềm */\n"
+"    padding: 4px 6px;               /* khoảng đệm bên trong */\n"
+"    selection-background-color: #cce4f7;\n"
+"    selection-color: #000;\n"
+"\n"
+"}\n"
+"\n"
+"/* Khi focus chuyển viền sang xanh */\n"
+"QLineEdit:focus,\n"
+"QTextEdit:focus,\n"
+"QPlainTextEdit:focus {\n"
+"    border: 1px solid #4a90e2;\n"
+"}\n"
+"\n"
+"/* Placeholder màu nhạt (chỉ với QLineEdit) */\n"
+"QLineEdit[placeholderText] {\n"
+"    color: #999999;\n"
+"}\n"
+"\n"
+"/* ReadOnly thì nền hơi xám */\n"
+"QLineEdit[readOnly=\"true\"],\n"
+"QTextEdit[readOnly=\"true\"] {\n"
+"    background-color: #f0f2f5;\n"
+"}\n"
+"\n"
+"/* Thanh cuộn bên trong QTextEdit bo góc & nhỏ gọn */\n"
+"QTextEdit QScrollBar:vertical,\n"
+"QPlainTextEdit QScrollBar:vertical {\n"
+"    background: transparent;\n"
+"    width: 8px;\n"
+"    margin: 0px;\n"
+"}\n"
+"QTextEdit QScrollBar::handle:vertical,\n"
+"QPlainTextEdit QScrollBar::handle:vertical {\n"
+"    background: #c0c4c8;\n"
+"    min-height: 20px;\n"
+"    border-radius: 4px;\n"
+"}\n"
+"QTextEdit QScrollBar::add-line, QTextEdit QScrollBar::sub-line,\n"
+"QPlainTextEdit QScrollBar::add-line, QPlainTextEdit QScrollBar::sub-line {\n"
+"    height: 0;\n"
+"}\n"
+"")
+        self.profilePathEdit.setObjectName("profilePathEdit")
+        self.gridLayout_3.addWidget(self.profilePathEdit, 1, 5, 1, 1)
+        self.pushButton_9 = QtWidgets.QPushButton(self.configurationGroupBox)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.pushButton_9.setFont(font)
+        self.pushButton_9.setStyleSheet("/* QPushButton */\n"
+"QPushButton {\n"
+"    background-color: #4a90e2;\n"
+"    border: none;\n"
+"    border-radius: 4px;\n"
+"    padding: 6px 12px;\n"
+"    color: #fff;\n"
+"\n"
+"}\n"
+"QPushButton:hover {\n"
+"    background-color: #5aa0f2;\n"
+"}\n"
+"QPushButton:pressed {\n"
+"    background-color: #3a7fcc;\n"
+"}")
+        self.pushButton_9.setObjectName("pushButton_9")
+        self.gridLayout_3.addWidget(self.pushButton_9, 0, 3, 1, 1)
+        self.profilePathLabel = QtWidgets.QLabel(self.configurationGroupBox)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.profilePathLabel.setFont(font)
+        self.profilePathLabel.setObjectName("profilePathLabel")
+        self.gridLayout_3.addWidget(self.profilePathLabel, 1, 3, 1, 1)
+        self.comboBox_2 = QtWidgets.QComboBox(self.configurationGroupBox)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.comboBox_2.setFont(font)
+        self.comboBox_2.setStyleSheet("/* ==== QComboBox ==== */\n"
+"QComboBox {\n"
+"    /* nền trắng, bo góc và viền xám nhạt giống QLineEdit */\n"
+"    background-color: #ffffff;\n"
+"    border: 1px solid #c0c4c8;\n"
+"    border-radius: 4px;\n"
+"    padding: 4px 30px 4px 8px; /* để chừa chỗ cho mũi tên */\n"
+"    min-height: 24px;\n"
+"    /* font đã định ở đầu styles.qss sẽ áp dụng */\n"
+"}\n"
+"\n"
+"/* Khi hover đổi nhẹ viền */\n"
+"QComboBox:hover {\n"
+"    border: 1px solid #a0a4a8;\n"
+"}\n"
+"\n"
+"/* Khi focus (đang chọn) đổi viền xanh */\n"
+"QComboBox:focus {\n"
+"    border: 1px solid #4a90e2;\n"
+"}\n"
+"\n"
+"/* Popup list (QAbstractItemView) */\n"
+"QComboBox QAbstractItemView {\n"
+"    background-color: #ffffff;\n"
+"    border: 1px solid #c0c4c8;\n"
+"    border-radius: 4px;\n"
+"    padding: 4px;\n"
+"    outline: none;\n"
+"    selection-background-color: #cce4f7;\n"
+"    selection-color: #000;\n"
+"}\n"
+"\n"
+"/* Các item trong list khi hover */\n"
+"QComboBox QAbstractItemView::item:hover {\n"
+"    background-color: #e8f1fb;\n"
+"}\n"
+"\n"
+"/* Scrollbar nhỏ gọn trong popup */\n"
+"QComboBox QAbstractItemView QScrollBar:vertical {\n"
+"    background: transparent;\n"
+"    width: 8px;\n"
+"    margin: 0px;\n"
+"}\n"
+"QComboBox QAbstractItemView QScrollBar::handle:vertical {\n"
+"    background: #c0c4c8;\n"
+"    min-height: 20px;\n"
+"    border-radius: 4px;\n"
+"}\n"
+"QComboBox QAbstractItemView QScrollBar::add-line,\n"
+"QComboBox QAbstractItemView QScrollBar::sub-line {\n"
+"    height: 0;\n"
+"}\n"
+"")
+        self.comboBox_2.setObjectName("comboBox_2")
+        self.gridLayout_3.addWidget(self.comboBox_2, 0, 2, 1, 1)
+        self.label_9 = QtWidgets.QLabel(self.configurationGroupBox)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.label_9.setFont(font)
+        self.label_9.setObjectName("label_9")
+        self.gridLayout_3.addWidget(self.label_9, 0, 0, 1, 2)
+        self.browserTypeCombo = QtWidgets.QComboBox(self.configurationGroupBox)
+        self.browserTypeCombo.setMinimumSize(QtCore.QSize(200, 34))
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.browserTypeCombo.setFont(font)
+        self.browserTypeCombo.setStyleSheet("/* ==== QComboBox ==== */\n"
+"QComboBox {\n"
+"    /* nền trắng, bo góc và viền xám nhạt giống QLineEdit */\n"
+"    background-color: #ffffff;\n"
+"    border: 1px solid #c0c4c8;\n"
+"    border-radius: 4px;\n"
+"    padding: 4px 30px 4px 8px; /* để chừa chỗ cho mũi tên */\n"
+"    min-height: 24px;\n"
+"    /* font đã định ở đầu styles.qss sẽ áp dụng */\n"
+"}\n"
+"\n"
+"/* Khi hover đổi nhẹ viền */\n"
+"QComboBox:hover {\n"
+"    border: 1px solid #a0a4a8;\n"
+"}\n"
+"\n"
+"/* Khi focus (đang chọn) đổi viền xanh */\n"
+"QComboBox:focus {\n"
+"    border: 1px solid #4a90e2;\n"
+"}\n"
+"\n"
+"/* Popup list (QAbstractItemView) */\n"
+"QComboBox QAbstractItemView {\n"
+"    background-color: #ffffff;\n"
+"    border: 1px solid #c0c4c8;\n"
+"    border-radius: 4px;\n"
+"    padding: 4px;\n"
+"    outline: none;\n"
+"    selection-background-color: #cce4f7;\n"
+"    selection-color: #000;\n"
+"}\n"
+"\n"
+"/* Các item trong list khi hover */\n"
+"QComboBox QAbstractItemView::item:hover {\n"
+"    background-color: #e8f1fb;\n"
+"}\n"
+"\n"
+"/* Scrollbar nhỏ gọn trong popup */\n"
+"QComboBox QAbstractItemView QScrollBar:vertical {\n"
+"    background: transparent;\n"
+"    width: 8px;\n"
+"    margin: 0px;\n"
+"}\n"
+"QComboBox QAbstractItemView QScrollBar::handle:vertical {\n"
+"    background: #c0c4c8;\n"
+"    min-height: 20px;\n"
+"    border-radius: 4px;\n"
+"}\n"
+"QComboBox QAbstractItemView QScrollBar::add-line,\n"
+"QComboBox QAbstractItemView QScrollBar::sub-line {\n"
+"    height: 0;\n"
+"}\n"
+"")
+        self.browserTypeCombo.setObjectName("browserTypeCombo")
+        self.browserTypeCombo.addItem("")
+        self.browserTypeCombo.addItem("")
+        self.browserTypeCombo.addItem("")
+        self.browserTypeCombo.addItem("")
+        self.gridLayout_3.addWidget(self.browserTypeCombo, 1, 2, 1, 1)
+        self.browseProfileButton = QtWidgets.QPushButton(self.configurationGroupBox)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.browseProfileButton.sizePolicy().hasHeightForWidth())
+        self.browseProfileButton.setSizePolicy(sizePolicy)
+        self.browseProfileButton.setMinimumSize(QtCore.QSize(150, 0))
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.browseProfileButton.setFont(font)
+        self.browseProfileButton.setStyleSheet("/* QPushButton */\n"
+"QPushButton {\n"
+"    background-color: #4a90e2;\n"
+"    border: none;\n"
+"    border-radius: 4px;\n"
+"    padding: 6px 12px;\n"
+"    color: #fff;\n"
+"\n"
+"}\n"
+"QPushButton:hover {\n"
+"    background-color: #5aa0f2;\n"
+"}\n"
+"QPushButton:pressed {\n"
+"    background-color: #3a7fcc;\n"
+"}")
+        self.browseProfileButton.setObjectName("browseProfileButton")
+        self.gridLayout_3.addWidget(self.browseProfileButton, 1, 6, 1, 1)
+        self.label_10 = QtWidgets.QLabel(self.configurationGroupBox)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        font.setItalic(True)
+        font.setUnderline(False)
+        font.setStrikeOut(False)
+        self.label_10.setFont(font)
+        self.label_10.setObjectName("label_10")
+        self.gridLayout_3.addWidget(self.label_10, 0, 6, 1, 1)
+        self.pushButton_10 = QtWidgets.QPushButton(self.configurationGroupBox)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.pushButton_10.setFont(font)
+        self.pushButton_10.setStyleSheet("/* QPushButton */\n"
+"QPushButton {\n"
+"    background-color: #e0e0e0; /* màu xám nhạt */\n"
+"    border: 1px solid #c0c0c0; /* viền xám sáng */\n"
+"    border-radius: 4px;\n"
+"    padding: 6px 12px;\n"
+"    color: #000; /* chữ màu đen hoặc xám đậm */\n"
+"}\n"
+"\n"
+"QPushButton:hover {\n"
+"    background-color: #d5d5d5; /* sáng hơn 1 chút khi hover */\n"
+"}\n"
+"\n"
+"QPushButton:pressed {\n"
+"    background-color: #c0c0c0; /* tối hơn khi nhấn */\n"
+"}\n"
+"")
+        self.pushButton_10.setObjectName("pushButton_10")
+        self.gridLayout_3.addWidget(self.pushButton_10, 3, 6, 1, 1)
+        self.pushButton_11 = QtWidgets.QPushButton(self.configurationGroupBox)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.pushButton_11.setFont(font)
+        self.pushButton_11.setStyleSheet("/* QPushButton */\n"
+"QPushButton {\n"
+"    background-color: #e0e0e0; /* màu xám nhạt */\n"
+"    border: 1px solid #c0c0c0; /* viền xám sáng */\n"
+"    border-radius: 4px;\n"
+"    padding: 6px 12px;\n"
+"    color: #000; /* chữ màu đen hoặc xám đậm */\n"
+"}\n"
+"\n"
+"QPushButton:hover {\n"
+"    background-color: #d5d5d5; /* sáng hơn 1 chút khi hover */\n"
+"}\n"
+"\n"
+"QPushButton:pressed {\n"
+"    background-color: #c0c0c0; /* tối hơn khi nhấn */\n"
+"}\n"
+"")
+        self.pushButton_11.setObjectName("pushButton_11")
+        self.gridLayout_3.addWidget(self.pushButton_11, 3, 7, 1, 1)
+        self.analysisOptionsLabel = QtWidgets.QLabel(self.configurationGroupBox)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.analysisOptionsLabel.setFont(font)
+        self.analysisOptionsLabel.setObjectName("analysisOptionsLabel")
+        self.gridLayout_3.addWidget(self.analysisOptionsLabel, 3, 0, 4, 2)
+        self.browserTypeLabel = QtWidgets.QLabel(self.configurationGroupBox)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.browserTypeLabel.setFont(font)
+        self.browserTypeLabel.setObjectName("browserTypeLabel")
+        self.gridLayout_3.addWidget(self.browserTypeLabel, 1, 0, 1, 2)
+        self.startAnalysisButton = QtWidgets.QPushButton(self.configurationGroupBox)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.startAnalysisButton.sizePolicy().hasHeightForWidth())
+        self.startAnalysisButton.setSizePolicy(sizePolicy)
+        self.startAnalysisButton.setMinimumSize(QtCore.QSize(150, 35))
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        font.setBold(False)
+        font.setWeight(50)
+        self.startAnalysisButton.setFont(font)
+        self.startAnalysisButton.setStyleSheet("/* QPushButton */\n"
+"QPushButton {\n"
+"    background-color: #4a90e2;\n"
+"    border: none;\n"
+"    border-radius: 4px;\n"
+"    padding: 6px 12px;\n"
+"    color: #fff;\n"
+"}\n"
+"QPushButton:hover {\n"
+"    background-color: #5aa0f2;\n"
+"}\n"
+"QPushButton:pressed {\n"
+"    background-color: #3a7fcc;\n"
+"}")
+        self.startAnalysisButton.setObjectName("startAnalysisButton")
+        self.gridLayout_3.addWidget(self.startAnalysisButton, 1, 7, 1, 1)
+        self.lineEdit = QtWidgets.QLineEdit(self.configurationGroupBox)
+        self.lineEdit.setEnabled(False)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.lineEdit.setFont(font)
+        self.lineEdit.setStyleSheet("/* ==== CHUNG CHO CÁC TEXT INPUT / TEXT EDIT ==== */\n"
+"QLineEdit,\n"
+"QTextEdit,\n"
+"QPlainTextEdit {\n"
+"    background-color: #ffffff;\n"
+"    border: 1px solid #c0c4c8;      /* viền xám nhạt */\n"
+"    border-radius: 4px;             /* bo góc mềm */\n"
+"    padding: 4px 6px;               /* khoảng đệm bên trong */\n"
+"    selection-background-color: #cce4f7;\n"
+"    selection-color: #000;\n"
+"     color: #999999;\n"
+"\n"
+"}\n"
+"")
+        self.lineEdit.setObjectName("lineEdit")
+        self.gridLayout_3.addWidget(self.lineEdit, 0, 5, 1, 1)
+        self.progressBar = QtWidgets.QProgressBar(self.configurationGroupBox)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.progressBar.setFont(font)
+        self.progressBar.setStyleSheet("/* QProgressBar */\n"
+"QProgressBar {\n"
+"    border: 1px solid #a0a4a8;\n"
+"    border-radius: 6px;\n"
+"    text-align: center;\n"
+"}\n"
+"QProgressBar::chunk {\n"
+"    background-color: #4a90e2;\n"
+"    border-radius: 6px;\n"
+"}")
+        self.progressBar.setProperty("value", 0)
+        self.progressBar.setObjectName("progressBar")
+        self.gridLayout_3.addWidget(self.progressBar, 1, 8, 1, 1)
+        self.statusLabel = QtWidgets.QLabel(self.configurationGroupBox)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.statusLabel.setFont(font)
+        self.statusLabel.setObjectName("statusLabel")
+        self.gridLayout_3.addWidget(self.statusLabel, 0, 8, 1, 1)
+        self.gridLayout_4.addWidget(self.configurationGroupBox, 0, 0, 1, 1)
+        self.horizontalLayout_5 = QtWidgets.QHBoxLayout()
+        self.horizontalLayout_5.setObjectName("horizontalLayout_5")
+        self.scrollArea = QtWidgets.QScrollArea(BrowserAnalysisWindow)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.scrollArea.sizePolicy().hasHeightForWidth())
+        self.scrollArea.setSizePolicy(sizePolicy)
+        self.scrollArea.setMinimumSize(QtCore.QSize(500, 0))
+        self.scrollArea.setWidgetResizable(True)
+        self.scrollArea.setObjectName("scrollArea")
+        self.scrollAreaWidgetContents = QtWidgets.QWidget()
+        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 498, 395))
+        self.scrollAreaWidgetContents.setObjectName("scrollAreaWidgetContents")
+        self.gridLayout_2 = QtWidgets.QGridLayout(self.scrollAreaWidgetContents)
+        self.gridLayout_2.setObjectName("gridLayout_2")
+        self.treeWidget = QtWidgets.QTreeWidget(self.scrollAreaWidgetContents)
+        self.treeWidget.setObjectName("treeWidget")
+        self.treeWidget.headerItem().setText(0, "1")
+        self.gridLayout_2.addWidget(self.treeWidget, 0, 0, 1, 1)
+        self.scrollArea.setWidget(self.scrollAreaWidgetContents)
+        self.horizontalLayout_5.addWidget(self.scrollArea)
+        self.mainTabWidget = QtWidgets.QTabWidget(BrowserAnalysisWindow)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        font.setBold(False)
+        font.setWeight(50)
+        self.mainTabWidget.setFont(font)
+        self.mainTabWidget.setStyleSheet("QTabBar::tab {\n"
+"    min-width: 140px;\n"
+"    max-width: 250px;\n"
+"    padding: 6px 2px;\n"
+"}")
+        self.mainTabWidget.setObjectName("mainTabWidget")
+        self.historyTab = QtWidgets.QWidget()
+        self.historyTab.setObjectName("historyTab")
+        self.historyLayout = QtWidgets.QVBoxLayout(self.historyTab)
+        self.historyLayout.setObjectName("historyLayout")
+        self.historySearchLayout = QtWidgets.QHBoxLayout()
+        self.historySearchLayout.setObjectName("historySearchLayout")
+        self.historySearchLabel = QtWidgets.QLabel(self.historyTab)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.historySearchLabel.setFont(font)
+        self.historySearchLabel.setObjectName("historySearchLabel")
+        self.historySearchLayout.addWidget(self.historySearchLabel)
+        self.historySearchEdit = QtWidgets.QLineEdit(self.historyTab)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.historySearchEdit.setFont(font)
+        self.historySearchEdit.setStyleSheet("/* ==== CHUNG CHO CÁC TEXT INPUT / TEXT EDIT ==== */\n"
+"QLineEdit,\n"
+"QTextEdit,\n"
+"QPlainTextEdit {\n"
+"    background-color: #ffffff;\n"
+"    border: 1px solid #c0c4c8;      /* viền xám nhạt */\n"
+"    border-radius: 4px;             /* bo góc mềm */\n"
+"    padding: 4px 6px;               /* khoảng đệm bên trong */\n"
+"    selection-background-color: #cce4f7;\n"
+"    selection-color: #000;\n"
+"\n"
+"}\n"
+"\n"
+"/* Khi focus chuyển viền sang xanh */\n"
+"QLineEdit:focus,\n"
+"QTextEdit:focus,\n"
+"QPlainTextEdit:focus {\n"
+"    border: 1px solid #4a90e2;\n"
+"}\n"
+"\n"
+"\n"
+"\n"
+"/* ReadOnly thì nền hơi xám */\n"
+"QLineEdit[readOnly=\"true\"],\n"
+"QTextEdit[readOnly=\"true\"] {\n"
+"    background-color: #f0f2f5;\n"
+"}\n"
+"\n"
+"/* Thanh cuộn bên trong QTextEdit bo góc & nhỏ gọn */\n"
+"QTextEdit QScrollBar:vertical,\n"
+"QPlainTextEdit QScrollBar:vertical {\n"
+"    background: transparent;\n"
+"    width: 8px;\n"
+"    margin: 0px;\n"
+"}\n"
+"QTextEdit QScrollBar::handle:vertical,\n"
+"QPlainTextEdit QScrollBar::handle:vertical {\n"
+"    background: #c0c4c8;\n"
+"    min-height: 20px;\n"
+"    border-radius: 4px;\n"
+"}\n"
+"QTextEdit QScrollBar::add-line, QTextEdit QScrollBar::sub-line,\n"
+"QPlainTextEdit QScrollBar::add-line, QPlainTextEdit QScrollBar::sub-line {\n"
+"    height: 0;\n"
+"}\n"
+"")
+        self.historySearchEdit.setObjectName("historySearchEdit")
+        self.historySearchLayout.addWidget(self.historySearchEdit)
+        self.pushButton_2 = QtWidgets.QPushButton(self.historyTab)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.pushButton_2.sizePolicy().hasHeightForWidth())
+        self.pushButton_2.setSizePolicy(sizePolicy)
+        self.pushButton_2.setMinimumSize(QtCore.QSize(150, 0))
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.pushButton_2.setFont(font)
+        self.pushButton_2.setStyleSheet("/* QPushButton */\n"
+"QPushButton {\n"
+"    background-color: #4a90e2;\n"
+"    border: none;\n"
+"    border-radius: 4px;\n"
+"    padding: 6px 12px;\n"
+"    color: #fff;\n"
+"}\n"
+"QPushButton:hover {\n"
+"    background-color: #5aa0f2;\n"
+"}\n"
+"QPushButton:pressed {\n"
+"    background-color: #3a7fcc;\n"
+"}")
+        self.pushButton_2.setObjectName("pushButton_2")
+        self.historySearchLayout.addWidget(self.pushButton_2)
+        self.historyFilterLabel = QtWidgets.QLabel(self.historyTab)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.historyFilterLabel.setFont(font)
+        self.historyFilterLabel.setObjectName("historyFilterLabel")
+        self.historySearchLayout.addWidget(self.historyFilterLabel)
+        self.historyFilterCombo = QtWidgets.QComboBox(self.historyTab)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.historyFilterCombo.setFont(font)
+        self.historyFilterCombo.setStyleSheet("/* ==== QComboBox ==== */\n"
+"QComboBox {\n"
+"    /* nền trắng, bo góc và viền xám nhạt giống QLineEdit */\n"
+"    background-color: #ffffff;\n"
+"    border: 1px solid #c0c4c8;\n"
+"    border-radius: 4px;\n"
+"    padding: 4px 30px 4px 8px; /* để chừa chỗ cho mũi tên */\n"
+"    min-height: 24px;\n"
+"\n"
+"    /* font đã định ở đầu styles.qss sẽ áp dụng */\n"
+"}\n"
+"\n"
+"/* Khi hover đổi nhẹ viền */\n"
+"QComboBox:hover {\n"
+"    border: 1px solid #a0a4a8;\n"
+"}\n"
+"\n"
+"/* Khi focus (đang chọn) đổi viền xanh */\n"
+"QComboBox:focus {\n"
+"    border: 1px solid #4a90e2;\n"
+"}\n"
+"\n"
+"/* Popup list (QAbstractItemView) */\n"
+"QComboBox QAbstractItemView {\n"
+"    background-color: #ffffff;\n"
+"    border: 1px solid #c0c4c8;\n"
+"    border-radius: 4px;\n"
+"    padding: 4px;\n"
+"    outline: none;\n"
+"    selection-background-color: #cce4f7;\n"
+"    selection-color: #000;\n"
+"}\n"
+"\n"
+"/* Các item trong list khi hover */\n"
+"QComboBox QAbstractItemView::item:hover {\n"
+"    background-color: #e8f1fb;\n"
+"}\n"
+"\n"
+"/* Scrollbar nhỏ gọn trong popup */\n"
+"QComboBox QAbstractItemView QScrollBar:vertical {\n"
+"    background: transparent;\n"
+"    width: 8px;\n"
+"    margin: 0px;\n"
+"}\n"
+"QComboBox QAbstractItemView QScrollBar::handle:vertical {\n"
+"    background: #c0c4c8;\n"
+"    min-height: 20px;\n"
+"    border-radius: 4px;\n"
+"}\n"
+"QComboBox QAbstractItemView QScrollBar::add-line,\n"
+"QComboBox QAbstractItemView QScrollBar::sub-line {\n"
+"    height: 0;\n"
+"}\n"
+"")
+        self.historyFilterCombo.setObjectName("historyFilterCombo")
+        self.historyFilterCombo.addItem("")
+        self.historyFilterCombo.addItem("")
+        self.historyFilterCombo.addItem("")
+        self.historyFilterCombo.addItem("")
+        self.historyFilterCombo.addItem("")
+        self.historySearchLayout.addWidget(self.historyFilterCombo)
+        self.label_3 = QtWidgets.QLabel(self.historyTab)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.label_3.setFont(font)
+        self.label_3.setObjectName("label_3")
+        self.historySearchLayout.addWidget(self.label_3)
+        self.historyLayout.addLayout(self.historySearchLayout)
+        self.historyTable = QtWidgets.QTableWidget(self.historyTab)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.historyTable.setFont(font)
+        self.historyTable.setStyleSheet("/* ==== QTableWidget / QTableView ==== */\n"
+"QTableWidget,\n"
+"QTableView {\n"
+"    background-color: #ffffff;           /* nền trắng */\n"
+"    border: 1px solid #c0c4c8;           /* viền xám nhạt */\n"
+"    gridline-color: #e0e3e6;             /* màu lưới */\n"
+"    border-radius: 6px;                  /* bo góc toàn widget */\n"
+"    selection-background-color: #cce4f7; /* màu nền khi chọn */\n"
+"    selection-color: #000000;            /* màu chữ khi chọn */\n"
+"}\n"
+"\n"
+"/* Alternating row colors */\n"
+"QTableWidget {\n"
+"    alternate-background-color: #f9fbfc;\n"
+"}\n"
+"QTableWidget::item:alternate,\n"
+"QTableView::item:alternate {\n"
+"    background-color: #f9fbfc;\n"
+"}\n"
+"\n"
+"/* Header (cột và hàng) */\n"
+"QHeaderView::section {\n"
+"    background-color: #e1e5ea;\n"
+"    padding: 6px;\n"
+"    border: none;\n"
+"    border-bottom: 1px solid #c0c4c8;\n"
+"    border-right: 1px solid #c0c4c8;\n"
+"    font-weight: bold;\n"
+"}\n"
+"QHeaderView::section:last,\n"
+"QHeaderView::section:last {\n"
+"    border-right: none;\n"
+"}\n"
+"\n"
+"/* Cell hover */\n"
+"QTableWidget::item:hover,\n"
+"QTableView::item:hover {\n"
+"    background-color: #e8f1fb;\n"
+"}\n"
+"\n"
+"/* Remove focus rectangle */\n"
+"QTableWidget::item:focus,\n"
+"QTableView::item:focus {\n"
+"    outline: none;\n"
+"}\n"
+"\n"
+"/* Scrollbar trong table */\n"
+"QTableWidget QScrollBar:vertical,\n"
+"QTableView QScrollBar:vertical {\n"
+"    background: transparent;\n"
+"    width: 8px;\n"
+"    margin: 0px;\n"
+"}\n"
+"QTableWidget QScrollBar::handle:vertical,\n"
+"QTableView QScrollBar::handle:vertical {\n"
+"    background: #c0c4c8;\n"
+"    min-height: 20px;\n"
+"    border-radius: 4px;\n"
+"}\n"
+"QTableWidget QScrollBar::add-line,\n"
+"QTableWidget QScrollBar::sub-line,\n"
+"QTableView QScrollBar::add-line,\n"
+"QTableView QScrollBar::sub-line {\n"
+"    height: 0;\n"
+"}\n"
+"\n"
+"/* Focused cell viền xanh nhẹ */\n"
+"QTableWidget::item:selected:active,\n"
+"QTableView::item:selected:active {\n"
+"    border: 1px solid #4a90e2;\n"
+"}\n"
+"\n"
+"/* Header hover (nếu muốn) */\n"
+"QHeaderView::section:hover {\n"
+"    background-color: #d7dae0;\n"
+"}\n"
+"")
+        self.historyTable.setAlternatingRowColors(True)
+        self.historyTable.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
+        self.historyTable.setObjectName("historyTable")
+        self.historyTable.setColumnCount(4)
+        self.historyTable.setRowCount(0)
+        item = QtWidgets.QTableWidgetItem()
+        self.historyTable.setHorizontalHeaderItem(0, item)
+        item = QtWidgets.QTableWidgetItem()
+        self.historyTable.setHorizontalHeaderItem(1, item)
+        item = QtWidgets.QTableWidgetItem()
+        self.historyTable.setHorizontalHeaderItem(2, item)
+        item = QtWidgets.QTableWidgetItem()
+        self.historyTable.setHorizontalHeaderItem(3, item)
+        self.historyLayout.addWidget(self.historyTable)
+        self.mainTabWidget.addTab(self.historyTab, "")
+        self.downloadsTab = QtWidgets.QWidget()
+        self.downloadsTab.setObjectName("downloadsTab")
+        self.downloadsLayout = QtWidgets.QVBoxLayout(self.downloadsTab)
+        self.downloadsLayout.setObjectName("downloadsLayout")
+        self.downloadsSearchLayout = QtWidgets.QHBoxLayout()
+        self.downloadsSearchLayout.setObjectName("downloadsSearchLayout")
+        self.downloadsSearchLabel = QtWidgets.QLabel(self.downloadsTab)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.downloadsSearchLabel.setFont(font)
+        self.downloadsSearchLabel.setObjectName("downloadsSearchLabel")
+        self.downloadsSearchLayout.addWidget(self.downloadsSearchLabel)
+        self.downloadsSearchEdit = QtWidgets.QLineEdit(self.downloadsTab)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.downloadsSearchEdit.setFont(font)
+        self.downloadsSearchEdit.setStyleSheet("/* ==== CHUNG CHO CÁC TEXT INPUT / TEXT EDIT ==== */\n"
+"QLineEdit,\n"
+"QTextEdit,\n"
+"QPlainTextEdit {\n"
+"    background-color: #ffffff;\n"
+"    border: 1px solid #c0c4c8;      /* viền xám nhạt */\n"
+"    border-radius: 4px;             /* bo góc mềm */\n"
+"    padding: 4px 6px;               /* khoảng đệm bên trong */\n"
+"    selection-background-color: #cce4f7;\n"
+"    selection-color: #000;\n"
+"\n"
+"}\n"
+"\n"
+"/* Khi focus chuyển viền sang xanh */\n"
+"QLineEdit:focus,\n"
+"QTextEdit:focus,\n"
+"QPlainTextEdit:focus {\n"
+"    border: 1px solid #4a90e2;\n"
+"}\n"
+"\n"
+"\n"
+"\n"
+"/* ReadOnly thì nền hơi xám */\n"
+"QLineEdit[readOnly=\"true\"],\n"
+"QTextEdit[readOnly=\"true\"] {\n"
+"    background-color: #f0f2f5;\n"
+"}\n"
+"\n"
+"/* Thanh cuộn bên trong QTextEdit bo góc & nhỏ gọn */\n"
+"QTextEdit QScrollBar:vertical,\n"
+"QPlainTextEdit QScrollBar:vertical {\n"
+"    background: transparent;\n"
+"    width: 8px;\n"
+"    margin: 0px;\n"
+"}\n"
+"QTextEdit QScrollBar::handle:vertical,\n"
+"QPlainTextEdit QScrollBar::handle:vertical {\n"
+"    background: #c0c4c8;\n"
+"    min-height: 20px;\n"
+"    border-radius: 4px;\n"
+"}\n"
+"QTextEdit QScrollBar::add-line, QTextEdit QScrollBar::sub-line,\n"
+"QPlainTextEdit QScrollBar::add-line, QPlainTextEdit QScrollBar::sub-line {\n"
+"    height: 0;\n"
+"}\n"
+"")
+        self.downloadsSearchEdit.setObjectName("downloadsSearchEdit")
+        self.downloadsSearchLayout.addWidget(self.downloadsSearchEdit)
+        self.pushButton = QtWidgets.QPushButton(self.downloadsTab)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.pushButton.sizePolicy().hasHeightForWidth())
+        self.pushButton.setSizePolicy(sizePolicy)
+        self.pushButton.setMinimumSize(QtCore.QSize(150, 0))
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.pushButton.setFont(font)
+        self.pushButton.setStyleSheet("/* QPushButton */\n"
+"QPushButton {\n"
+"    background-color: #4a90e2;\n"
+"    border: none;\n"
+"    border-radius: 4px;\n"
+"    padding: 6px 12px;\n"
+"    color: #fff;\n"
+"}\n"
+"QPushButton:hover {\n"
+"    background-color: #5aa0f2;\n"
+"}\n"
+"QPushButton:pressed {\n"
+"    background-color: #3a7fcc;\n"
+"}")
+        self.pushButton.setObjectName("pushButton")
+        self.downloadsSearchLayout.addWidget(self.pushButton)
+        self.downloadsFilterLabel = QtWidgets.QLabel(self.downloadsTab)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.downloadsFilterLabel.setFont(font)
+        self.downloadsFilterLabel.setObjectName("downloadsFilterLabel")
+        self.downloadsSearchLayout.addWidget(self.downloadsFilterLabel)
+        self.downloadsFilterCombo = QtWidgets.QComboBox(self.downloadsTab)
+        self.downloadsFilterCombo.setMinimumSize(QtCore.QSize(150, 34))
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.downloadsFilterCombo.setFont(font)
+        self.downloadsFilterCombo.setStyleSheet("/* ==== QComboBox ==== */\n"
+"QComboBox {\n"
+"    /* nền trắng, bo góc và viền xám nhạt giống QLineEdit */\n"
+"    background-color: #ffffff;\n"
+"    border: 1px solid #c0c4c8;\n"
+"    border-radius: 4px;\n"
+"    padding: 4px 30px 4px 8px; /* để chừa chỗ cho mũi tên */\n"
+"    min-height: 24px;\n"
+"    /* font đã định ở đầu styles.qss sẽ áp dụng */\n"
+"}\n"
+"\n"
+"/* Khi hover đổi nhẹ viền */\n"
+"QComboBox:hover {\n"
+"    border: 1px solid #a0a4a8;\n"
+"}\n"
+"\n"
+"/* Khi focus (đang chọn) đổi viền xanh */\n"
+"QComboBox:focus {\n"
+"    border: 1px solid #4a90e2;\n"
+"}\n"
+"\n"
+"/* Popup list (QAbstractItemView) */\n"
+"QComboBox QAbstractItemView {\n"
+"    background-color: #ffffff;\n"
+"    border: 1px solid #c0c4c8;\n"
+"    border-radius: 4px;\n"
+"    padding: 4px;\n"
+"    outline: none;\n"
+"    selection-background-color: #cce4f7;\n"
+"    selection-color: #000;\n"
+"}\n"
+"\n"
+"/* Các item trong list khi hover */\n"
+"QComboBox QAbstractItemView::item:hover {\n"
+"    background-color: #e8f1fb;\n"
+"}\n"
+"\n"
+"/* Scrollbar nhỏ gọn trong popup */\n"
+"QComboBox QAbstractItemView QScrollBar:vertical {\n"
+"    background: transparent;\n"
+"    width: 8px;\n"
+"    margin: 0px;\n"
+"}\n"
+"QComboBox QAbstractItemView QScrollBar::handle:vertical {\n"
+"    background: #c0c4c8;\n"
+"    min-height: 20px;\n"
+"    border-radius: 4px;\n"
+"}\n"
+"QComboBox QAbstractItemView QScrollBar::add-line,\n"
+"QComboBox QAbstractItemView QScrollBar::sub-line {\n"
+"    height: 0;\n"
+"}\n"
+"")
+        self.downloadsFilterCombo.setObjectName("downloadsFilterCombo")
+        self.downloadsFilterCombo.addItem("")
+        self.downloadsFilterCombo.addItem("")
+        self.downloadsFilterCombo.addItem("")
+        self.downloadsFilterCombo.addItem("")
+        self.downloadsFilterCombo.addItem("")
+        self.downloadsSearchLayout.addWidget(self.downloadsFilterCombo)
+        self.label_2 = QtWidgets.QLabel(self.downloadsTab)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.label_2.setFont(font)
+        self.label_2.setObjectName("label_2")
+        self.downloadsSearchLayout.addWidget(self.label_2)
+        self.label = QtWidgets.QLabel(self.downloadsTab)
+        self.label.setText("")
         self.label.setObjectName("label")
-        self.gridLayout.addWidget(self.label, 0, 0, 1, 1)
+        self.downloadsSearchLayout.addWidget(self.label)
+        self.downloadsLayout.addLayout(self.downloadsSearchLayout)
+        self.downloadsTable = QtWidgets.QTableWidget(self.downloadsTab)
+        self.downloadsTable.setStyleSheet("/* ==== QTableWidget / QTableView ==== */\n"
+"QTableWidget,\n"
+"QTableView {\n"
+"    background-color: #ffffff;           /* nền trắng */\n"
+"    border: 1px solid #c0c4c8;           /* viền xám nhạt */\n"
+"    gridline-color: #e0e3e6;             /* màu lưới */\n"
+"    border-radius: 6px;                  /* bo góc toàn widget */\n"
+"    selection-background-color: #cce4f7; /* màu nền khi chọn */\n"
+"    selection-color: #000000;            /* màu chữ khi chọn */\n"
+"}\n"
+"\n"
+"/* Alternating row colors */\n"
+"QTableWidget {\n"
+"    alternate-background-color: #f9fbfc;\n"
+"}\n"
+"QTableWidget::item:alternate,\n"
+"QTableView::item:alternate {\n"
+"    background-color: #f9fbfc;\n"
+"}\n"
+"\n"
+"/* Header (cột và hàng) */\n"
+"QHeaderView::section {\n"
+"    background-color: #e1e5ea;\n"
+"    padding: 6px;\n"
+"    border: none;\n"
+"    border-bottom: 1px solid #c0c4c8;\n"
+"    border-right: 1px solid #c0c4c8;\n"
+"    font-weight: bold;\n"
+"}\n"
+"QHeaderView::section:last,\n"
+"QHeaderView::section:last {\n"
+"    border-right: none;\n"
+"}\n"
+"\n"
+"/* Cell hover */\n"
+"QTableWidget::item:hover,\n"
+"QTableView::item:hover {\n"
+"    background-color: #e8f1fb;\n"
+"}\n"
+"\n"
+"/* Remove focus rectangle */\n"
+"QTableWidget::item:focus,\n"
+"QTableView::item:focus {\n"
+"    outline: none;\n"
+"}\n"
+"\n"
+"/* Scrollbar trong table */\n"
+"QTableWidget QScrollBar:vertical,\n"
+"QTableView QScrollBar:vertical {\n"
+"    background: transparent;\n"
+"    width: 8px;\n"
+"    margin: 0px;\n"
+"}\n"
+"QTableWidget QScrollBar::handle:vertical,\n"
+"QTableView QScrollBar::handle:vertical {\n"
+"    background: #c0c4c8;\n"
+"    min-height: 20px;\n"
+"    border-radius: 4px;\n"
+"}\n"
+"QTableWidget QScrollBar::add-line,\n"
+"QTableWidget QScrollBar::sub-line,\n"
+"QTableView QScrollBar::add-line,\n"
+"QTableView QScrollBar::sub-line {\n"
+"    height: 0;\n"
+"}\n"
+"\n"
+"/* Focused cell viền xanh nhẹ */\n"
+"QTableWidget::item:selected:active,\n"
+"QTableView::item:selected:active {\n"
+"    border: 1px solid #4a90e2;\n"
+"}\n"
+"\n"
+"/* Header hover (nếu muốn) */\n"
+"QHeaderView::section:hover {\n"
+"    background-color: #d7dae0;\n"
+"}\n"
+"")
+        self.downloadsTable.setAlternatingRowColors(True)
+        self.downloadsTable.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
+        self.downloadsTable.setObjectName("downloadsTable")
+        self.downloadsTable.setColumnCount(5)
+        self.downloadsTable.setRowCount(0)
+        item = QtWidgets.QTableWidgetItem()
+        self.downloadsTable.setHorizontalHeaderItem(0, item)
+        item = QtWidgets.QTableWidgetItem()
+        self.downloadsTable.setHorizontalHeaderItem(1, item)
+        item = QtWidgets.QTableWidgetItem()
+        self.downloadsTable.setHorizontalHeaderItem(2, item)
+        item = QtWidgets.QTableWidgetItem()
+        self.downloadsTable.setHorizontalHeaderItem(3, item)
+        item = QtWidgets.QTableWidgetItem()
+        self.downloadsTable.setHorizontalHeaderItem(4, item)
+        self.downloadsLayout.addWidget(self.downloadsTable)
+        self.mainTabWidget.addTab(self.downloadsTab, "")
+        self.cookiesTab = QtWidgets.QWidget()
+        self.cookiesTab.setObjectName("cookiesTab")
+        self.cookiesLayout = QtWidgets.QVBoxLayout(self.cookiesTab)
+        self.cookiesLayout.setObjectName("cookiesLayout")
+        self.cookiesSearchLayout = QtWidgets.QHBoxLayout()
+        self.cookiesSearchLayout.setObjectName("cookiesSearchLayout")
+        self.cookiesSearchLabel = QtWidgets.QLabel(self.cookiesTab)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.cookiesSearchLabel.setFont(font)
+        self.cookiesSearchLabel.setObjectName("cookiesSearchLabel")
+        self.cookiesSearchLayout.addWidget(self.cookiesSearchLabel)
+        self.cookiesSearchEdit = QtWidgets.QLineEdit(self.cookiesTab)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.cookiesSearchEdit.setFont(font)
+        self.cookiesSearchEdit.setStyleSheet("/* ==== CHUNG CHO CÁC TEXT INPUT / TEXT EDIT ==== */\n"
+"QLineEdit,\n"
+"QTextEdit,\n"
+"QPlainTextEdit {\n"
+"    background-color: #ffffff;\n"
+"    border: 1px solid #c0c4c8;      /* viền xám nhạt */\n"
+"    border-radius: 4px;             /* bo góc mềm */\n"
+"    padding: 4px 6px;               /* khoảng đệm bên trong */\n"
+"    selection-background-color: #cce4f7;\n"
+"    selection-color: #000;\n"
+"\n"
+"}\n"
+"\n"
+"/* Khi focus chuyển viền sang xanh */\n"
+"QLineEdit:focus,\n"
+"QTextEdit:focus,\n"
+"QPlainTextEdit:focus {\n"
+"    border: 1px solid #4a90e2;\n"
+"}\n"
+"\n"
+"/* ReadOnly thì nền hơi xám */\n"
+"QLineEdit[readOnly=\"true\"],\n"
+"QTextEdit[readOnly=\"true\"] {\n"
+"    background-color: #f0f2f5;\n"
+"}\n"
+"/* Thanh cuộn bên trong QTextEdit bo góc & nhỏ gọn */\n"
+"QTextEdit QScrollBar:vertical,\n"
+"QPlainTextEdit QScrollBar:vertical {\n"
+"    background: transparent;\n"
+"    width: 8px;\n"
+"    margin: 0px;\n"
+"}\n"
+"QTextEdit QScrollBar::handle:vertical,\n"
+"QPlainTextEdit QScrollBar::handle:vertical {\n"
+"    background: #c0c4c8;\n"
+"    min-height: 20px;\n"
+"    border-radius: 4px;\n"
+"}\n"
+"QTextEdit QScrollBar::add-line, QTextEdit QScrollBar::sub-line,\n"
+"QPlainTextEdit QScrollBar::add-line, QPlainTextEdit QScrollBar::sub-line {\n"
+"    height: 0;\n"
+"}\n"
+"")
+        self.cookiesSearchEdit.setObjectName("cookiesSearchEdit")
+        self.cookiesSearchLayout.addWidget(self.cookiesSearchEdit)
+        self.pushButton_5 = QtWidgets.QPushButton(self.cookiesTab)
+        self.pushButton_5.setMinimumSize(QtCore.QSize(150, 0))
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.pushButton_5.setFont(font)
+        self.pushButton_5.setStyleSheet("/* QPushButton */\n"
+"QPushButton {\n"
+"    background-color: #4a90e2;\n"
+"    border: none;\n"
+"    border-radius: 4px;\n"
+"    padding: 6px 12px;\n"
+"    color: #fff;\n"
+"}\n"
+"QPushButton:hover {\n"
+"    background-color: #5aa0f2;\n"
+"}\n"
+"QPushButton:pressed {\n"
+"    background-color: #3a7fcc;\n"
+"}")
+        self.pushButton_5.setObjectName("pushButton_5")
+        self.cookiesSearchLayout.addWidget(self.pushButton_5)
+        self.cookiesFilterLabel = QtWidgets.QLabel(self.cookiesTab)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.cookiesFilterLabel.setFont(font)
+        self.cookiesFilterLabel.setObjectName("cookiesFilterLabel")
+        self.cookiesSearchLayout.addWidget(self.cookiesFilterLabel)
+        self.cookiesFilterCombo = QtWidgets.QComboBox(self.cookiesTab)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.cookiesFilterCombo.setFont(font)
+        self.cookiesFilterCombo.setStyleSheet("/* ==== QComboBox ==== */\n"
+"QComboBox {\n"
+"    /* nền trắng, bo góc và viền xám nhạt giống QLineEdit */\n"
+"    background-color: #ffffff;\n"
+"    border: 1px solid #c0c4c8;\n"
+"    border-radius: 4px;\n"
+"    padding: 4px 30px 4px 8px; /* để chừa chỗ cho mũi tên */\n"
+"    min-height: 24px;\n"
+"    /* font đã định ở đầu styles.qss sẽ áp dụng */\n"
+"}\n"
+"\n"
+"/* Khi hover đổi nhẹ viền */\n"
+"QComboBox:hover {\n"
+"    border: 1px solid #a0a4a8;\n"
+"}\n"
+"\n"
+"/* Khi focus (đang chọn) đổi viền xanh */\n"
+"QComboBox:focus {\n"
+"    border: 1px solid #4a90e2;\n"
+"}\n"
+"\n"
+"/* Popup list (QAbstractItemView) */\n"
+"QComboBox QAbstractItemView {\n"
+"    background-color: #ffffff;\n"
+"    border: 1px solid #c0c4c8;\n"
+"    border-radius: 4px;\n"
+"    padding: 4px;\n"
+"    outline: none;\n"
+"    selection-background-color: #cce4f7;\n"
+"    selection-color: #000;\n"
+"}\n"
+"\n"
+"/* Các item trong list khi hover */\n"
+"QComboBox QAbstractItemView::item:hover {\n"
+"    background-color: #e8f1fb;\n"
+"}\n"
+"\n"
+"/* Scrollbar nhỏ gọn trong popup */\n"
+"QComboBox QAbstractItemView QScrollBar:vertical {\n"
+"    background: transparent;\n"
+"    width: 8px;\n"
+"    margin: 0px;\n"
+"}\n"
+"QComboBox QAbstractItemView QScrollBar::handle:vertical {\n"
+"    background: #c0c4c8;\n"
+"    min-height: 20px;\n"
+"    border-radius: 4px;\n"
+"}\n"
+"QComboBox QAbstractItemView QScrollBar::add-line,\n"
+"QComboBox QAbstractItemView QScrollBar::sub-line {\n"
+"    height: 0;\n"
+"}\n"
+"")
+        self.cookiesFilterCombo.setObjectName("cookiesFilterCombo")
+        self.cookiesFilterCombo.addItem("")
+        self.cookiesSearchLayout.addWidget(self.cookiesFilterCombo)
+        self.label_5 = QtWidgets.QLabel(self.cookiesTab)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.label_5.setFont(font)
+        self.label_5.setObjectName("label_5")
+        self.cookiesSearchLayout.addWidget(self.label_5)
+        self.cookiesLayout.addLayout(self.cookiesSearchLayout)
+        self.cookiesTable = QtWidgets.QTableWidget(self.cookiesTab)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.cookiesTable.setFont(font)
+        self.cookiesTable.setStyleSheet("/* ==== QTableWidget / QTableView ==== */\n"
+"QTableWidget,\n"
+"QTableView {\n"
+"    background-color: #ffffff;           /* nền trắng */\n"
+"    border: 1px solid #c0c4c8;           /* viền xám nhạt */\n"
+"    gridline-color: #e0e3e6;             /* màu lưới */\n"
+"    border-radius: 6px;                  /* bo góc toàn widget */\n"
+"    selection-background-color: #cce4f7; /* màu nền khi chọn */\n"
+"    selection-color: #000000;            /* màu chữ khi chọn */\n"
+"}\n"
+"\n"
+"/* Alternating row colors */\n"
+"QTableWidget {\n"
+"    alternate-background-color: #f9fbfc;\n"
+"}\n"
+"QTableWidget::item:alternate,\n"
+"QTableView::item:alternate {\n"
+"    background-color: #f9fbfc;\n"
+"}\n"
+"\n"
+"/* Header (cột và hàng) */\n"
+"QHeaderView::section {\n"
+"    background-color: #e1e5ea;\n"
+"    padding: 6px;\n"
+"    border: none;\n"
+"    border-bottom: 1px solid #c0c4c8;\n"
+"    border-right: 1px solid #c0c4c8;\n"
+"    font-weight: bold;\n"
+"}\n"
+"QHeaderView::section:last,\n"
+"QHeaderView::section:last {\n"
+"    border-right: none;\n"
+"}\n"
+"\n"
+"/* Cell hover */\n"
+"QTableWidget::item:hover,\n"
+"QTableView::item:hover {\n"
+"    background-color: #e8f1fb;\n"
+"}\n"
+"\n"
+"/* Remove focus rectangle */\n"
+"QTableWidget::item:focus,\n"
+"QTableView::item:focus {\n"
+"    outline: none;\n"
+"}\n"
+"\n"
+"/* Scrollbar trong table */\n"
+"QTableWidget QScrollBar:vertical,\n"
+"QTableView QScrollBar:vertical {\n"
+"    background: transparent;\n"
+"    width: 8px;\n"
+"    margin: 0px;\n"
+"}\n"
+"QTableWidget QScrollBar::handle:vertical,\n"
+"QTableView QScrollBar::handle:vertical {\n"
+"    background: #c0c4c8;\n"
+"    min-height: 20px;\n"
+"    border-radius: 4px;\n"
+"}\n"
+"QTableWidget QScrollBar::add-line,\n"
+"QTableWidget QScrollBar::sub-line,\n"
+"QTableView QScrollBar::add-line,\n"
+"QTableView QScrollBar::sub-line {\n"
+"    height: 0;\n"
+"}\n"
+"\n"
+"/* Focused cell viền xanh nhẹ */\n"
+"QTableWidget::item:selected:active,\n"
+"QTableView::item:selected:active {\n"
+"    border: 1px solid #4a90e2;\n"
+"}\n"
+"\n"
+"/* Header hover (nếu muốn) */\n"
+"QHeaderView::section:hover {\n"
+"    background-color: #d7dae0;\n"
+"}\n"
+"")
+        self.cookiesTable.setAlternatingRowColors(True)
+        self.cookiesTable.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
+        self.cookiesTable.setObjectName("cookiesTable")
+        self.cookiesTable.setColumnCount(6)
+        self.cookiesTable.setRowCount(0)
+        item = QtWidgets.QTableWidgetItem()
+        self.cookiesTable.setHorizontalHeaderItem(0, item)
+        item = QtWidgets.QTableWidgetItem()
+        self.cookiesTable.setHorizontalHeaderItem(1, item)
+        item = QtWidgets.QTableWidgetItem()
+        self.cookiesTable.setHorizontalHeaderItem(2, item)
+        item = QtWidgets.QTableWidgetItem()
+        self.cookiesTable.setHorizontalHeaderItem(3, item)
+        item = QtWidgets.QTableWidgetItem()
+        self.cookiesTable.setHorizontalHeaderItem(4, item)
+        item = QtWidgets.QTableWidgetItem()
+        self.cookiesTable.setHorizontalHeaderItem(5, item)
+        self.cookiesLayout.addWidget(self.cookiesTable)
+        self.mainTabWidget.addTab(self.cookiesTab, "")
+        self.cacheTab = QtWidgets.QWidget()
+        self.cacheTab.setObjectName("cacheTab")
+        self.cacheLayout = QtWidgets.QVBoxLayout(self.cacheTab)
+        self.cacheLayout.setObjectName("cacheLayout")
+        self.cacheSearchLayout = QtWidgets.QHBoxLayout()
+        self.cacheSearchLayout.setObjectName("cacheSearchLayout")
+        self.cacheSearchLabel = QtWidgets.QLabel(self.cacheTab)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.cacheSearchLabel.setFont(font)
+        self.cacheSearchLabel.setObjectName("cacheSearchLabel")
+        self.cacheSearchLayout.addWidget(self.cacheSearchLabel)
+        self.cacheSearchEdit = QtWidgets.QLineEdit(self.cacheTab)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.cacheSearchEdit.setFont(font)
+        self.cacheSearchEdit.setStyleSheet("/* ==== CHUNG CHO CÁC TEXT INPUT / TEXT EDIT ==== */\n"
+"QLineEdit,\n"
+"QTextEdit,\n"
+"QPlainTextEdit {\n"
+"    background-color: #ffffff;\n"
+"    border: 1px solid #c0c4c8;      /* viền xám nhạt */\n"
+"    border-radius: 4px;             /* bo góc mềm */\n"
+"    padding: 4px 6px;               /* khoảng đệm bên trong */\n"
+"    selection-background-color: #cce4f7;\n"
+"    selection-color: #000;\n"
+"}\n"
+"\n"
+"/* Khi focus chuyển viền sang xanh */\n"
+"QLineEdit:focus,\n"
+"QTextEdit:focus,\n"
+"QPlainTextEdit:focus {\n"
+"    border: 1px solid #4a90e2;\n"
+"}\n"
+"\n"
+"\n"
+"/* ReadOnly thì nền hơi xám */\n"
+"QLineEdit[readOnly=\"true\"],\n"
+"QTextEdit[readOnly=\"true\"] {\n"
+"    background-color: #f0f2f5;\n"
+"}\n"
+"\n"
+"/* Thanh cuộn bên trong QTextEdit bo góc & nhỏ gọn */\n"
+"QTextEdit QScrollBar:vertical,\n"
+"QPlainTextEdit QScrollBar:vertical {\n"
+"    background: transparent;\n"
+"    width: 8px;\n"
+"    margin: 0px;\n"
+"}\n"
+"QTextEdit QScrollBar::handle:vertical,\n"
+"QPlainTextEdit QScrollBar::handle:vertical {\n"
+"    background: #c0c4c8;\n"
+"    min-height: 20px;\n"
+"    border-radius: 4px;\n"
+"}\n"
+"QTextEdit QScrollBar::add-line, QTextEdit QScrollBar::sub-line,\n"
+"QPlainTextEdit QScrollBar::add-line, QPlainTextEdit QScrollBar::sub-line {\n"
+"    height: 0;\n"
+"}\n"
+"")
+        self.cacheSearchEdit.setObjectName("cacheSearchEdit")
+        self.cacheSearchLayout.addWidget(self.cacheSearchEdit)
+        self.pushButton_3 = QtWidgets.QPushButton(self.cacheTab)
+        self.pushButton_3.setMinimumSize(QtCore.QSize(150, 0))
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.pushButton_3.setFont(font)
+        self.pushButton_3.setStyleSheet("/* QPushButton */\n"
+"QPushButton {\n"
+"    background-color: #4a90e2;\n"
+"    border: none;\n"
+"    border-radius: 4px;\n"
+"    padding: 6px 12px;\n"
+"    color: #fff;\n"
+"}\n"
+"QPushButton:hover {\n"
+"    background-color: #5aa0f2;\n"
+"}\n"
+"QPushButton:pressed {\n"
+"    background-color: #3a7fcc;\n"
+"}")
+        self.pushButton_3.setObjectName("pushButton_3")
+        self.cacheSearchLayout.addWidget(self.pushButton_3)
+        self.pushButton_4 = QtWidgets.QPushButton(self.cacheTab)
+        self.pushButton_4.setMinimumSize(QtCore.QSize(150, 0))
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.pushButton_4.setFont(font)
+        self.pushButton_4.setStyleSheet("/* QPushButton */\n"
+"QPushButton {\n"
+"    background-color: #4a90e2;\n"
+"    border: none;\n"
+"    border-radius: 4px;\n"
+"    padding: 6px 12px;\n"
+"    color: #fff;\n"
+"}\n"
+"QPushButton:hover {\n"
+"    background-color: #5aa0f2;\n"
+"}\n"
+"QPushButton:pressed {\n"
+"    background-color: #3a7fcc;\n"
+"}")
+        self.pushButton_4.setObjectName("pushButton_4")
+        self.cacheSearchLayout.addWidget(self.pushButton_4)
+        self.cacheFilterLabel = QtWidgets.QLabel(self.cacheTab)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.cacheFilterLabel.setFont(font)
+        self.cacheFilterLabel.setObjectName("cacheFilterLabel")
+        self.cacheSearchLayout.addWidget(self.cacheFilterLabel)
+        self.cacheFilterCombo = QtWidgets.QComboBox(self.cacheTab)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.cacheFilterCombo.setFont(font)
+        self.cacheFilterCombo.setStyleSheet("/* ==== QComboBox ==== */\n"
+"QComboBox {\n"
+"    /* nền trắng, bo góc và viền xám nhạt giống QLineEdit */\n"
+"    background-color: #ffffff;\n"
+"    border: 1px solid #c0c4c8;\n"
+"    border-radius: 4px;\n"
+"    padding: 4px 30px 4px 8px; /* để chừa chỗ cho mũi tên */\n"
+"    min-height: 24px;\n"
+"\n"
+"    /* font đã định ở đầu styles.qss sẽ áp dụng */\n"
+"}\n"
+"\n"
+"/* Khi hover đổi nhẹ viền */\n"
+"QComboBox:hover {\n"
+"    border: 1px solid #a0a4a8;\n"
+"}\n"
+"\n"
+"/* Khi focus (đang chọn) đổi viền xanh */\n"
+"QComboBox:focus {\n"
+"    border: 1px solid #4a90e2;\n"
+"}\n"
+"\n"
+"/* Popup list (QAbstractItemView) */\n"
+"QComboBox QAbstractItemView {\n"
+"    background-color: #ffffff;\n"
+"    border: 1px solid #c0c4c8;\n"
+"    border-radius: 4px;\n"
+"    padding: 4px;\n"
+"    outline: none;\n"
+"    selection-background-color: #cce4f7;\n"
+"    selection-color: #000;\n"
+"}\n"
+"\n"
+"/* Các item trong list khi hover */\n"
+"QComboBox QAbstractItemView::item:hover {\n"
+"    background-color: #e8f1fb;\n"
+"}\n"
+"\n"
+"/* Scrollbar nhỏ gọn trong popup */\n"
+"QComboBox QAbstractItemView QScrollBar:vertical {\n"
+"    background: transparent;\n"
+"    width: 8px;\n"
+"    margin: 0px;\n"
+"}\n"
+"QComboBox QAbstractItemView QScrollBar::handle:vertical {\n"
+"    background: #c0c4c8;\n"
+"    min-height: 20px;\n"
+"    border-radius: 4px;\n"
+"}\n"
+"QComboBox QAbstractItemView QScrollBar::add-line,\n"
+"QComboBox QAbstractItemView QScrollBar::sub-line {\n"
+"    height: 0;\n"
+"}\n"
+"")
+        self.cacheFilterCombo.setObjectName("cacheFilterCombo")
+        self.cacheFilterCombo.addItem("")
+        self.cacheFilterCombo.addItem("")
+        self.cacheFilterCombo.addItem("")
+        self.cacheFilterCombo.addItem("")
+        self.cacheFilterCombo.addItem("")
+        self.cacheSearchLayout.addWidget(self.cacheFilterCombo)
+        self.label_4 = QtWidgets.QLabel(self.cacheTab)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.label_4.setFont(font)
+        self.label_4.setObjectName("label_4")
+        self.cacheSearchLayout.addWidget(self.label_4)
+        self.cacheLayout.addLayout(self.cacheSearchLayout)
+        self.cacheTable = QtWidgets.QTableWidget(self.cacheTab)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.cacheTable.setFont(font)
+        self.cacheTable.setStyleSheet("/* ==== QTableWidget / QTableView ==== */\n"
+"QTableWidget,\n"
+"QTableView {\n"
+"    background-color: #ffffff;           /* nền trắng */\n"
+"    border: 1px solid #c0c4c8;           /* viền xám nhạt */\n"
+"    gridline-color: #e0e3e6;             /* màu lưới */\n"
+"    border-radius: 6px;                  /* bo góc toàn widget */\n"
+"    selection-background-color: #cce4f7; /* màu nền khi chọn */\n"
+"    selection-color: #000000;            /* màu chữ khi chọn */\n"
+"}\n"
+"\n"
+"/* Alternating row colors */\n"
+"QTableWidget {\n"
+"    alternate-background-color: #f9fbfc;\n"
+"}\n"
+"QTableWidget::item:alternate,\n"
+"QTableView::item:alternate {\n"
+"    background-color: #f9fbfc;\n"
+"}\n"
+"\n"
+"/* Header (cột và hàng) */\n"
+"QHeaderView::section {\n"
+"    background-color: #e1e5ea;\n"
+"    padding: 6px;\n"
+"    border: none;\n"
+"    border-bottom: 1px solid #c0c4c8;\n"
+"    border-right: 1px solid #c0c4c8;\n"
+"    font-weight: bold;\n"
+"}\n"
+"QHeaderView::section:last,\n"
+"QHeaderView::section:last {\n"
+"    border-right: none;\n"
+"}\n"
+"\n"
+"/* Cell hover */\n"
+"QTableWidget::item:hover,\n"
+"QTableView::item:hover {\n"
+"    background-color: #e8f1fb;\n"
+"}\n"
+"\n"
+"/* Remove focus rectangle */\n"
+"QTableWidget::item:focus,\n"
+"QTableView::item:focus {\n"
+"    outline: none;\n"
+"}\n"
+"\n"
+"/* Scrollbar trong table */\n"
+"QTableWidget QScrollBar:vertical,\n"
+"QTableView QScrollBar:vertical {\n"
+"    background: transparent;\n"
+"    width: 8px;\n"
+"    margin: 0px;\n"
+"}\n"
+"QTableWidget QScrollBar::handle:vertical,\n"
+"QTableView QScrollBar::handle:vertical {\n"
+"    background: #c0c4c8;\n"
+"    min-height: 20px;\n"
+"    border-radius: 4px;\n"
+"}\n"
+"QTableWidget QScrollBar::add-line,\n"
+"QTableWidget QScrollBar::sub-line,\n"
+"QTableView QScrollBar::add-line,\n"
+"QTableView QScrollBar::sub-line {\n"
+"    height: 0;\n"
+"}\n"
+"\n"
+"/* Focused cell viền xanh nhẹ */\n"
+"QTableWidget::item:selected:active,\n"
+"QTableView::item:selected:active {\n"
+"    border: 1px solid #4a90e2;\n"
+"}\n"
+"\n"
+"/* Header hover (nếu muốn) */\n"
+"QHeaderView::section:hover {\n"
+"    background-color: #d7dae0;\n"
+"}\n"
+"")
+        self.cacheTable.setAlternatingRowColors(True)
+        self.cacheTable.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
+        self.cacheTable.setObjectName("cacheTable")
+        self.cacheTable.setColumnCount(5)
+        self.cacheTable.setRowCount(0)
+        item = QtWidgets.QTableWidgetItem()
+        self.cacheTable.setHorizontalHeaderItem(0, item)
+        item = QtWidgets.QTableWidgetItem()
+        self.cacheTable.setHorizontalHeaderItem(1, item)
+        item = QtWidgets.QTableWidgetItem()
+        self.cacheTable.setHorizontalHeaderItem(2, item)
+        item = QtWidgets.QTableWidgetItem()
+        self.cacheTable.setHorizontalHeaderItem(3, item)
+        item = QtWidgets.QTableWidgetItem()
+        self.cacheTable.setHorizontalHeaderItem(4, item)
+        self.cacheLayout.addWidget(self.cacheTable)
+        self.mainTabWidget.addTab(self.cacheTab, "")
+        self.extensionsTab = QtWidgets.QWidget()
+        self.extensionsTab.setObjectName("extensionsTab")
+        self.extensionsLayout = QtWidgets.QVBoxLayout(self.extensionsTab)
+        self.extensionsLayout.setObjectName("extensionsLayout")
+        self.extensionsTable = QtWidgets.QTableWidget(self.extensionsTab)
+        self.extensionsTable.setStyleSheet("/* ==== QTableWidget / QTableView ==== */\n"
+"QTableWidget,\n"
+"QTableView {\n"
+"    background-color: #ffffff;           /* nền trắng */\n"
+"    border: 1px solid #c0c4c8;           /* viền xám nhạt */\n"
+"    gridline-color: #e0e3e6;             /* màu lưới */\n"
+"    border-radius: 6px;                  /* bo góc toàn widget */\n"
+"    selection-background-color: #cce4f7; /* màu nền khi chọn */\n"
+"    selection-color: #000000;            /* màu chữ khi chọn */\n"
+"}\n"
+"\n"
+"/* Alternating row colors */\n"
+"QTableWidget {\n"
+"    alternate-background-color: #f9fbfc;\n"
+"}\n"
+"QTableWidget::item:alternate,\n"
+"QTableView::item:alternate {\n"
+"    background-color: #f9fbfc;\n"
+"}\n"
+"\n"
+"/* Header (cột và hàng) */\n"
+"QHeaderView::section {\n"
+"    background-color: #e1e5ea;\n"
+"    padding: 6px;\n"
+"    border: none;\n"
+"    border-bottom: 1px solid #c0c4c8;\n"
+"    border-right: 1px solid #c0c4c8;\n"
+"    font-weight: bold;\n"
+"}\n"
+"QHeaderView::section:last,\n"
+"QHeaderView::section:last {\n"
+"    border-right: none;\n"
+"}\n"
+"\n"
+"/* Cell hover */\n"
+"QTableWidget::item:hover,\n"
+"QTableView::item:hover {\n"
+"    background-color: #e8f1fb;\n"
+"}\n"
+"\n"
+"/* Remove focus rectangle */\n"
+"QTableWidget::item:focus,\n"
+"QTableView::item:focus {\n"
+"    outline: none;\n"
+"}\n"
+"\n"
+"/* Scrollbar trong table */\n"
+"QTableWidget QScrollBar:vertical,\n"
+"QTableView QScrollBar:vertical {\n"
+"    background: transparent;\n"
+"    width: 8px;\n"
+"    margin: 0px;\n"
+"}\n"
+"QTableWidget QScrollBar::handle:vertical,\n"
+"QTableView QScrollBar::handle:vertical {\n"
+"    background: #c0c4c8;\n"
+"    min-height: 20px;\n"
+"    border-radius: 4px;\n"
+"}\n"
+"QTableWidget QScrollBar::add-line,\n"
+"QTableWidget QScrollBar::sub-line,\n"
+"QTableView QScrollBar::add-line,\n"
+"QTableView QScrollBar::sub-line {\n"
+"    height: 0;\n"
+"}\n"
+"\n"
+"/* Focused cell viền xanh nhẹ */\n"
+"QTableWidget::item:selected:active,\n"
+"QTableView::item:selected:active {\n"
+"    border: 1px solid #4a90e2;\n"
+"}\n"
+"\n"
+"/* Header hover (nếu muốn) */\n"
+"QHeaderView::section:hover {\n"
+"    background-color: #d7dae0;\n"
+"}\n"
+"")
+        self.extensionsTable.setAlternatingRowColors(True)
+        self.extensionsTable.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
+        self.extensionsTable.setObjectName("extensionsTable")
+        self.extensionsTable.setColumnCount(6)
+        self.extensionsTable.setRowCount(0)
+        item = QtWidgets.QTableWidgetItem()
+        self.extensionsTable.setHorizontalHeaderItem(0, item)
+        item = QtWidgets.QTableWidgetItem()
+        self.extensionsTable.setHorizontalHeaderItem(1, item)
+        item = QtWidgets.QTableWidgetItem()
+        self.extensionsTable.setHorizontalHeaderItem(2, item)
+        item = QtWidgets.QTableWidgetItem()
+        self.extensionsTable.setHorizontalHeaderItem(3, item)
+        item = QtWidgets.QTableWidgetItem()
+        self.extensionsTable.setHorizontalHeaderItem(4, item)
+        item = QtWidgets.QTableWidgetItem()
+        self.extensionsTable.setHorizontalHeaderItem(5, item)
+        self.extensionsLayout.addWidget(self.extensionsTable)
+        self.mainTabWidget.addTab(self.extensionsTab, "")
+        self.formDataTab = QtWidgets.QWidget()
+        self.formDataTab.setObjectName("formDataTab")
+        self.formDataLayout = QtWidgets.QVBoxLayout(self.formDataTab)
+        self.formDataLayout.setObjectName("formDataLayout")
+        self.label_6 = QtWidgets.QLabel(self.formDataTab)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        font.setBold(True)
+        font.setWeight(75)
+        self.label_6.setFont(font)
+        self.label_6.setStyleSheet("color: #e67e22; font-weight: bold; padding: 5px; background-color: #fdf2e9; border-radius: 3px;")
+        self.label_6.setObjectName("label_6")
+        self.formDataLayout.addWidget(self.label_6)
+        self.formDataSearchLayout = QtWidgets.QHBoxLayout()
+        self.formDataSearchLayout.setObjectName("formDataSearchLayout")
+        self.formDataSearchLabel = QtWidgets.QLabel(self.formDataTab)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.formDataSearchLabel.setFont(font)
+        self.formDataSearchLabel.setObjectName("formDataSearchLabel")
+        self.formDataSearchLayout.addWidget(self.formDataSearchLabel)
+        self.formDataSearchEdit = QtWidgets.QLineEdit(self.formDataTab)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.formDataSearchEdit.setFont(font)
+        self.formDataSearchEdit.setStyleSheet("/* ==== CHUNG CHO CÁC TEXT INPUT / TEXT EDIT ==== */\n"
+"QLineEdit,\n"
+"QTextEdit,\n"
+"QPlainTextEdit {\n"
+"    background-color: #ffffff;\n"
+"    border: 1px solid #c0c4c8;      /* viền xám nhạt */\n"
+"    border-radius: 4px;             /* bo góc mềm */\n"
+"    padding: 4px 6px;               /* khoảng đệm bên trong */\n"
+"    selection-background-color: #cce4f7;\n"
+"    selection-color: #000;\n"
+"\n"
+"}\n"
+"\n"
+"/* Khi focus chuyển viền sang xanh */\n"
+"QLineEdit:focus,\n"
+"QTextEdit:focus,\n"
+"QPlainTextEdit:focus {\n"
+"    border: 1px solid #4a90e2;\n"
+"}\n"
+"\n"
+"\n"
+"\n"
+"/* ReadOnly thì nền hơi xám */\n"
+"QLineEdit[readOnly=\"true\"],\n"
+"QTextEdit[readOnly=\"true\"] {\n"
+"    background-color: #f0f2f5;\n"
+"}\n"
+"\n"
+"/* Thanh cuộn bên trong QTextEdit bo góc & nhỏ gọn */\n"
+"QTextEdit QScrollBar:vertical,\n"
+"QPlainTextEdit QScrollBar:vertical {\n"
+"    background: transparent;\n"
+"    width: 8px;\n"
+"    margin: 0px;\n"
+"}\n"
+"QTextEdit QScrollBar::handle:vertical,\n"
+"QPlainTextEdit QScrollBar::handle:vertical {\n"
+"    background: #c0c4c8;\n"
+"    min-height: 20px;\n"
+"    border-radius: 4px;\n"
+"}\n"
+"QTextEdit QScrollBar::add-line, QTextEdit QScrollBar::sub-line,\n"
+"QPlainTextEdit QScrollBar::add-line, QPlainTextEdit QScrollBar::sub-line {\n"
+"    height: 0;\n"
+"}\n"
+"")
+        self.formDataSearchEdit.setObjectName("formDataSearchEdit")
+        self.formDataSearchLayout.addWidget(self.formDataSearchEdit)
+        self.showPasswordsCheckBox = QtWidgets.QCheckBox(self.formDataTab)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.showPasswordsCheckBox.setFont(font)
+        self.showPasswordsCheckBox.setObjectName("showPasswordsCheckBox")
+        self.formDataSearchLayout.addWidget(self.showPasswordsCheckBox)
+        self.pushButton_6 = QtWidgets.QPushButton(self.formDataTab)
+        self.pushButton_6.setMinimumSize(QtCore.QSize(150, 0))
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.pushButton_6.setFont(font)
+        self.pushButton_6.setStyleSheet("/* QPushButton */\n"
+"QPushButton {\n"
+"    background-color: #4a90e2;\n"
+"    border: none;\n"
+"    border-radius: 4px;\n"
+"    padding: 6px 12px;\n"
+"    color: #fff;\n"
+"}\n"
+"QPushButton:hover {\n"
+"    background-color: #5aa0f2;\n"
+"}\n"
+"QPushButton:pressed {\n"
+"    background-color: #3a7fcc;\n"
+"}")
+        self.pushButton_6.setObjectName("pushButton_6")
+        self.formDataSearchLayout.addWidget(self.pushButton_6)
+        self.label_7 = QtWidgets.QLabel(self.formDataTab)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.label_7.setFont(font)
+        self.label_7.setObjectName("label_7")
+        self.formDataSearchLayout.addWidget(self.label_7)
+        self.formDataLayout.addLayout(self.formDataSearchLayout)
+        self.formDataTable = QtWidgets.QTableWidget(self.formDataTab)
+        self.formDataTable.setStyleSheet("/* ==== QTableWidget / QTableView ==== */\n"
+"QTableWidget,\n"
+"QTableView {\n"
+"    background-color: #ffffff;           /* nền trắng */\n"
+"    border: 1px solid #c0c4c8;           /* viền xám nhạt */\n"
+"    gridline-color: #e0e3e6;             /* màu lưới */\n"
+"    border-radius: 6px;                  /* bo góc toàn widget */\n"
+"    selection-background-color: #cce4f7; /* màu nền khi chọn */\n"
+"    selection-color: #000000;            /* màu chữ khi chọn */\n"
+"}\n"
+"\n"
+"/* Alternating row colors */\n"
+"QTableWidget {\n"
+"    alternate-background-color: #f9fbfc;\n"
+"}\n"
+"QTableWidget::item:alternate,\n"
+"QTableView::item:alternate {\n"
+"    background-color: #f9fbfc;\n"
+"}\n"
+"\n"
+"/* Header (cột và hàng) */\n"
+"QHeaderView::section {\n"
+"    background-color: #e1e5ea;\n"
+"    padding: 6px;\n"
+"    border: none;\n"
+"    border-bottom: 1px solid #c0c4c8;\n"
+"    border-right: 1px solid #c0c4c8;\n"
+"    font-weight: bold;\n"
+"}\n"
+"QHeaderView::section:last,\n"
+"QHeaderView::section:last {\n"
+"    border-right: none;\n"
+"}\n"
+"\n"
+"/* Cell hover */\n"
+"QTableWidget::item:hover,\n"
+"QTableView::item:hover {\n"
+"    background-color: #e8f1fb;\n"
+"}\n"
+"\n"
+"/* Remove focus rectangle */\n"
+"QTableWidget::item:focus,\n"
+"QTableView::item:focus {\n"
+"    outline: none;\n"
+"}\n"
+"\n"
+"/* Scrollbar trong table */\n"
+"QTableWidget QScrollBar:vertical,\n"
+"QTableView QScrollBar:vertical {\n"
+"    background: transparent;\n"
+"    width: 8px;\n"
+"    margin: 0px;\n"
+"}\n"
+"QTableWidget QScrollBar::handle:vertical,\n"
+"QTableView QScrollBar::handle:vertical {\n"
+"    background: #c0c4c8;\n"
+"    min-height: 20px;\n"
+"    border-radius: 4px;\n"
+"}\n"
+"QTableWidget QScrollBar::add-line,\n"
+"QTableWidget QScrollBar::sub-line,\n"
+"QTableView QScrollBar::add-line,\n"
+"QTableView QScrollBar::sub-line {\n"
+"    height: 0;\n"
+"}\n"
+"\n"
+"/* Focused cell viền xanh nhẹ */\n"
+"QTableWidget::item:selected:active,\n"
+"QTableView::item:selected:active {\n"
+"    border: 1px solid #4a90e2;\n"
+"}\n"
+"\n"
+"/* Header hover (nếu muốn) */\n"
+"QHeaderView::section:hover {\n"
+"    background-color: #d7dae0;\n"
+"}\n"
+"")
+        self.formDataTable.setAlternatingRowColors(True)
+        self.formDataTable.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
+        self.formDataTable.setObjectName("formDataTable")
+        self.formDataTable.setColumnCount(5)
+        self.formDataTable.setRowCount(0)
+        item = QtWidgets.QTableWidgetItem()
+        self.formDataTable.setHorizontalHeaderItem(0, item)
+        item = QtWidgets.QTableWidgetItem()
+        self.formDataTable.setHorizontalHeaderItem(1, item)
+        item = QtWidgets.QTableWidgetItem()
+        self.formDataTable.setHorizontalHeaderItem(2, item)
+        item = QtWidgets.QTableWidgetItem()
+        self.formDataTable.setHorizontalHeaderItem(3, item)
+        item = QtWidgets.QTableWidgetItem()
+        self.formDataTable.setHorizontalHeaderItem(4, item)
+        self.formDataLayout.addWidget(self.formDataTable)
+        self.mainTabWidget.addTab(self.formDataTab, "")
+        self.timelineTab = QtWidgets.QWidget()
+        self.timelineTab.setObjectName("timelineTab")
+        self.timelineLayout = QtWidgets.QVBoxLayout(self.timelineTab)
+        self.timelineLayout.setObjectName("timelineLayout")
+        self.timelineFilterLayout = QtWidgets.QHBoxLayout()
+        self.timelineFilterLayout.setObjectName("timelineFilterLayout")
+        self.comboBox = QtWidgets.QComboBox(self.timelineTab)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.comboBox.setFont(font)
+        self.comboBox.setStyleSheet("/* ==== QComboBox ==== */\n"
+"QComboBox {\n"
+"    /* nền trắng, bo góc và viền xám nhạt giống QLineEdit */\n"
+"    background-color: #ffffff;\n"
+"    border: 1px solid #c0c4c8;\n"
+"    border-radius: 4px;\n"
+"    padding: 4px 30px 4px 8px; /* để chừa chỗ cho mũi tên */\n"
+"    min-height: 24px;\n"
+"\n"
+"    /* font đã định ở đầu styles.qss sẽ áp dụng */\n"
+"}\n"
+"\n"
+"/* Khi hover đổi nhẹ viền */\n"
+"QComboBox:hover {\n"
+"    border: 1px solid #a0a4a8;\n"
+"}\n"
+"\n"
+"/* Khi focus (đang chọn) đổi viền xanh */\n"
+"QComboBox:focus {\n"
+"    border: 1px solid #4a90e2;\n"
+"}\n"
+"\n"
+"/* Popup list (QAbstractItemView) */\n"
+"QComboBox QAbstractItemView {\n"
+"    background-color: #ffffff;\n"
+"    border: 1px solid #c0c4c8;\n"
+"    border-radius: 4px;\n"
+"    padding: 4px;\n"
+"    outline: none;\n"
+"    selection-background-color: #cce4f7;\n"
+"    selection-color: #000;\n"
+"}\n"
+"\n"
+"/* Các item trong list khi hover */\n"
+"QComboBox QAbstractItemView::item:hover {\n"
+"    background-color: #e8f1fb;\n"
+"}\n"
+"\n"
+"/* Scrollbar nhỏ gọn trong popup */\n"
+"QComboBox QAbstractItemView QScrollBar:vertical {\n"
+"    background: transparent;\n"
+"    width: 8px;\n"
+"    margin: 0px;\n"
+"}\n"
+"QComboBox QAbstractItemView QScrollBar::handle:vertical {\n"
+"    background: #c0c4c8;\n"
+"    min-height: 20px;\n"
+"    border-radius: 4px;\n"
+"}\n"
+"QComboBox QAbstractItemView QScrollBar::add-line,\n"
+"QComboBox QAbstractItemView QScrollBar::sub-line {\n"
+"    height: 0;\n"
+"}\n"
+"")
+        self.comboBox.setObjectName("comboBox")
+        self.comboBox.addItem("")
+        self.comboBox.addItem("")
+        self.comboBox.addItem("")
+        self.comboBox.addItem("")
+        self.comboBox.addItem("")
+        self.timelineFilterLayout.addWidget(self.comboBox)
+        self.pushButton_7 = QtWidgets.QPushButton(self.timelineTab)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.pushButton_7.sizePolicy().hasHeightForWidth())
+        self.pushButton_7.setSizePolicy(sizePolicy)
+        self.pushButton_7.setMinimumSize(QtCore.QSize(150, 0))
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.pushButton_7.setFont(font)
+        self.pushButton_7.setStyleSheet("/* QPushButton */\n"
+"QPushButton {\n"
+"    background-color: #4a90e2;\n"
+"    border: none;\n"
+"    border-radius: 4px;\n"
+"    padding: 6px 12px;\n"
+"    color: #fff;\n"
+"}\n"
+"QPushButton:hover {\n"
+"    background-color: #5aa0f2;\n"
+"}\n"
+"QPushButton:pressed {\n"
+"    background-color: #3a7fcc;\n"
+"}")
+        self.pushButton_7.setObjectName("pushButton_7")
+        self.timelineFilterLayout.addWidget(self.pushButton_7)
+        self.pushButton_8 = QtWidgets.QPushButton(self.timelineTab)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.pushButton_8.sizePolicy().hasHeightForWidth())
+        self.pushButton_8.setSizePolicy(sizePolicy)
+        self.pushButton_8.setMinimumSize(QtCore.QSize(150, 0))
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.pushButton_8.setFont(font)
+        self.pushButton_8.setStyleSheet("/* QPushButton */\n"
+"QPushButton {\n"
+"    background-color: #4a90e2;\n"
+"    border: none;\n"
+"    border-radius: 4px;\n"
+"    padding: 6px 12px;\n"
+"    color: #fff;\n"
+"}\n"
+"QPushButton:hover {\n"
+"    background-color: #5aa0f2;\n"
+"}\n"
+"QPushButton:pressed {\n"
+"    background-color: #3a7fcc;\n"
+"}")
+        self.pushButton_8.setObjectName("pushButton_8")
+        self.timelineFilterLayout.addWidget(self.pushButton_8)
+        self.timelineDateLabel = QtWidgets.QLabel(self.timelineTab)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.timelineDateLabel.setFont(font)
+        self.timelineDateLabel.setObjectName("timelineDateLabel")
+        self.timelineFilterLayout.addWidget(self.timelineDateLabel)
+        self.startDateEdit = QtWidgets.QDateEdit(self.timelineTab)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.startDateEdit.setFont(font)
+        self.startDateEdit.setStyleSheet("/* ==== QDateEdit ==== */\n"
+"QDateEdit {\n"
+"    background-color: #ffffff;\n"
+"    border: 1px solid #c0c4c8;\n"
+"    border-radius: 4px;\n"
+"    padding: 4px 30px 4px 8px; /* chừa chỗ cho nút mũi tên */\n"
+"    min-height: 24px;\n"
+"    /* font sẽ kế thừa từ thiết lập chung */\n"
+"\n"
+"}\n"
+"\n"
+"/* Hover viền xám đậm hơn */\n"
+"QDateEdit:hover {\n"
+"    border: 1px solid #a0a4a8;\n"
+"}\n"
+"\n"
+"/* Focus viền xanh */\n"
+"QDateEdit:focus {\n"
+"    border: 1px solid #4a90e2;\n"
+"}\n"
+"\n"
+"/* ==== Popup Calendar ==== */\n"
+"QCalendarWidget {\n"
+"    background-color: #ffffff;\n"
+"    border: 1px solid #c0c4c8;\n"
+"    border-radius: 6px;\n"
+"    padding: 8px;\n"
+"    selection-background-color: #cce4f7;\n"
+"    selection-color: #000000;\n"
+"}\n"
+"\n"
+"/* Header tháng */\n"
+"QCalendarWidget QToolButton {\n"
+"    background-color: transparent;\n"
+"    border: none;\n"
+"    font-weight: bold;\n"
+"    color: #333333;\n"
+"}\n"
+"\n"
+"/* Tuần, ngày... */\n"
+"QCalendarWidget QAbstractItemView:enabled {\n"
+"    color: #2d2d2d;\n"
+"    selection-background-color: #cce4f7;\n"
+"    selection-color: #000;\n"
+"}\n"
+"\n"
+"/* Ngày khi hover */\n"
+"QCalendarWidget QAbstractItemView::item:hover {\n"
+"    background-color: #e8f1fb;\n"
+"}\n"
+"\n"
+"/* Scrollbar trong lịch (nếu có) */\n"
+"QCalendarWidget QScrollBar:vertical {\n"
+"    background: transparent;\n"
+"    width: 8px;\n"
+"}\n"
+"QCalendarWidget QScrollBar::handle:vertical {\n"
+"    background: #c0c4c8;\n"
+"    min-height: 20px;\n"
+"    border-radius: 4px;\n"
+"}\n"
+"QCalendarWidget QScrollBar::add-line,\n"
+"QCalendarWidget QScrollBar::sub-line {\n"
+"    height: 0;\n"
+"}\n"
+"")
+        self.startDateEdit.setCalendarPopup(True)
+        self.startDateEdit.setObjectName("startDateEdit")
+        self.timelineFilterLayout.addWidget(self.startDateEdit)
+        self.timelineToLabel = QtWidgets.QLabel(self.timelineTab)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.timelineToLabel.setFont(font)
+        self.timelineToLabel.setObjectName("timelineToLabel")
+        self.timelineFilterLayout.addWidget(self.timelineToLabel)
+        self.endDateEdit = QtWidgets.QDateEdit(self.timelineTab)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.endDateEdit.setFont(font)
+        self.endDateEdit.setStyleSheet("/* ==== QDateEdit ==== */\n"
+"QDateEdit {\n"
+"    background-color: #ffffff;\n"
+"    border: 1px solid #c0c4c8;\n"
+"    border-radius: 4px;\n"
+"    padding: 4px 30px 4px 8px; /* chừa chỗ cho nút mũi tên */\n"
+"    min-height: 24px;\n"
+"\n"
+"    /* font sẽ kế thừa từ thiết lập chung */\n"
+"}\n"
+"\n"
+"/* Hover viền xám đậm hơn */\n"
+"QDateEdit:hover {\n"
+"    border: 1px solid #a0a4a8;\n"
+"}\n"
+"\n"
+"/* Focus viền xanh */\n"
+"QDateEdit:focus {\n"
+"    border: 1px solid #4a90e2;\n"
+"}\n"
+"\n"
+"/* ==== Popup Calendar ==== */\n"
+"QCalendarWidget {\n"
+"    background-color: #ffffff;\n"
+"    border: 1px solid #c0c4c8;\n"
+"    border-radius: 6px;\n"
+"    padding: 8px;\n"
+"    selection-background-color: #cce4f7;\n"
+"    selection-color: #000000;\n"
+"}\n"
+"\n"
+"/* Header tháng */\n"
+"QCalendarWidget QToolButton {\n"
+"    background-color: transparent;\n"
+"    border: none;\n"
+"    font-weight: bold;\n"
+"    color: #333333;\n"
+"}\n"
+"\n"
+"/* Tuần, ngày... */\n"
+"QCalendarWidget QAbstractItemView:enabled {\n"
+"    color: #2d2d2d;\n"
+"    selection-background-color: #cce4f7;\n"
+"    selection-color: #000;\n"
+"}\n"
+"\n"
+"/* Ngày khi hover */\n"
+"QCalendarWidget QAbstractItemView::item:hover {\n"
+"    background-color: #e8f1fb;\n"
+"}\n"
+"\n"
+"/* Scrollbar trong lịch (nếu có) */\n"
+"QCalendarWidget QScrollBar:vertical {\n"
+"    background: transparent;\n"
+"    width: 8px;\n"
+"}\n"
+"QCalendarWidget QScrollBar::handle:vertical {\n"
+"    background: #c0c4c8;\n"
+"    min-height: 20px;\n"
+"    border-radius: 4px;\n"
+"}\n"
+"QCalendarWidget QScrollBar::add-line,\n"
+"QCalendarWidget QScrollBar::sub-line {\n"
+"    height: 0;\n"
+"}\n"
+"")
+        self.endDateEdit.setCalendarPopup(True)
+        self.endDateEdit.setObjectName("endDateEdit")
+        self.timelineFilterLayout.addWidget(self.endDateEdit)
+        self.updateTimelineButton = QtWidgets.QPushButton(self.timelineTab)
+        self.updateTimelineButton.setMinimumSize(QtCore.QSize(150, 0))
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.updateTimelineButton.setFont(font)
+        self.updateTimelineButton.setStyleSheet("/* QPushButton */\n"
+"QPushButton {\n"
+"    background-color: #4a90e2;\n"
+"    border: none;\n"
+"    border-radius: 4px;\n"
+"    padding: 6px 12px;\n"
+"    color: #fff;\n"
+"}\n"
+"QPushButton:hover {\n"
+"    background-color: #5aa0f2;\n"
+"}\n"
+"QPushButton:pressed {\n"
+"    background-color: #3a7fcc;\n"
+"}")
+        self.updateTimelineButton.setObjectName("updateTimelineButton")
+        self.timelineFilterLayout.addWidget(self.updateTimelineButton)
+        self.label_8 = QtWidgets.QLabel(self.timelineTab)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.label_8.setFont(font)
+        self.label_8.setObjectName("label_8")
+        self.timelineFilterLayout.addWidget(self.label_8)
+        self.timelineLayout.addLayout(self.timelineFilterLayout)
+        self.timelineTable = QtWidgets.QTableWidget(self.timelineTab)
+        self.timelineTable.setStyleSheet("/* ==== QTableWidget / QTableView ==== */\n"
+"QTableWidget,\n"
+"QTableView {\n"
+"    background-color: #ffffff;           /* nền trắng */\n"
+"    border: 1px solid #c0c4c8;           /* viền xám nhạt */\n"
+"    gridline-color: #e0e3e6;             /* màu lưới */\n"
+"    border-radius: 6px;                  /* bo góc toàn widget */\n"
+"    selection-background-color: #cce4f7; /* màu nền khi chọn */\n"
+"    selection-color: #000000;            /* màu chữ khi chọn */\n"
+"}\n"
+"\n"
+"/* Alternating row colors */\n"
+"QTableWidget {\n"
+"    alternate-background-color: #f9fbfc;\n"
+"}\n"
+"QTableWidget::item:alternate,\n"
+"QTableView::item:alternate {\n"
+"    background-color: #f9fbfc;\n"
+"}\n"
+"\n"
+"/* Header (cột và hàng) */\n"
+"QHeaderView::section {\n"
+"    background-color: #e1e5ea;\n"
+"    padding: 6px;\n"
+"    border: none;\n"
+"    border-bottom: 1px solid #c0c4c8;\n"
+"    border-right: 1px solid #c0c4c8;\n"
+"    font-weight: bold;\n"
+"}\n"
+"QHeaderView::section:last,\n"
+"QHeaderView::section:last {\n"
+"    border-right: none;\n"
+"}\n"
+"\n"
+"/* Cell hover */\n"
+"QTableWidget::item:hover,\n"
+"QTableView::item:hover {\n"
+"    background-color: #e8f1fb;\n"
+"}\n"
+"\n"
+"/* Remove focus rectangle */\n"
+"QTableWidget::item:focus,\n"
+"QTableView::item:focus {\n"
+"    outline: none;\n"
+"}\n"
+"\n"
+"/* Scrollbar trong table */\n"
+"QTableWidget QScrollBar:vertical,\n"
+"QTableView QScrollBar:vertical {\n"
+"    background: transparent;\n"
+"    width: 8px;\n"
+"    margin: 0px;\n"
+"}\n"
+"QTableWidget QScrollBar::handle:vertical,\n"
+"QTableView QScrollBar::handle:vertical {\n"
+"    background: #c0c4c8;\n"
+"    min-height: 20px;\n"
+"    border-radius: 4px;\n"
+"}\n"
+"QTableWidget QScrollBar::add-line,\n"
+"QTableWidget QScrollBar::sub-line,\n"
+"QTableView QScrollBar::add-line,\n"
+"QTableView QScrollBar::sub-line {\n"
+"    height: 0;\n"
+"}\n"
+"\n"
+"/* Focused cell viền xanh nhẹ */\n"
+"QTableWidget::item:selected:active,\n"
+"QTableView::item:selected:active {\n"
+"    border: 1px solid #4a90e2;\n"
+"}\n"
+"\n"
+"/* Header hover (nếu muốn) */\n"
+"QHeaderView::section:hover {\n"
+"    background-color: #d7dae0;\n"
+"}\n"
+"")
+        self.timelineTable.setAlternatingRowColors(True)
+        self.timelineTable.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
+        self.timelineTable.setObjectName("timelineTable")
+        self.timelineTable.setColumnCount(4)
+        self.timelineTable.setRowCount(0)
+        item = QtWidgets.QTableWidgetItem()
+        self.timelineTable.setHorizontalHeaderItem(0, item)
+        item = QtWidgets.QTableWidgetItem()
+        self.timelineTable.setHorizontalHeaderItem(1, item)
+        item = QtWidgets.QTableWidgetItem()
+        self.timelineTable.setHorizontalHeaderItem(2, item)
+        item = QtWidgets.QTableWidgetItem()
+        self.timelineTable.setHorizontalHeaderItem(3, item)
+        self.timelineLayout.addWidget(self.timelineTable)
+        self.mainTabWidget.addTab(self.timelineTab, "")
+        self.securityTab = QtWidgets.QWidget()
+        self.securityTab.setObjectName("securityTab")
+        self.securityLayout = QtWidgets.QVBoxLayout(self.securityTab)
+        self.securityLayout.setObjectName("securityLayout")
+        self.securityOptionsGroupBox = QtWidgets.QGroupBox(self.securityTab)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.securityOptionsGroupBox.setFont(font)
+        self.securityOptionsGroupBox.setObjectName("securityOptionsGroupBox")
+        self.securityOptionsLayout = QtWidgets.QGridLayout(self.securityOptionsGroupBox)
+        self.securityOptionsLayout.setObjectName("securityOptionsLayout")
+        self.suspiciousExtensionsCheckBox = QtWidgets.QCheckBox(self.securityOptionsGroupBox)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.suspiciousExtensionsCheckBox.setFont(font)
+        self.suspiciousExtensionsCheckBox.setChecked(True)
+        self.suspiciousExtensionsCheckBox.setObjectName("suspiciousExtensionsCheckBox")
+        self.securityOptionsLayout.addWidget(self.suspiciousExtensionsCheckBox, 0, 0, 1, 1)
+        self.unusualPatternsCheckBox = QtWidgets.QCheckBox(self.securityOptionsGroupBox)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.unusualPatternsCheckBox.setFont(font)
+        self.unusualPatternsCheckBox.setChecked(True)
+        self.unusualPatternsCheckBox.setObjectName("unusualPatternsCheckBox")
+        self.securityOptionsLayout.addWidget(self.unusualPatternsCheckBox, 0, 1, 1, 1)
+        self.dataExfiltrationCheckBox = QtWidgets.QCheckBox(self.securityOptionsGroupBox)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.dataExfiltrationCheckBox.setFont(font)
+        self.dataExfiltrationCheckBox.setChecked(True)
+        self.dataExfiltrationCheckBox.setObjectName("dataExfiltrationCheckBox")
+        self.securityOptionsLayout.addWidget(self.dataExfiltrationCheckBox, 1, 0, 1, 1)
+        self.privacySettingsCheckBox = QtWidgets.QCheckBox(self.securityOptionsGroupBox)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.privacySettingsCheckBox.setFont(font)
+        self.privacySettingsCheckBox.setChecked(True)
+        self.privacySettingsCheckBox.setObjectName("privacySettingsCheckBox")
+        self.securityOptionsLayout.addWidget(self.privacySettingsCheckBox, 1, 1, 1, 1)
+        self.securityLayout.addWidget(self.securityOptionsGroupBox)
+        self.securityFindingsGroupBox = QtWidgets.QGroupBox(self.securityTab)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.securityFindingsGroupBox.setFont(font)
+        self.securityFindingsGroupBox.setObjectName("securityFindingsGroupBox")
+        self.securityFindingsLayout = QtWidgets.QVBoxLayout(self.securityFindingsGroupBox)
+        self.securityFindingsLayout.setObjectName("securityFindingsLayout")
+        self.securityFindingsText = QtWidgets.QTextEdit(self.securityFindingsGroupBox)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.securityFindingsText.setFont(font)
+        self.securityFindingsText.setStyleSheet("/* ==== CHUNG CHO CÁC TEXT INPUT / TEXT EDIT ==== */\n"
+"QLineEdit,\n"
+"QTextEdit,\n"
+"QPlainTextEdit {\n"
+"    background-color: #ffffff;\n"
+"    border: 1px solid #c0c4c8;      /* viền xám nhạt */\n"
+"    border-radius: 4px;             /* bo góc mềm */\n"
+"    padding: 4px 6px;               /* khoảng đệm bên trong */\n"
+"    selection-background-color: #cce4f7;\n"
+"    selection-color: #000;\n"
+"}\n"
+"\n"
+"/* Khi focus chuyển viền sang xanh */\n"
+"QLineEdit:focus,\n"
+"QTextEdit:focus,\n"
+"QPlainTextEdit:focus {\n"
+"    border: 1px solid #4a90e2;\n"
+"}\n"
+"\n"
+"\n"
+"\n"
+"\n"
+"/* Thanh cuộn bên trong QTextEdit bo góc & nhỏ gọn */\n"
+"QTextEdit QScrollBar:vertical,\n"
+"QPlainTextEdit QScrollBar:vertical {\n"
+"    background: transparent;\n"
+"    width: 8px;\n"
+"    margin: 0px;\n"
+"}\n"
+"QTextEdit QScrollBar::handle:vertical,\n"
+"QPlainTextEdit QScrollBar::handle:vertical {\n"
+"    background: #c0c4c8;\n"
+"    min-height: 20px;\n"
+"    border-radius: 4px;\n"
+"}\n"
+"QTextEdit QScrollBar::add-line, QTextEdit QScrollBar::sub-line,\n"
+"QPlainTextEdit QScrollBar::add-line, QPlainTextEdit QScrollBar::sub-line {\n"
+"    height: 0;\n"
+"}\n"
+"")
+        self.securityFindingsText.setReadOnly(True)
+        self.securityFindingsText.setObjectName("securityFindingsText")
+        self.securityFindingsLayout.addWidget(self.securityFindingsText)
+        self.securityLayout.addWidget(self.securityFindingsGroupBox)
+        self.mainTabWidget.addTab(self.securityTab, "")
+        self.exportTab = QtWidgets.QWidget()
+        self.exportTab.setObjectName("exportTab")
+        self.exportLayout = QtWidgets.QVBoxLayout(self.exportTab)
+        self.exportLayout.setObjectName("exportLayout")
+        self.exportOptionsGroupBox = QtWidgets.QGroupBox(self.exportTab)
+        self.exportOptionsGroupBox.setObjectName("exportOptionsGroupBox")
+        self.gridLayout = QtWidgets.QGridLayout(self.exportOptionsGroupBox)
+        self.gridLayout.setObjectName("gridLayout")
+        self.horizontalLayout = QtWidgets.QHBoxLayout()
+        self.horizontalLayout.setContentsMargins(100, -1, 100, -1)
+        self.horizontalLayout.setObjectName("horizontalLayout")
+        self.exportFormatLabel = QtWidgets.QLabel(self.exportOptionsGroupBox)
+        self.exportFormatLabel.setMinimumSize(QtCore.QSize(300, 0))
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.exportFormatLabel.setFont(font)
+        self.exportFormatLabel.setObjectName("exportFormatLabel")
+        self.horizontalLayout.addWidget(self.exportFormatLabel)
+        self.exportFormatCombo = QtWidgets.QComboBox(self.exportOptionsGroupBox)
+        self.exportFormatCombo.setMinimumSize(QtCore.QSize(500, 34))
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.exportFormatCombo.setFont(font)
+        self.exportFormatCombo.setStyleSheet("/* ==== QComboBox ==== */\n"
+"QComboBox {\n"
+"    /* nền trắng, bo góc và viền xám nhạt giống QLineEdit */\n"
+"    background-color: #ffffff;\n"
+"    border: 1px solid #c0c4c8;\n"
+"    border-radius: 4px;\n"
+"    padding: 4px 30px 4px 8px; /* để chừa chỗ cho mũi tên */\n"
+"    min-height: 24px;\n"
+"    /* font đã định ở đầu styles.qss sẽ áp dụng */\n"
+"}\n"
+"\n"
+"/* Khi hover đổi nhẹ viền */\n"
+"QComboBox:hover {\n"
+"    border: 1px solid #a0a4a8;\n"
+"}\n"
+"\n"
+"/* Khi focus (đang chọn) đổi viền xanh */\n"
+"QComboBox:focus {\n"
+"    border: 1px solid #4a90e2;\n"
+"}\n"
+"\n"
+"/* Popup list (QAbstractItemView) */\n"
+"QComboBox QAbstractItemView {\n"
+"    background-color: #ffffff;\n"
+"    border: 1px solid #c0c4c8;\n"
+"    border-radius: 4px;\n"
+"    padding: 4px;\n"
+"    outline: none;\n"
+"    selection-background-color: #cce4f7;\n"
+"    selection-color: #000;\n"
+"}\n"
+"\n"
+"/* Các item trong list khi hover */\n"
+"QComboBox QAbstractItemView::item:hover {\n"
+"    background-color: #e8f1fb;\n"
+"}\n"
+"\n"
+"/* Scrollbar nhỏ gọn trong popup */\n"
+"QComboBox QAbstractItemView QScrollBar:vertical {\n"
+"    background: transparent;\n"
+"    width: 8px;\n"
+"    margin: 0px;\n"
+"}\n"
+"QComboBox QAbstractItemView QScrollBar::handle:vertical {\n"
+"    background: #c0c4c8;\n"
+"    min-height: 20px;\n"
+"    border-radius: 4px;\n"
+"}\n"
+"QComboBox QAbstractItemView QScrollBar::add-line,\n"
+"QComboBox QAbstractItemView QScrollBar::sub-line {\n"
+"    height: 0;\n"
+"}\n"
+"")
+        self.exportFormatCombo.setObjectName("exportFormatCombo")
+        self.exportFormatCombo.addItem("")
+        self.exportFormatCombo.addItem("")
+        self.exportFormatCombo.addItem("")
+        self.exportFormatCombo.addItem("")
+        self.horizontalLayout.addWidget(self.exportFormatCombo)
+        spacerItem = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.horizontalLayout.addItem(spacerItem)
+        self.gridLayout.addLayout(self.horizontalLayout, 0, 0, 1, 1)
+        self.horizontalLayout_2 = QtWidgets.QHBoxLayout()
+        self.horizontalLayout_2.setContentsMargins(100, -1, 100, -1)
+        self.horizontalLayout_2.setObjectName("horizontalLayout_2")
+        self.includeSectionsLabel = QtWidgets.QLabel(self.exportOptionsGroupBox)
+        self.includeSectionsLabel.setMaximumSize(QtCore.QSize(300, 16777215))
+        self.includeSectionsLabel.setObjectName("includeSectionsLabel")
+        self.horizontalLayout_2.addWidget(self.includeSectionsLabel)
+        self.verticalLayout_2 = QtWidgets.QVBoxLayout()
+        self.verticalLayout_2.setObjectName("verticalLayout_2")
+        self.exportHistoryCheckBox = QtWidgets.QCheckBox(self.exportOptionsGroupBox)
+        self.exportHistoryCheckBox.setChecked(True)
+        self.exportHistoryCheckBox.setObjectName("exportHistoryCheckBox")
+        self.verticalLayout_2.addWidget(self.exportHistoryCheckBox)
+        self.exportCookiesCheckBox = QtWidgets.QCheckBox(self.exportOptionsGroupBox)
+        self.exportCookiesCheckBox.setChecked(True)
+        self.exportCookiesCheckBox.setObjectName("exportCookiesCheckBox")
+        self.verticalLayout_2.addWidget(self.exportCookiesCheckBox)
+        self.exportFormDataCheckBox = QtWidgets.QCheckBox(self.exportOptionsGroupBox)
+        self.exportFormDataCheckBox.setChecked(True)
+        self.exportFormDataCheckBox.setObjectName("exportFormDataCheckBox")
+        self.verticalLayout_2.addWidget(self.exportFormDataCheckBox)
+        self.horizontalLayout_2.addLayout(self.verticalLayout_2)
+        self.verticalLayout_3 = QtWidgets.QVBoxLayout()
+        self.verticalLayout_3.setObjectName("verticalLayout_3")
+        self.exportDownloadsCheckBox = QtWidgets.QCheckBox(self.exportOptionsGroupBox)
+        self.exportDownloadsCheckBox.setChecked(True)
+        self.exportDownloadsCheckBox.setObjectName("exportDownloadsCheckBox")
+        self.verticalLayout_3.addWidget(self.exportDownloadsCheckBox)
+        self.exportExtensionsCheckBox = QtWidgets.QCheckBox(self.exportOptionsGroupBox)
+        self.exportExtensionsCheckBox.setChecked(True)
+        self.exportExtensionsCheckBox.setObjectName("exportExtensionsCheckBox")
+        self.verticalLayout_3.addWidget(self.exportExtensionsCheckBox)
+        self.exportSecurityCheckBox = QtWidgets.QCheckBox(self.exportOptionsGroupBox)
+        self.exportSecurityCheckBox.setChecked(True)
+        self.exportSecurityCheckBox.setObjectName("exportSecurityCheckBox")
+        self.verticalLayout_3.addWidget(self.exportSecurityCheckBox)
+        self.horizontalLayout_2.addLayout(self.verticalLayout_3)
+        self.gridLayout.addLayout(self.horizontalLayout_2, 1, 0, 1, 1)
+        self.exportLayout.addWidget(self.exportOptionsGroupBox)
+        self.exportButtonsLayout = QtWidgets.QHBoxLayout()
+        self.exportButtonsLayout.setObjectName("exportButtonsLayout")
+        spacerItem1 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.exportButtonsLayout.addItem(spacerItem1)
+        self.generateReportButton = QtWidgets.QPushButton(self.exportTab)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.generateReportButton.sizePolicy().hasHeightForWidth())
+        self.generateReportButton.setSizePolicy(sizePolicy)
+        self.generateReportButton.setMinimumSize(QtCore.QSize(200, 40))
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        font.setBold(True)
+        font.setWeight(75)
+        self.generateReportButton.setFont(font)
+        self.generateReportButton.setStyleSheet("QPushButton {\n"
+"    background-color: #007bff;\n"
+"    color: white;\n"
+"    border: none;\n"
+"    border-radius: 5px;\n"
+"    padding: 10px 20px;\n"
+"}\n"
+"QPushButton:hover {\n"
+"    background-color: #0056b3;\n"
+"}\n"
+"QPushButton:pressed {\n"
+"    background-color: #004085;\n"
+"}")
+        self.generateReportButton.setObjectName("generateReportButton")
+        self.exportButtonsLayout.addWidget(self.generateReportButton)
+        self.exportSelectedButton = QtWidgets.QPushButton(self.exportTab)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.exportSelectedButton.sizePolicy().hasHeightForWidth())
+        self.exportSelectedButton.setSizePolicy(sizePolicy)
+        self.exportSelectedButton.setMinimumSize(QtCore.QSize(200, 40))
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        font.setBold(True)
+        font.setWeight(75)
+        self.exportSelectedButton.setFont(font)
+        self.exportSelectedButton.setStyleSheet("/* QPushButton */\n"
+"QPushButton {\n"
+"    background-color: #4a90e2;\n"
+"    border: none;\n"
+"    border-radius: 4px;\n"
+"    padding: 6px 12px;\n"
+"    color: #fff;\n"
+"}\n"
+"QPushButton:hover {\n"
+"    background-color: #5aa0f2;\n"
+"}\n"
+"QPushButton:pressed {\n"
+"    background-color: #3a7fcc;\n"
+"}")
+        self.exportSelectedButton.setObjectName("exportSelectedButton")
+        self.exportButtonsLayout.addWidget(self.exportSelectedButton)
+        spacerItem2 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.exportButtonsLayout.addItem(spacerItem2)
+        self.exportLayout.addLayout(self.exportButtonsLayout)
+        self.mainTabWidget.addTab(self.exportTab, "")
+        self.horizontalLayout_5.addWidget(self.mainTabWidget)
+        self.gridLayout_4.addLayout(self.horizontalLayout_5, 1, 0, 1, 1)
 
-        self.retranslateUi(Form)
-        QtCore.QMetaObject.connectSlotsByName(Form)
+        self.retranslateUi(BrowserAnalysisWindow)
+        self.mainTabWidget.setCurrentIndex(0)
+        QtCore.QMetaObject.connectSlotsByName(BrowserAnalysisWindow)
 
-    def retranslateUi(self, Form):
+    def retranslateUi(self, BrowserAnalysisWindow):
         _translate = QtCore.QCoreApplication.translate
-        Form.setWindowTitle(_translate("Form", "Form"))
-        self.label.setText(_translate("Form", "Browser analysis"))
+        BrowserAnalysisWindow.setWindowTitle(_translate("BrowserAnalysisWindow", "Browser Analysis"))
+        self.historyCheckBox.setText(_translate("BrowserAnalysisWindow", "History Analysis"))
+        self.cookiesCheckBox.setText(_translate("BrowserAnalysisWindow", "Cookies Analysis"))
+        self.extensionsCheckBox.setText(_translate("BrowserAnalysisWindow", "Extensions"))
+        self.passwordsCheckBox.setText(_translate("BrowserAnalysisWindow", "Passwords"))
+        self.formDataCheckBox.setText(_translate("BrowserAnalysisWindow", "Form Data"))
+        self.downloadsCheckBox.setText(_translate("BrowserAnalysisWindow", "Downloads"))
+        self.cacheCheckBox.setText(_translate("BrowserAnalysisWindow", "Cache Files"))
+        self.sessionsCheckBox.setText(_translate("BrowserAnalysisWindow", "Sessions"))
+        self.bookmarksCheckBox.setText(_translate("BrowserAnalysisWindow", "Bookmarks"))
+        self.checkBox.setText(_translate("BrowserAnalysisWindow", "CheckBox"))
+        self.profilePathEdit.setPlaceholderText(_translate("BrowserAnalysisWindow", "C:\\Users\\...\\AppData\\Local\\Google\\Chrome\\User Data\\Default"))
+        self.pushButton_9.setText(_translate("BrowserAnalysisWindow", "Refresh"))
+        self.profilePathLabel.setText(_translate("BrowserAnalysisWindow", "Profile Path:"))
+        self.label_9.setText(_translate("BrowserAnalysisWindow", "Evidence:"))
+        self.browserTypeCombo.setItemText(0, _translate("BrowserAnalysisWindow", "Google Chrome"))
+        self.browserTypeCombo.setItemText(1, _translate("BrowserAnalysisWindow", "Microsoft Edge"))
+        self.browserTypeCombo.setItemText(2, _translate("BrowserAnalysisWindow", "Mozilla Firefox"))
+        self.browserTypeCombo.setItemText(3, _translate("BrowserAnalysisWindow", "Internet Explorer"))
+        self.browseProfileButton.setText(_translate("BrowserAnalysisWindow", "Browse"))
+        self.label_10.setText(_translate("BrowserAnalysisWindow", "(Evidence Path)"))
+        self.pushButton_10.setText(_translate("BrowserAnalysisWindow", "Chọn tất cả"))
+        self.pushButton_11.setText(_translate("BrowserAnalysisWindow", "Bỏ chọn tất cả"))
+        self.analysisOptionsLabel.setText(_translate("BrowserAnalysisWindow", "Analysis Options:"))
+        self.browserTypeLabel.setText(_translate("BrowserAnalysisWindow", "Browser Type:"))
+        self.startAnalysisButton.setText(_translate("BrowserAnalysisWindow", "Start Analysis"))
+        self.lineEdit.setText(_translate("BrowserAnalysisWindow", "C:\\Users\\halin\\AppData\\Local\\Google\\Chrome\\User Data\\Default"))
+        self.statusLabel.setText(_translate("BrowserAnalysisWindow", "Status: Ready"))
+        self.historySearchLabel.setText(_translate("BrowserAnalysisWindow", "Search:"))
+        self.historySearchEdit.setPlaceholderText(_translate("BrowserAnalysisWindow", "Search URLs, titles..."))
+        self.pushButton_2.setText(_translate("BrowserAnalysisWindow", "Export"))
+        self.historyFilterLabel.setText(_translate("BrowserAnalysisWindow", "Filter by Date:"))
+        self.historyFilterCombo.setItemText(0, _translate("BrowserAnalysisWindow", "All Time"))
+        self.historyFilterCombo.setItemText(1, _translate("BrowserAnalysisWindow", "Today"))
+        self.historyFilterCombo.setItemText(2, _translate("BrowserAnalysisWindow", "Last 7 Days"))
+        self.historyFilterCombo.setItemText(3, _translate("BrowserAnalysisWindow", "Last 30 Days"))
+        self.historyFilterCombo.setItemText(4, _translate("BrowserAnalysisWindow", "Custom Range"))
+        self.label_3.setText(_translate("BrowserAnalysisWindow", "0 records"))
+        self.historyTable.setSortingEnabled(True)
+        item = self.historyTable.horizontalHeaderItem(0)
+        item.setText(_translate("BrowserAnalysisWindow", "URL"))
+        item = self.historyTable.horizontalHeaderItem(1)
+        item.setText(_translate("BrowserAnalysisWindow", "Title"))
+        item = self.historyTable.horizontalHeaderItem(2)
+        item.setText(_translate("BrowserAnalysisWindow", "Visit Time"))
+        item = self.historyTable.horizontalHeaderItem(3)
+        item.setText(_translate("BrowserAnalysisWindow", "Visit Count"))
+        self.mainTabWidget.setTabText(self.mainTabWidget.indexOf(self.historyTab), _translate("BrowserAnalysisWindow", "Browsing History"))
+        self.downloadsSearchLabel.setText(_translate("BrowserAnalysisWindow", "Search:"))
+        self.downloadsSearchEdit.setPlaceholderText(_translate("BrowserAnalysisWindow", "Search filenames..."))
+        self.pushButton.setText(_translate("BrowserAnalysisWindow", "Export"))
+        self.downloadsFilterLabel.setText(_translate("BrowserAnalysisWindow", "Filter by Type:"))
+        self.downloadsFilterCombo.setItemText(0, _translate("BrowserAnalysisWindow", "All Types"))
+        self.downloadsFilterCombo.setItemText(1, _translate("BrowserAnalysisWindow", "Documents"))
+        self.downloadsFilterCombo.setItemText(2, _translate("BrowserAnalysisWindow", "Images"))
+        self.downloadsFilterCombo.setItemText(3, _translate("BrowserAnalysisWindow", "Videos"))
+        self.downloadsFilterCombo.setItemText(4, _translate("BrowserAnalysisWindow", "Executables"))
+        self.label_2.setText(_translate("BrowserAnalysisWindow", "0 downloads"))
+        self.downloadsTable.setSortingEnabled(True)
+        item = self.downloadsTable.horizontalHeaderItem(0)
+        item.setText(_translate("BrowserAnalysisWindow", "Filename"))
+        item = self.downloadsTable.horizontalHeaderItem(1)
+        item.setText(_translate("BrowserAnalysisWindow", "URL"))
+        item = self.downloadsTable.horizontalHeaderItem(2)
+        item.setText(_translate("BrowserAnalysisWindow", "Size"))
+        item = self.downloadsTable.horizontalHeaderItem(3)
+        item.setText(_translate("BrowserAnalysisWindow", "Download Date"))
+        item = self.downloadsTable.horizontalHeaderItem(4)
+        item.setText(_translate("BrowserAnalysisWindow", "Status"))
+        self.mainTabWidget.setTabText(self.mainTabWidget.indexOf(self.downloadsTab), _translate("BrowserAnalysisWindow", "Downloads"))
+        self.cookiesSearchLabel.setText(_translate("BrowserAnalysisWindow", "Search:"))
+        self.cookiesSearchEdit.setPlaceholderText(_translate("BrowserAnalysisWindow", "Search domains, cookie names..."))
+        self.pushButton_5.setText(_translate("BrowserAnalysisWindow", "Export"))
+        self.cookiesFilterLabel.setText(_translate("BrowserAnalysisWindow", "Filter by Domain:"))
+        self.cookiesFilterCombo.setItemText(0, _translate("BrowserAnalysisWindow", "All Domains"))
+        self.label_5.setText(_translate("BrowserAnalysisWindow", " 0 cookies"))
+        self.cookiesTable.setSortingEnabled(True)
+        item = self.cookiesTable.horizontalHeaderItem(0)
+        item.setText(_translate("BrowserAnalysisWindow", "Domain"))
+        item = self.cookiesTable.horizontalHeaderItem(1)
+        item.setText(_translate("BrowserAnalysisWindow", "Name"))
+        item = self.cookiesTable.horizontalHeaderItem(2)
+        item.setText(_translate("BrowserAnalysisWindow", "Value"))
+        item = self.cookiesTable.horizontalHeaderItem(3)
+        item.setText(_translate("BrowserAnalysisWindow", "Expires"))
+        item = self.cookiesTable.horizontalHeaderItem(4)
+        item.setText(_translate("BrowserAnalysisWindow", "Secure"))
+        item = self.cookiesTable.horizontalHeaderItem(5)
+        item.setText(_translate("BrowserAnalysisWindow", "HttpOnly"))
+        self.mainTabWidget.setTabText(self.mainTabWidget.indexOf(self.cookiesTab), _translate("BrowserAnalysisWindow", "Cookies Analysis"))
+        self.cacheSearchLabel.setText(_translate("BrowserAnalysisWindow", "Search:"))
+        self.cacheSearchEdit.setPlaceholderText(_translate("BrowserAnalysisWindow", "Search filenames..."))
+        self.pushButton_3.setText(_translate("BrowserAnalysisWindow", "Extract files"))
+        self.pushButton_4.setText(_translate("BrowserAnalysisWindow", "Export"))
+        self.cacheFilterLabel.setText(_translate("BrowserAnalysisWindow", "Filter by Type:"))
+        self.cacheFilterCombo.setItemText(0, _translate("BrowserAnalysisWindow", "All Types"))
+        self.cacheFilterCombo.setItemText(1, _translate("BrowserAnalysisWindow", "Images"))
+        self.cacheFilterCombo.setItemText(2, _translate("BrowserAnalysisWindow", "Scripts"))
+        self.cacheFilterCombo.setItemText(3, _translate("BrowserAnalysisWindow", "Stylesheets"))
+        self.cacheFilterCombo.setItemText(4, _translate("BrowserAnalysisWindow", "Documents"))
+        self.label_4.setText(_translate("BrowserAnalysisWindow", "0 files"))
+        self.cacheTable.setSortingEnabled(True)
+        item = self.cacheTable.horizontalHeaderItem(0)
+        item.setText(_translate("BrowserAnalysisWindow", "Filename"))
+        item = self.cacheTable.horizontalHeaderItem(1)
+        item.setText(_translate("BrowserAnalysisWindow", "Type"))
+        item = self.cacheTable.horizontalHeaderItem(2)
+        item.setText(_translate("BrowserAnalysisWindow", "Size"))
+        item = self.cacheTable.horizontalHeaderItem(3)
+        item.setText(_translate("BrowserAnalysisWindow", "Last Access"))
+        item = self.cacheTable.horizontalHeaderItem(4)
+        item.setText(_translate("BrowserAnalysisWindow", "URL"))
+        self.mainTabWidget.setTabText(self.mainTabWidget.indexOf(self.cacheTab), _translate("BrowserAnalysisWindow", "Cache Analysis"))
+        self.extensionsTable.setSortingEnabled(True)
+        item = self.extensionsTable.horizontalHeaderItem(0)
+        item.setText(_translate("BrowserAnalysisWindow", "Extension Name"))
+        item = self.extensionsTable.horizontalHeaderItem(1)
+        item.setText(_translate("BrowserAnalysisWindow", "Version"))
+        item = self.extensionsTable.horizontalHeaderItem(2)
+        item.setText(_translate("BrowserAnalysisWindow", "ID"))
+        item = self.extensionsTable.horizontalHeaderItem(3)
+        item.setText(_translate("BrowserAnalysisWindow", "Permissions"))
+        item = self.extensionsTable.horizontalHeaderItem(4)
+        item.setText(_translate("BrowserAnalysisWindow", "Enabled"))
+        item = self.extensionsTable.horizontalHeaderItem(5)
+        item.setText(_translate("BrowserAnalysisWindow", "Install Date"))
+        self.mainTabWidget.setTabText(self.mainTabWidget.indexOf(self.extensionsTab), _translate("BrowserAnalysisWindow", "Extensions & Add-ons"))
+        self.label_6.setText(_translate("BrowserAnalysisWindow", "⚠️ Warning: Password analysis requires elevated privileges and may be restricted by security policies."))
+        self.formDataSearchLabel.setText(_translate("BrowserAnalysisWindow", "Search:"))
+        self.formDataSearchEdit.setPlaceholderText(_translate("BrowserAnalysisWindow", "Search URLs, usernames..."))
+        self.showPasswordsCheckBox.setText(_translate("BrowserAnalysisWindow", "Show Passwords"))
+        self.pushButton_6.setText(_translate("BrowserAnalysisWindow", "Export "))
+        self.label_7.setText(_translate("BrowserAnalysisWindow", "0 passwords"))
+        self.formDataTable.setSortingEnabled(True)
+        item = self.formDataTable.horizontalHeaderItem(0)
+        item.setText(_translate("BrowserAnalysisWindow", "URL"))
+        item = self.formDataTable.horizontalHeaderItem(1)
+        item.setText(_translate("BrowserAnalysisWindow", "Username"))
+        item = self.formDataTable.horizontalHeaderItem(2)
+        item.setText(_translate("BrowserAnalysisWindow", "Password"))
+        item = self.formDataTable.horizontalHeaderItem(3)
+        item.setText(_translate("BrowserAnalysisWindow", "Last Used"))
+        item = self.formDataTable.horizontalHeaderItem(4)
+        item.setText(_translate("BrowserAnalysisWindow", "Field Type"))
+        self.mainTabWidget.setTabText(self.mainTabWidget.indexOf(self.formDataTab), _translate("BrowserAnalysisWindow", "Form Data & Passwords"))
+        self.comboBox.setItemText(0, _translate("BrowserAnalysisWindow", "All Activities"))
+        self.comboBox.setItemText(1, _translate("BrowserAnalysisWindow", "History Only"))
+        self.comboBox.setItemText(2, _translate("BrowserAnalysisWindow", "Downloads Only"))
+        self.comboBox.setItemText(3, _translate("BrowserAnalysisWindow", "Cache Activity"))
+        self.comboBox.setItemText(4, _translate("BrowserAnalysisWindow", "Cookie Activity"))
+        self.pushButton_7.setText(_translate("BrowserAnalysisWindow", "Refresh"))
+        self.pushButton_8.setText(_translate("BrowserAnalysisWindow", "Export Timeline"))
+        self.timelineDateLabel.setText(_translate("BrowserAnalysisWindow", "Date Range:"))
+        self.timelineToLabel.setText(_translate("BrowserAnalysisWindow", "to"))
+        self.updateTimelineButton.setText(_translate("BrowserAnalysisWindow", "Update"))
+        self.label_8.setText(_translate("BrowserAnalysisWindow", "0 events"))
+        self.timelineTable.setSortingEnabled(True)
+        item = self.timelineTable.horizontalHeaderItem(0)
+        item.setText(_translate("BrowserAnalysisWindow", "Time"))
+        item = self.timelineTable.horizontalHeaderItem(1)
+        item.setText(_translate("BrowserAnalysisWindow", "Activity Type"))
+        item = self.timelineTable.horizontalHeaderItem(2)
+        item.setText(_translate("BrowserAnalysisWindow", "Details"))
+        item = self.timelineTable.horizontalHeaderItem(3)
+        item.setText(_translate("BrowserAnalysisWindow", "Browser"))
+        self.mainTabWidget.setTabText(self.mainTabWidget.indexOf(self.timelineTab), _translate("BrowserAnalysisWindow", "Timeline Analysis"))
+        self.securityOptionsGroupBox.setTitle(_translate("BrowserAnalysisWindow", "Security Analysis Options"))
+        self.suspiciousExtensionsCheckBox.setText(_translate("BrowserAnalysisWindow", "Check for Suspicious Extensions"))
+        self.unusualPatternsCheckBox.setText(_translate("BrowserAnalysisWindow", "Analyze Unusual Browsing Patterns"))
+        self.dataExfiltrationCheckBox.setText(_translate("BrowserAnalysisWindow", "Detect Potential Data Exfiltration"))
+        self.privacySettingsCheckBox.setText(_translate("BrowserAnalysisWindow", "Review Privacy Settings"))
+        self.securityFindingsGroupBox.setTitle(_translate("BrowserAnalysisWindow", "Security Findings"))
+        self.securityFindingsText.setPlaceholderText(_translate("BrowserAnalysisWindow", "Security analysis results will appear here..."))
+        self.mainTabWidget.setTabText(self.mainTabWidget.indexOf(self.securityTab), _translate("BrowserAnalysisWindow", "Security Analysis"))
+        self.exportOptionsGroupBox.setTitle(_translate("BrowserAnalysisWindow", "Export Options"))
+        self.exportFormatLabel.setText(_translate("BrowserAnalysisWindow", "Export Format:"))
+        self.exportFormatCombo.setItemText(0, _translate("BrowserAnalysisWindow", "HTML"))
+        self.exportFormatCombo.setItemText(1, _translate("BrowserAnalysisWindow", "PDF"))
+        self.exportFormatCombo.setItemText(2, _translate("BrowserAnalysisWindow", "CSV"))
+        self.exportFormatCombo.setItemText(3, _translate("BrowserAnalysisWindow", "JSON"))
+        self.includeSectionsLabel.setText(_translate("BrowserAnalysisWindow", "Include Sections:"))
+        self.exportHistoryCheckBox.setText(_translate("BrowserAnalysisWindow", "Browsing History"))
+        self.exportCookiesCheckBox.setText(_translate("BrowserAnalysisWindow", "Cookies"))
+        self.exportFormDataCheckBox.setText(_translate("BrowserAnalysisWindow", "Form Data"))
+        self.exportDownloadsCheckBox.setText(_translate("BrowserAnalysisWindow", "Downloads"))
+        self.exportExtensionsCheckBox.setText(_translate("BrowserAnalysisWindow", "Extensions"))
+        self.exportSecurityCheckBox.setText(_translate("BrowserAnalysisWindow", "Security Analysis"))
+        self.generateReportButton.setText(_translate("BrowserAnalysisWindow", "Generate Report"))
+        self.exportSelectedButton.setText(_translate("BrowserAnalysisWindow", "Export Selected Data"))
+        self.mainTabWidget.setTabText(self.mainTabWidget.indexOf(self.exportTab), _translate("BrowserAnalysisWindow", "Export & Report"))
 
 
 if __name__ == "__main__":
     import sys
     app = QtWidgets.QApplication(sys.argv)
-    Form = QtWidgets.QWidget()
-    ui = Ui_Form()
-    ui.setupUi(Form)
-    Form.show()
+    BrowserAnalysisWindow = QtWidgets.QWidget()
+    ui = Ui_BrowserAnalysisWindow()
+    ui.setupUi(BrowserAnalysisWindow)
+    BrowserAnalysisWindow.show()
     sys.exit(app.exec_())

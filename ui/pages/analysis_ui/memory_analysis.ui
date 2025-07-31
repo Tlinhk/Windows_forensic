@@ -1,212 +1,2858 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>MemoryAnalysisWidget</class>
- <widget class="QWidget" name="MemoryAnalysisWidget">
+ <class>MemoryAnalysisWindow</class>
+ <widget class="QMainWindow" name="MemoryAnalysisWindow">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1280</width>
-    <height>765</height>
+    <width>1167</width>
+    <height>700</height>
    </rect>
   </property>
-  <layout class="QHBoxLayout" name="mainLayout">
-   <item>
-    <widget class="QSplitter" name="splitter">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-     <widget class="QFrame" name="sidebar">
-      <property name="frameShape">
-       <enum>QFrame::StyledPanel</enum>
+  <property name="windowTitle">
+   <string>Memory Analysis System - Digital Forensics</string>
+  </property>
+  <property name="windowIcon">
+   <iconset>
+    <normaloff>.</normaloff>.</iconset>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">background-color: #f8f9fa;
+
+/* ==== QTableWidget / QTableView ==== */
+QTableWidget,
+QTableView {
+    background-color: #ffffff;           /* nền trắng */
+    border: 1px solid #c0c4c8;           /* viền xám nhạt */
+    gridline-color: #e0e3e6;             /* màu lưới */
+    border-radius: 6px;                  /* bo góc toàn widget */
+    selection-background-color: #cce4f7; /* màu nền khi chọn */
+    selection-color: #000000;            /* màu chữ khi chọn */
+}
+
+/* Alternating row colors */
+QTableWidget {
+    alternate-background-color: #f9fbfc;
+}
+QTableWidget::item:alternate,
+QTableView::item:alternate {
+    background-color: #f9fbfc;
+}
+
+/* Header (cột và hàng) */
+QHeaderView::section {
+    background-color: #e1e5ea;
+    padding: 6px;
+    border: none;
+    border-bottom: 1px solid #c0c4c8;
+    border-right: 1px solid #c0c4c8;
+    font-weight: bold;
+}
+QHeaderView::section:last,
+QHeaderView::section:last {
+    border-right: none;
+}
+
+/* Cell hover */
+QTableWidget::item:hover,
+QTableView::item:hover {
+    background-color: #e8f1fb;
+}
+
+/* Remove focus rectangle */
+QTableWidget::item:focus,
+QTableView::item:focus {
+    outline: none;
+}
+
+/* Scrollbar trong table */
+QTableWidget QScrollBar:vertical,
+QTableView QScrollBar:vertical {
+    background: transparent;
+    width: 8px;
+    margin: 0px;
+}
+QTableWidget QScrollBar::handle:vertical,
+QTableView QScrollBar::handle:vertical {
+    background: #c0c4c8;
+    min-height: 20px;
+    border-radius: 4px;
+}
+QTableWidget QScrollBar::add-line,
+QTableWidget QScrollBar::sub-line,
+QTableView QScrollBar::add-line,
+QTableView QScrollBar::sub-line {
+    height: 0;
+}
+
+/* Focused cell viền xanh nhẹ */
+QTableWidget::item:selected:active,
+QTableView::item:selected:active {
+    border: 1px solid #4a90e2;
+}
+
+/* Header hover (nếu muốn) */
+QHeaderView::section:hover {
+    background-color: #d7dae0;
+}
+
+</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <property name="styleSheet">
+    <string notr="true">/* ==== QTableWidget / QTableView ==== */
+QTableWidget,
+QTableView {
+    background-color: #ffffff;           /* nền trắng */
+    border: 1px solid #c0c4c8;           /* viền xám nhạt */
+    gridline-color: #e0e3e6;             /* màu lưới */
+    border-radius: 6px;                  /* bo góc toàn widget */
+    selection-background-color: #cce4f7; /* màu nền khi chọn */
+    selection-color: #000000;            /* màu chữ khi chọn */
+}
+
+/* Alternating row colors */
+QTableWidget {
+    alternate-background-color: #f9fbfc;
+}
+QTableWidget::item:alternate,
+QTableView::item:alternate {
+    background-color: #f9fbfc;
+}
+
+/* Header (cột và hàng) */
+QHeaderView::section {
+    background-color: #e1e5ea;
+    padding: 6px;
+    border: none;
+    border-bottom: 1px solid #c0c4c8;
+    border-right: 1px solid #c0c4c8;
+    font-weight: bold;
+}
+QHeaderView::section:last,
+QHeaderView::section:last {
+    border-right: none;
+}
+
+/* Cell hover */
+QTableWidget::item:hover,
+QTableView::item:hover {
+    background-color: #e8f1fb;
+}
+
+/* Remove focus rectangle */
+QTableWidget::item:focus,
+QTableView::item:focus {
+    outline: none;
+}
+
+/* Scrollbar trong table */
+QTableWidget QScrollBar:vertical,
+QTableView QScrollBar:vertical {
+    background: transparent;
+    width: 8px;
+    margin: 0px;
+}
+QTableWidget QScrollBar::handle:vertical,
+QTableView QScrollBar::handle:vertical {
+    background: #c0c4c8;
+    min-height: 20px;
+    border-radius: 4px;
+}
+QTableWidget QScrollBar::add-line,
+QTableWidget QScrollBar::sub-line,
+QTableView QScrollBar::add-line,
+QTableView QScrollBar::sub-line {
+    height: 0;
+}
+
+/* Focused cell viền xanh nhẹ */
+QTableWidget::item:selected:active,
+QTableView::item:selected:active {
+    border: 1px solid #4a90e2;
+}
+
+/* Header hover (nếu muốn) */
+QHeaderView::section:hover {
+    background-color: #d7dae0;
+}
+
+/* QPushButton */
+QPushButton {
+    background-color: #4a90e2;
+    border: none;
+    border-radius: 4px;
+    padding: 6px 12px;
+    color: #fff;
+}
+QPushButton:hover {
+    background-color: #5aa0f2;
+}
+QPushButton:pressed {
+    background-color: #3a7fcc;
+}
+/* ==== QComboBox ==== */
+QComboBox {
+    /* nền trắng, bo góc và viền xám nhạt giống QLineEdit */
+    background-color: #ffffff;
+    border: 1px solid #c0c4c8;
+    border-radius: 4px;
+    padding: 4px 30px 4px 8px; /* để chừa chỗ cho mũi tên */
+    min-height: 24px;
+    /* font đã định ở đầu styles.qss sẽ áp dụng */
+}
+
+/* Khi hover đổi nhẹ viền */
+QComboBox:hover {
+    border: 1px solid #a0a4a8;
+}
+
+/* Khi focus (đang chọn) đổi viền xanh */
+QComboBox:focus {
+    border: 1px solid #4a90e2;
+}
+
+/* Popup list (QAbstractItemView) */
+QComboBox QAbstractItemView {
+    background-color: #ffffff;
+    border: 1px solid #c0c4c8;
+    border-radius: 4px;
+    padding: 4px;
+    outline: none;
+    selection-background-color: #cce4f7;
+    selection-color: #000;
+}
+
+/* Các item trong list khi hover */
+QComboBox QAbstractItemView::item:hover {
+    background-color: #e8f1fb;
+}
+
+/* Scrollbar nhỏ gọn trong popup */
+QComboBox QAbstractItemView QScrollBar:vertical {
+    background: transparent;
+    width: 8px;
+    margin: 0px;
+}
+QComboBox QAbstractItemView QScrollBar::handle:vertical {
+    background: #c0c4c8;
+    min-height: 20px;
+    border-radius: 4px;
+}
+QComboBox QAbstractItemView QScrollBar::add-line,
+QComboBox QAbstractItemView QScrollBar::sub-line {
+    height: 0;
+}
+</string>
+   </property>
+   <layout class="QGridLayout" name="gridLayout_3">
+    <item row="2" column="0">
+     <widget class="QTabWidget" name="mainTabWidget">
+      <property name="font">
+       <font>
+        <pointsize>9</pointsize>
+       </font>
       </property>
-      <layout class="QVBoxLayout" name="sidebarLayout">
-       <item>
-        <widget class="QLabel" name="label_case_info">
-         <property name="styleSheet">
-          <string>font-weight: bold; font-size: 15px; color: #1976d2; margin-bottom: 8px;</string>
-         </property>
-         <property name="text">
-          <string>Case: [Chưa chọn]</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QGroupBox" name="groupBoxMemoryFile">
-         <property name="font">
-          <font>
-           <pointsize>10</pointsize>
-           <weight>75</weight>
-           <bold>true</bold>
-          </font>
-         </property>
-         <property name="styleSheet">
-          <string>QGroupBox { font-weight: bold; }</string>
-         </property>
-         <property name="title">
-          <string>Memory File Selection</string>
-         </property>
-         <layout class="QVBoxLayout" name="memoryFileLayout">
+      <property name="currentIndex">
+       <number>3</number>
+      </property>
+      <widget class="QWidget" name="rawMemoryTab">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <attribute name="title">
+        <string>Raw Memory Analysis</string>
+       </attribute>
+       <layout class="QVBoxLayout" name="rawMemoryLayout">
+        <property name="spacing">
+         <number>0</number>
+        </property>
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
+        <item>
+         <widget class="QTabWidget" name="rawMemoryTabWidget">
+          <property name="font">
+           <font>
+            <pointsize>9</pointsize>
+           </font>
+          </property>
+          <property name="currentIndex">
+           <number>1</number>
+          </property>
+          <widget class="QWidget" name="systemContextTab">
+           <attribute name="title">
+            <string>System Context</string>
+           </attribute>
+           <layout class="QVBoxLayout" name="systemContextVBox">
+            <item>
+             <layout class="QFormLayout" name="systemContextLayout">
+              <property name="leftMargin">
+               <number>35</number>
+              </property>
+              <property name="topMargin">
+               <number>15</number>
+              </property>
+              <item row="0" column="0">
+               <widget class="QLabel" name="osVersionLabel">
+                <property name="font">
+                 <font>
+                  <pointsize>9</pointsize>
+                 </font>
+                </property>
+                <property name="text">
+                 <string>OS Version:</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1">
+               <widget class="QLabel" name="osVersionValue">
+                <property name="font">
+                 <font>
+                  <pointsize>9</pointsize>
+                 </font>
+                </property>
+                <property name="text">
+                 <string>-</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="0">
+               <widget class="QLabel" name="architectureLabel">
+                <property name="font">
+                 <font>
+                  <pointsize>9</pointsize>
+                 </font>
+                </property>
+                <property name="text">
+                 <string>Architecture:</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="1">
+               <widget class="QLabel" name="architectureValue">
+                <property name="font">
+                 <font>
+                  <pointsize>9</pointsize>
+                 </font>
+                </property>
+                <property name="text">
+                 <string>-</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="0">
+               <widget class="QLabel" name="timestampLabel">
+                <property name="font">
+                 <font>
+                  <pointsize>9</pointsize>
+                 </font>
+                </property>
+                <property name="text">
+                 <string>Capture Time:</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="1">
+               <widget class="QLabel" name="timestampValue">
+                <property name="font">
+                 <font>
+                  <pointsize>9</pointsize>
+                 </font>
+                </property>
+                <property name="text">
+                 <string>-</string>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="0">
+               <widget class="QLabel" name="profileLabel">
+                <property name="font">
+                 <font>
+                  <pointsize>9</pointsize>
+                 </font>
+                </property>
+                <property name="text">
+                 <string>Profile:</string>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="1">
+               <widget class="QLabel" name="profileValue">
+                <property name="font">
+                 <font>
+                  <pointsize>9</pointsize>
+                 </font>
+                </property>
+                <property name="text">
+                 <string>-</string>
+                </property>
+               </widget>
+              </item>
+              <item row="4" column="0">
+               <widget class="QLabel" name="kernelBaseLabel">
+                <property name="font">
+                 <font>
+                  <pointsize>9</pointsize>
+                 </font>
+                </property>
+                <property name="text">
+                 <string>Kernel Base:</string>
+                </property>
+               </widget>
+              </item>
+              <item row="4" column="1">
+               <widget class="QLabel" name="kernelBaseValue">
+                <property name="font">
+                 <font>
+                  <pointsize>9</pointsize>
+                 </font>
+                </property>
+                <property name="text">
+                 <string>-</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="pluginDetailButtonLayout">
+              <item>
+               <widget class="QPushButton" name="btnKdbgscanDetail">
+                <property name="font">
+                 <font>
+                  <pointsize>9</pointsize>
+                 </font>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true">/* QPushButton */
+QPushButton {
+    background-color: #4a90e2;
+    border: none;
+    border-radius: 4px;
+    padding: 6px 12px;
+    color: #fff;
+}
+QPushButton:hover {
+    background-color: #5aa0f2;
+}
+QPushButton:pressed {
+    background-color: #3a7fcc;
+}</string>
+                </property>
+                <property name="text">
+                 <string>Xem chi tiết kdbgscan</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="btnImageinfoDetail">
+                <property name="font">
+                 <font>
+                  <pointsize>9</pointsize>
+                 </font>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true">/* QPushButton */
+QPushButton {
+    background-color: #4a90e2;
+    border: none;
+    border-radius: 4px;
+    padding: 6px 12px;
+    color: #fff;
+}
+QPushButton:hover {
+    background-color: #5aa0f2;
+}
+QPushButton:pressed {
+    background-color: #3a7fcc;
+}</string>
+                </property>
+                <property name="text">
+                 <string>Xem chi tiết imageinfo</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="btnWindowsInfoDetail">
+                <property name="font">
+                 <font>
+                  <pointsize>9</pointsize>
+                 </font>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true">/* QPushButton */
+QPushButton {
+    background-color: #4a90e2;
+    border: none;
+    border-radius: 4px;
+    padding: 6px 12px;
+    color: #fff;
+}
+QPushButton:hover {
+    background-color: #5aa0f2;
+}
+QPushButton:pressed {
+    background-color: #3a7fcc;
+}</string>
+                </property>
+                <property name="text">
+                 <string>Xem chi tiết windows.info</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <widget class="QTextEdit" name="pluginDetailText">
+              <property name="visible">
+               <bool>false</bool>
+              </property>
+              <property name="readOnly">
+               <bool>true</bool>
+              </property>
+              <property name="placeholderText">
+               <string>Chi tiết plugin sẽ hiển thị ở đây...</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+          <widget class="QWidget" name="processAnalysisTab">
+           <attribute name="title">
+            <string>Process Analysis</string>
+           </attribute>
+           <layout class="QVBoxLayout" name="processAnalysisLayout">
+            <item>
+             <widget class="QTabWidget" name="processTabWidget">
+              <property name="font">
+               <font>
+                <pointsize>9</pointsize>
+               </font>
+              </property>
+              <property name="currentIndex">
+               <number>2</number>
+              </property>
+              <widget class="QWidget" name="processListTab">
+               <attribute name="title">
+                <string>Process List</string>
+               </attribute>
+               <layout class="QVBoxLayout" name="processListLayout">
+                <item>
+                 <widget class="QTableWidget" name="pslistTable"/>
+                </item>
+               </layout>
+              </widget>
+              <widget class="QWidget" name="dllTab">
+               <attribute name="title">
+                <string>DLL List</string>
+               </attribute>
+               <layout class="QVBoxLayout" name="dllDriverLayout">
+                <item>
+                 <widget class="QTableWidget" name="dlllistTable"/>
+                </item>
+               </layout>
+              </widget>
+              <widget class="QWidget" name="malwareDetectionTab">
+               <attribute name="title">
+                <string>Malfind</string>
+               </attribute>
+               <layout class="QVBoxLayout" name="malwareDetectionLayout">
+                <item>
+                 <widget class="QTextEdit" name="malfindText"/>
+                </item>
+               </layout>
+              </widget>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+          <widget class="QWidget" name="networkTabWidget">
+           <attribute name="title">
+            <string>Network Analysis</string>
+           </attribute>
+           <layout class="QVBoxLayout" name="networkAnalysisLayout">
+            <item>
+             <widget class="QTableWidget" name="netscanTable"/>
+            </item>
+           </layout>
+          </widget>
+          <widget class="QWidget" name="fileRegistryTab">
+           <attribute name="title">
+            <string>File Analysis</string>
+           </attribute>
+           <layout class="QVBoxLayout" name="fileRegistryLayout">
+            <item>
+             <widget class="QTabWidget" name="fileTabWidget">
+              <property name="font">
+               <font>
+                <pointsize>9</pointsize>
+               </font>
+              </property>
+              <property name="currentIndex">
+               <number>0</number>
+              </property>
+              <widget class="QWidget" name="fileScanTab">
+               <attribute name="title">
+                <string>File Scan</string>
+               </attribute>
+               <layout class="QVBoxLayout" name="fileScanLayout">
+                <item>
+                 <widget class="QTableWidget" name="filescanTable">
+                  <property name="alternatingRowColors">
+                   <bool>true</bool>
+                  </property>
+                  <property name="selectionBehavior">
+                   <enum>QAbstractItemView::SelectRows</enum>
+                  </property>
+                  <property name="sortingEnabled">
+                   <bool>true</bool>
+                  </property>
+                  <column>
+                   <property name="text">
+                    <string>File Path</string>
+                   </property>
+                  </column>
+                  <column>
+                   <property name="text">
+                    <string>Size</string>
+                   </property>
+                  </column>
+                  <column>
+                   <property name="text">
+                    <string>Offset</string>
+                   </property>
+                  </column>
+                  <column>
+                   <property name="text">
+                    <string>Access Time</string>
+                   </property>
+                  </column>
+                  <column>
+                   <property name="text">
+                    <string>Created</string>
+                   </property>
+                  </column>
+                  <column>
+                   <property name="text">
+                    <string>Modified</string>
+                   </property>
+                  </column>
+                 </widget>
+                </item>
+               </layout>
+              </widget>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+          <widget class="QWidget" name="userActivityTab">
+           <attribute name="title">
+            <string>User Activity</string>
+           </attribute>
+           <layout class="QVBoxLayout" name="userActivityLayout">
+            <item>
+             <widget class="QTabWidget" name="commandTabWidget">
+              <property name="font">
+               <font>
+                <pointsize>9</pointsize>
+               </font>
+              </property>
+              <property name="currentIndex">
+               <number>0</number>
+              </property>
+              <widget class="QWidget" name="commandHistoryTab">
+               <attribute name="title">
+                <string>Command History</string>
+               </attribute>
+               <layout class="QVBoxLayout" name="commandHistoryLayout">
+                <item>
+                 <widget class="QTextEdit" name="cmdscanText"/>
+                </item>
+               </layout>
+              </widget>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+          <widget class="QWidget" name="credentialsTab">
+           <attribute name="title">
+            <string>Credentials/Keys</string>
+           </attribute>
+           <layout class="QVBoxLayout" name="credentialsLayout">
+            <item>
+             <widget class="QTabWidget" name="credentialTabWidget">
+              <property name="font">
+               <font>
+                <pointsize>9</pointsize>
+               </font>
+              </property>
+              <property name="currentIndex">
+               <number>0</number>
+              </property>
+              <widget class="QWidget" name="passwordHashesTab">
+               <attribute name="title">
+                <string>Password Hashes</string>
+               </attribute>
+               <layout class="QVBoxLayout" name="passwordHashesLayout">
+                <item>
+                 <widget class="QTextEdit" name="hashdumpText"/>
+                </item>
+               </layout>
+              </widget>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+          <widget class="QWidget" name="customPluginTab">
+           <attribute name="title">
+            <string>Custom Plugin Results</string>
+           </attribute>
+           <layout class="QVBoxLayout" name="customPluginLayout">
+            <item>
+             <widget class="QTabWidget" name="otherTabWidget">
+              <property name="font">
+               <font>
+                <pointsize>9</pointsize>
+               </font>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="hibernationTab">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <attribute name="title">
+        <string>Hibernation Analysis</string>
+       </attribute>
+       <layout class="QVBoxLayout" name="hibernationLayout">
+        <property name="spacing">
+         <number>0</number>
+        </property>
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
+        <item>
+         <widget class="QGroupBox" name="hibernationInfoGroup">
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>150</height>
+           </size>
+          </property>
+          <property name="font">
+           <font>
+            <pointsize>9</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
+          </property>
+          <property name="title">
+           <string>Hibernation Information</string>
+          </property>
+          <layout class="QGridLayout" name="hibernationInfoLayout">
+           <property name="leftMargin">
+            <number>30</number>
+           </property>
+           <property name="topMargin">
+            <number>5</number>
+           </property>
+           <property name="rightMargin">
+            <number>5</number>
+           </property>
+           <property name="bottomMargin">
+            <number>10</number>
+           </property>
+           <property name="horizontalSpacing">
+            <number>0</number>
+           </property>
+           <property name="verticalSpacing">
+            <number>10</number>
+           </property>
+           <item row="0" column="0">
+            <widget class="QLabel" name="hibernationTypeLabel">
+             <property name="font">
+              <font>
+               <pointsize>9</pointsize>
+              </font>
+             </property>
+             <property name="text">
+              <string>Hibernation Type:</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QLabel" name="hibernationTypeValue">
+             <property name="text">
+              <string>-</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="0">
+            <widget class="QLabel" name="compressedSizeLabel">
+             <property name="font">
+              <font>
+               <pointsize>9</pointsize>
+              </font>
+             </property>
+             <property name="text">
+              <string>Compressed Size:</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="1">
+            <widget class="QLabel" name="compressedSizeValue">
+             <property name="text">
+              <string>-</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="0">
+            <widget class="QLabel" name="originalSizeLabel">
+             <property name="font">
+              <font>
+               <pointsize>9</pointsize>
+              </font>
+             </property>
+             <property name="text">
+              <string>Original Size:</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="1">
+            <widget class="QLabel" name="originalSizeValue">
+             <property name="text">
+              <string>-</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
+         <widget class="QGroupBox" name="hibernationResultsGroup">
+          <property name="font">
+           <font>
+            <pointsize>9</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
+          </property>
+          <property name="title">
+           <string>Analysis Results</string>
+          </property>
+          <layout class="QVBoxLayout" name="hibernationResultsLayout">
+           <property name="spacing">
+            <number>0</number>
+           </property>
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
+            <number>0</number>
+           </property>
+           <item>
+            <widget class="QTextEdit" name="hibernationResultsText">
+             <property name="readOnly">
+              <bool>true</bool>
+             </property>
+             <property name="placeholderText">
+              <string>Hibernation analysis results will appear here...</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="pageFileTab">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <attribute name="title">
+        <string>Page File Analysis</string>
+       </attribute>
+       <layout class="QVBoxLayout" name="pageFileLayout">
+        <property name="spacing">
+         <number>0</number>
+        </property>
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
+        <item>
+         <widget class="QSplitter" name="pageFileSplitter">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <widget class="QWidget" name="pageFileLeftWidget">
+           <layout class="QVBoxLayout" name="pageFileLeftLayout">
+            <property name="spacing">
+             <number>0</number>
+            </property>
+            <item>
+             <widget class="QGroupBox" name="pageFileScanGroup">
+              <property name="font">
+               <font>
+                <pointsize>9</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
+              </property>
+              <property name="title">
+               <string>Page File Scan Results</string>
+              </property>
+              <layout class="QVBoxLayout" name="pageFileScanLayout">
+               <property name="spacing">
+                <number>5</number>
+               </property>
+               <property name="leftMargin">
+                <number>5</number>
+               </property>
+               <property name="topMargin">
+                <number>5</number>
+               </property>
+               <property name="rightMargin">
+                <number>0</number>
+               </property>
+               <property name="bottomMargin">
+                <number>5</number>
+               </property>
+               <item>
+                <widget class="QTreeWidget" name="pagefiletreeWidget">
+                 <column>
+                  <property name="text">
+                   <string notr="true">1</string>
+                  </property>
+                 </column>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+          <widget class="QWidget" name="pageFileRightWidget">
+           <layout class="QVBoxLayout" name="pageFileRightLayout">
+            <property name="spacing">
+             <number>0</number>
+            </property>
+            <item>
+             <widget class="QGroupBox" name="ResultsGroup">
+              <property name="font">
+               <font>
+                <pointsize>9</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
+              </property>
+              <property name="title">
+               <string>Analysis Results</string>
+              </property>
+              <layout class="QVBoxLayout" name="yaraResultsLayout">
+               <property name="spacing">
+                <number>5</number>
+               </property>
+               <property name="leftMargin">
+                <number>0</number>
+               </property>
+               <property name="topMargin">
+                <number>5</number>
+               </property>
+               <property name="rightMargin">
+                <number>5</number>
+               </property>
+               <property name="bottomMargin">
+                <number>5</number>
+               </property>
+               <item>
+                <widget class="QStackedWidget" name="stackedWidget">
+                 <widget class="QWidget" name="pageExtractStrings">
+                  <layout class="QGridLayout" name="gridLayout_7">
+                   <item row="0" column="0">
+                    <widget class="QLineEdit" name="lineEdit_2">
+                     <property name="font">
+                      <font>
+                       <pointsize>9</pointsize>
+                      </font>
+                     </property>
+                     <property name="placeholderText">
+                      <string>Search something</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="1" column="0">
+                    <widget class="QTableWidget" name="tableStrings"/>
+                   </item>
+                  </layout>
+                 </widget>
+                 <widget class="QWidget" name="pageYaraDetails">
+                  <layout class="QGridLayout" name="gridLayout_8">
+                   <item row="0" column="0">
+                    <widget class="QPlainTextEdit" name="txtYaraMatches"/>
+                   </item>
+                  </layout>
+                 </widget>
+                 <widget class="QWidget" name="pageCarveFiles">
+                  <layout class="QGridLayout" name="gridLayout_9">
+                   <item row="0" column="0">
+                    <widget class="QListWidget" name="lstCarved"/>
+                   </item>
+                  </layout>
+                 </widget>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="crashDumpTab">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <attribute name="title">
+        <string>Crash Dump Analysis</string>
+       </attribute>
+       <layout class="QVBoxLayout" name="crashDumpLayout">
+        <property name="spacing">
+         <number>0</number>
+        </property>
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
+        <item>
+         <widget class="QGroupBox" name="crashAnalysisGroup">
+          <property name="font">
+           <font>
+            <pointsize>10</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
+          </property>
+          <property name="title">
+           <string/>
+          </property>
+          <layout class="QVBoxLayout" name="crashAnalysisLayout">
+           <property name="spacing">
+            <number>5</number>
+           </property>
+           <property name="leftMargin">
+            <number>5</number>
+           </property>
+           <property name="topMargin">
+            <number>5</number>
+           </property>
+           <property name="rightMargin">
+            <number>5</number>
+           </property>
+           <property name="bottomMargin">
+            <number>5</number>
+           </property>
+           <item>
+            <widget class="QFrame" name="cdbControlsFrame">
+             <property name="maximumSize">
+              <size>
+               <width>16777215</width>
+               <height>80</height>
+              </size>
+             </property>
+             <property name="font">
+              <font>
+               <pointsize>9</pointsize>
+              </font>
+             </property>
+             <property name="frameShape">
+              <enum>QFrame::StyledPanel</enum>
+             </property>
+             <property name="frameShadow">
+              <enum>QFrame::Raised</enum>
+             </property>
+             <layout class="QVBoxLayout" name="cdbControlsLayout">
+              <property name="spacing">
+               <number>5</number>
+              </property>
+              <property name="leftMargin">
+               <number>10</number>
+              </property>
+              <property name="topMargin">
+               <number>5</number>
+              </property>
+              <property name="rightMargin">
+               <number>10</number>
+              </property>
+              <property name="bottomMargin">
+               <number>5</number>
+              </property>
+              <item>
+               <layout class="QHBoxLayout" name="cdbHeaderLayout"/>
+              </item>
+              <item>
+               <layout class="QHBoxLayout" name="cdbCustomLayout">
+                <item>
+                 <widget class="QLabel" name="customCommandLabel">
+                  <property name="font">
+                   <font>
+                    <pointsize>9</pointsize>
+                   </font>
+                  </property>
+                  <property name="text">
+                   <string>Advance Command:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLineEdit" name="customCommandEdit">
+                  <property name="font">
+                   <font>
+                    <pointsize>9</pointsize>
+                   </font>
+                  </property>
+                  <property name="placeholderText">
+                   <string>Enter CDB command (e.g., !analyze -v, k, lm, etc.)</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="addCustomCommandButton">
+                  <property name="font">
+                   <font>
+                    <pointsize>9</pointsize>
+                   </font>
+                  </property>
+                  <property name="styleSheet">
+                   <string notr="true">QPushButton {
+    background-color: #3498db;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+}
+QPushButton:hover {
+    background-color: #2980b9;
+}</string>
+                  </property>
+                  <property name="text">
+                   <string>Run command</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+              <item>
+               <layout class="QHBoxLayout" name="runningCommandLayout">
+                <item>
+                 <widget class="QLabel" name="runningCommandLabel">
+                  <property name="font">
+                   <font>
+                    <pointsize>9</pointsize>
+                   </font>
+                  </property>
+                  <property name="text">
+                   <string>Running CDB command:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLineEdit" name="runningCommandEdit">
+                  <property name="enabled">
+                   <bool>false</bool>
+                  </property>
+                  <property name="font">
+                   <font>
+                    <pointsize>9</pointsize>
+                   </font>
+                  </property>
+                  <property name="styleSheet">
+                   <string notr="true">QLineEdit:disabled {
+    background-color: #f5f5f5;
+    color: #666666;
+    border: 1px solid #cccccc;
+    border-radius: 4px;
+    padding: 4px 8px;
+    font-family: 'Consolas', 'Monaco', monospace;
+}</string>
+                  </property>
+                  <property name="placeholderText">
+                   <string>Ready to run CDB commands...</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
+            <widget class="QTabWidget" name="crashAnalysisTabWidget">
+             <property name="font">
+              <font>
+               <pointsize>9</pointsize>
+              </font>
+             </property>
+             <property name="currentIndex">
+              <number>-1</number>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="aiAnalysisTab">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <attribute name="title">
+        <string>AI Analysis</string>
+       </attribute>
+       <layout class="QVBoxLayout" name="aiAnalysisLayout">
+        <property name="spacing">
+         <number>0</number>
+        </property>
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
+        <item>
+         <widget class="QGroupBox" name="aiSettingsGroup">
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>100</height>
+           </size>
+          </property>
+          <property name="font">
+           <font>
+            <pointsize>9</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
+          </property>
+          <property name="title">
+           <string>AI Analysis Settings</string>
+          </property>
+          <layout class="QHBoxLayout" name="aiSettingsLayout">
+           <property name="spacing">
+            <number>10</number>
+           </property>
+           <property name="leftMargin">
+            <number>30</number>
+           </property>
+           <property name="topMargin">
+            <number>10</number>
+           </property>
+           <property name="rightMargin">
+            <number>30</number>
+           </property>
+           <property name="bottomMargin">
+            <number>10</number>
+           </property>
+           <item>
+            <widget class="QCheckBox" name="enableAICheckbox">
+             <property name="font">
+              <font>
+               <pointsize>9</pointsize>
+              </font>
+             </property>
+             <property name="text">
+              <string>Enable AI Analysis</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="aiModelLabel">
+             <property name="font">
+              <font>
+               <pointsize>9</pointsize>
+              </font>
+             </property>
+             <property name="text">
+              <string>Model:</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QComboBox" name="aiModelCombo">
+             <property name="font">
+              <font>
+               <pointsize>9</pointsize>
+              </font>
+             </property>
+             <item>
+              <property name="text">
+               <string>Volmemlyzer ML</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Custom Model</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="runAIAnalysisButton">
+             <property name="font">
+              <font>
+               <pointsize>9</pointsize>
+              </font>
+             </property>
+             <property name="text">
+              <string>Run AI Analysis</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
+         <widget class="QGroupBox" name="aiResultsGroup">
+          <property name="font">
+           <font>
+            <pointsize>9</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
+          </property>
+          <property name="title">
+           <string>AI Analysis Results</string>
+          </property>
+          <layout class="QVBoxLayout" name="aiResultsLayout">
+           <property name="spacing">
+            <number>0</number>
+           </property>
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
+            <number>0</number>
+           </property>
+           <item>
+            <widget class="QTextEdit" name="aiResultsText">
+             <property name="font">
+              <font>
+               <pointsize>9</pointsize>
+              </font>
+             </property>
+             <property name="readOnly">
+              <bool>true</bool>
+             </property>
+             <property name="placeholderText">
+              <string>AI analysis results will appear here...</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="analysisOptionsTab">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <attribute name="title">
+        <string>Analysis Options</string>
+       </attribute>
+       <layout class="QGridLayout" name="gridLayout_2">
+        <item row="0" column="0">
+         <widget class="QGroupBox" name="volatilityOptionsGroup">
+          <property name="font">
+           <font>
+            <pointsize>9</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">QGroupBox {
+    border: 1px solid #c0c4c8;
+    border-radius: 6px;
+    margin-top: 12px;
+    padding: 8px;
+}
+</string>
+          </property>
+          <property name="title">
+           <string>Volatility Options</string>
+          </property>
+          <layout class="QVBoxLayout" name="volatilityOptionsVBox">
+           <property name="spacing">
+            <number>5</number>
+           </property>
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>11</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
+            <number>0</number>
+           </property>
+           <item>
+            <widget class="QLineEdit" name="pluginSearchEdit">
+             <property name="font">
+              <font>
+               <pointsize>9</pointsize>
+               <weight>50</weight>
+               <bold>false</bold>
+              </font>
+             </property>
+             <property name="styleSheet">
+              <string notr="true">/* ==== CHUNG CHO CÁC TEXT INPUT / TEXT EDIT ==== */
+QLineEdit,
+QTextEdit,
+QPlainTextEdit {
+    background-color: #ffffff;
+    border: 1px solid #c0c4c8;      /* viền xám nhạt */
+    border-radius: 4px;             /* bo góc mềm */
+    padding: 4px 6px;               /* khoảng đệm bên trong */
+    selection-background-color: #cce4f7;
+    selection-color: #000;
+}
+
+/* Khi focus chuyển viền sang xanh */
+QLineEdit:focus,
+QTextEdit:focus,
+QPlainTextEdit:focus {
+    border: 1px solid #4a90e2;
+}
+
+/* Placeholder màu nhạt (chỉ với QLineEdit) */
+QLineEdit[placeholderText] {
+    color: #999999;
+}
+
+/* ReadOnly thì nền hơi xám */
+QLineEdit[readOnly=&quot;true&quot;],
+QTextEdit[readOnly=&quot;true&quot;] {
+    background-color: #f0f2f5;
+}
+
+/* Thanh cuộn bên trong QTextEdit bo góc &amp; nhỏ gọn */
+QTextEdit QScrollBar:vertical,
+QPlainTextEdit QScrollBar:vertical {
+    background: transparent;
+    width: 8px;
+    margin: 0px;
+}
+QTextEdit QScrollBar::handle:vertical,
+QPlainTextEdit QScrollBar::handle:vertical {
+    background: #c0c4c8;
+    min-height: 20px;
+    border-radius: 4px;
+}
+QTextEdit QScrollBar::add-line, QTextEdit QScrollBar::sub-line,
+QPlainTextEdit QScrollBar::add-line, QPlainTextEdit QScrollBar::sub-line {
+    height: 0;
+}
+</string>
+             </property>
+             <property name="placeholderText">
+              <string>Search plugin...</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QTableWidget" name="pluginTableWidget">
+             <property name="styleSheet">
+              <string notr="true">/* ==== QTableWidget / QTableView ==== */
+QTableWidget,
+QTableView {
+    background-color: #ffffff;           /* nền trắng */
+    border: 1px solid #c0c4c8;           /* viền xám nhạt */
+    gridline-color: #e0e3e6;             /* màu lưới */
+    border-radius: 6px;                  /* bo góc toàn widget */
+    selection-background-color: #cce4f7; /* màu nền khi chọn */
+    selection-color: #000000;            /* màu chữ khi chọn */
+}
+
+/* Alternating row colors */
+QTableWidget {
+    alternate-background-color: #f9fbfc;
+}
+QTableWidget::item:alternate,
+QTableView::item:alternate {
+    background-color: #f9fbfc;
+}
+
+/* Header (cột và hàng) */
+QHeaderView::section {
+    background-color: #e1e5ea;
+    padding: 6px;
+    border: none;
+    border-bottom: 1px solid #c0c4c8;
+    border-right: 1px solid #c0c4c8;
+    font-weight: bold;
+}
+QHeaderView::section:last,
+QHeaderView::section:last {
+    border-right: none;
+}
+
+/* Cell hover */
+QTableWidget::item:hover,
+QTableView::item:hover {
+    background-color: #e8f1fb;
+}
+
+/* Remove focus rectangle */
+QTableWidget::item:focus,
+QTableView::item:focus {
+    outline: none;
+}
+
+/* Scrollbar trong table */
+QTableWidget QScrollBar:vertical,
+QTableView QScrollBar:vertical {
+    background: transparent;
+    width: 8px;
+    margin: 0px;
+}
+QTableWidget QScrollBar::handle:vertical,
+QTableView QScrollBar::handle:vertical {
+    background: #c0c4c8;
+    min-height: 20px;
+    border-radius: 4px;
+}
+QTableWidget QScrollBar::add-line,
+QTableWidget QScrollBar::sub-line,
+QTableView QScrollBar::add-line,
+QTableView QScrollBar::sub-line {
+    height: 0;
+}
+
+/* Focused cell viền xanh nhẹ */
+QTableWidget::item:selected:active,
+QTableView::item:selected:active {
+    border: 1px solid #4a90e2;
+}
+
+/* Header hover (nếu muốn) */
+QHeaderView::section:hover {
+    background-color: #d7dae0;
+}
+</string>
+             </property>
+             <property name="alternatingRowColors">
+              <bool>true</bool>
+             </property>
+             <property name="selectionBehavior">
+              <enum>QAbstractItemView::SelectRows</enum>
+             </property>
+             <property name="columnCount">
+              <number>4</number>
+             </property>
+             <column>
+              <property name="text">
+               <string>Chọn</string>
+              </property>
+             </column>
+             <column>
+              <property name="text">
+               <string>Tên plugin</string>
+              </property>
+             </column>
+             <column>
+              <property name="text">
+               <string>Loại</string>
+              </property>
+             </column>
+             <column>
+              <property name="text">
+               <string>Mô tả</string>
+              </property>
+             </column>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <layout class="QHBoxLayout" name="horizontalLayout">
           <item>
-           <widget class="QLabel" name="labelEvidence">
-            <property name="font">
-             <font>
-              <pointsize>9</pointsize>
-             </font>
-            </property>
-            <property name="text">
-             <string>Available Memory Files:</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QListWidget" name="listWidgetMemoryFiles">
-            <property name="styleSheet">
-             <string>font-size: 12px;</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLabel" name="labelFileInfo">
-            <property name="styleSheet">
-             <string notr="true">font-size: 12px; color: #666; font-style: italic;</string>
-            </property>
-            <property name="text">
-             <string>File info: Select a file from the list</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-       </item>
-       <item>
-        <widget class="QGroupBox" name="groupBoxVolatilityPlugins">
-         <property name="font">
-          <font>
-           <pointsize>10</pointsize>
-           <weight>75</weight>
-           <bold>true</bold>
-          </font>
-         </property>
-         <property name="styleSheet">
-          <string>QGroupBox { font-weight: bold; }</string>
-         </property>
-         <property name="title">
-          <string>Volatility Plugins</string>
-         </property>
-         <layout class="QVBoxLayout" name="pluginsLayout">
-          <item>
-           <widget class="QLineEdit" name="lineEditPluginSearch">
-            <property name="styleSheet">
-             <string>background: #e3f2fd; border-radius: 5px; padding: 4px 8px; font-size: 12px; margin-bottom: 4px;</string>
-            </property>
-            <property name="placeholderText">
-             <string>Search plugins...</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QListWidget" name="listWidgetPlugins">
+           <widget class="QGroupBox" name="outputOptionsGroup">
             <property name="minimumSize">
              <size>
               <width>0</width>
-              <height>140</height>
+              <height>100</height>
              </size>
             </property>
-            <property name="styleSheet">
-             <string>font-size: 12px;</string>
+            <property name="maximumSize">
+             <size>
+              <width>800</width>
+              <height>16777215</height>
+             </size>
             </property>
-            <property name="selectionMode">
-             <enum>QAbstractItemView::MultiSelection</enum>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLabel" name="labelPluginSuggestion">
             <property name="font">
              <font>
-              <pointsize>-1</pointsize>
-              <italic>true</italic>
+              <pointsize>9</pointsize>
+              <weight>75</weight>
+              <bold>true</bold>
              </font>
             </property>
             <property name="styleSheet">
-             <string notr="true">font-size: 12px; color: #1976d2; font-style: italic;</string>
+             <string notr="true">QGroupBox {
+    border: 1px solid #c0c4c8;
+    border-radius: 6px;
+    margin-top: 12px;
+    padding: 8px;
+}</string>
             </property>
-            <property name="text">
-             <string>💡 Suggested: Select a memory file first</string>
+            <property name="title">
+             <string>Output Options</string>
             </property>
+            <layout class="QGridLayout" name="gridLayout_4">
+             <item row="0" column="0">
+              <widget class="QLabel" name="outputFormatLabel">
+               <property name="font">
+                <font>
+                 <pointsize>9</pointsize>
+                 <weight>50</weight>
+                 <bold>false</bold>
+                </font>
+               </property>
+               <property name="text">
+                <string>Output Format:</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="1">
+              <widget class="QComboBox" name="outputFormatCombo">
+               <property name="font">
+                <font>
+                 <pointsize>9</pointsize>
+                 <weight>50</weight>
+                 <bold>false</bold>
+                </font>
+               </property>
+               <property name="styleSheet">
+                <string notr="true">/* ==== QComboBox ==== */
+QComboBox {
+    /* nền trắng, bo góc và viền xám nhạt giống QLineEdit */
+    background-color: #ffffff;
+    border: 1px solid #c0c4c8;
+    border-radius: 4px;
+    padding: 4px 30px 4px 8px; /* để chừa chỗ cho mũi tên */
+    min-height: 24px;
+    /* font đã định ở đầu styles.qss sẽ áp dụng */
+}
+
+/* Khi hover đổi nhẹ viền */
+QComboBox:hover {
+    border: 1px solid #a0a4a8;
+}
+
+/* Khi focus (đang chọn) đổi viền xanh */
+QComboBox:focus {
+    border: 1px solid #4a90e2;
+}
+
+/* Mũi tên xổ xuống */
+QComboBox::down-arrow {
+    image: url(:/icons/arrow-down.svg); /* bạn có thể thay bằng đường dẫn SVG của bạn */
+    width: 12px;
+    height: 12px;
+}
+
+/* Vị trí của mũi tên */
+QComboBox::drop-down {
+    subcontrol-origin: padding;
+    subcontrol-position: top right;
+    width: 24px;
+    border: none;
+    background: transparent;
+}
+
+/* Popup list (QAbstractItemView) */
+QComboBox QAbstractItemView {
+    background-color: #ffffff;
+    border: 1px solid #c0c4c8;
+    border-radius: 4px;
+    padding: 4px;
+    outline: none;
+    selection-background-color: #cce4f7;
+    selection-color: #000;
+}
+
+/* Các item trong list khi hover */
+QComboBox QAbstractItemView::item:hover {
+    background-color: #e8f1fb;
+}
+
+/* Scrollbar nhỏ gọn trong popup */
+QComboBox QAbstractItemView QScrollBar:vertical {
+    background: transparent;
+    width: 8px;
+    margin: 0px;
+}
+QComboBox QAbstractItemView QScrollBar::handle:vertical {
+    background: #c0c4c8;
+    min-height: 20px;
+    border-radius: 4px;
+}
+QComboBox QAbstractItemView QScrollBar::add-line,
+QComboBox QAbstractItemView QScrollBar::sub-line {
+    height: 0;
+}
+</string>
+               </property>
+               <item>
+                <property name="text">
+                 <string>JSON</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>CSV</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>XML</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Text</string>
+                </property>
+               </item>
+              </widget>
+             </item>
+             <item row="1" column="0">
+              <widget class="QLabel" name="outputDirLabel">
+               <property name="font">
+                <font>
+                 <pointsize>9</pointsize>
+                 <weight>50</weight>
+                 <bold>false</bold>
+                </font>
+               </property>
+               <property name="text">
+                <string>Output Directory:</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="1">
+              <widget class="QLineEdit" name="outputDirEdit">
+               <property name="font">
+                <font>
+                 <pointsize>9</pointsize>
+                 <weight>50</weight>
+                 <bold>false</bold>
+                </font>
+               </property>
+               <property name="styleSheet">
+                <string notr="true">/* ==== CHUNG CHO CÁC TEXT INPUT / TEXT EDIT ==== */
+QLineEdit,
+QTextEdit,
+QPlainTextEdit {
+    background-color: #ffffff;
+    border: 1px solid #c0c4c8;      /* viền xám nhạt */
+    border-radius: 4px;             /* bo góc mềm */
+    padding: 4px 6px;               /* khoảng đệm bên trong */
+    selection-background-color: #cce4f7;
+    selection-color: #000;
+}
+
+/* Khi focus chuyển viền sang xanh */
+QLineEdit:focus,
+QTextEdit:focus,
+QPlainTextEdit:focus {
+    border: 1px solid #4a90e2;
+}
+
+/* Placeholder màu nhạt (chỉ với QLineEdit) */
+QLineEdit[placeholderText] {
+    color: #999999;
+}
+
+/* ReadOnly thì nền hơi xám */
+QLineEdit[readOnly=&quot;true&quot;],
+QTextEdit[readOnly=&quot;true&quot;] {
+    background-color: #f0f2f5;
+}
+
+/* Thanh cuộn bên trong QTextEdit bo góc &amp; nhỏ gọn */
+QTextEdit QScrollBar:vertical,
+QPlainTextEdit QScrollBar:vertical {
+    background: transparent;
+    width: 8px;
+    margin: 0px;
+}
+QTextEdit QScrollBar::handle:vertical,
+QPlainTextEdit QScrollBar::handle:vertical {
+    background: #c0c4c8;
+    min-height: 20px;
+    border-radius: 4px;
+}
+QTextEdit QScrollBar::add-line, QTextEdit QScrollBar::sub-line,
+QPlainTextEdit QScrollBar::add-line, QPlainTextEdit QScrollBar::sub-line {
+    height: 0;
+}
+</string>
+               </property>
+               <property name="placeholderText">
+                <string>Select output directory...</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="2">
+              <widget class="QPushButton" name="outputDirButton">
+               <property name="font">
+                <font>
+                 <weight>50</weight>
+                 <bold>false</bold>
+                </font>
+               </property>
+               <property name="styleSheet">
+                <string notr="true">/* QPushButton */
+QPushButton {
+    background-color: #4a90e2;
+    border: none;
+    border-radius: 4px;
+    padding: 6px 12px;
+    color: #fff;
+}
+QPushButton:hover {
+    background-color: #5aa0f2;
+}
+QPushButton:pressed {
+    background-color: #3a7fcc;
+}</string>
+               </property>
+               <property name="text">
+                <string>Browse</string>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="0">
+              <widget class="QCheckBox" name="saveRawOutputCheckbox">
+               <property name="font">
+                <font>
+                 <pointsize>9</pointsize>
+                 <weight>50</weight>
+                 <bold>false</bold>
+                </font>
+               </property>
+               <property name="text">
+                <string>Save Raw Output</string>
+               </property>
+               <property name="checked">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="1">
+              <widget class="QCheckBox" name="generateReportCheckbox">
+               <property name="font">
+                <font>
+                 <pointsize>9</pointsize>
+                 <weight>50</weight>
+                 <bold>false</bold>
+                </font>
+               </property>
+               <property name="text">
+                <string>Generate HTML Report</string>
+               </property>
+               <property name="checked">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item>
+           <widget class="QGroupBox" name="advancedOptionsGroup">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>100</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>500</width>
+              <height>16777215</height>
+             </size>
+            </property>
+            <property name="font">
+             <font>
+              <pointsize>9</pointsize>
+              <weight>75</weight>
+              <bold>true</bold>
+             </font>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">QGroupBox {
+    border: 1px solid #c0c4c8;
+    border-radius: 6px;
+    margin-top: 12px;
+    padding: 8px;
+}</string>
+            </property>
+            <property name="title">
+             <string>Advanced Options</string>
+            </property>
+            <layout class="QGridLayout" name="gridLayout_5">
+             <item row="0" column="0">
+              <widget class="QLabel" name="threadsLabel">
+               <property name="font">
+                <font>
+                 <pointsize>9</pointsize>
+                 <weight>50</weight>
+                 <bold>false</bold>
+                </font>
+               </property>
+               <property name="text">
+                <string>Analysis Threads:</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="1">
+              <widget class="QSpinBox" name="threadsSpinBox">
+               <property name="font">
+                <font>
+                 <family>Segoe UI</family>
+                 <pointsize>9</pointsize>
+                </font>
+               </property>
+               <property name="styleSheet">
+                <string notr="true">/* ==== QSpinBox &amp; QDoubleSpinBox ==== */
+QSpinBox,
+QDoubleSpinBox {
+    background-color: #ffffff;
+    border: 1px solid #c0c4c8;
+    border-radius: 4px;
+    min-height: 24px;
+    padding: 2px 6px;            /* chừa khoảng cho text */
+    font-family: &quot;Segoe UI&quot;;     /* kế thừa font chung */
+}
+
+/* Khi hover thì viền đậm lên */
+QSpinBox:hover,
+QDoubleSpinBox:hover {
+    border: 1px solid #a0a4a8;
+}
+
+/* Khi focus (đang nhập/xoay số) đổi sang xanh */
+QSpinBox:focus,
+QDoubleSpinBox:focus {
+    border: 1px solid #4a90e2;
+}
+
+
+
+
+/* Xoá highlight nền của subcontrol khi disabled */
+QSpinBox:disabled,
+QDoubleSpinBox:disabled {
+    background-color: #f0f2f5;
+    color: #999;
+}
+</string>
+               </property>
+               <property name="minimum">
+                <number>1</number>
+               </property>
+               <property name="maximum">
+                <number>16</number>
+               </property>
+               <property name="value">
+                <number>4</number>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="0">
+              <widget class="QLabel" name="timeoutLabel">
+               <property name="font">
+                <font>
+                 <pointsize>9</pointsize>
+                 <weight>50</weight>
+                 <bold>false</bold>
+                </font>
+               </property>
+               <property name="text">
+                <string>Timeout (minutes):</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="1">
+              <widget class="QSpinBox" name="timeoutSpinBox">
+               <property name="font">
+                <font>
+                 <family>Segoe UI</family>
+                 <pointsize>9</pointsize>
+                </font>
+               </property>
+               <property name="styleSheet">
+                <string notr="true">/* ==== QSpinBox &amp; QDoubleSpinBox ==== */
+QSpinBox,
+QDoubleSpinBox {
+    background-color: #ffffff;
+    border: 1px solid #c0c4c8;
+    border-radius: 4px;
+    min-height: 24px;
+    padding: 2px 6px;            /* chừa khoảng cho text */
+    font-family: &quot;Segoe UI&quot;;     /* kế thừa font chung */
+}
+
+/* Khi hover thì viền đậm lên */
+QSpinBox:hover,
+QDoubleSpinBox:hover {
+    border: 1px solid #a0a4a8;
+}
+
+/* Khi focus (đang nhập/xoay số) đổi sang xanh */
+QSpinBox:focus,
+QDoubleSpinBox:focus {
+    border: 1px solid #4a90e2;
+}
+
+
+
+
+/* Xoá highlight nền của subcontrol khi disabled */
+QSpinBox:disabled,
+QDoubleSpinBox:disabled {
+    background-color: #f0f2f5;
+    color: #999;
+}
+</string>
+               </property>
+               <property name="minimum">
+                <number>5</number>
+               </property>
+               <property name="maximum">
+                <number>180</number>
+               </property>
+               <property name="value">
+                <number>60</number>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="0">
+              <widget class="QCheckBox" name="verboseCheckbox">
+               <property name="font">
+                <font>
+                 <pointsize>9</pointsize>
+                 <weight>50</weight>
+                 <bold>false</bold>
+                </font>
+               </property>
+               <property name="text">
+                <string>Verbose Output</string>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="1">
+              <widget class="QCheckBox" name="debugCheckbox">
+               <property name="font">
+                <font>
+                 <pointsize>9</pointsize>
+                 <weight>50</weight>
+                 <bold>false</bold>
+                </font>
+               </property>
+               <property name="text">
+                <string>Debug Mode</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
            </widget>
           </item>
          </layout>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="btnStart">
-         <property name="styleSheet">
-          <string notr="true">font-size: 15px; font-weight: bold; background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #1976d2, stop:1 #42a5f5); color: white; border-radius: 6px; padding: 10px 0; margin-top: 8px; margin-bottom: 4px;</string>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="logTab">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <attribute name="title">
+        <string>Analysis Log</string>
+       </attribute>
+       <layout class="QVBoxLayout" name="logLayout">
+        <property name="spacing">
+         <number>0</number>
+        </property>
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
+        <item>
+         <widget class="QFrame" name="logControlFrame">
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>60</height>
+           </size>
+          </property>
+          <property name="frameShape">
+           <enum>QFrame::StyledPanel</enum>
+          </property>
+          <layout class="QHBoxLayout" name="logControlLayout">
+           <item>
+            <widget class="QLabel" name="logLevelLabel">
+             <property name="font">
+              <font>
+               <pointsize>9</pointsize>
+              </font>
+             </property>
+             <property name="text">
+              <string>Log Level:</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QComboBox" name="logLevelCombo">
+             <property name="font">
+              <font>
+               <pointsize>9</pointsize>
+              </font>
+             </property>
+             <item>
+              <property name="text">
+               <string>Debug</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Info</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Warning</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Error</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+           <item>
+            <spacer name="horizontalSpacer">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item>
+            <widget class="QPushButton" name="clearLogButton">
+             <property name="font">
+              <font>
+               <pointsize>9</pointsize>
+              </font>
+             </property>
+             <property name="text">
+              <string>Clear Log</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="saveLogButton">
+             <property name="font">
+              <font>
+               <pointsize>9</pointsize>
+              </font>
+             </property>
+             <property name="text">
+              <string>Save Log</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
+         <widget class="QTextEdit" name="logTextEdit">
+          <property name="font">
+           <font>
+            <family>Courier New</family>
+            <pointsize>9</pointsize>
+           </font>
+          </property>
+          <property name="readOnly">
+           <bool>true</bool>
+          </property>
+          <property name="placeholderText">
+           <string>Analysis log will appear here...</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </widget>
+    </item>
+    <item row="0" column="0">
+     <widget class="QFrame" name="frame">
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>20</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>16777215</width>
+        <height>40</height>
+       </size>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>9</pointsize>
+       </font>
+      </property>
+      <property name="frameShape">
+       <enum>QFrame::StyledPanel</enum>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Raised</enum>
+      </property>
+      <layout class="QGridLayout" name="gridLayout">
+       <property name="leftMargin">
+        <number>15</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+       <property name="spacing">
+        <number>0</number>
+       </property>
+       <item row="0" column="0">
+        <widget class="QLabel" name="label">
+         <property name="font">
+          <font>
+           <pointsize>9</pointsize>
+          </font>
          </property>
          <property name="text">
-          <string>▶️ Analyze Selected File</string>
+          <string>Case name:</string>
          </property>
         </widget>
        </item>
-       <item>
-        <widget class="QPushButton" name="btnExport">
-         <property name="styleSheet">
-          <string notr="true">font-size: 15px; background: #e3f2fd; color: #1976d2; border-radius: 6px; padding: 6px 0; margin-bottom: 4px;</string>
-         </property>
-         <property name="text">
-          <string>💾 Export Results</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QProgressBar" name="progressBar">
+       <item row="0" column="1">
+        <widget class="QLineEdit" name="lineEdit">
          <property name="font">
           <font>
            <pointsize>9</pointsize>
           </font>
          </property>
          <property name="styleSheet">
-          <string>border-radius: 5px; height: 18px; background: #f5f5f5; color: #1976d2;</string>
-         </property>
-         <property name="minimum">
-          <number>0</number>
-         </property>
-         <property name="maximum">
-          <number>100</number>
-         </property>
-         <property name="value">
-          <number>0</number>
-         </property>
-         <property name="textVisible">
-          <bool>true</bool>
-         </property>
-         <property name="format">
-          <string>Analysis progress: %p%</string>
+          <string notr="true">/* ==== CHUNG CHO CÁC TEXT INPUT / TEXT EDIT ==== */
+QLineEdit,
+QTextEdit,
+QPlainTextEdit {
+    background-color: #ffffff;
+    border: 1px solid #c0c4c8;      /* viền xám nhạt */
+    border-radius: 4px;             /* bo góc mềm */
+    padding: 4px 6px;               /* khoảng đệm bên trong */
+    selection-background-color: #cce4f7;
+    selection-color: #000;
+}
+
+/* Khi focus chuyển viền sang xanh */
+QLineEdit:focus,
+QTextEdit:focus,
+QPlainTextEdit:focus {
+    border: 1px solid #4a90e2;
+}
+
+/* Placeholder màu nhạt (chỉ với QLineEdit) */
+QLineEdit[placeholderText] {
+    color: #999999;
+}
+
+/* ReadOnly thì nền hơi xám */
+QLineEdit[readOnly=&quot;true&quot;],
+QTextEdit[readOnly=&quot;true&quot;] {
+    background-color: #f0f2f5;
+}
+
+/* Thanh cuộn bên trong QTextEdit bo góc &amp; nhỏ gọn */
+QTextEdit QScrollBar:vertical,
+QPlainTextEdit QScrollBar:vertical {
+    background: transparent;
+    width: 8px;
+    margin: 0px;
+}
+QTextEdit QScrollBar::handle:vertical,
+QPlainTextEdit QScrollBar::handle:vertical {
+    background: #c0c4c8;
+    min-height: 20px;
+    border-radius: 4px;
+}
+QTextEdit QScrollBar::add-line, QTextEdit QScrollBar::sub-line,
+QPlainTextEdit QScrollBar::add-line, QPlainTextEdit QScrollBar::sub-line {
+    height: 0;
+}
+</string>
          </property>
         </widget>
        </item>
-       <item>
-        <widget class="QGroupBox" name="groupBoxLog">
+       <item row="0" column="2">
+        <spacer name="horizontalSpacer_2">
          <property name="font">
           <font>
-           <pointsize>10</pointsize>
+           <pointsize>9</pointsize>
+          </font>
+         </property>
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>995</width>
+           <height>3</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item row="1" column="0">
+     <widget class="QFrame" name="headerFrame">
+      <property name="maximumSize">
+       <size>
+        <width>16777215</width>
+        <height>130</height>
+       </size>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>9</pointsize>
+       </font>
+      </property>
+      <property name="frameShape">
+       <enum>QFrame::StyledPanel</enum>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Raised</enum>
+      </property>
+      <layout class="QHBoxLayout" name="headerLayout">
+       <property name="spacing">
+        <number>0</number>
+       </property>
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+       <item>
+        <widget class="QGroupBox" name="evidenceGroupBox">
+         <property name="font">
+          <font>
+           <pointsize>9</pointsize>
            <weight>75</weight>
            <bold>true</bold>
           </font>
          </property>
-         <property name="styleSheet">
-          <string>QGroupBox { font-weight: bold; }</string>
+         <property name="title">
+          <string>Evidence</string>
+         </property>
+         <layout class="QGridLayout" name="evidenceGridLayout">
+          <property name="leftMargin">
+           <number>15</number>
+          </property>
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <property name="rightMargin">
+           <number>5</number>
+          </property>
+          <property name="bottomMargin">
+           <number>5</number>
+          </property>
+          <property name="spacing">
+           <number>5</number>
+          </property>
+          <item row="0" column="0">
+           <widget class="QLabel" name="evidenceTypeLabel">
+            <property name="font">
+             <font>
+              <pointsize>9</pointsize>
+             </font>
+            </property>
+            <property name="text">
+             <string>Evidence Type:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QComboBox" name="evidenceTypeCombo">
+            <property name="minimumSize">
+             <size>
+              <width>200</width>
+              <height>34</height>
+             </size>
+            </property>
+            <property name="font">
+             <font>
+              <pointsize>9</pointsize>
+             </font>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">/* ==== QComboBox ==== */
+QComboBox {
+    /* nền trắng, bo góc và viền xám nhạt giống QLineEdit */
+    background-color: #ffffff;
+    border: 1px solid #c0c4c8;
+    border-radius: 4px;
+    padding: 4px 30px 4px 8px; /* để chừa chỗ cho mũi tên */
+    min-height: 24px;
+    /* font đã định ở đầu styles.qss sẽ áp dụng */
+}
+
+/* Khi hover đổi nhẹ viền */
+QComboBox:hover {
+    border: 1px solid #a0a4a8;
+}
+
+/* Khi focus (đang chọn) đổi viền xanh */
+QComboBox:focus {
+    border: 1px solid #4a90e2;
+}
+
+/* Popup list (QAbstractItemView) */
+QComboBox QAbstractItemView {
+    background-color: #ffffff;
+    border: 1px solid #c0c4c8;
+    border-radius: 4px;
+    padding: 4px;
+    outline: none;
+    selection-background-color: #cce4f7;
+    selection-color: #000;
+}
+
+/* Các item trong list khi hover */
+QComboBox QAbstractItemView::item:hover {
+    background-color: #e8f1fb;
+}
+
+/* Scrollbar nhỏ gọn trong popup */
+QComboBox QAbstractItemView QScrollBar:vertical {
+    background: transparent;
+    width: 8px;
+    margin: 0px;
+}
+QComboBox QAbstractItemView QScrollBar::handle:vertical {
+    background: #c0c4c8;
+    min-height: 20px;
+    border-radius: 4px;
+}
+QComboBox QAbstractItemView QScrollBar::add-line,
+QComboBox QAbstractItemView QScrollBar::sub-line {
+    height: 0;
+}
+</string>
+            </property>
+            <item>
+             <property name="text">
+              <string>Raw Memory (.raw, .mem, .vmem)</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Hibernation File (hiberfil.sys)</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Page File (pagefile.sys)</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Crash Dump (.dmp)</string>
+             </property>
+            </item>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="QLineEdit" name="filePathEdit">
+            <property name="font">
+             <font>
+              <pointsize>9</pointsize>
+             </font>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">/* ==== CHUNG CHO CÁC TEXT INPUT / TEXT EDIT ==== */
+QLineEdit,
+QTextEdit,
+QPlainTextEdit {
+    background-color: #ffffff;
+    border: 1px solid #c0c4c8;      /* viền xám nhạt */
+    border-radius: 4px;             /* bo góc mềm */
+    padding: 4px 6px;               /* khoảng đệm bên trong */
+    selection-background-color: #cce4f7;
+    selection-color: #000;
+}
+
+/* Khi focus chuyển viền sang xanh */
+QLineEdit:focus,
+QTextEdit:focus,
+QPlainTextEdit:focus {
+    border: 1px solid #4a90e2;
+}
+
+/* Placeholder màu nhạt (chỉ với QLineEdit) */
+QLineEdit[placeholderText] {
+    color: #999999;
+}
+
+/* ReadOnly thì nền hơi xám */
+QLineEdit[readOnly=&quot;true&quot;],
+QTextEdit[readOnly=&quot;true&quot;] {
+    background-color: #f0f2f5;
+}
+
+/* Thanh cuộn bên trong QTextEdit bo góc &amp; nhỏ gọn */
+QTextEdit QScrollBar:vertical,
+QPlainTextEdit QScrollBar:vertical {
+    background: transparent;
+    width: 8px;
+    margin: 0px;
+}
+QTextEdit QScrollBar::handle:vertical,
+QPlainTextEdit QScrollBar::handle:vertical {
+    background: #c0c4c8;
+    min-height: 20px;
+    border-radius: 4px;
+}
+QTextEdit QScrollBar::add-line, QTextEdit QScrollBar::sub-line,
+QPlainTextEdit QScrollBar::add-line, QPlainTextEdit QScrollBar::sub-line {
+    height: 0;
+}
+</string>
+            </property>
+            <property name="placeholderText">
+             <string>Select evidence file...</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="filePathLabel">
+            <property name="font">
+             <font>
+              <pointsize>9</pointsize>
+             </font>
+            </property>
+            <property name="text">
+             <string>File Path:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_2">
+            <property name="font">
+             <font>
+              <pointsize>9</pointsize>
+             </font>
+            </property>
+            <property name="text">
+             <string>Evidence</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QComboBox" name="evidencecombo">
+            <property name="font">
+             <font>
+              <pointsize>9</pointsize>
+             </font>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="statusGroupBox">
+         <property name="maximumSize">
+          <size>
+           <width>600</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="font">
+          <font>
+           <pointsize>9</pointsize>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
          </property>
          <property name="title">
-          <string>Analysis Log</string>
+          <string>Analysis Status</string>
          </property>
-         <layout class="QVBoxLayout" name="logLayout">
-          <item>
-           <widget class="QListWidget" name="listWidget_log">
+         <layout class="QGridLayout" name="gridLayout_6">
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
+          <property name="verticalSpacing">
+           <number>2</number>
+          </property>
+          <item row="2" column="0">
+           <widget class="QSplitter" name="splitter">
+            <property name="font">
+             <font>
+              <pointsize>9</pointsize>
+             </font>
+            </property>
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <widget class="QPushButton" name="startAnalysisButton">
+             <property name="maximumSize">
+              <size>
+               <width>130</width>
+               <height>16777215</height>
+              </size>
+             </property>
+             <property name="font">
+              <font>
+               <pointsize>9</pointsize>
+              </font>
+             </property>
+             <property name="styleSheet">
+              <string notr="true">/* QPushButton */
+QPushButton {
+    background-color: #4a90e2;
+    border: none;
+    border-radius: 4px;
+    padding: 6px 12px;
+    color: #fff;
+}
+QPushButton:hover {
+    background-color: #5aa0f2;
+}
+QPushButton:pressed {
+    background-color: #3a7fcc;
+}</string>
+             </property>
+             <property name="text">
+              <string>Start Analysis</string>
+             </property>
+            </widget>
+            <widget class="QPushButton" name="stopButton">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>150</width>
+               <height>16777215</height>
+              </size>
+             </property>
+             <property name="font">
+              <font>
+               <pointsize>9</pointsize>
+               <underline>false</underline>
+              </font>
+             </property>
+             <property name="layoutDirection">
+              <enum>Qt::LeftToRight</enum>
+             </property>
+             <property name="styleSheet">
+              <string notr="true">/* QPushButton */
+QPushButton {
+    background-color: #4a90e2;
+    border: none;
+    border-radius: 4px;
+    padding: 6px 12px;
+    color: #fff;
+}
+QPushButton:hover {
+    background-color: #5aa0f2;
+}
+QPushButton:pressed {
+    background-color: #3a7fcc;
+}</string>
+             </property>
+             <property name="text">
+              <string>Stop Analysis</string>
+             </property>
+            </widget>
+            <widget class="QPushButton" name="pushButton_2">
+             <property name="font">
+              <font>
+               <pointsize>9</pointsize>
+              </font>
+             </property>
+             <property name="text">
+              <string>Save Results</string>
+             </property>
+            </widget>
+            <widget class="QPushButton" name="pushButton">
+             <property name="font">
+              <font>
+               <pointsize>9</pointsize>
+              </font>
+             </property>
+             <property name="text">
+              <string>Export Report</string>
+             </property>
+            </widget>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QProgressBar" name="progressBar">
+            <property name="font">
+             <font>
+              <pointsize>9</pointsize>
+             </font>
+            </property>
             <property name="styleSheet">
-             <string notr="true">background: #f5f5f5; font-size: 12px; border-radius: 5px;</string>
+             <string notr="true">/* QProgressBar */
+QProgressBar {
+    border: 1px solid #a0a4a8;
+    border-radius: 6px;
+    text-align: center;
+}
+QProgressBar::chunk {
+    background-color: #4a90e2;
+    border-radius: 6px;
+}</string>
+            </property>
+            <property name="value">
+             <number>0</number>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <widget class="QLabel" name="statusLabel">
+            <property name="font">
+             <font>
+              <pointsize>9</pointsize>
+             </font>
+            </property>
+            <property name="text">
+             <string>Status</string>
             </property>
            </widget>
           </item>
@@ -215,47 +2861,299 @@
        </item>
       </layout>
      </widget>
-     <widget class="QTabWidget" name="tabWidget">
-      <property name="styleSheet">
-       <string notr="true">QTabBar::tab {
-    min-width: 220px; /* Increased width to ensure full text visibility */
-    padding: 5px 15px; /* Adjust padding for better spacing */
-    text-align: left; /* Align text to the left */
-    font-size: 16px; /* Explicit font size */
-}
-
-QTabBar::tab:selected {
-    background-color: #2a82da;
-    color: white;
-    border: 1px solid #2a82da;
-    border-bottom-color: #2a82da; /* same as background color */
-}
-
-QTabBar::tab:!selected {
-    background-color: #f0f0f0;
-    border: 1px solid #dcdcdc;
-    border-bottom-color: #dcdcdc; /* same as border color */
-}
-
-QTabBar::close-button {
-    image: url(:/icons/icons8-close-30.png); /* Ensure you have this icon in your resources */
-    subcontrol-position: right;
-}
-
-QTabBar::close-button:hover {
-    background: #ff7878;}</string>
-      </property>
-      <property name="currentIndex">
-       <number>-1</number>
-      </property>
-      <property name="tabsClosable">
-       <bool>true</bool>
-      </property>
-     </widget>
-    </widget>
-   </item>
-  </layout>
+    </item>
+   </layout>
+  </widget>
+  <action name="actionOpen_Evidence">
+   <property name="text">
+    <string>Open Evidence</string>
+   </property>
+   <property name="toolTip">
+    <string>Open evidence file for analysis</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+O</string>
+   </property>
+  </action>
+  <action name="actionRecent_Files">
+   <property name="text">
+    <string>Recent Files</string>
+   </property>
+  </action>
+  <action name="actionSave_Results">
+   <property name="text">
+    <string>Save Results</string>
+   </property>
+   <property name="toolTip">
+    <string>Save analysis results</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+S</string>
+   </property>
+  </action>
+  <action name="actionExport_Report">
+   <property name="text">
+    <string>Export Report</string>
+   </property>
+   <property name="toolTip">
+    <string>Export analysis report</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+E</string>
+   </property>
+  </action>
+  <action name="actionExit">
+   <property name="text">
+    <string>Exit</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Q</string>
+   </property>
+  </action>
+  <action name="actionStart_Analysis">
+   <property name="text">
+    <string>Start Analysis</string>
+   </property>
+   <property name="toolTip">
+    <string>Start memory analysis</string>
+   </property>
+   <property name="shortcut">
+    <string>F5</string>
+   </property>
+  </action>
+  <action name="actionStop_Analysis">
+   <property name="text">
+    <string>Stop Analysis</string>
+   </property>
+   <property name="toolTip">
+    <string>Stop running analysis</string>
+   </property>
+   <property name="shortcut">
+    <string>F6</string>
+   </property>
+  </action>
+  <action name="actionQuick_Analysis">
+   <property name="text">
+    <string>Quick Analysis</string>
+   </property>
+   <property name="toolTip">
+    <string>Run quick analysis with basic plugins</string>
+   </property>
+  </action>
+  <action name="actionFull_Analysis">
+   <property name="text">
+    <string>Full Analysis</string>
+   </property>
+   <property name="toolTip">
+    <string>Run comprehensive analysis with all plugins</string>
+   </property>
+  </action>
+  <action name="actionCustom_Plugin">
+   <property name="text">
+    <string>Custom Plugin</string>
+   </property>
+   <property name="toolTip">
+    <string>Run custom Volatility plugin</string>
+   </property>
+  </action>
+  <action name="actionVolatility_Settings">
+   <property name="text">
+    <string>Volatility Settings</string>
+   </property>
+  </action>
+  <action name="actionYARA_Rules">
+   <property name="text">
+    <string>YARA Rules</string>
+   </property>
+  </action>
+  <action name="actionPreferences">
+   <property name="text">
+    <string>Preferences</string>
+   </property>
+   <property name="toolTip">
+    <string>Application preferences</string>
+   </property>
+  </action>
+  <action name="actionShow_System_Info">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>System Info</string>
+   </property>
+  </action>
+  <action name="actionShow_Process_Tree">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Process Tree</string>
+   </property>
+  </action>
+  <action name="actionShow_Network_Connections">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Network Connections</string>
+   </property>
+  </action>
+  <action name="actionRefresh">
+   <property name="text">
+    <string>Refresh</string>
+   </property>
+   <property name="shortcut">
+    <string>F5</string>
+   </property>
+  </action>
+  <action name="actionUser_Manual">
+   <property name="text">
+    <string>User Manual</string>
+   </property>
+  </action>
+  <action name="actionVolatility_Documentation">
+   <property name="text">
+    <string>Volatility Documentation</string>
+   </property>
+  </action>
+  <action name="actionAbout">
+   <property name="text">
+    <string>About</string>
+   </property>
+  </action>
  </widget>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>startAnalysisButton</sender>
+   <signal>clicked()</signal>
+   <receiver>MemoryAnalysisWindow</receiver>
+   <slot>start_analysis()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1090</x>
+     <y>55</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>600</x>
+     <y>400</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>stopButton</sender>
+   <signal>clicked()</signal>
+   <receiver>MemoryAnalysisWindow</receiver>
+   <slot>stop_analysis()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1090</x>
+     <y>115</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>600</x>
+     <y>400</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>evidenceTypeCombo</sender>
+   <signal>currentTextChanged(QString)</signal>
+   <receiver>MemoryAnalysisWindow</receiver>
+   <slot>evidence_type_changed(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>400</x>
+     <y>55</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>600</x>
+     <y>400</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>outputDirButton</sender>
+   <signal>clicked()</signal>
+   <receiver>MemoryAnalysisWindow</receiver>
+   <slot>browse_output_directory()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>950</x>
+     <y>700</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>600</x>
+     <y>400</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>clearLogButton</sender>
+   <signal>clicked()</signal>
+   <receiver>MemoryAnalysisWindow</receiver>
+   <slot>clear_log()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1000</x>
+     <y>750</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>600</x>
+     <y>400</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>saveLogButton</sender>
+   <signal>clicked()</signal>
+   <receiver>MemoryAnalysisWindow</receiver>
+   <slot>save_log()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1100</x>
+     <y>750</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>600</x>
+     <y>400</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>runAIAnalysisButton</sender>
+   <signal>clicked()</signal>
+   <receiver>MemoryAnalysisWindow</receiver>
+   <slot>run_ai_analysis()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>800</x>
+     <y>650</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>600</x>
+     <y>400</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>browse_evidence_file()</slot>
+  <slot>start_analysis()</slot>
+  <slot>stop_analysis()</slot>
+  <slot>evidence_type_changed(QString)</slot>
+  <slot>browse_output_directory()</slot>
+  <slot>clear_log()</slot>
+  <slot>save_log()</slot>
+  <slot>run_ai_analysis()</slot>
+ </slots>
 </ui>

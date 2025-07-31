@@ -26,17 +26,18 @@ class Ui_MainWindow(object):
         self.splitter.setHandleWidth(0)
         self.splitter.setObjectName("splitter")
         self.menu_widget = QtWidgets.QWidget(self.splitter)
-        self.menu_widget.setStyleSheet("background-color: #1e2a4a;\n"
-"color: #fff;\n"
-"border: none;\n"
-"")
+        self.menu_widget.setStyleSheet(
+            "background-color: #1e2a4a;\n" "color: #fff;\n" "border: none;\n" ""
+        )
         self.menu_widget.setObjectName("menu_widget")
         self.gridLayout = QtWidgets.QGridLayout(self.menu_widget)
         self.gridLayout.setContentsMargins(4, 4, 4, 15)
         self.gridLayout.setSpacing(0)
         self.gridLayout.setObjectName("gridLayout")
         self.toolBox = QtWidgets.QToolBox(self.menu_widget)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
+        sizePolicy = QtWidgets.QSizePolicy(
+            QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred
+        )
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.toolBox.sizePolicy().hasHeightForWidth())
@@ -44,35 +45,37 @@ class Ui_MainWindow(object):
         font = QtGui.QFont()
         font.setPointSize(12)
         self.toolBox.setFont(font)
-        self.toolBox.setStyleSheet("#toolBox {\n"
-"    color: #fff;\n"
-"}\n"
-"\n"
-"#toolBox::tab {\n"
-"    padding-left: 5px;\n"
-"    text-align: left;\n"
-"    border-radius: 2px;\n"
-"}\n"
-"\n"
-"#toolBox::tab:selected {\n"
-"    background-color: #2d5c8b;\n"
-"    font-weight: bold;\n"
-"}\n"
-"\n"
-"#toolBox QPushButton {\n"
-"    padding: 5px 0px 5px 20px;\n"
-"    text-align: left;\n"
-"    border-radius: 3px;\n"
-"}\n"
-"\n"
-"#toolBox QPushButton:hover {\n"
-"    background-color: #85C1E9;\n"
-"}\n"
-"\n"
-"#toolBox QPushButton:checked {\n"
-"    background-color: #3399DB;\n"
-"}\n"
-"")
+        self.toolBox.setStyleSheet(
+            "#toolBox {\n"
+            "    color: #fff;\n"
+            "}\n"
+            "\n"
+            "#toolBox::tab {\n"
+            "    padding-left: 5px;\n"
+            "    text-align: left;\n"
+            "    border-radius: 2px;\n"
+            "}\n"
+            "\n"
+            "#toolBox::tab:selected {\n"
+            "    background-color: #2d5c8b;\n"
+            "    font-weight: bold;\n"
+            "}\n"
+            "\n"
+            "#toolBox QPushButton {\n"
+            "    padding: 5px 0px 5px 20px;\n"
+            "    text-align: left;\n"
+            "    border-radius: 3px;\n"
+            "}\n"
+            "\n"
+            "#toolBox QPushButton:hover {\n"
+            "    background-color: #85C1E9;\n"
+            "}\n"
+            "\n"
+            "#toolBox QPushButton:checked {\n"
+            "    background-color: #3399DB;\n"
+            "}\n"
+            ""
+        )
         self.toolBox.setObjectName("toolBox")
         self.page_3 = QtWidgets.QWidget()
         self.page_3.setGeometry(QtCore.QRect(0, 0, 457, 467))
@@ -106,10 +109,16 @@ class Ui_MainWindow(object):
         self.pushButton_3.setCheckable(True)
         self.pushButton_3.setObjectName("pushButton_3")
         self.verticalLayout.addWidget(self.pushButton_3)
-        spacerItem = QtWidgets.QSpacerItem(20, 370, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        spacerItem = QtWidgets.QSpacerItem(
+            20, 370, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding
+        )
         self.verticalLayout.addItem(spacerItem)
         icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap(":/icons/icons/antivirus_2894894.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon.addPixmap(
+            QtGui.QPixmap(":/icons/icons/antivirus_2894894.png"),
+            QtGui.QIcon.Normal,
+            QtGui.QIcon.Off,
+        )
         self.toolBox.addItem(self.page_3, icon, "")
         self.page_4 = QtWidgets.QWidget()
         self.page_4.setGeometry(QtCore.QRect(0, 0, 457, 467))
@@ -134,10 +143,16 @@ class Ui_MainWindow(object):
         self.pushButton_5.setCheckable(True)
         self.pushButton_5.setObjectName("pushButton_5")
         self.verticalLayout_2.addWidget(self.pushButton_5)
-        spacerItem1 = QtWidgets.QSpacerItem(20, 406, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        spacerItem1 = QtWidgets.QSpacerItem(
+            20, 406, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding
+        )
         self.verticalLayout_2.addItem(spacerItem1)
         icon1 = QtGui.QIcon()
-        icon1.addPixmap(QtGui.QPixmap(":/icons/icons/icons8-collect-50.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon1.addPixmap(
+            QtGui.QPixmap(":/icons/icons/icons8-collect-50.png"),
+            QtGui.QIcon.Normal,
+            QtGui.QIcon.Off,
+        )
         self.toolBox.addItem(self.page_4, icon1, "")
         self.page_5 = QtWidgets.QWidget()
         self.page_5.setGeometry(QtCore.QRect(0, 0, 457, 467))
@@ -194,10 +209,16 @@ class Ui_MainWindow(object):
         self.pushButton_11.setCheckable(True)
         self.pushButton_11.setObjectName("pushButton_11")
         self.verticalLayout_3.addWidget(self.pushButton_11)
-        spacerItem2 = QtWidgets.QSpacerItem(20, 262, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        spacerItem2 = QtWidgets.QSpacerItem(
+            20, 262, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding
+        )
         self.verticalLayout_3.addItem(spacerItem2)
         icon2 = QtGui.QIcon()
-        icon2.addPixmap(QtGui.QPixmap(":/icons/icons/icons8-combo-chart-50.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon2.addPixmap(
+            QtGui.QPixmap(":/icons/icons/icons8-combo-chart-50.png"),
+            QtGui.QIcon.Normal,
+            QtGui.QIcon.Off,
+        )
         self.toolBox.addItem(self.page_5, icon2, "")
         self.page_6 = QtWidgets.QWidget()
         self.page_6.setGeometry(QtCore.QRect(0, 0, 457, 467))
@@ -212,10 +233,16 @@ class Ui_MainWindow(object):
         self.pushButton_14.setFont(font)
         self.pushButton_14.setObjectName("pushButton_14")
         self.verticalLayout_4.addWidget(self.pushButton_14)
-        spacerItem3 = QtWidgets.QSpacerItem(20, 478, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        spacerItem3 = QtWidgets.QSpacerItem(
+            20, 478, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding
+        )
         self.verticalLayout_4.addItem(spacerItem3)
         icon3 = QtGui.QIcon()
-        icon3.addPixmap(QtGui.QPixmap(":/icons/icons/icons8-report-50 (1).png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon3.addPixmap(
+            QtGui.QPixmap(":/icons/icons/icons8-report-50 (1).png"),
+            QtGui.QIcon.Normal,
+            QtGui.QIcon.Off,
+        )
         self.toolBox.addItem(self.page_6, icon3, "")
         self.page_7 = QtWidgets.QWidget()
         self.page_7.setGeometry(QtCore.QRect(0, 0, 457, 467))
@@ -224,10 +251,16 @@ class Ui_MainWindow(object):
         self.verticalLayout_5.setContentsMargins(5, 5, 5, 5)
         self.verticalLayout_5.setSpacing(10)
         self.verticalLayout_5.setObjectName("verticalLayout_5")
-        spacerItem4 = QtWidgets.QSpacerItem(20, 478, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        spacerItem4 = QtWidgets.QSpacerItem(
+            20, 478, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding
+        )
         self.verticalLayout_5.addItem(spacerItem4)
         icon4 = QtGui.QIcon()
-        icon4.addPixmap(QtGui.QPixmap(":/icons/icons/icons8-system-setting-53 (1).png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon4.addPixmap(
+            QtGui.QPixmap(":/icons/icons/icons8-system-setting-53 (1).png"),
+            QtGui.QIcon.Normal,
+            QtGui.QIcon.Off,
+        )
         self.toolBox.addItem(self.page_7, icon4, "")
         self.page_8 = QtWidgets.QWidget()
         self.page_8.setGeometry(QtCore.QRect(0, 0, 457, 467))
@@ -237,10 +270,16 @@ class Ui_MainWindow(object):
         self.gridLayout_3.setHorizontalSpacing(10)
         self.gridLayout_3.setVerticalSpacing(7)
         self.gridLayout_3.setObjectName("gridLayout_3")
-        spacerItem5 = QtWidgets.QSpacerItem(20, 478, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        spacerItem5 = QtWidgets.QSpacerItem(
+            20, 478, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding
+        )
         self.gridLayout_3.addItem(spacerItem5, 0, 0, 1, 1)
         icon5 = QtGui.QIcon()
-        icon5.addPixmap(QtGui.QPixmap(":/icons/icons/icons8-logout-50.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon5.addPixmap(
+            QtGui.QPixmap(":/icons/icons/icons8-logout-50.png"),
+            QtGui.QIcon.Normal,
+            QtGui.QIcon.Off,
+        )
         self.toolBox.addItem(self.page_8, icon5, "")
         self.gridLayout.addWidget(self.toolBox, 0, 1, 1, 1)
         self.main_widget = QtWidgets.QWidget(self.splitter)
@@ -254,10 +293,9 @@ class Ui_MainWindow(object):
         self.gridLayout_2.setSpacing(0)
         self.gridLayout_2.setObjectName("gridLayout_2")
         self.search_widget = QtWidgets.QWidget(self.main_widget)
-        self.search_widget.setStyleSheet("#search_widget {\n"
-"    background-color: #2980b9;\n"
-"}\n"
-"")
+        self.search_widget.setStyleSheet(
+            "#search_widget {\n" "    background-color: #2980b9;\n" "}\n" ""
+        )
         self.search_widget.setObjectName("search_widget")
         self.horizontalLayout_2 = QtWidgets.QHBoxLayout(self.search_widget)
         self.horizontalLayout_2.setObjectName("horizontalLayout_2")
@@ -266,42 +304,58 @@ class Ui_MainWindow(object):
         self.pushButton_12.setMaximumSize(QtCore.QSize(30, 30))
         self.pushButton_12.setText("")
         icon6 = QtGui.QIcon()
-        icon6.addPixmap(QtGui.QPixmap(":/icons/icons/arrow-96-48.ico"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        icon6.addPixmap(QtGui.QPixmap(":/icons/icons/arrow-31-48.ico"), QtGui.QIcon.Normal, QtGui.QIcon.On)
+        icon6.addPixmap(
+            QtGui.QPixmap(":/icons/icons/arrow-96-48.ico"),
+            QtGui.QIcon.Normal,
+            QtGui.QIcon.Off,
+        )
+        icon6.addPixmap(
+            QtGui.QPixmap(":/icons/icons/arrow-31-48.ico"),
+            QtGui.QIcon.Normal,
+            QtGui.QIcon.On,
+        )
         self.pushButton_12.setIcon(icon6)
         self.pushButton_12.setCheckable(True)
         self.pushButton_12.setObjectName("pushButton_12")
         self.horizontalLayout_2.addWidget(self.pushButton_12)
         self.timestamp_label = QtWidgets.QLabel(self.search_widget)
-        self.timestamp_label.setStyleSheet("#timestamp_label {\n"
-"    color: #ffffff;\n"
-"    font-size: 16px;\n"
-"    font-weight: 500;\n"
-"    padding: 5px 10px;\n"
-"}")
+        self.timestamp_label.setStyleSheet(
+            "#timestamp_label {\n"
+            "    color: #ffffff;\n"
+            "    font-size: 16px;\n"
+            "    font-weight: 500;\n"
+            "    padding: 5px 10px;\n"
+            "}"
+        )
         self.timestamp_label.setObjectName("timestamp_label")
         self.horizontalLayout_2.addWidget(self.timestamp_label)
-        spacerItem6 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        spacerItem6 = QtWidgets.QSpacerItem(
+            40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum
+        )
         self.horizontalLayout_2.addItem(spacerItem6)
         self.username_label = QtWidgets.QLabel(self.search_widget)
-        self.username_label.setStyleSheet("#username_label {\n"
-"    color: #ffffff;\n"
-"    font-size: 16px;\n"
-"    font-weight: bold;\n"
-"    padding: 5px 8px;\n"
-"}")
+        self.username_label.setStyleSheet(
+            "#username_label {\n"
+            "    color: #ffffff;\n"
+            "    font-size: 16px;\n"
+            "    font-weight: bold;\n"
+            "    padding: 5px 8px;\n"
+            "}"
+        )
         self.username_label.setObjectName("username_label")
         self.horizontalLayout_2.addWidget(self.username_label)
         self.user_label = QtWidgets.QLabel(self.search_widget)
         self.user_label.setMinimumSize(QtCore.QSize(30, 30))
         self.user_label.setMaximumSize(QtCore.QSize(30, 30))
-        self.user_label.setStyleSheet("#user_label {\n"
-"    background-color: #fff;\n"
-"    border: 1px solid #F2F4F4;\n"
-"    padding: 5px 5px;\n"
-"    border-radius: 15%;\n"
-"}\n"
-"")
+        self.user_label.setStyleSheet(
+            "#user_label {\n"
+            "    background-color: #fff;\n"
+            "    border: 1px solid #F2F4F4;\n"
+            "    padding: 5px 5px;\n"
+            "    border-radius: 15%;\n"
+            "}\n"
+            ""
+        )
         self.user_label.setText("")
         self.user_label.setPixmap(QtGui.QPixmap(":/icons/icons/user-48.ico"))
         self.user_label.setScaledContents(True)
@@ -309,41 +363,43 @@ class Ui_MainWindow(object):
         self.horizontalLayout_2.addWidget(self.user_label)
         self.gridLayout_2.addWidget(self.search_widget, 0, 0, 1, 1)
         self.tabWidget = QtWidgets.QTabWidget(self.main_widget)
-        self.tabWidget.setStyleSheet("#tabWidget {\n"
-"    background-color: #fff;\n"
-"}\n"
-"\n"
-"QTabBar::close-button {\n"
-"    margin-left: 3px;\n"
-"    image: url(:/icons/icons/x-mark-4-32.ico);\n"
-"}\n"
-"\n"
-"QTabBar::close-button:hover {\n"
-"    image: url(:/icons/icons/x-mark-4-48.ico);\n"
-"}\n"
-"\n"
-"QTabBar::tab {\n"
-"                background-color: #f5f5f5;\n"
-"                color: #333333;\n"
-"                border: 1px solid #c0c0c0;\n"
-"                border-bottom: none;\n"
-"                margin-right: 2px;\n"
-"                border-top-left-radius: 6px;\n"
-"                border-top-right-radius: 6px;\n"
-"                font-size: 16px; \n"
-"}\n"
-"     \n"
-"QTabBar::tab:selected {\n"
-"                background-color: #28a745 ;\n"
-"                color: #ffffff;\n"
-"                border-bottom: none;\n"
-"            }\n"
-"            \n"
-"QTabBar::tab:hover:!selected {\n"
-"                background-color: #e8f4f8;\n"
-"                color: #2E86AB;\n"
-"                border: 1px solid #85C1E9;\n"
-"}")
+        self.tabWidget.setStyleSheet(
+            "#tabWidget {\n"
+            "    background-color: #fff;\n"
+            "}\n"
+            "\n"
+            "QTabBar::close-button {\n"
+            "    margin-left: 3px;\n"
+            "    image: url(:/icons/icons/x-mark-4-32.ico);\n"
+            "}\n"
+            "\n"
+            "QTabBar::close-button:hover {\n"
+            "    image: url(:/icons/icons/x-mark-4-48.ico);\n"
+            "}\n"
+            "\n"
+            "QTabBar::tab {\n"
+            "                background-color: #f5f5f5;\n"
+            "                color: #333333;\n"
+            "                border: 1px solid #c0c0c0;\n"
+            "                border-bottom: none;\n"
+            "                margin-right: 2px;\n"
+            "                border-top-left-radius: 6px;\n"
+            "                border-top-right-radius: 6px;\n"
+            "                font-size: 16px; \n"
+            "}\n"
+            "     \n"
+            "QTabBar::tab:selected {\n"
+            "                background-color: #28a745 ;\n"
+            "                color: #ffffff;\n"
+            "                border-bottom: none;\n"
+            "            }\n"
+            "            \n"
+            "QTabBar::tab:hover:!selected {\n"
+            "                background-color: #e8f4f8;\n"
+            "                color: #2E86AB;\n"
+            "                border: 1px solid #85C1E9;\n"
+            "}"
+        )
         self.tabWidget.setTabsClosable(True)
         self.tabWidget.setObjectName("tabWidget")
         self.gridLayout_2.addWidget(self.tabWidget, 1, 0, 1, 1)
@@ -353,7 +409,7 @@ class Ui_MainWindow(object):
         self.retranslateUi(MainWindow)
         self.toolBox.setCurrentIndex(0)
         self.tabWidget.setCurrentIndex(-1)
-        self.pushButton_12.toggled['bool'].connect(self.menu_widget.setHidden) # type: ignore
+        self.pushButton_12.toggled["bool"].connect(self.menu_widget.setHidden)  # type: ignore
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
@@ -362,28 +418,51 @@ class Ui_MainWindow(object):
         self.pushButton.setText(_translate("MainWindow", "Bảng điều khiển"))
         self.pushButton_2.setText(_translate("MainWindow", "Quản lý vụ án"))
         self.pushButton_3.setText(_translate("MainWindow", "Quản lý người dùng"))
-        self.toolBox.setItemText(self.toolBox.indexOf(self.page_3), _translate("MainWindow", "Điều tra máy tính"))
+        self.toolBox.setItemText(
+            self.toolBox.indexOf(self.page_3),
+            _translate("MainWindow", "Điều tra máy tính"),
+        )
         self.pushButton_4.setText(_translate("MainWindow", "Dữ liệu khả biến"))
         self.pushButton_5.setText(_translate("MainWindow", "Dữ liệu bất biển"))
-        self.toolBox.setItemText(self.toolBox.indexOf(self.page_4), _translate("MainWindow", "Thu thập dữ liệu"))
+        self.toolBox.setItemText(
+            self.toolBox.indexOf(self.page_4),
+            _translate("MainWindow", "Thu thập dữ liệu"),
+        )
         self.pushButton_6.setText(_translate("MainWindow", "Phân tích bộ nhớ"))
         self.pushButton_7.setText(_translate("MainWindow", "Phân tích sổ đăng ký"))
         self.pushButton_8.setText(_translate("MainWindow", "Phân tích trình duyệt"))
         self.pushButton_9.setText(_translate("MainWindow", "Phân tích hệ thống tệp"))
-        self.pushButton_10.setText(_translate("MainWindow", "Phân tích siêu dữ liệu tệp"))
-        self.pushButton_11.setText(_translate("MainWindow", "Phân tích nhật ký sự kiện"))
-        self.toolBox.setItemText(self.toolBox.indexOf(self.page_5), _translate("MainWindow", "Phân tích dữ liệu"))
+        self.pushButton_10.setText(
+            _translate("MainWindow", "Phân tích siêu dữ liệu tệp")
+        )
+        self.pushButton_11.setText(
+            _translate("MainWindow", "Phân tích nhật ký sự kiện")
+        )
+        self.toolBox.setItemText(
+            self.toolBox.indexOf(self.page_5),
+            _translate("MainWindow", "Phân tích dữ liệu"),
+        )
         self.pushButton_14.setText(_translate("MainWindow", "Tạo báo cáo"))
-        self.toolBox.setItemText(self.toolBox.indexOf(self.page_6), _translate("MainWindow", "Báo cáo"))
-        self.toolBox.setItemText(self.toolBox.indexOf(self.page_7), _translate("MainWindow", "Cài đặt hệ thống"))
-        self.toolBox.setItemText(self.toolBox.indexOf(self.page_8), _translate("MainWindow", "Đăng xuất"))
+        self.toolBox.setItemText(
+            self.toolBox.indexOf(self.page_6), _translate("MainWindow", "Báo cáo")
+        )
+        self.toolBox.setItemText(
+            self.toolBox.indexOf(self.page_7),
+            _translate("MainWindow", "Cài đặt hệ thống"),
+        )
+        self.toolBox.setItemText(
+            self.toolBox.indexOf(self.page_8), _translate("MainWindow", "Đăng xuất")
+        )
         self.timestamp_label.setText(_translate("MainWindow", "🕒 --"))
         self.username_label.setText(_translate("MainWindow", "Người dùng"))
+
+
 from static import resource_rc
 
 
 if __name__ == "__main__":
     import sys
+
     app = QtWidgets.QApplication(sys.argv)
     MainWindow = QtWidgets.QMainWindow()
     ui = Ui_MainWindow()

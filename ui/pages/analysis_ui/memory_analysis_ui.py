@@ -11,168 +11,2348 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 
-class Ui_MemoryAnalysisWidget(object):
-    def setupUi(self, MemoryAnalysisWidget):
-        MemoryAnalysisWidget.setObjectName("MemoryAnalysisWidget")
-        MemoryAnalysisWidget.resize(1280, 765)
-        self.mainLayout = QtWidgets.QHBoxLayout(MemoryAnalysisWidget)
-        self.mainLayout.setObjectName("mainLayout")
-        self.splitter = QtWidgets.QSplitter(MemoryAnalysisWidget)
-        self.splitter.setOrientation(QtCore.Qt.Horizontal)
-        self.splitter.setObjectName("splitter")
-        self.sidebar = QtWidgets.QFrame(self.splitter)
-        self.sidebar.setFrameShape(QtWidgets.QFrame.StyledPanel)
-        self.sidebar.setObjectName("sidebar")
-        self.sidebarLayout = QtWidgets.QVBoxLayout(self.sidebar)
-        self.sidebarLayout.setObjectName("sidebarLayout")
-        self.label_case_info = QtWidgets.QLabel(self.sidebar)
-        self.label_case_info.setObjectName("label_case_info")
-        self.sidebarLayout.addWidget(self.label_case_info)
-        self.groupBoxMemoryFile = QtWidgets.QGroupBox(self.sidebar)
-        font = QtGui.QFont()
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.groupBoxMemoryFile.setFont(font)
-        self.groupBoxMemoryFile.setObjectName("groupBoxMemoryFile")
-        self.memoryFileLayout = QtWidgets.QVBoxLayout(self.groupBoxMemoryFile)
-        self.memoryFileLayout.setObjectName("memoryFileLayout")
-        self.labelEvidence = QtWidgets.QLabel(self.groupBoxMemoryFile)
+class Ui_MemoryAnalysisWindow(object):
+    def setupUi(self, MemoryAnalysisWindow):
+        MemoryAnalysisWindow.setObjectName("MemoryAnalysisWindow")
+        MemoryAnalysisWindow.resize(1167, 700)
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap(".\\."), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        MemoryAnalysisWindow.setWindowIcon(icon)
+        MemoryAnalysisWindow.setStyleSheet(
+            "background-color: #f8f9fa;\n"
+            "\n"
+            "/* ==== QTableWidget / QTableView ==== */\n"
+            "QTableWidget,\n"
+            "QTableView {\n"
+            "    background-color: #ffffff;           /* nền trắng */\n"
+            "    border: 1px solid #c0c4c8;           /* viền xám nhạt */\n"
+            "    gridline-color: #e0e3e6;             /* màu lưới */\n"
+            "    border-radius: 6px;                  /* bo góc toàn widget */\n"
+            "    selection-background-color: #cce4f7; /* màu nền khi chọn */\n"
+            "    selection-color: #000000;            /* màu chữ khi chọn */\n"
+            "}\n"
+            "\n"
+            "/* Alternating row colors */\n"
+            "QTableWidget {\n"
+            "    alternate-background-color: #f9fbfc;\n"
+            "}\n"
+            "QTableWidget::item:alternate,\n"
+            "QTableView::item:alternate {\n"
+            "    background-color: #f9fbfc;\n"
+            "}\n"
+            "\n"
+            "/* Header (cột và hàng) */\n"
+            "QHeaderView::section {\n"
+            "    background-color: #e1e5ea;\n"
+            "    padding: 6px;\n"
+            "    border: none;\n"
+            "    border-bottom: 1px solid #c0c4c8;\n"
+            "    border-right: 1px solid #c0c4c8;\n"
+            "    font-weight: bold;\n"
+            "}\n"
+            "QHeaderView::section:last,\n"
+            "QHeaderView::section:last {\n"
+            "    border-right: none;\n"
+            "}\n"
+            "\n"
+            "/* Cell hover */\n"
+            "QTableWidget::item:hover,\n"
+            "QTableView::item:hover {\n"
+            "    background-color: #e8f1fb;\n"
+            "}\n"
+            "\n"
+            "/* Remove focus rectangle */\n"
+            "QTableWidget::item:focus,\n"
+            "QTableView::item:focus {\n"
+            "    outline: none;\n"
+            "}\n"
+            "\n"
+            "/* Scrollbar trong table */\n"
+            "QTableWidget QScrollBar:vertical,\n"
+            "QTableView QScrollBar:vertical {\n"
+            "    background: transparent;\n"
+            "    width: 8px;\n"
+            "    margin: 0px;\n"
+            "}\n"
+            "QTableWidget QScrollBar::handle:vertical,\n"
+            "QTableView QScrollBar::handle:vertical {\n"
+            "    background: #c0c4c8;\n"
+            "    min-height: 20px;\n"
+            "    border-radius: 4px;\n"
+            "}\n"
+            "QTableWidget QScrollBar::add-line,\n"
+            "QTableWidget QScrollBar::sub-line,\n"
+            "QTableView QScrollBar::add-line,\n"
+            "QTableView QScrollBar::sub-line {\n"
+            "    height: 0;\n"
+            "}\n"
+            "\n"
+            "/* Focused cell viền xanh nhẹ */\n"
+            "QTableWidget::item:selected:active,\n"
+            "QTableView::item:selected:active {\n"
+            "    border: 1px solid #4a90e2;\n"
+            "}\n"
+            "\n"
+            "/* Header hover (nếu muốn) */\n"
+            "QHeaderView::section:hover {\n"
+            "    background-color: #d7dae0;\n"
+            "}\n"
+            "\n"
+            ""
+        )
+        self.centralwidget = QtWidgets.QWidget(MemoryAnalysisWindow)
+        self.centralwidget.setStyleSheet(
+            "/* ==== QTableWidget / QTableView ==== */\n"
+            "QTableWidget,\n"
+            "QTableView {\n"
+            "    background-color: #ffffff;           /* nền trắng */\n"
+            "    border: 1px solid #c0c4c8;           /* viền xám nhạt */\n"
+            "    gridline-color: #e0e3e6;             /* màu lưới */\n"
+            "    border-radius: 6px;                  /* bo góc toàn widget */\n"
+            "    selection-background-color: #cce4f7; /* màu nền khi chọn */\n"
+            "    selection-color: #000000;            /* màu chữ khi chọn */\n"
+            "}\n"
+            "\n"
+            "/* Alternating row colors */\n"
+            "QTableWidget {\n"
+            "    alternate-background-color: #f9fbfc;\n"
+            "}\n"
+            "QTableWidget::item:alternate,\n"
+            "QTableView::item:alternate {\n"
+            "    background-color: #f9fbfc;\n"
+            "}\n"
+            "\n"
+            "/* Header (cột và hàng) */\n"
+            "QHeaderView::section {\n"
+            "    background-color: #e1e5ea;\n"
+            "    padding: 6px;\n"
+            "    border: none;\n"
+            "    border-bottom: 1px solid #c0c4c8;\n"
+            "    border-right: 1px solid #c0c4c8;\n"
+            "    font-weight: bold;\n"
+            "}\n"
+            "QHeaderView::section:last,\n"
+            "QHeaderView::section:last {\n"
+            "    border-right: none;\n"
+            "}\n"
+            "\n"
+            "/* Cell hover */\n"
+            "QTableWidget::item:hover,\n"
+            "QTableView::item:hover {\n"
+            "    background-color: #e8f1fb;\n"
+            "}\n"
+            "\n"
+            "/* Remove focus rectangle */\n"
+            "QTableWidget::item:focus,\n"
+            "QTableView::item:focus {\n"
+            "    outline: none;\n"
+            "}\n"
+            "\n"
+            "/* Scrollbar trong table */\n"
+            "QTableWidget QScrollBar:vertical,\n"
+            "QTableView QScrollBar:vertical {\n"
+            "    background: transparent;\n"
+            "    width: 8px;\n"
+            "    margin: 0px;\n"
+            "}\n"
+            "QTableWidget QScrollBar::handle:vertical,\n"
+            "QTableView QScrollBar::handle:vertical {\n"
+            "    background: #c0c4c8;\n"
+            "    min-height: 20px;\n"
+            "    border-radius: 4px;\n"
+            "}\n"
+            "QTableWidget QScrollBar::add-line,\n"
+            "QTableWidget QScrollBar::sub-line,\n"
+            "QTableView QScrollBar::add-line,\n"
+            "QTableView QScrollBar::sub-line {\n"
+            "    height: 0;\n"
+            "}\n"
+            "\n"
+            "/* Focused cell viền xanh nhẹ */\n"
+            "QTableWidget::item:selected:active,\n"
+            "QTableView::item:selected:active {\n"
+            "    border: 1px solid #4a90e2;\n"
+            "}\n"
+            "\n"
+            "/* Header hover (nếu muốn) */\n"
+            "QHeaderView::section:hover {\n"
+            "    background-color: #d7dae0;\n"
+            "}\n"
+            "\n"
+            "/* QPushButton */\n"
+            "QPushButton {\n"
+            "    background-color: #4a90e2;\n"
+            "    border: none;\n"
+            "    border-radius: 4px;\n"
+            "    padding: 6px 12px;\n"
+            "    color: #fff;\n"
+            "}\n"
+            "QPushButton:hover {\n"
+            "    background-color: #5aa0f2;\n"
+            "}\n"
+            "QPushButton:pressed {\n"
+            "    background-color: #3a7fcc;\n"
+            "}\n"
+            "/* ==== QComboBox ==== */\n"
+            "QComboBox {\n"
+            "    /* nền trắng, bo góc và viền xám nhạt giống QLineEdit */\n"
+            "    background-color: #ffffff;\n"
+            "    border: 1px solid #c0c4c8;\n"
+            "    border-radius: 4px;\n"
+            "    padding: 4px 30px 4px 8px; /* để chừa chỗ cho mũi tên */\n"
+            "    min-height: 24px;\n"
+            "    /* font đã định ở đầu styles.qss sẽ áp dụng */\n"
+            "}\n"
+            "\n"
+            "/* Khi hover đổi nhẹ viền */\n"
+            "QComboBox:hover {\n"
+            "    border: 1px solid #a0a4a8;\n"
+            "}\n"
+            "\n"
+            "/* Khi focus (đang chọn) đổi viền xanh */\n"
+            "QComboBox:focus {\n"
+            "    border: 1px solid #4a90e2;\n"
+            "}\n"
+            "\n"
+            "/* Popup list (QAbstractItemView) */\n"
+            "QComboBox QAbstractItemView {\n"
+            "    background-color: #ffffff;\n"
+            "    border: 1px solid #c0c4c8;\n"
+            "    border-radius: 4px;\n"
+            "    padding: 4px;\n"
+            "    outline: none;\n"
+            "    selection-background-color: #cce4f7;\n"
+            "    selection-color: #000;\n"
+            "}\n"
+            "\n"
+            "/* Các item trong list khi hover */\n"
+            "QComboBox QAbstractItemView::item:hover {\n"
+            "    background-color: #e8f1fb;\n"
+            "}\n"
+            "\n"
+            "/* Scrollbar nhỏ gọn trong popup */\n"
+            "QComboBox QAbstractItemView QScrollBar:vertical {\n"
+            "    background: transparent;\n"
+            "    width: 8px;\n"
+            "    margin: 0px;\n"
+            "}\n"
+            "QComboBox QAbstractItemView QScrollBar::handle:vertical {\n"
+            "    background: #c0c4c8;\n"
+            "    min-height: 20px;\n"
+            "    border-radius: 4px;\n"
+            "}\n"
+            "QComboBox QAbstractItemView QScrollBar::add-line,\n"
+            "QComboBox QAbstractItemView QScrollBar::sub-line {\n"
+            "    height: 0;\n"
+            "}\n"
+            ""
+        )
+        self.centralwidget.setObjectName("centralwidget")
+        self.gridLayout_3 = QtWidgets.QGridLayout(self.centralwidget)
+        self.gridLayout_3.setObjectName("gridLayout_3")
+        self.mainTabWidget = QtWidgets.QTabWidget(self.centralwidget)
         font = QtGui.QFont()
         font.setPointSize(9)
-        self.labelEvidence.setFont(font)
-        self.labelEvidence.setObjectName("labelEvidence")
-        self.memoryFileLayout.addWidget(self.labelEvidence)
-        self.listWidgetMemoryFiles = QtWidgets.QListWidget(self.groupBoxMemoryFile)
-        self.listWidgetMemoryFiles.setObjectName("listWidgetMemoryFiles")
-        self.memoryFileLayout.addWidget(self.listWidgetMemoryFiles)
-        self.labelFileInfo = QtWidgets.QLabel(self.groupBoxMemoryFile)
-        self.labelFileInfo.setStyleSheet("font-size: 12px; color: #666; font-style: italic;")
-        self.labelFileInfo.setObjectName("labelFileInfo")
-        self.memoryFileLayout.addWidget(self.labelFileInfo)
-        self.sidebarLayout.addWidget(self.groupBoxMemoryFile)
-        self.groupBoxVolatilityPlugins = QtWidgets.QGroupBox(self.sidebar)
+        self.mainTabWidget.setFont(font)
+        self.mainTabWidget.setObjectName("mainTabWidget")
+        self.rawMemoryTab = QtWidgets.QWidget()
+        sizePolicy = QtWidgets.QSizePolicy(
+            QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred
+        )
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.rawMemoryTab.sizePolicy().hasHeightForWidth())
+        self.rawMemoryTab.setSizePolicy(sizePolicy)
+        self.rawMemoryTab.setObjectName("rawMemoryTab")
+        self.rawMemoryLayout = QtWidgets.QVBoxLayout(self.rawMemoryTab)
+        self.rawMemoryLayout.setContentsMargins(0, 0, 0, 0)
+        self.rawMemoryLayout.setSpacing(0)
+        self.rawMemoryLayout.setObjectName("rawMemoryLayout")
+        self.rawMemoryTabWidget = QtWidgets.QTabWidget(self.rawMemoryTab)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.rawMemoryTabWidget.setFont(font)
+        self.rawMemoryTabWidget.setObjectName("rawMemoryTabWidget")
+        self.systemContextTab = QtWidgets.QWidget()
+        self.systemContextTab.setObjectName("systemContextTab")
+        self.systemContextVBox = QtWidgets.QVBoxLayout(self.systemContextTab)
+        self.systemContextVBox.setObjectName("systemContextVBox")
+        self.systemContextLayout = QtWidgets.QFormLayout()
+        self.systemContextLayout.setContentsMargins(35, 15, -1, -1)
+        self.systemContextLayout.setObjectName("systemContextLayout")
+        self.osVersionLabel = QtWidgets.QLabel(self.systemContextTab)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.osVersionLabel.setFont(font)
+        self.osVersionLabel.setObjectName("osVersionLabel")
+        self.systemContextLayout.setWidget(
+            0, QtWidgets.QFormLayout.LabelRole, self.osVersionLabel
+        )
+        self.osVersionValue = QtWidgets.QLabel(self.systemContextTab)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.osVersionValue.setFont(font)
+        self.osVersionValue.setObjectName("osVersionValue")
+        self.systemContextLayout.setWidget(
+            0, QtWidgets.QFormLayout.FieldRole, self.osVersionValue
+        )
+        self.architectureLabel = QtWidgets.QLabel(self.systemContextTab)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.architectureLabel.setFont(font)
+        self.architectureLabel.setObjectName("architectureLabel")
+        self.systemContextLayout.setWidget(
+            1, QtWidgets.QFormLayout.LabelRole, self.architectureLabel
+        )
+        self.architectureValue = QtWidgets.QLabel(self.systemContextTab)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.architectureValue.setFont(font)
+        self.architectureValue.setObjectName("architectureValue")
+        self.systemContextLayout.setWidget(
+            1, QtWidgets.QFormLayout.FieldRole, self.architectureValue
+        )
+        self.timestampLabel = QtWidgets.QLabel(self.systemContextTab)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.timestampLabel.setFont(font)
+        self.timestampLabel.setObjectName("timestampLabel")
+        self.systemContextLayout.setWidget(
+            2, QtWidgets.QFormLayout.LabelRole, self.timestampLabel
+        )
+        self.timestampValue = QtWidgets.QLabel(self.systemContextTab)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.timestampValue.setFont(font)
+        self.timestampValue.setObjectName("timestampValue")
+        self.systemContextLayout.setWidget(
+            2, QtWidgets.QFormLayout.FieldRole, self.timestampValue
+        )
+        self.profileLabel = QtWidgets.QLabel(self.systemContextTab)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.profileLabel.setFont(font)
+        self.profileLabel.setObjectName("profileLabel")
+        self.systemContextLayout.setWidget(
+            3, QtWidgets.QFormLayout.LabelRole, self.profileLabel
+        )
+        self.profileValue = QtWidgets.QLabel(self.systemContextTab)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.profileValue.setFont(font)
+        self.profileValue.setObjectName("profileValue")
+        self.systemContextLayout.setWidget(
+            3, QtWidgets.QFormLayout.FieldRole, self.profileValue
+        )
+        self.kernelBaseLabel = QtWidgets.QLabel(self.systemContextTab)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.kernelBaseLabel.setFont(font)
+        self.kernelBaseLabel.setObjectName("kernelBaseLabel")
+        self.systemContextLayout.setWidget(
+            4, QtWidgets.QFormLayout.LabelRole, self.kernelBaseLabel
+        )
+        self.kernelBaseValue = QtWidgets.QLabel(self.systemContextTab)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.kernelBaseValue.setFont(font)
+        self.kernelBaseValue.setObjectName("kernelBaseValue")
+        self.systemContextLayout.setWidget(
+            4, QtWidgets.QFormLayout.FieldRole, self.kernelBaseValue
+        )
+        self.systemContextVBox.addLayout(self.systemContextLayout)
+        self.pluginDetailButtonLayout = QtWidgets.QHBoxLayout()
+        self.pluginDetailButtonLayout.setObjectName("pluginDetailButtonLayout")
+        self.btnKdbgscanDetail = QtWidgets.QPushButton(self.systemContextTab)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.btnKdbgscanDetail.setFont(font)
+        self.btnKdbgscanDetail.setStyleSheet(
+            "/* QPushButton */\n"
+            "QPushButton {\n"
+            "    background-color: #4a90e2;\n"
+            "    border: none;\n"
+            "    border-radius: 4px;\n"
+            "    padding: 6px 12px;\n"
+            "    color: #fff;\n"
+            "}\n"
+            "QPushButton:hover {\n"
+            "    background-color: #5aa0f2;\n"
+            "}\n"
+            "QPushButton:pressed {\n"
+            "    background-color: #3a7fcc;\n"
+            "}"
+        )
+        self.btnKdbgscanDetail.setObjectName("btnKdbgscanDetail")
+        self.pluginDetailButtonLayout.addWidget(self.btnKdbgscanDetail)
+        self.btnImageinfoDetail = QtWidgets.QPushButton(self.systemContextTab)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.btnImageinfoDetail.setFont(font)
+        self.btnImageinfoDetail.setStyleSheet(
+            "/* QPushButton */\n"
+            "QPushButton {\n"
+            "    background-color: #4a90e2;\n"
+            "    border: none;\n"
+            "    border-radius: 4px;\n"
+            "    padding: 6px 12px;\n"
+            "    color: #fff;\n"
+            "}\n"
+            "QPushButton:hover {\n"
+            "    background-color: #5aa0f2;\n"
+            "}\n"
+            "QPushButton:pressed {\n"
+            "    background-color: #3a7fcc;\n"
+            "}"
+        )
+        self.btnImageinfoDetail.setObjectName("btnImageinfoDetail")
+        self.pluginDetailButtonLayout.addWidget(self.btnImageinfoDetail)
+        self.btnWindowsInfoDetail = QtWidgets.QPushButton(self.systemContextTab)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.btnWindowsInfoDetail.setFont(font)
+        self.btnWindowsInfoDetail.setStyleSheet(
+            "/* QPushButton */\n"
+            "QPushButton {\n"
+            "    background-color: #4a90e2;\n"
+            "    border: none;\n"
+            "    border-radius: 4px;\n"
+            "    padding: 6px 12px;\n"
+            "    color: #fff;\n"
+            "}\n"
+            "QPushButton:hover {\n"
+            "    background-color: #5aa0f2;\n"
+            "}\n"
+            "QPushButton:pressed {\n"
+            "    background-color: #3a7fcc;\n"
+            "}"
+        )
+        self.btnWindowsInfoDetail.setObjectName("btnWindowsInfoDetail")
+        self.pluginDetailButtonLayout.addWidget(self.btnWindowsInfoDetail)
+        self.systemContextVBox.addLayout(self.pluginDetailButtonLayout)
+        self.pluginDetailText = QtWidgets.QTextEdit(self.systemContextTab)
+        self.pluginDetailText.setVisible(False)
+        self.pluginDetailText.setReadOnly(True)
+        self.pluginDetailText.setObjectName("pluginDetailText")
+        self.systemContextVBox.addWidget(self.pluginDetailText)
+        self.rawMemoryTabWidget.addTab(self.systemContextTab, "")
+        self.processAnalysisTab = QtWidgets.QWidget()
+        self.processAnalysisTab.setObjectName("processAnalysisTab")
+        self.processAnalysisLayout = QtWidgets.QVBoxLayout(self.processAnalysisTab)
+        self.processAnalysisLayout.setObjectName("processAnalysisLayout")
+        self.processTabWidget = QtWidgets.QTabWidget(self.processAnalysisTab)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.processTabWidget.setFont(font)
+        self.processTabWidget.setObjectName("processTabWidget")
+        self.processListTab = QtWidgets.QWidget()
+        self.processListTab.setObjectName("processListTab")
+        self.processListLayout = QtWidgets.QVBoxLayout(self.processListTab)
+        self.processListLayout.setObjectName("processListLayout")
+        self.pslistTable = QtWidgets.QTableWidget(self.processListTab)
+        self.pslistTable.setObjectName("pslistTable")
+        self.pslistTable.setColumnCount(0)
+        self.pslistTable.setRowCount(0)
+        self.processListLayout.addWidget(self.pslistTable)
+        self.processTabWidget.addTab(self.processListTab, "")
+        self.dllTab = QtWidgets.QWidget()
+        self.dllTab.setObjectName("dllTab")
+        self.dllDriverLayout = QtWidgets.QVBoxLayout(self.dllTab)
+        self.dllDriverLayout.setObjectName("dllDriverLayout")
+        self.dlllistTable = QtWidgets.QTableWidget(self.dllTab)
+        self.dlllistTable.setObjectName("dlllistTable")
+        self.dlllistTable.setColumnCount(0)
+        self.dlllistTable.setRowCount(0)
+        self.dllDriverLayout.addWidget(self.dlllistTable)
+        self.processTabWidget.addTab(self.dllTab, "")
+        self.malwareDetectionTab = QtWidgets.QWidget()
+        self.malwareDetectionTab.setObjectName("malwareDetectionTab")
+        self.malwareDetectionLayout = QtWidgets.QVBoxLayout(self.malwareDetectionTab)
+        self.malwareDetectionLayout.setObjectName("malwareDetectionLayout")
+        self.malfindText = QtWidgets.QTextEdit(self.malwareDetectionTab)
+        self.malfindText.setObjectName("malfindText")
+        self.malwareDetectionLayout.addWidget(self.malfindText)
+        self.processTabWidget.addTab(self.malwareDetectionTab, "")
+        self.processAnalysisLayout.addWidget(self.processTabWidget)
+        self.rawMemoryTabWidget.addTab(self.processAnalysisTab, "")
+        self.networkTabWidget = QtWidgets.QWidget()
+        self.networkTabWidget.setObjectName("networkTabWidget")
+        self.networkAnalysisLayout = QtWidgets.QVBoxLayout(self.networkTabWidget)
+        self.networkAnalysisLayout.setObjectName("networkAnalysisLayout")
+        self.netscanTable = QtWidgets.QTableWidget(self.networkTabWidget)
+        self.netscanTable.setObjectName("netscanTable")
+        self.netscanTable.setColumnCount(0)
+        self.netscanTable.setRowCount(0)
+        self.networkAnalysisLayout.addWidget(self.netscanTable)
+        self.rawMemoryTabWidget.addTab(self.networkTabWidget, "")
+        self.fileRegistryTab = QtWidgets.QWidget()
+        self.fileRegistryTab.setObjectName("fileRegistryTab")
+        self.fileRegistryLayout = QtWidgets.QVBoxLayout(self.fileRegistryTab)
+        self.fileRegistryLayout.setObjectName("fileRegistryLayout")
+        self.fileTabWidget = QtWidgets.QTabWidget(self.fileRegistryTab)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.fileTabWidget.setFont(font)
+        self.fileTabWidget.setObjectName("fileTabWidget")
+        self.fileScanTab = QtWidgets.QWidget()
+        self.fileScanTab.setObjectName("fileScanTab")
+        self.fileScanLayout = QtWidgets.QVBoxLayout(self.fileScanTab)
+        self.fileScanLayout.setObjectName("fileScanLayout")
+        self.filescanTable = QtWidgets.QTableWidget(self.fileScanTab)
+        self.filescanTable.setAlternatingRowColors(True)
+        self.filescanTable.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
+        self.filescanTable.setObjectName("filescanTable")
+        self.filescanTable.setColumnCount(6)
+        self.filescanTable.setRowCount(0)
+        item = QtWidgets.QTableWidgetItem()
+        self.filescanTable.setHorizontalHeaderItem(0, item)
+        item = QtWidgets.QTableWidgetItem()
+        self.filescanTable.setHorizontalHeaderItem(1, item)
+        item = QtWidgets.QTableWidgetItem()
+        self.filescanTable.setHorizontalHeaderItem(2, item)
+        item = QtWidgets.QTableWidgetItem()
+        self.filescanTable.setHorizontalHeaderItem(3, item)
+        item = QtWidgets.QTableWidgetItem()
+        self.filescanTable.setHorizontalHeaderItem(4, item)
+        item = QtWidgets.QTableWidgetItem()
+        self.filescanTable.setHorizontalHeaderItem(5, item)
+        self.fileScanLayout.addWidget(self.filescanTable)
+        self.fileTabWidget.addTab(self.fileScanTab, "")
+        self.fileRegistryLayout.addWidget(self.fileTabWidget)
+        self.rawMemoryTabWidget.addTab(self.fileRegistryTab, "")
+        self.userActivityTab = QtWidgets.QWidget()
+        self.userActivityTab.setObjectName("userActivityTab")
+        self.userActivityLayout = QtWidgets.QVBoxLayout(self.userActivityTab)
+        self.userActivityLayout.setObjectName("userActivityLayout")
+        self.commandTabWidget = QtWidgets.QTabWidget(self.userActivityTab)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.commandTabWidget.setFont(font)
+        self.commandTabWidget.setObjectName("commandTabWidget")
+        self.commandHistoryTab = QtWidgets.QWidget()
+        self.commandHistoryTab.setObjectName("commandHistoryTab")
+        self.commandHistoryLayout = QtWidgets.QVBoxLayout(self.commandHistoryTab)
+        self.commandHistoryLayout.setObjectName("commandHistoryLayout")
+        self.cmdscanText = QtWidgets.QTextEdit(self.commandHistoryTab)
+        self.cmdscanText.setObjectName("cmdscanText")
+        self.commandHistoryLayout.addWidget(self.cmdscanText)
+        self.commandTabWidget.addTab(self.commandHistoryTab, "")
+        self.userActivityLayout.addWidget(self.commandTabWidget)
+        self.rawMemoryTabWidget.addTab(self.userActivityTab, "")
+        self.credentialsTab = QtWidgets.QWidget()
+        self.credentialsTab.setObjectName("credentialsTab")
+        self.credentialsLayout = QtWidgets.QVBoxLayout(self.credentialsTab)
+        self.credentialsLayout.setObjectName("credentialsLayout")
+        self.credentialTabWidget = QtWidgets.QTabWidget(self.credentialsTab)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.credentialTabWidget.setFont(font)
+        self.credentialTabWidget.setObjectName("credentialTabWidget")
+        self.passwordHashesTab = QtWidgets.QWidget()
+        self.passwordHashesTab.setObjectName("passwordHashesTab")
+        self.passwordHashesLayout = QtWidgets.QVBoxLayout(self.passwordHashesTab)
+        self.passwordHashesLayout.setObjectName("passwordHashesLayout")
+        self.hashdumpText = QtWidgets.QTextEdit(self.passwordHashesTab)
+        self.hashdumpText.setObjectName("hashdumpText")
+        self.passwordHashesLayout.addWidget(self.hashdumpText)
+        self.credentialTabWidget.addTab(self.passwordHashesTab, "")
+        self.credentialsLayout.addWidget(self.credentialTabWidget)
+        self.rawMemoryTabWidget.addTab(self.credentialsTab, "")
+        self.customPluginTab = QtWidgets.QWidget()
+        self.customPluginTab.setObjectName("customPluginTab")
+        self.customPluginLayout = QtWidgets.QVBoxLayout(self.customPluginTab)
+        self.customPluginLayout.setObjectName("customPluginLayout")
+        self.otherTabWidget = QtWidgets.QTabWidget(self.customPluginTab)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.otherTabWidget.setFont(font)
+        self.otherTabWidget.setObjectName("otherTabWidget")
+        self.customPluginLayout.addWidget(self.otherTabWidget)
+        self.rawMemoryTabWidget.addTab(self.customPluginTab, "")
+        self.rawMemoryLayout.addWidget(self.rawMemoryTabWidget)
+        self.mainTabWidget.addTab(self.rawMemoryTab, "")
+        self.hibernationTab = QtWidgets.QWidget()
+        sizePolicy = QtWidgets.QSizePolicy(
+            QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred
+        )
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(
+            self.hibernationTab.sizePolicy().hasHeightForWidth()
+        )
+        self.hibernationTab.setSizePolicy(sizePolicy)
+        self.hibernationTab.setObjectName("hibernationTab")
+        self.hibernationLayout = QtWidgets.QVBoxLayout(self.hibernationTab)
+        self.hibernationLayout.setContentsMargins(0, 0, 0, 0)
+        self.hibernationLayout.setSpacing(0)
+        self.hibernationLayout.setObjectName("hibernationLayout")
+        self.hibernationInfoGroup = QtWidgets.QGroupBox(self.hibernationTab)
+        self.hibernationInfoGroup.setMaximumSize(QtCore.QSize(16777215, 150))
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        font.setBold(True)
+        font.setWeight(75)
+        self.hibernationInfoGroup.setFont(font)
+        self.hibernationInfoGroup.setObjectName("hibernationInfoGroup")
+        self.hibernationInfoLayout = QtWidgets.QGridLayout(self.hibernationInfoGroup)
+        self.hibernationInfoLayout.setContentsMargins(30, 5, 5, 10)
+        self.hibernationInfoLayout.setHorizontalSpacing(0)
+        self.hibernationInfoLayout.setVerticalSpacing(10)
+        self.hibernationInfoLayout.setObjectName("hibernationInfoLayout")
+        self.hibernationTypeLabel = QtWidgets.QLabel(self.hibernationInfoGroup)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.hibernationTypeLabel.setFont(font)
+        self.hibernationTypeLabel.setObjectName("hibernationTypeLabel")
+        self.hibernationInfoLayout.addWidget(self.hibernationTypeLabel, 0, 0, 1, 1)
+        self.hibernationTypeValue = QtWidgets.QLabel(self.hibernationInfoGroup)
+        self.hibernationTypeValue.setObjectName("hibernationTypeValue")
+        self.hibernationInfoLayout.addWidget(self.hibernationTypeValue, 0, 1, 1, 1)
+        self.compressedSizeLabel = QtWidgets.QLabel(self.hibernationInfoGroup)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.compressedSizeLabel.setFont(font)
+        self.compressedSizeLabel.setObjectName("compressedSizeLabel")
+        self.hibernationInfoLayout.addWidget(self.compressedSizeLabel, 1, 0, 1, 1)
+        self.compressedSizeValue = QtWidgets.QLabel(self.hibernationInfoGroup)
+        self.compressedSizeValue.setObjectName("compressedSizeValue")
+        self.hibernationInfoLayout.addWidget(self.compressedSizeValue, 1, 1, 1, 1)
+        self.originalSizeLabel = QtWidgets.QLabel(self.hibernationInfoGroup)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.originalSizeLabel.setFont(font)
+        self.originalSizeLabel.setObjectName("originalSizeLabel")
+        self.hibernationInfoLayout.addWidget(self.originalSizeLabel, 2, 0, 1, 1)
+        self.originalSizeValue = QtWidgets.QLabel(self.hibernationInfoGroup)
+        self.originalSizeValue.setObjectName("originalSizeValue")
+        self.hibernationInfoLayout.addWidget(self.originalSizeValue, 2, 1, 1, 1)
+        self.hibernationLayout.addWidget(self.hibernationInfoGroup)
+        self.hibernationResultsGroup = QtWidgets.QGroupBox(self.hibernationTab)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        font.setBold(True)
+        font.setWeight(75)
+        self.hibernationResultsGroup.setFont(font)
+        self.hibernationResultsGroup.setObjectName("hibernationResultsGroup")
+        self.hibernationResultsLayout = QtWidgets.QVBoxLayout(
+            self.hibernationResultsGroup
+        )
+        self.hibernationResultsLayout.setContentsMargins(0, 0, 0, 0)
+        self.hibernationResultsLayout.setSpacing(0)
+        self.hibernationResultsLayout.setObjectName("hibernationResultsLayout")
+        self.hibernationResultsText = QtWidgets.QTextEdit(self.hibernationResultsGroup)
+        self.hibernationResultsText.setReadOnly(True)
+        self.hibernationResultsText.setObjectName("hibernationResultsText")
+        self.hibernationResultsLayout.addWidget(self.hibernationResultsText)
+        self.hibernationLayout.addWidget(self.hibernationResultsGroup)
+        self.mainTabWidget.addTab(self.hibernationTab, "")
+        self.pageFileTab = QtWidgets.QWidget()
+        sizePolicy = QtWidgets.QSizePolicy(
+            QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred
+        )
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.pageFileTab.sizePolicy().hasHeightForWidth())
+        self.pageFileTab.setSizePolicy(sizePolicy)
+        self.pageFileTab.setObjectName("pageFileTab")
+        self.pageFileLayout = QtWidgets.QVBoxLayout(self.pageFileTab)
+        self.pageFileLayout.setContentsMargins(0, 0, 0, 0)
+        self.pageFileLayout.setSpacing(0)
+        self.pageFileLayout.setObjectName("pageFileLayout")
+        self.pageFileSplitter = QtWidgets.QSplitter(self.pageFileTab)
+        self.pageFileSplitter.setOrientation(QtCore.Qt.Horizontal)
+        self.pageFileSplitter.setObjectName("pageFileSplitter")
+        self.pageFileLeftWidget = QtWidgets.QWidget(self.pageFileSplitter)
+        self.pageFileLeftWidget.setObjectName("pageFileLeftWidget")
+        self.pageFileLeftLayout = QtWidgets.QVBoxLayout(self.pageFileLeftWidget)
+        self.pageFileLeftLayout.setContentsMargins(0, 0, 0, 0)
+        self.pageFileLeftLayout.setSpacing(0)
+        self.pageFileLeftLayout.setObjectName("pageFileLeftLayout")
+        self.pageFileScanGroup = QtWidgets.QGroupBox(self.pageFileLeftWidget)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        font.setBold(True)
+        font.setWeight(75)
+        self.pageFileScanGroup.setFont(font)
+        self.pageFileScanGroup.setObjectName("pageFileScanGroup")
+        self.pageFileScanLayout = QtWidgets.QVBoxLayout(self.pageFileScanGroup)
+        self.pageFileScanLayout.setContentsMargins(5, 5, 0, 5)
+        self.pageFileScanLayout.setSpacing(5)
+        self.pageFileScanLayout.setObjectName("pageFileScanLayout")
+        self.pagefiletreeWidget = QtWidgets.QTreeWidget(self.pageFileScanGroup)
+        self.pagefiletreeWidget.setObjectName("pagefiletreeWidget")
+        self.pagefiletreeWidget.headerItem().setText(0, "1")
+        self.pageFileScanLayout.addWidget(self.pagefiletreeWidget)
+        self.pageFileLeftLayout.addWidget(self.pageFileScanGroup)
+        self.pageFileRightWidget = QtWidgets.QWidget(self.pageFileSplitter)
+        self.pageFileRightWidget.setObjectName("pageFileRightWidget")
+        self.pageFileRightLayout = QtWidgets.QVBoxLayout(self.pageFileRightWidget)
+        self.pageFileRightLayout.setContentsMargins(0, 0, 0, 0)
+        self.pageFileRightLayout.setSpacing(0)
+        self.pageFileRightLayout.setObjectName("pageFileRightLayout")
+        self.ResultsGroup = QtWidgets.QGroupBox(self.pageFileRightWidget)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        font.setBold(True)
+        font.setWeight(75)
+        self.ResultsGroup.setFont(font)
+        self.ResultsGroup.setObjectName("ResultsGroup")
+        self.yaraResultsLayout = QtWidgets.QVBoxLayout(self.ResultsGroup)
+        self.yaraResultsLayout.setContentsMargins(0, 5, 5, 5)
+        self.yaraResultsLayout.setSpacing(5)
+        self.yaraResultsLayout.setObjectName("yaraResultsLayout")
+        self.stackedWidget = QtWidgets.QStackedWidget(self.ResultsGroup)
+        self.stackedWidget.setObjectName("stackedWidget")
+        self.pageExtractStrings = QtWidgets.QWidget()
+        self.pageExtractStrings.setObjectName("pageExtractStrings")
+        self.gridLayout_7 = QtWidgets.QGridLayout(self.pageExtractStrings)
+        self.gridLayout_7.setObjectName("gridLayout_7")
+        self.lineEdit_2 = QtWidgets.QLineEdit(self.pageExtractStrings)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.lineEdit_2.setFont(font)
+        self.lineEdit_2.setObjectName("lineEdit_2")
+        self.gridLayout_7.addWidget(self.lineEdit_2, 0, 0, 1, 1)
+        self.tableStrings = QtWidgets.QTableWidget(self.pageExtractStrings)
+        self.tableStrings.setObjectName("tableStrings")
+        self.tableStrings.setColumnCount(0)
+        self.tableStrings.setRowCount(0)
+        self.gridLayout_7.addWidget(self.tableStrings, 1, 0, 1, 1)
+        self.stackedWidget.addWidget(self.pageExtractStrings)
+        self.pageYaraDetails = QtWidgets.QWidget()
+        self.pageYaraDetails.setObjectName("pageYaraDetails")
+        self.gridLayout_8 = QtWidgets.QGridLayout(self.pageYaraDetails)
+        self.gridLayout_8.setObjectName("gridLayout_8")
+        self.txtYaraMatches = QtWidgets.QPlainTextEdit(self.pageYaraDetails)
+        self.txtYaraMatches.setObjectName("txtYaraMatches")
+        self.gridLayout_8.addWidget(self.txtYaraMatches, 0, 0, 1, 1)
+        self.stackedWidget.addWidget(self.pageYaraDetails)
+        self.pageCarveFiles = QtWidgets.QWidget()
+        self.pageCarveFiles.setObjectName("pageCarveFiles")
+        self.gridLayout_9 = QtWidgets.QGridLayout(self.pageCarveFiles)
+        self.gridLayout_9.setObjectName("gridLayout_9")
+        self.lstCarved = QtWidgets.QListWidget(self.pageCarveFiles)
+        self.lstCarved.setObjectName("lstCarved")
+        self.gridLayout_9.addWidget(self.lstCarved, 0, 0, 1, 1)
+        self.stackedWidget.addWidget(self.pageCarveFiles)
+        self.yaraResultsLayout.addWidget(self.stackedWidget)
+        self.pageFileRightLayout.addWidget(self.ResultsGroup)
+        self.pageFileLayout.addWidget(self.pageFileSplitter)
+        self.mainTabWidget.addTab(self.pageFileTab, "")
+        self.crashDumpTab = QtWidgets.QWidget()
+        sizePolicy = QtWidgets.QSizePolicy(
+            QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred
+        )
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.crashDumpTab.sizePolicy().hasHeightForWidth())
+        self.crashDumpTab.setSizePolicy(sizePolicy)
+        self.crashDumpTab.setObjectName("crashDumpTab")
+        self.crashDumpLayout = QtWidgets.QVBoxLayout(self.crashDumpTab)
+        self.crashDumpLayout.setContentsMargins(0, 0, 0, 0)
+        self.crashDumpLayout.setSpacing(0)
+        self.crashDumpLayout.setObjectName("crashDumpLayout")
+        self.crashAnalysisGroup = QtWidgets.QGroupBox(self.crashDumpTab)
         font = QtGui.QFont()
         font.setPointSize(10)
         font.setBold(True)
         font.setWeight(75)
-        self.groupBoxVolatilityPlugins.setFont(font)
-        self.groupBoxVolatilityPlugins.setObjectName("groupBoxVolatilityPlugins")
-        self.pluginsLayout = QtWidgets.QVBoxLayout(self.groupBoxVolatilityPlugins)
-        self.pluginsLayout.setObjectName("pluginsLayout")
-        self.lineEditPluginSearch = QtWidgets.QLineEdit(self.groupBoxVolatilityPlugins)
-        self.lineEditPluginSearch.setObjectName("lineEditPluginSearch")
-        self.pluginsLayout.addWidget(self.lineEditPluginSearch)
-        self.listWidgetPlugins = QtWidgets.QListWidget(self.groupBoxVolatilityPlugins)
-        self.listWidgetPlugins.setMinimumSize(QtCore.QSize(0, 140))
-        self.listWidgetPlugins.setSelectionMode(QtWidgets.QAbstractItemView.MultiSelection)
-        self.listWidgetPlugins.setObjectName("listWidgetPlugins")
-        self.pluginsLayout.addWidget(self.listWidgetPlugins)
-        self.labelPluginSuggestion = QtWidgets.QLabel(self.groupBoxVolatilityPlugins)
+        self.crashAnalysisGroup.setFont(font)
+        self.crashAnalysisGroup.setTitle("")
+        self.crashAnalysisGroup.setObjectName("crashAnalysisGroup")
+        self.crashAnalysisLayout = QtWidgets.QVBoxLayout(self.crashAnalysisGroup)
+        self.crashAnalysisLayout.setContentsMargins(5, 5, 5, 5)
+        self.crashAnalysisLayout.setSpacing(5)
+        self.crashAnalysisLayout.setObjectName("crashAnalysisLayout")
+        self.cdbControlsFrame = QtWidgets.QFrame(self.crashAnalysisGroup)
+        self.cdbControlsFrame.setMaximumSize(QtCore.QSize(16777215, 80))
         font = QtGui.QFont()
-        font.setPointSize(-1)
-        font.setItalic(True)
-        self.labelPluginSuggestion.setFont(font)
-        self.labelPluginSuggestion.setStyleSheet("font-size: 12px; color: #1976d2; font-style: italic;")
-        self.labelPluginSuggestion.setObjectName("labelPluginSuggestion")
-        self.pluginsLayout.addWidget(self.labelPluginSuggestion)
-        self.sidebarLayout.addWidget(self.groupBoxVolatilityPlugins)
-        self.btnStart = QtWidgets.QPushButton(self.sidebar)
-        self.btnStart.setStyleSheet("font-size: 15px; font-weight: bold; background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #1976d2, stop:1 #42a5f5); color: white; border-radius: 6px; padding: 10px 0; margin-top: 8px; margin-bottom: 4px;")
-        self.btnStart.setObjectName("btnStart")
-        self.sidebarLayout.addWidget(self.btnStart)
-        self.btnExport = QtWidgets.QPushButton(self.sidebar)
-        self.btnExport.setStyleSheet("font-size: 15px; background: #e3f2fd; color: #1976d2; border-radius: 6px; padding: 6px 0; margin-bottom: 4px;")
-        self.btnExport.setObjectName("btnExport")
-        self.sidebarLayout.addWidget(self.btnExport)
-        self.progressBar = QtWidgets.QProgressBar(self.sidebar)
+        font.setPointSize(9)
+        self.cdbControlsFrame.setFont(font)
+        self.cdbControlsFrame.setFrameShape(QtWidgets.QFrame.StyledPanel)
+        self.cdbControlsFrame.setFrameShadow(QtWidgets.QFrame.Raised)
+        self.cdbControlsFrame.setObjectName("cdbControlsFrame")
+        self.cdbControlsLayout = QtWidgets.QVBoxLayout(self.cdbControlsFrame)
+        self.cdbControlsLayout.setContentsMargins(10, 5, 10, 5)
+        self.cdbControlsLayout.setSpacing(5)
+        self.cdbControlsLayout.setObjectName("cdbControlsLayout")
+        self.cdbHeaderLayout = QtWidgets.QHBoxLayout()
+        self.cdbHeaderLayout.setObjectName("cdbHeaderLayout")
+        self.cdbControlsLayout.addLayout(self.cdbHeaderLayout)
+        self.cdbCustomLayout = QtWidgets.QHBoxLayout()
+        self.cdbCustomLayout.setObjectName("cdbCustomLayout")
+        self.customCommandLabel = QtWidgets.QLabel(self.cdbControlsFrame)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.customCommandLabel.setFont(font)
+        self.customCommandLabel.setObjectName("customCommandLabel")
+        self.cdbCustomLayout.addWidget(self.customCommandLabel)
+        self.customCommandEdit = QtWidgets.QLineEdit(self.cdbControlsFrame)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.customCommandEdit.setFont(font)
+        self.customCommandEdit.setObjectName("customCommandEdit")
+        self.cdbCustomLayout.addWidget(self.customCommandEdit)
+        self.addCustomCommandButton = QtWidgets.QPushButton(self.cdbControlsFrame)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.addCustomCommandButton.setFont(font)
+        self.addCustomCommandButton.setStyleSheet(
+            "QPushButton {\n"
+            "    background-color: #3498db;\n"
+            "    color: white;\n"
+            "    border: none;\n"
+            "    padding: 6px 12px;\n"
+            "    border-radius: 4px;\n"
+            "}\n"
+            "QPushButton:hover {\n"
+            "    background-color: #2980b9;\n"
+            "}"
+        )
+        self.addCustomCommandButton.setObjectName("addCustomCommandButton")
+        self.cdbCustomLayout.addWidget(self.addCustomCommandButton)
+        self.cdbControlsLayout.addLayout(self.cdbCustomLayout)
+        self.runningCommandLayout = QtWidgets.QHBoxLayout()
+        self.runningCommandLayout.setObjectName("runningCommandLayout")
+        self.runningCommandLabel = QtWidgets.QLabel(self.cdbControlsFrame)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.runningCommandLabel.setFont(font)
+        self.runningCommandLabel.setObjectName("runningCommandLabel")
+        self.runningCommandLayout.addWidget(self.runningCommandLabel)
+        self.runningCommandEdit = QtWidgets.QLineEdit(self.cdbControlsFrame)
+        self.runningCommandEdit.setEnabled(False)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.runningCommandEdit.setFont(font)
+        self.runningCommandEdit.setStyleSheet(
+            "QLineEdit:disabled {\n"
+            "    background-color: #f5f5f5;\n"
+            "    color: #666666;\n"
+            "    border: 1px solid #cccccc;\n"
+            "    border-radius: 4px;\n"
+            "    padding: 4px 8px;\n"
+            "    font-family: 'Consolas', 'Monaco', monospace;\n"
+            "}"
+        )
+        self.runningCommandEdit.setObjectName("runningCommandEdit")
+        self.runningCommandLayout.addWidget(self.runningCommandEdit)
+        self.cdbControlsLayout.addLayout(self.runningCommandLayout)
+        self.crashAnalysisLayout.addWidget(self.cdbControlsFrame)
+        self.crashAnalysisTabWidget = QtWidgets.QTabWidget(self.crashAnalysisGroup)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.crashAnalysisTabWidget.setFont(font)
+        self.crashAnalysisTabWidget.setObjectName("crashAnalysisTabWidget")
+        self.crashAnalysisLayout.addWidget(self.crashAnalysisTabWidget)
+        self.crashDumpLayout.addWidget(self.crashAnalysisGroup)
+        self.mainTabWidget.addTab(self.crashDumpTab, "")
+        self.aiAnalysisTab = QtWidgets.QWidget()
+        sizePolicy = QtWidgets.QSizePolicy(
+            QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred
+        )
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(
+            self.aiAnalysisTab.sizePolicy().hasHeightForWidth()
+        )
+        self.aiAnalysisTab.setSizePolicy(sizePolicy)
+        self.aiAnalysisTab.setObjectName("aiAnalysisTab")
+        self.aiAnalysisLayout = QtWidgets.QVBoxLayout(self.aiAnalysisTab)
+        self.aiAnalysisLayout.setContentsMargins(0, 0, 0, 0)
+        self.aiAnalysisLayout.setSpacing(0)
+        self.aiAnalysisLayout.setObjectName("aiAnalysisLayout")
+        self.aiSettingsGroup = QtWidgets.QGroupBox(self.aiAnalysisTab)
+        self.aiSettingsGroup.setMaximumSize(QtCore.QSize(16777215, 100))
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        font.setBold(True)
+        font.setWeight(75)
+        self.aiSettingsGroup.setFont(font)
+        self.aiSettingsGroup.setObjectName("aiSettingsGroup")
+        self.aiSettingsLayout = QtWidgets.QHBoxLayout(self.aiSettingsGroup)
+        self.aiSettingsLayout.setContentsMargins(30, 10, 30, 10)
+        self.aiSettingsLayout.setSpacing(10)
+        self.aiSettingsLayout.setObjectName("aiSettingsLayout")
+        self.enableAICheckbox = QtWidgets.QCheckBox(self.aiSettingsGroup)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.enableAICheckbox.setFont(font)
+        self.enableAICheckbox.setObjectName("enableAICheckbox")
+        self.aiSettingsLayout.addWidget(self.enableAICheckbox)
+        self.aiModelLabel = QtWidgets.QLabel(self.aiSettingsGroup)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.aiModelLabel.setFont(font)
+        self.aiModelLabel.setObjectName("aiModelLabel")
+        self.aiSettingsLayout.addWidget(self.aiModelLabel)
+        self.aiModelCombo = QtWidgets.QComboBox(self.aiSettingsGroup)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.aiModelCombo.setFont(font)
+        self.aiModelCombo.setObjectName("aiModelCombo")
+        self.aiModelCombo.addItem("")
+        self.aiModelCombo.addItem("")
+        self.aiSettingsLayout.addWidget(self.aiModelCombo)
+        self.runAIAnalysisButton = QtWidgets.QPushButton(self.aiSettingsGroup)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.runAIAnalysisButton.setFont(font)
+        self.runAIAnalysisButton.setObjectName("runAIAnalysisButton")
+        self.aiSettingsLayout.addWidget(self.runAIAnalysisButton)
+        self.aiAnalysisLayout.addWidget(self.aiSettingsGroup)
+        self.aiResultsGroup = QtWidgets.QGroupBox(self.aiAnalysisTab)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        font.setBold(True)
+        font.setWeight(75)
+        self.aiResultsGroup.setFont(font)
+        self.aiResultsGroup.setObjectName("aiResultsGroup")
+        self.aiResultsLayout = QtWidgets.QVBoxLayout(self.aiResultsGroup)
+        self.aiResultsLayout.setContentsMargins(0, 0, 0, 0)
+        self.aiResultsLayout.setSpacing(0)
+        self.aiResultsLayout.setObjectName("aiResultsLayout")
+        self.aiResultsText = QtWidgets.QTextEdit(self.aiResultsGroup)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.aiResultsText.setFont(font)
+        self.aiResultsText.setReadOnly(True)
+        self.aiResultsText.setObjectName("aiResultsText")
+        self.aiResultsLayout.addWidget(self.aiResultsText)
+        self.aiAnalysisLayout.addWidget(self.aiResultsGroup)
+        self.mainTabWidget.addTab(self.aiAnalysisTab, "")
+        self.analysisOptionsTab = QtWidgets.QWidget()
+        sizePolicy = QtWidgets.QSizePolicy(
+            QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred
+        )
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(
+            self.analysisOptionsTab.sizePolicy().hasHeightForWidth()
+        )
+        self.analysisOptionsTab.setSizePolicy(sizePolicy)
+        self.analysisOptionsTab.setObjectName("analysisOptionsTab")
+        self.gridLayout_2 = QtWidgets.QGridLayout(self.analysisOptionsTab)
+        self.gridLayout_2.setObjectName("gridLayout_2")
+        self.volatilityOptionsGroup = QtWidgets.QGroupBox(self.analysisOptionsTab)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        font.setBold(True)
+        font.setWeight(75)
+        self.volatilityOptionsGroup.setFont(font)
+        self.volatilityOptionsGroup.setStyleSheet(
+            "QGroupBox {\n"
+            "    border: 1px solid #c0c4c8;\n"
+            "    border-radius: 6px;\n"
+            "    margin-top: 12px;\n"
+            "    padding: 8px;\n"
+            "}\n"
+            ""
+        )
+        self.volatilityOptionsGroup.setObjectName("volatilityOptionsGroup")
+        self.volatilityOptionsVBox = QtWidgets.QVBoxLayout(self.volatilityOptionsGroup)
+        self.volatilityOptionsVBox.setContentsMargins(0, 11, 0, 0)
+        self.volatilityOptionsVBox.setSpacing(5)
+        self.volatilityOptionsVBox.setObjectName("volatilityOptionsVBox")
+        self.pluginSearchEdit = QtWidgets.QLineEdit(self.volatilityOptionsGroup)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        font.setBold(False)
+        font.setWeight(50)
+        self.pluginSearchEdit.setFont(font)
+        self.pluginSearchEdit.setStyleSheet(
+            "/* ==== CHUNG CHO CÁC TEXT INPUT / TEXT EDIT ==== */\n"
+            "QLineEdit,\n"
+            "QTextEdit,\n"
+            "QPlainTextEdit {\n"
+            "    background-color: #ffffff;\n"
+            "    border: 1px solid #c0c4c8;      /* viền xám nhạt */\n"
+            "    border-radius: 4px;             /* bo góc mềm */\n"
+            "    padding: 4px 6px;               /* khoảng đệm bên trong */\n"
+            "    selection-background-color: #cce4f7;\n"
+            "    selection-color: #000;\n"
+            "}\n"
+            "\n"
+            "/* Khi focus chuyển viền sang xanh */\n"
+            "QLineEdit:focus,\n"
+            "QTextEdit:focus,\n"
+            "QPlainTextEdit:focus {\n"
+            "    border: 1px solid #4a90e2;\n"
+            "}\n"
+            "\n"
+            "/* Placeholder màu nhạt (chỉ với QLineEdit) */\n"
+            "QLineEdit[placeholderText] {\n"
+            "    color: #999999;\n"
+            "}\n"
+            "\n"
+            "/* ReadOnly thì nền hơi xám */\n"
+            'QLineEdit[readOnly="true"],\n'
+            'QTextEdit[readOnly="true"] {\n'
+            "    background-color: #f0f2f5;\n"
+            "}\n"
+            "\n"
+            "/* Thanh cuộn bên trong QTextEdit bo góc & nhỏ gọn */\n"
+            "QTextEdit QScrollBar:vertical,\n"
+            "QPlainTextEdit QScrollBar:vertical {\n"
+            "    background: transparent;\n"
+            "    width: 8px;\n"
+            "    margin: 0px;\n"
+            "}\n"
+            "QTextEdit QScrollBar::handle:vertical,\n"
+            "QPlainTextEdit QScrollBar::handle:vertical {\n"
+            "    background: #c0c4c8;\n"
+            "    min-height: 20px;\n"
+            "    border-radius: 4px;\n"
+            "}\n"
+            "QTextEdit QScrollBar::add-line, QTextEdit QScrollBar::sub-line,\n"
+            "QPlainTextEdit QScrollBar::add-line, QPlainTextEdit QScrollBar::sub-line {\n"
+            "    height: 0;\n"
+            "}\n"
+            ""
+        )
+        self.pluginSearchEdit.setObjectName("pluginSearchEdit")
+        self.volatilityOptionsVBox.addWidget(self.pluginSearchEdit)
+        self.pluginTableWidget = QtWidgets.QTableWidget(self.volatilityOptionsGroup)
+        self.pluginTableWidget.setStyleSheet(
+            "/* ==== QTableWidget / QTableView ==== */\n"
+            "QTableWidget,\n"
+            "QTableView {\n"
+            "    background-color: #ffffff;           /* nền trắng */\n"
+            "    border: 1px solid #c0c4c8;           /* viền xám nhạt */\n"
+            "    gridline-color: #e0e3e6;             /* màu lưới */\n"
+            "    border-radius: 6px;                  /* bo góc toàn widget */\n"
+            "    selection-background-color: #cce4f7; /* màu nền khi chọn */\n"
+            "    selection-color: #000000;            /* màu chữ khi chọn */\n"
+            "}\n"
+            "\n"
+            "/* Alternating row colors */\n"
+            "QTableWidget {\n"
+            "    alternate-background-color: #f9fbfc;\n"
+            "}\n"
+            "QTableWidget::item:alternate,\n"
+            "QTableView::item:alternate {\n"
+            "    background-color: #f9fbfc;\n"
+            "}\n"
+            "\n"
+            "/* Header (cột và hàng) */\n"
+            "QHeaderView::section {\n"
+            "    background-color: #e1e5ea;\n"
+            "    padding: 6px;\n"
+            "    border: none;\n"
+            "    border-bottom: 1px solid #c0c4c8;\n"
+            "    border-right: 1px solid #c0c4c8;\n"
+            "    font-weight: bold;\n"
+            "}\n"
+            "QHeaderView::section:last,\n"
+            "QHeaderView::section:last {\n"
+            "    border-right: none;\n"
+            "}\n"
+            "\n"
+            "/* Cell hover */\n"
+            "QTableWidget::item:hover,\n"
+            "QTableView::item:hover {\n"
+            "    background-color: #e8f1fb;\n"
+            "}\n"
+            "\n"
+            "/* Remove focus rectangle */\n"
+            "QTableWidget::item:focus,\n"
+            "QTableView::item:focus {\n"
+            "    outline: none;\n"
+            "}\n"
+            "\n"
+            "/* Scrollbar trong table */\n"
+            "QTableWidget QScrollBar:vertical,\n"
+            "QTableView QScrollBar:vertical {\n"
+            "    background: transparent;\n"
+            "    width: 8px;\n"
+            "    margin: 0px;\n"
+            "}\n"
+            "QTableWidget QScrollBar::handle:vertical,\n"
+            "QTableView QScrollBar::handle:vertical {\n"
+            "    background: #c0c4c8;\n"
+            "    min-height: 20px;\n"
+            "    border-radius: 4px;\n"
+            "}\n"
+            "QTableWidget QScrollBar::add-line,\n"
+            "QTableWidget QScrollBar::sub-line,\n"
+            "QTableView QScrollBar::add-line,\n"
+            "QTableView QScrollBar::sub-line {\n"
+            "    height: 0;\n"
+            "}\n"
+            "\n"
+            "/* Focused cell viền xanh nhẹ */\n"
+            "QTableWidget::item:selected:active,\n"
+            "QTableView::item:selected:active {\n"
+            "    border: 1px solid #4a90e2;\n"
+            "}\n"
+            "\n"
+            "/* Header hover (nếu muốn) */\n"
+            "QHeaderView::section:hover {\n"
+            "    background-color: #d7dae0;\n"
+            "}\n"
+            ""
+        )
+        self.pluginTableWidget.setAlternatingRowColors(True)
+        self.pluginTableWidget.setSelectionBehavior(
+            QtWidgets.QAbstractItemView.SelectRows
+        )
+        self.pluginTableWidget.setColumnCount(4)
+        self.pluginTableWidget.setObjectName("pluginTableWidget")
+        self.pluginTableWidget.setRowCount(0)
+        item = QtWidgets.QTableWidgetItem()
+        self.pluginTableWidget.setHorizontalHeaderItem(0, item)
+        item = QtWidgets.QTableWidgetItem()
+        self.pluginTableWidget.setHorizontalHeaderItem(1, item)
+        item = QtWidgets.QTableWidgetItem()
+        self.pluginTableWidget.setHorizontalHeaderItem(2, item)
+        item = QtWidgets.QTableWidgetItem()
+        self.pluginTableWidget.setHorizontalHeaderItem(3, item)
+        self.volatilityOptionsVBox.addWidget(self.pluginTableWidget)
+        self.gridLayout_2.addWidget(self.volatilityOptionsGroup, 0, 0, 1, 1)
+        self.horizontalLayout = QtWidgets.QHBoxLayout()
+        self.horizontalLayout.setObjectName("horizontalLayout")
+        self.outputOptionsGroup = QtWidgets.QGroupBox(self.analysisOptionsTab)
+        self.outputOptionsGroup.setMinimumSize(QtCore.QSize(0, 100))
+        self.outputOptionsGroup.setMaximumSize(QtCore.QSize(800, 16777215))
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        font.setBold(True)
+        font.setWeight(75)
+        self.outputOptionsGroup.setFont(font)
+        self.outputOptionsGroup.setStyleSheet(
+            "QGroupBox {\n"
+            "    border: 1px solid #c0c4c8;\n"
+            "    border-radius: 6px;\n"
+            "    margin-top: 12px;\n"
+            "    padding: 8px;\n"
+            "}"
+        )
+        self.outputOptionsGroup.setObjectName("outputOptionsGroup")
+        self.gridLayout_4 = QtWidgets.QGridLayout(self.outputOptionsGroup)
+        self.gridLayout_4.setObjectName("gridLayout_4")
+        self.outputFormatLabel = QtWidgets.QLabel(self.outputOptionsGroup)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        font.setBold(False)
+        font.setWeight(50)
+        self.outputFormatLabel.setFont(font)
+        self.outputFormatLabel.setObjectName("outputFormatLabel")
+        self.gridLayout_4.addWidget(self.outputFormatLabel, 0, 0, 1, 1)
+        self.outputFormatCombo = QtWidgets.QComboBox(self.outputOptionsGroup)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        font.setBold(False)
+        font.setWeight(50)
+        self.outputFormatCombo.setFont(font)
+        self.outputFormatCombo.setStyleSheet(
+            "/* ==== QComboBox ==== */\n"
+            "QComboBox {\n"
+            "    /* nền trắng, bo góc và viền xám nhạt giống QLineEdit */\n"
+            "    background-color: #ffffff;\n"
+            "    border: 1px solid #c0c4c8;\n"
+            "    border-radius: 4px;\n"
+            "    padding: 4px 30px 4px 8px; /* để chừa chỗ cho mũi tên */\n"
+            "    min-height: 24px;\n"
+            "    /* font đã định ở đầu styles.qss sẽ áp dụng */\n"
+            "}\n"
+            "\n"
+            "/* Khi hover đổi nhẹ viền */\n"
+            "QComboBox:hover {\n"
+            "    border: 1px solid #a0a4a8;\n"
+            "}\n"
+            "\n"
+            "/* Khi focus (đang chọn) đổi viền xanh */\n"
+            "QComboBox:focus {\n"
+            "    border: 1px solid #4a90e2;\n"
+            "}\n"
+            "\n"
+            "/* Mũi tên xổ xuống */\n"
+            "QComboBox::down-arrow {\n"
+            "    image: url(:/icons/arrow-down.svg); /* bạn có thể thay bằng đường dẫn SVG của bạn */\n"
+            "    width: 12px;\n"
+            "    height: 12px;\n"
+            "}\n"
+            "\n"
+            "/* Vị trí của mũi tên */\n"
+            "QComboBox::drop-down {\n"
+            "    subcontrol-origin: padding;\n"
+            "    subcontrol-position: top right;\n"
+            "    width: 24px;\n"
+            "    border: none;\n"
+            "    background: transparent;\n"
+            "}\n"
+            "\n"
+            "/* Popup list (QAbstractItemView) */\n"
+            "QComboBox QAbstractItemView {\n"
+            "    background-color: #ffffff;\n"
+            "    border: 1px solid #c0c4c8;\n"
+            "    border-radius: 4px;\n"
+            "    padding: 4px;\n"
+            "    outline: none;\n"
+            "    selection-background-color: #cce4f7;\n"
+            "    selection-color: #000;\n"
+            "}\n"
+            "\n"
+            "/* Các item trong list khi hover */\n"
+            "QComboBox QAbstractItemView::item:hover {\n"
+            "    background-color: #e8f1fb;\n"
+            "}\n"
+            "\n"
+            "/* Scrollbar nhỏ gọn trong popup */\n"
+            "QComboBox QAbstractItemView QScrollBar:vertical {\n"
+            "    background: transparent;\n"
+            "    width: 8px;\n"
+            "    margin: 0px;\n"
+            "}\n"
+            "QComboBox QAbstractItemView QScrollBar::handle:vertical {\n"
+            "    background: #c0c4c8;\n"
+            "    min-height: 20px;\n"
+            "    border-radius: 4px;\n"
+            "}\n"
+            "QComboBox QAbstractItemView QScrollBar::add-line,\n"
+            "QComboBox QAbstractItemView QScrollBar::sub-line {\n"
+            "    height: 0;\n"
+            "}\n"
+            ""
+        )
+        self.outputFormatCombo.setObjectName("outputFormatCombo")
+        self.outputFormatCombo.addItem("")
+        self.outputFormatCombo.addItem("")
+        self.outputFormatCombo.addItem("")
+        self.outputFormatCombo.addItem("")
+        self.gridLayout_4.addWidget(self.outputFormatCombo, 0, 1, 1, 1)
+        self.outputDirLabel = QtWidgets.QLabel(self.outputOptionsGroup)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        font.setBold(False)
+        font.setWeight(50)
+        self.outputDirLabel.setFont(font)
+        self.outputDirLabel.setObjectName("outputDirLabel")
+        self.gridLayout_4.addWidget(self.outputDirLabel, 1, 0, 1, 1)
+        self.outputDirEdit = QtWidgets.QLineEdit(self.outputOptionsGroup)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        font.setBold(False)
+        font.setWeight(50)
+        self.outputDirEdit.setFont(font)
+        self.outputDirEdit.setStyleSheet(
+            "/* ==== CHUNG CHO CÁC TEXT INPUT / TEXT EDIT ==== */\n"
+            "QLineEdit,\n"
+            "QTextEdit,\n"
+            "QPlainTextEdit {\n"
+            "    background-color: #ffffff;\n"
+            "    border: 1px solid #c0c4c8;      /* viền xám nhạt */\n"
+            "    border-radius: 4px;             /* bo góc mềm */\n"
+            "    padding: 4px 6px;               /* khoảng đệm bên trong */\n"
+            "    selection-background-color: #cce4f7;\n"
+            "    selection-color: #000;\n"
+            "}\n"
+            "\n"
+            "/* Khi focus chuyển viền sang xanh */\n"
+            "QLineEdit:focus,\n"
+            "QTextEdit:focus,\n"
+            "QPlainTextEdit:focus {\n"
+            "    border: 1px solid #4a90e2;\n"
+            "}\n"
+            "\n"
+            "/* Placeholder màu nhạt (chỉ với QLineEdit) */\n"
+            "QLineEdit[placeholderText] {\n"
+            "    color: #999999;\n"
+            "}\n"
+            "\n"
+            "/* ReadOnly thì nền hơi xám */\n"
+            'QLineEdit[readOnly="true"],\n'
+            'QTextEdit[readOnly="true"] {\n'
+            "    background-color: #f0f2f5;\n"
+            "}\n"
+            "\n"
+            "/* Thanh cuộn bên trong QTextEdit bo góc & nhỏ gọn */\n"
+            "QTextEdit QScrollBar:vertical,\n"
+            "QPlainTextEdit QScrollBar:vertical {\n"
+            "    background: transparent;\n"
+            "    width: 8px;\n"
+            "    margin: 0px;\n"
+            "}\n"
+            "QTextEdit QScrollBar::handle:vertical,\n"
+            "QPlainTextEdit QScrollBar::handle:vertical {\n"
+            "    background: #c0c4c8;\n"
+            "    min-height: 20px;\n"
+            "    border-radius: 4px;\n"
+            "}\n"
+            "QTextEdit QScrollBar::add-line, QTextEdit QScrollBar::sub-line,\n"
+            "QPlainTextEdit QScrollBar::add-line, QPlainTextEdit QScrollBar::sub-line {\n"
+            "    height: 0;\n"
+            "}\n"
+            ""
+        )
+        self.outputDirEdit.setObjectName("outputDirEdit")
+        self.gridLayout_4.addWidget(self.outputDirEdit, 1, 1, 1, 1)
+        self.outputDirButton = QtWidgets.QPushButton(self.outputOptionsGroup)
+        font = QtGui.QFont()
+        font.setBold(False)
+        font.setWeight(50)
+        self.outputDirButton.setFont(font)
+        self.outputDirButton.setStyleSheet(
+            "/* QPushButton */\n"
+            "QPushButton {\n"
+            "    background-color: #4a90e2;\n"
+            "    border: none;\n"
+            "    border-radius: 4px;\n"
+            "    padding: 6px 12px;\n"
+            "    color: #fff;\n"
+            "}\n"
+            "QPushButton:hover {\n"
+            "    background-color: #5aa0f2;\n"
+            "}\n"
+            "QPushButton:pressed {\n"
+            "    background-color: #3a7fcc;\n"
+            "}"
+        )
+        self.outputDirButton.setObjectName("outputDirButton")
+        self.gridLayout_4.addWidget(self.outputDirButton, 1, 2, 1, 1)
+        self.saveRawOutputCheckbox = QtWidgets.QCheckBox(self.outputOptionsGroup)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        font.setBold(False)
+        font.setWeight(50)
+        self.saveRawOutputCheckbox.setFont(font)
+        self.saveRawOutputCheckbox.setChecked(True)
+        self.saveRawOutputCheckbox.setObjectName("saveRawOutputCheckbox")
+        self.gridLayout_4.addWidget(self.saveRawOutputCheckbox, 2, 0, 1, 1)
+        self.generateReportCheckbox = QtWidgets.QCheckBox(self.outputOptionsGroup)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        font.setBold(False)
+        font.setWeight(50)
+        self.generateReportCheckbox.setFont(font)
+        self.generateReportCheckbox.setChecked(True)
+        self.generateReportCheckbox.setObjectName("generateReportCheckbox")
+        self.gridLayout_4.addWidget(self.generateReportCheckbox, 2, 1, 1, 1)
+        self.horizontalLayout.addWidget(self.outputOptionsGroup)
+        self.advancedOptionsGroup = QtWidgets.QGroupBox(self.analysisOptionsTab)
+        self.advancedOptionsGroup.setMinimumSize(QtCore.QSize(0, 100))
+        self.advancedOptionsGroup.setMaximumSize(QtCore.QSize(500, 16777215))
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        font.setBold(True)
+        font.setWeight(75)
+        self.advancedOptionsGroup.setFont(font)
+        self.advancedOptionsGroup.setStyleSheet(
+            "QGroupBox {\n"
+            "    border: 1px solid #c0c4c8;\n"
+            "    border-radius: 6px;\n"
+            "    margin-top: 12px;\n"
+            "    padding: 8px;\n"
+            "}"
+        )
+        self.advancedOptionsGroup.setObjectName("advancedOptionsGroup")
+        self.gridLayout_5 = QtWidgets.QGridLayout(self.advancedOptionsGroup)
+        self.gridLayout_5.setObjectName("gridLayout_5")
+        self.threadsLabel = QtWidgets.QLabel(self.advancedOptionsGroup)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        font.setBold(False)
+        font.setWeight(50)
+        self.threadsLabel.setFont(font)
+        self.threadsLabel.setObjectName("threadsLabel")
+        self.gridLayout_5.addWidget(self.threadsLabel, 0, 0, 1, 1)
+        self.threadsSpinBox = QtWidgets.QSpinBox(self.advancedOptionsGroup)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(9)
+        self.threadsSpinBox.setFont(font)
+        self.threadsSpinBox.setStyleSheet(
+            "/* ==== QSpinBox & QDoubleSpinBox ==== */\n"
+            "QSpinBox,\n"
+            "QDoubleSpinBox {\n"
+            "    background-color: #ffffff;\n"
+            "    border: 1px solid #c0c4c8;\n"
+            "    border-radius: 4px;\n"
+            "    min-height: 24px;\n"
+            "    padding: 2px 6px;            /* chừa khoảng cho text */\n"
+            '    font-family: "Segoe UI";     /* kế thừa font chung */\n'
+            "}\n"
+            "\n"
+            "/* Khi hover thì viền đậm lên */\n"
+            "QSpinBox:hover,\n"
+            "QDoubleSpinBox:hover {\n"
+            "    border: 1px solid #a0a4a8;\n"
+            "}\n"
+            "\n"
+            "/* Khi focus (đang nhập/xoay số) đổi sang xanh */\n"
+            "QSpinBox:focus,\n"
+            "QDoubleSpinBox:focus {\n"
+            "    border: 1px solid #4a90e2;\n"
+            "}\n"
+            "\n"
+            "\n"
+            "\n"
+            "\n"
+            "/* Xoá highlight nền của subcontrol khi disabled */\n"
+            "QSpinBox:disabled,\n"
+            "QDoubleSpinBox:disabled {\n"
+            "    background-color: #f0f2f5;\n"
+            "    color: #999;\n"
+            "}\n"
+            ""
+        )
+        self.threadsSpinBox.setMinimum(1)
+        self.threadsSpinBox.setMaximum(16)
+        self.threadsSpinBox.setProperty("value", 4)
+        self.threadsSpinBox.setObjectName("threadsSpinBox")
+        self.gridLayout_5.addWidget(self.threadsSpinBox, 0, 1, 1, 1)
+        self.timeoutLabel = QtWidgets.QLabel(self.advancedOptionsGroup)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        font.setBold(False)
+        font.setWeight(50)
+        self.timeoutLabel.setFont(font)
+        self.timeoutLabel.setObjectName("timeoutLabel")
+        self.gridLayout_5.addWidget(self.timeoutLabel, 1, 0, 1, 1)
+        self.timeoutSpinBox = QtWidgets.QSpinBox(self.advancedOptionsGroup)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(9)
+        self.timeoutSpinBox.setFont(font)
+        self.timeoutSpinBox.setStyleSheet(
+            "/* ==== QSpinBox & QDoubleSpinBox ==== */\n"
+            "QSpinBox,\n"
+            "QDoubleSpinBox {\n"
+            "    background-color: #ffffff;\n"
+            "    border: 1px solid #c0c4c8;\n"
+            "    border-radius: 4px;\n"
+            "    min-height: 24px;\n"
+            "    padding: 2px 6px;            /* chừa khoảng cho text */\n"
+            '    font-family: "Segoe UI";     /* kế thừa font chung */\n'
+            "}\n"
+            "\n"
+            "/* Khi hover thì viền đậm lên */\n"
+            "QSpinBox:hover,\n"
+            "QDoubleSpinBox:hover {\n"
+            "    border: 1px solid #a0a4a8;\n"
+            "}\n"
+            "\n"
+            "/* Khi focus (đang nhập/xoay số) đổi sang xanh */\n"
+            "QSpinBox:focus,\n"
+            "QDoubleSpinBox:focus {\n"
+            "    border: 1px solid #4a90e2;\n"
+            "}\n"
+            "\n"
+            "\n"
+            "\n"
+            "\n"
+            "/* Xoá highlight nền của subcontrol khi disabled */\n"
+            "QSpinBox:disabled,\n"
+            "QDoubleSpinBox:disabled {\n"
+            "    background-color: #f0f2f5;\n"
+            "    color: #999;\n"
+            "}\n"
+            ""
+        )
+        self.timeoutSpinBox.setMinimum(5)
+        self.timeoutSpinBox.setMaximum(180)
+        self.timeoutSpinBox.setProperty("value", 60)
+        self.timeoutSpinBox.setObjectName("timeoutSpinBox")
+        self.gridLayout_5.addWidget(self.timeoutSpinBox, 1, 1, 1, 1)
+        self.verboseCheckbox = QtWidgets.QCheckBox(self.advancedOptionsGroup)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        font.setBold(False)
+        font.setWeight(50)
+        self.verboseCheckbox.setFont(font)
+        self.verboseCheckbox.setObjectName("verboseCheckbox")
+        self.gridLayout_5.addWidget(self.verboseCheckbox, 2, 0, 1, 1)
+        self.debugCheckbox = QtWidgets.QCheckBox(self.advancedOptionsGroup)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        font.setBold(False)
+        font.setWeight(50)
+        self.debugCheckbox.setFont(font)
+        self.debugCheckbox.setObjectName("debugCheckbox")
+        self.gridLayout_5.addWidget(self.debugCheckbox, 2, 1, 1, 1)
+        self.horizontalLayout.addWidget(self.advancedOptionsGroup)
+        self.gridLayout_2.addLayout(self.horizontalLayout, 1, 0, 1, 1)
+        self.mainTabWidget.addTab(self.analysisOptionsTab, "")
+        self.logTab = QtWidgets.QWidget()
+        sizePolicy = QtWidgets.QSizePolicy(
+            QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred
+        )
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.logTab.sizePolicy().hasHeightForWidth())
+        self.logTab.setSizePolicy(sizePolicy)
+        self.logTab.setObjectName("logTab")
+        self.logLayout = QtWidgets.QVBoxLayout(self.logTab)
+        self.logLayout.setContentsMargins(0, 0, 0, 0)
+        self.logLayout.setSpacing(0)
+        self.logLayout.setObjectName("logLayout")
+        self.logControlFrame = QtWidgets.QFrame(self.logTab)
+        self.logControlFrame.setMaximumSize(QtCore.QSize(16777215, 60))
+        self.logControlFrame.setFrameShape(QtWidgets.QFrame.StyledPanel)
+        self.logControlFrame.setObjectName("logControlFrame")
+        self.logControlLayout = QtWidgets.QHBoxLayout(self.logControlFrame)
+        self.logControlLayout.setObjectName("logControlLayout")
+        self.logLevelLabel = QtWidgets.QLabel(self.logControlFrame)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.logLevelLabel.setFont(font)
+        self.logLevelLabel.setObjectName("logLevelLabel")
+        self.logControlLayout.addWidget(self.logLevelLabel)
+        self.logLevelCombo = QtWidgets.QComboBox(self.logControlFrame)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.logLevelCombo.setFont(font)
+        self.logLevelCombo.setObjectName("logLevelCombo")
+        self.logLevelCombo.addItem("")
+        self.logLevelCombo.addItem("")
+        self.logLevelCombo.addItem("")
+        self.logLevelCombo.addItem("")
+        self.logControlLayout.addWidget(self.logLevelCombo)
+        spacerItem = QtWidgets.QSpacerItem(
+            40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum
+        )
+        self.logControlLayout.addItem(spacerItem)
+        self.clearLogButton = QtWidgets.QPushButton(self.logControlFrame)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.clearLogButton.setFont(font)
+        self.clearLogButton.setObjectName("clearLogButton")
+        self.logControlLayout.addWidget(self.clearLogButton)
+        self.saveLogButton = QtWidgets.QPushButton(self.logControlFrame)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.saveLogButton.setFont(font)
+        self.saveLogButton.setObjectName("saveLogButton")
+        self.logControlLayout.addWidget(self.saveLogButton)
+        self.logLayout.addWidget(self.logControlFrame)
+        self.logTextEdit = QtWidgets.QTextEdit(self.logTab)
+        font = QtGui.QFont()
+        font.setFamily("Courier New")
+        font.setPointSize(9)
+        self.logTextEdit.setFont(font)
+        self.logTextEdit.setReadOnly(True)
+        self.logTextEdit.setObjectName("logTextEdit")
+        self.logLayout.addWidget(self.logTextEdit)
+        self.mainTabWidget.addTab(self.logTab, "")
+        self.gridLayout_3.addWidget(self.mainTabWidget, 2, 0, 1, 1)
+        self.frame = QtWidgets.QFrame(self.centralwidget)
+        self.frame.setMinimumSize(QtCore.QSize(0, 20))
+        self.frame.setMaximumSize(QtCore.QSize(16777215, 40))
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.frame.setFont(font)
+        self.frame.setFrameShape(QtWidgets.QFrame.StyledPanel)
+        self.frame.setFrameShadow(QtWidgets.QFrame.Raised)
+        self.frame.setObjectName("frame")
+        self.gridLayout = QtWidgets.QGridLayout(self.frame)
+        self.gridLayout.setContentsMargins(15, -1, 0, 0)
+        self.gridLayout.setSpacing(0)
+        self.gridLayout.setObjectName("gridLayout")
+        self.label = QtWidgets.QLabel(self.frame)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.label.setFont(font)
+        self.label.setObjectName("label")
+        self.gridLayout.addWidget(self.label, 0, 0, 1, 1)
+        self.lineEdit = QtWidgets.QLineEdit(self.frame)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.lineEdit.setFont(font)
+        self.lineEdit.setStyleSheet(
+            "/* ==== CHUNG CHO CÁC TEXT INPUT / TEXT EDIT ==== */\n"
+            "QLineEdit,\n"
+            "QTextEdit,\n"
+            "QPlainTextEdit {\n"
+            "    background-color: #ffffff;\n"
+            "    border: 1px solid #c0c4c8;      /* viền xám nhạt */\n"
+            "    border-radius: 4px;             /* bo góc mềm */\n"
+            "    padding: 4px 6px;               /* khoảng đệm bên trong */\n"
+            "    selection-background-color: #cce4f7;\n"
+            "    selection-color: #000;\n"
+            "}\n"
+            "\n"
+            "/* Khi focus chuyển viền sang xanh */\n"
+            "QLineEdit:focus,\n"
+            "QTextEdit:focus,\n"
+            "QPlainTextEdit:focus {\n"
+            "    border: 1px solid #4a90e2;\n"
+            "}\n"
+            "\n"
+            "/* Placeholder màu nhạt (chỉ với QLineEdit) */\n"
+            "QLineEdit[placeholderText] {\n"
+            "    color: #999999;\n"
+            "}\n"
+            "\n"
+            "/* ReadOnly thì nền hơi xám */\n"
+            'QLineEdit[readOnly="true"],\n'
+            'QTextEdit[readOnly="true"] {\n'
+            "    background-color: #f0f2f5;\n"
+            "}\n"
+            "\n"
+            "/* Thanh cuộn bên trong QTextEdit bo góc & nhỏ gọn */\n"
+            "QTextEdit QScrollBar:vertical,\n"
+            "QPlainTextEdit QScrollBar:vertical {\n"
+            "    background: transparent;\n"
+            "    width: 8px;\n"
+            "    margin: 0px;\n"
+            "}\n"
+            "QTextEdit QScrollBar::handle:vertical,\n"
+            "QPlainTextEdit QScrollBar::handle:vertical {\n"
+            "    background: #c0c4c8;\n"
+            "    min-height: 20px;\n"
+            "    border-radius: 4px;\n"
+            "}\n"
+            "QTextEdit QScrollBar::add-line, QTextEdit QScrollBar::sub-line,\n"
+            "QPlainTextEdit QScrollBar::add-line, QPlainTextEdit QScrollBar::sub-line {\n"
+            "    height: 0;\n"
+            "}\n"
+            ""
+        )
+        self.lineEdit.setObjectName("lineEdit")
+        self.gridLayout.addWidget(self.lineEdit, 0, 1, 1, 1)
+        spacerItem1 = QtWidgets.QSpacerItem(
+            995, 3, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum
+        )
+        self.gridLayout.addItem(spacerItem1, 0, 2, 1, 1)
+        self.gridLayout_3.addWidget(self.frame, 0, 0, 1, 1)
+        self.headerFrame = QtWidgets.QFrame(self.centralwidget)
+        self.headerFrame.setMaximumSize(QtCore.QSize(16777215, 130))
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.headerFrame.setFont(font)
+        self.headerFrame.setFrameShape(QtWidgets.QFrame.StyledPanel)
+        self.headerFrame.setFrameShadow(QtWidgets.QFrame.Raised)
+        self.headerFrame.setObjectName("headerFrame")
+        self.headerLayout = QtWidgets.QHBoxLayout(self.headerFrame)
+        self.headerLayout.setContentsMargins(0, 0, 0, 0)
+        self.headerLayout.setSpacing(0)
+        self.headerLayout.setObjectName("headerLayout")
+        self.evidenceGroupBox = QtWidgets.QGroupBox(self.headerFrame)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        font.setBold(True)
+        font.setWeight(75)
+        self.evidenceGroupBox.setFont(font)
+        self.evidenceGroupBox.setObjectName("evidenceGroupBox")
+        self.evidenceGridLayout = QtWidgets.QGridLayout(self.evidenceGroupBox)
+        self.evidenceGridLayout.setContentsMargins(15, 0, 5, 5)
+        self.evidenceGridLayout.setSpacing(5)
+        self.evidenceGridLayout.setObjectName("evidenceGridLayout")
+        self.evidenceTypeLabel = QtWidgets.QLabel(self.evidenceGroupBox)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.evidenceTypeLabel.setFont(font)
+        self.evidenceTypeLabel.setObjectName("evidenceTypeLabel")
+        self.evidenceGridLayout.addWidget(self.evidenceTypeLabel, 0, 0, 1, 1)
+        self.evidenceTypeCombo = QtWidgets.QComboBox(self.evidenceGroupBox)
+        self.evidenceTypeCombo.setMinimumSize(QtCore.QSize(200, 34))
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.evidenceTypeCombo.setFont(font)
+        self.evidenceTypeCombo.setStyleSheet(
+            "/* ==== QComboBox ==== */\n"
+            "QComboBox {\n"
+            "    /* nền trắng, bo góc và viền xám nhạt giống QLineEdit */\n"
+            "    background-color: #ffffff;\n"
+            "    border: 1px solid #c0c4c8;\n"
+            "    border-radius: 4px;\n"
+            "    padding: 4px 30px 4px 8px; /* để chừa chỗ cho mũi tên */\n"
+            "    min-height: 24px;\n"
+            "    /* font đã định ở đầu styles.qss sẽ áp dụng */\n"
+            "}\n"
+            "\n"
+            "/* Khi hover đổi nhẹ viền */\n"
+            "QComboBox:hover {\n"
+            "    border: 1px solid #a0a4a8;\n"
+            "}\n"
+            "\n"
+            "/* Khi focus (đang chọn) đổi viền xanh */\n"
+            "QComboBox:focus {\n"
+            "    border: 1px solid #4a90e2;\n"
+            "}\n"
+            "\n"
+            "/* Popup list (QAbstractItemView) */\n"
+            "QComboBox QAbstractItemView {\n"
+            "    background-color: #ffffff;\n"
+            "    border: 1px solid #c0c4c8;\n"
+            "    border-radius: 4px;\n"
+            "    padding: 4px;\n"
+            "    outline: none;\n"
+            "    selection-background-color: #cce4f7;\n"
+            "    selection-color: #000;\n"
+            "}\n"
+            "\n"
+            "/* Các item trong list khi hover */\n"
+            "QComboBox QAbstractItemView::item:hover {\n"
+            "    background-color: #e8f1fb;\n"
+            "}\n"
+            "\n"
+            "/* Scrollbar nhỏ gọn trong popup */\n"
+            "QComboBox QAbstractItemView QScrollBar:vertical {\n"
+            "    background: transparent;\n"
+            "    width: 8px;\n"
+            "    margin: 0px;\n"
+            "}\n"
+            "QComboBox QAbstractItemView QScrollBar::handle:vertical {\n"
+            "    background: #c0c4c8;\n"
+            "    min-height: 20px;\n"
+            "    border-radius: 4px;\n"
+            "}\n"
+            "QComboBox QAbstractItemView QScrollBar::add-line,\n"
+            "QComboBox QAbstractItemView QScrollBar::sub-line {\n"
+            "    height: 0;\n"
+            "}\n"
+            ""
+        )
+        self.evidenceTypeCombo.setObjectName("evidenceTypeCombo")
+        self.evidenceTypeCombo.addItem("")
+        self.evidenceTypeCombo.addItem("")
+        self.evidenceTypeCombo.addItem("")
+        self.evidenceTypeCombo.addItem("")
+        self.evidenceGridLayout.addWidget(self.evidenceTypeCombo, 0, 1, 1, 1)
+        self.filePathEdit = QtWidgets.QLineEdit(self.evidenceGroupBox)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.filePathEdit.setFont(font)
+        self.filePathEdit.setStyleSheet(
+            "/* ==== CHUNG CHO CÁC TEXT INPUT / TEXT EDIT ==== */\n"
+            "QLineEdit,\n"
+            "QTextEdit,\n"
+            "QPlainTextEdit {\n"
+            "    background-color: #ffffff;\n"
+            "    border: 1px solid #c0c4c8;      /* viền xám nhạt */\n"
+            "    border-radius: 4px;             /* bo góc mềm */\n"
+            "    padding: 4px 6px;               /* khoảng đệm bên trong */\n"
+            "    selection-background-color: #cce4f7;\n"
+            "    selection-color: #000;\n"
+            "}\n"
+            "\n"
+            "/* Khi focus chuyển viền sang xanh */\n"
+            "QLineEdit:focus,\n"
+            "QTextEdit:focus,\n"
+            "QPlainTextEdit:focus {\n"
+            "    border: 1px solid #4a90e2;\n"
+            "}\n"
+            "\n"
+            "/* Placeholder màu nhạt (chỉ với QLineEdit) */\n"
+            "QLineEdit[placeholderText] {\n"
+            "    color: #999999;\n"
+            "}\n"
+            "\n"
+            "/* ReadOnly thì nền hơi xám */\n"
+            'QLineEdit[readOnly="true"],\n'
+            'QTextEdit[readOnly="true"] {\n'
+            "    background-color: #f0f2f5;\n"
+            "}\n"
+            "\n"
+            "/* Thanh cuộn bên trong QTextEdit bo góc & nhỏ gọn */\n"
+            "QTextEdit QScrollBar:vertical,\n"
+            "QPlainTextEdit QScrollBar:vertical {\n"
+            "    background: transparent;\n"
+            "    width: 8px;\n"
+            "    margin: 0px;\n"
+            "}\n"
+            "QTextEdit QScrollBar::handle:vertical,\n"
+            "QPlainTextEdit QScrollBar::handle:vertical {\n"
+            "    background: #c0c4c8;\n"
+            "    min-height: 20px;\n"
+            "    border-radius: 4px;\n"
+            "}\n"
+            "QTextEdit QScrollBar::add-line, QTextEdit QScrollBar::sub-line,\n"
+            "QPlainTextEdit QScrollBar::add-line, QPlainTextEdit QScrollBar::sub-line {\n"
+            "    height: 0;\n"
+            "}\n"
+            ""
+        )
+        self.filePathEdit.setObjectName("filePathEdit")
+        self.evidenceGridLayout.addWidget(self.filePathEdit, 2, 1, 1, 1)
+        self.filePathLabel = QtWidgets.QLabel(self.evidenceGroupBox)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.filePathLabel.setFont(font)
+        self.filePathLabel.setObjectName("filePathLabel")
+        self.evidenceGridLayout.addWidget(self.filePathLabel, 2, 0, 1, 1)
+        self.label_2 = QtWidgets.QLabel(self.evidenceGroupBox)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.label_2.setFont(font)
+        self.label_2.setObjectName("label_2")
+        self.evidenceGridLayout.addWidget(self.label_2, 1, 0, 1, 1)
+        self.evidencecombo = QtWidgets.QComboBox(self.evidenceGroupBox)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.evidencecombo.setFont(font)
+        self.evidencecombo.setObjectName("evidencecombo")
+        self.evidenceGridLayout.addWidget(self.evidencecombo, 1, 1, 1, 1)
+        self.headerLayout.addWidget(self.evidenceGroupBox)
+        self.statusGroupBox = QtWidgets.QGroupBox(self.headerFrame)
+        self.statusGroupBox.setMaximumSize(QtCore.QSize(600, 16777215))
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        font.setBold(True)
+        font.setWeight(75)
+        self.statusGroupBox.setFont(font)
+        self.statusGroupBox.setObjectName("statusGroupBox")
+        self.gridLayout_6 = QtWidgets.QGridLayout(self.statusGroupBox)
+        self.gridLayout_6.setContentsMargins(-1, 0, -1, 0)
+        self.gridLayout_6.setVerticalSpacing(2)
+        self.gridLayout_6.setObjectName("gridLayout_6")
+        self.splitter = QtWidgets.QSplitter(self.statusGroupBox)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.splitter.setFont(font)
+        self.splitter.setOrientation(QtCore.Qt.Horizontal)
+        self.splitter.setObjectName("splitter")
+        self.startAnalysisButton = QtWidgets.QPushButton(self.splitter)
+        self.startAnalysisButton.setMaximumSize(QtCore.QSize(130, 16777215))
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.startAnalysisButton.setFont(font)
+        self.startAnalysisButton.setStyleSheet(
+            "/* QPushButton */\n"
+            "QPushButton {\n"
+            "    background-color: #4a90e2;\n"
+            "    border: none;\n"
+            "    border-radius: 4px;\n"
+            "    padding: 6px 12px;\n"
+            "    color: #fff;\n"
+            "}\n"
+            "QPushButton:hover {\n"
+            "    background-color: #5aa0f2;\n"
+            "}\n"
+            "QPushButton:pressed {\n"
+            "    background-color: #3a7fcc;\n"
+            "}"
+        )
+        self.startAnalysisButton.setObjectName("startAnalysisButton")
+        self.stopButton = QtWidgets.QPushButton(self.splitter)
+        self.stopButton.setEnabled(False)
+        self.stopButton.setMaximumSize(QtCore.QSize(150, 16777215))
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        font.setUnderline(False)
+        self.stopButton.setFont(font)
+        self.stopButton.setLayoutDirection(QtCore.Qt.LeftToRight)
+        self.stopButton.setStyleSheet(
+            "/* QPushButton */\n"
+            "QPushButton {\n"
+            "    background-color: #4a90e2;\n"
+            "    border: none;\n"
+            "    border-radius: 4px;\n"
+            "    padding: 6px 12px;\n"
+            "    color: #fff;\n"
+            "}\n"
+            "QPushButton:hover {\n"
+            "    background-color: #5aa0f2;\n"
+            "}\n"
+            "QPushButton:pressed {\n"
+            "    background-color: #3a7fcc;\n"
+            "}"
+        )
+        self.stopButton.setObjectName("stopButton")
+        self.pushButton_2 = QtWidgets.QPushButton(self.splitter)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.pushButton_2.setFont(font)
+        self.pushButton_2.setObjectName("pushButton_2")
+        self.pushButton = QtWidgets.QPushButton(self.splitter)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.pushButton.setFont(font)
+        self.pushButton.setObjectName("pushButton")
+        self.gridLayout_6.addWidget(self.splitter, 2, 0, 1, 1)
+        self.progressBar = QtWidgets.QProgressBar(self.statusGroupBox)
         font = QtGui.QFont()
         font.setPointSize(9)
         self.progressBar.setFont(font)
-        self.progressBar.setMinimum(0)
-        self.progressBar.setMaximum(100)
+        self.progressBar.setStyleSheet(
+            "/* QProgressBar */\n"
+            "QProgressBar {\n"
+            "    border: 1px solid #a0a4a8;\n"
+            "    border-radius: 6px;\n"
+            "    text-align: center;\n"
+            "}\n"
+            "QProgressBar::chunk {\n"
+            "    background-color: #4a90e2;\n"
+            "    border-radius: 6px;\n"
+            "}"
+        )
         self.progressBar.setProperty("value", 0)
-        self.progressBar.setTextVisible(True)
         self.progressBar.setObjectName("progressBar")
-        self.sidebarLayout.addWidget(self.progressBar)
-        self.groupBoxLog = QtWidgets.QGroupBox(self.sidebar)
+        self.gridLayout_6.addWidget(self.progressBar, 1, 0, 1, 1)
+        self.statusLabel = QtWidgets.QLabel(self.statusGroupBox)
         font = QtGui.QFont()
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.groupBoxLog.setFont(font)
-        self.groupBoxLog.setObjectName("groupBoxLog")
-        self.logLayout = QtWidgets.QVBoxLayout(self.groupBoxLog)
-        self.logLayout.setObjectName("logLayout")
-        self.listWidget_log = QtWidgets.QListWidget(self.groupBoxLog)
-        self.listWidget_log.setStyleSheet("background: #f5f5f5; font-size: 12px; border-radius: 5px;")
-        self.listWidget_log.setObjectName("listWidget_log")
-        self.logLayout.addWidget(self.listWidget_log)
-        self.sidebarLayout.addWidget(self.groupBoxLog)
-        self.tabWidget = QtWidgets.QTabWidget(self.splitter)
-        self.tabWidget.setStyleSheet("QTabBar::tab {\n"
-"    min-width: 220px; /* Increased width to ensure full text visibility */\n"
-"    padding: 5px 15px; /* Adjust padding for better spacing */\n"
-"    text-align: left; /* Align text to the left */\n"
-"    font-size: 16px; /* Explicit font size */\n"
-"}\n"
-"\n"
-"QTabBar::tab:selected {\n"
-"    background-color: #2a82da;\n"
-"    color: white;\n"
-"    border: 1px solid #2a82da;\n"
-"    border-bottom-color: #2a82da; /* same as background color */\n"
-"}\n"
-"\n"
-"QTabBar::tab:!selected {\n"
-"    background-color: #f0f0f0;\n"
-"    border: 1px solid #dcdcdc;\n"
-"    border-bottom-color: #dcdcdc; /* same as border color */\n"
-"}\n"
-"\n"
-"QTabBar::close-button {\n"
-"    image: url(:/icons/icons8-close-30.png); /* Ensure you have this icon in your resources */\n"
-"    subcontrol-position: right;\n"
-"}\n"
-"\n"
-"QTabBar::close-button:hover {\n"
-"    background: #ff7878;}")
-        self.tabWidget.setTabsClosable(True)
-        self.tabWidget.setObjectName("tabWidget")
-        self.mainLayout.addWidget(self.splitter)
+        font.setPointSize(9)
+        self.statusLabel.setFont(font)
+        self.statusLabel.setObjectName("statusLabel")
+        self.gridLayout_6.addWidget(self.statusLabel, 0, 0, 1, 1)
+        self.headerLayout.addWidget(self.statusGroupBox)
+        self.gridLayout_3.addWidget(self.headerFrame, 1, 0, 1, 1)
+        MemoryAnalysisWindow.setCentralWidget(self.centralwidget)
+        self.actionOpen_Evidence = QtWidgets.QAction(MemoryAnalysisWindow)
+        self.actionOpen_Evidence.setObjectName("actionOpen_Evidence")
+        self.actionRecent_Files = QtWidgets.QAction(MemoryAnalysisWindow)
+        self.actionRecent_Files.setObjectName("actionRecent_Files")
+        self.actionSave_Results = QtWidgets.QAction(MemoryAnalysisWindow)
+        self.actionSave_Results.setObjectName("actionSave_Results")
+        self.actionExport_Report = QtWidgets.QAction(MemoryAnalysisWindow)
+        self.actionExport_Report.setObjectName("actionExport_Report")
+        self.actionExit = QtWidgets.QAction(MemoryAnalysisWindow)
+        self.actionExit.setObjectName("actionExit")
+        self.actionStart_Analysis = QtWidgets.QAction(MemoryAnalysisWindow)
+        self.actionStart_Analysis.setObjectName("actionStart_Analysis")
+        self.actionStop_Analysis = QtWidgets.QAction(MemoryAnalysisWindow)
+        self.actionStop_Analysis.setObjectName("actionStop_Analysis")
+        self.actionQuick_Analysis = QtWidgets.QAction(MemoryAnalysisWindow)
+        self.actionQuick_Analysis.setObjectName("actionQuick_Analysis")
+        self.actionFull_Analysis = QtWidgets.QAction(MemoryAnalysisWindow)
+        self.actionFull_Analysis.setObjectName("actionFull_Analysis")
+        self.actionCustom_Plugin = QtWidgets.QAction(MemoryAnalysisWindow)
+        self.actionCustom_Plugin.setObjectName("actionCustom_Plugin")
+        self.actionVolatility_Settings = QtWidgets.QAction(MemoryAnalysisWindow)
+        self.actionVolatility_Settings.setObjectName("actionVolatility_Settings")
+        self.actionYARA_Rules = QtWidgets.QAction(MemoryAnalysisWindow)
+        self.actionYARA_Rules.setObjectName("actionYARA_Rules")
+        self.actionPreferences = QtWidgets.QAction(MemoryAnalysisWindow)
+        self.actionPreferences.setObjectName("actionPreferences")
+        self.actionShow_System_Info = QtWidgets.QAction(MemoryAnalysisWindow)
+        self.actionShow_System_Info.setCheckable(True)
+        self.actionShow_System_Info.setChecked(True)
+        self.actionShow_System_Info.setObjectName("actionShow_System_Info")
+        self.actionShow_Process_Tree = QtWidgets.QAction(MemoryAnalysisWindow)
+        self.actionShow_Process_Tree.setCheckable(True)
+        self.actionShow_Process_Tree.setChecked(True)
+        self.actionShow_Process_Tree.setObjectName("actionShow_Process_Tree")
+        self.actionShow_Network_Connections = QtWidgets.QAction(MemoryAnalysisWindow)
+        self.actionShow_Network_Connections.setCheckable(True)
+        self.actionShow_Network_Connections.setChecked(True)
+        self.actionShow_Network_Connections.setObjectName(
+            "actionShow_Network_Connections"
+        )
+        self.actionRefresh = QtWidgets.QAction(MemoryAnalysisWindow)
+        self.actionRefresh.setObjectName("actionRefresh")
+        self.actionUser_Manual = QtWidgets.QAction(MemoryAnalysisWindow)
+        self.actionUser_Manual.setObjectName("actionUser_Manual")
+        self.actionVolatility_Documentation = QtWidgets.QAction(MemoryAnalysisWindow)
+        self.actionVolatility_Documentation.setObjectName(
+            "actionVolatility_Documentation"
+        )
+        self.actionAbout = QtWidgets.QAction(MemoryAnalysisWindow)
+        self.actionAbout.setObjectName("actionAbout")
 
-        self.retranslateUi(MemoryAnalysisWidget)
-        self.tabWidget.setCurrentIndex(-1)
-        QtCore.QMetaObject.connectSlotsByName(MemoryAnalysisWidget)
+        self.retranslateUi(MemoryAnalysisWindow)
+        self.mainTabWidget.setCurrentIndex(3)
+        self.rawMemoryTabWidget.setCurrentIndex(1)
+        self.processTabWidget.setCurrentIndex(2)
+        self.fileTabWidget.setCurrentIndex(0)
+        self.commandTabWidget.setCurrentIndex(0)
+        self.credentialTabWidget.setCurrentIndex(0)
+        self.crashAnalysisTabWidget.setCurrentIndex(-1)
+        # self.startAnalysisButton.clicked.connect(MemoryAnalysisWindow.start_analysis) # type: ignore
+        # self.stopButton.clicked.connect(MemoryAnalysisWindow.stop_analysis) # type: ignore
+        ## self.outputDirButton.clicked.connect(MemoryAnalysisWindow.browse_output_directory) # type: ignore
+        self.clearLogButton.clicked.connect(MemoryAnalysisWindow.clear_log)  # type: ignore
+        self.saveLogButton.clicked.connect(MemoryAnalysisWindow.save_log)  # type: ignore
+        self.runAIAnalysisButton.clicked.connect(MemoryAnalysisWindow.run_ai_analysis)  # type: ignore
+        QtCore.QMetaObject.connectSlotsByName(MemoryAnalysisWindow)
 
-    def retranslateUi(self, MemoryAnalysisWidget):
+    def retranslateUi(self, MemoryAnalysisWindow):
         _translate = QtCore.QCoreApplication.translate
-        self.label_case_info.setStyleSheet(_translate("MemoryAnalysisWidget", "font-weight: bold; font-size: 15px; color: #1976d2; margin-bottom: 8px;"))
-        self.label_case_info.setText(_translate("MemoryAnalysisWidget", "Case: [Chưa chọn]"))
-        self.groupBoxMemoryFile.setStyleSheet(_translate("MemoryAnalysisWidget", "QGroupBox { font-weight: bold; }"))
-        self.groupBoxMemoryFile.setTitle(_translate("MemoryAnalysisWidget", "Memory File Selection"))
-        self.labelEvidence.setText(_translate("MemoryAnalysisWidget", "Available Memory Files:"))
-        self.listWidgetMemoryFiles.setStyleSheet(_translate("MemoryAnalysisWidget", "font-size: 12px;"))
-        self.labelFileInfo.setText(_translate("MemoryAnalysisWidget", "File info: Select a file from the list"))
-        self.groupBoxVolatilityPlugins.setStyleSheet(_translate("MemoryAnalysisWidget", "QGroupBox { font-weight: bold; }"))
-        self.groupBoxVolatilityPlugins.setTitle(_translate("MemoryAnalysisWidget", "Volatility Plugins"))
-        self.lineEditPluginSearch.setStyleSheet(_translate("MemoryAnalysisWidget", "background: #e3f2fd; border-radius: 5px; padding: 4px 8px; font-size: 12px; margin-bottom: 4px;"))
-        self.lineEditPluginSearch.setPlaceholderText(_translate("MemoryAnalysisWidget", "Search plugins..."))
-        self.listWidgetPlugins.setStyleSheet(_translate("MemoryAnalysisWidget", "font-size: 12px;"))
-        self.labelPluginSuggestion.setText(_translate("MemoryAnalysisWidget", "💡 Suggested: Select a memory file first"))
-        self.btnStart.setText(_translate("MemoryAnalysisWidget", "▶️ Analyze Selected File"))
-        self.btnExport.setText(_translate("MemoryAnalysisWidget", "💾 Export Results"))
-        self.progressBar.setStyleSheet(_translate("MemoryAnalysisWidget", "border-radius: 5px; height: 18px; background: #f5f5f5; color: #1976d2;"))
-        self.progressBar.setFormat(_translate("MemoryAnalysisWidget", "Analysis progress: %p%"))
-        self.groupBoxLog.setStyleSheet(_translate("MemoryAnalysisWidget", "QGroupBox { font-weight: bold; }"))
-        self.groupBoxLog.setTitle(_translate("MemoryAnalysisWidget", "Analysis Log"))
+        MemoryAnalysisWindow.setWindowTitle(
+            _translate(
+                "MemoryAnalysisWindow", "Memory Analysis System - Digital Forensics"
+            )
+        )
+        self.osVersionLabel.setText(_translate("MemoryAnalysisWindow", "OS Version:"))
+        self.osVersionValue.setText(_translate("MemoryAnalysisWindow", "-"))
+        self.architectureLabel.setText(
+            _translate("MemoryAnalysisWindow", "Architecture:")
+        )
+        self.architectureValue.setText(_translate("MemoryAnalysisWindow", "-"))
+        self.timestampLabel.setText(_translate("MemoryAnalysisWindow", "Capture Time:"))
+        self.timestampValue.setText(_translate("MemoryAnalysisWindow", "-"))
+        self.profileLabel.setText(_translate("MemoryAnalysisWindow", "Profile:"))
+        self.profileValue.setText(_translate("MemoryAnalysisWindow", "-"))
+        self.kernelBaseLabel.setText(_translate("MemoryAnalysisWindow", "Kernel Base:"))
+        self.kernelBaseValue.setText(_translate("MemoryAnalysisWindow", "-"))
+        self.btnKdbgscanDetail.setText(
+            _translate("MemoryAnalysisWindow", "Xem chi tiết kdbgscan")
+        )
+        self.btnImageinfoDetail.setText(
+            _translate("MemoryAnalysisWindow", "Xem chi tiết imageinfo")
+        )
+        self.btnWindowsInfoDetail.setText(
+            _translate("MemoryAnalysisWindow", "Xem chi tiết windows.info")
+        )
+        self.pluginDetailText.setPlaceholderText(
+            _translate("MemoryAnalysisWindow", "Chi tiết plugin sẽ hiển thị ở đây...")
+        )
+        self.rawMemoryTabWidget.setTabText(
+            self.rawMemoryTabWidget.indexOf(self.systemContextTab),
+            _translate("MemoryAnalysisWindow", "System Context"),
+        )
+        self.processTabWidget.setTabText(
+            self.processTabWidget.indexOf(self.processListTab),
+            _translate("MemoryAnalysisWindow", "Process List"),
+        )
+        self.processTabWidget.setTabText(
+            self.processTabWidget.indexOf(self.dllTab),
+            _translate("MemoryAnalysisWindow", "DLL List"),
+        )
+        self.processTabWidget.setTabText(
+            self.processTabWidget.indexOf(self.malwareDetectionTab),
+            _translate("MemoryAnalysisWindow", "Malfind"),
+        )
+        self.rawMemoryTabWidget.setTabText(
+            self.rawMemoryTabWidget.indexOf(self.processAnalysisTab),
+            _translate("MemoryAnalysisWindow", "Process Analysis"),
+        )
+        self.rawMemoryTabWidget.setTabText(
+            self.rawMemoryTabWidget.indexOf(self.networkTabWidget),
+            _translate("MemoryAnalysisWindow", "Network Analysis"),
+        )
+        self.filescanTable.setSortingEnabled(True)
+        item = self.filescanTable.horizontalHeaderItem(0)
+        item.setText(_translate("MemoryAnalysisWindow", "File Path"))
+        item = self.filescanTable.horizontalHeaderItem(1)
+        item.setText(_translate("MemoryAnalysisWindow", "Size"))
+        item = self.filescanTable.horizontalHeaderItem(2)
+        item.setText(_translate("MemoryAnalysisWindow", "Offset"))
+        item = self.filescanTable.horizontalHeaderItem(3)
+        item.setText(_translate("MemoryAnalysisWindow", "Access Time"))
+        item = self.filescanTable.horizontalHeaderItem(4)
+        item.setText(_translate("MemoryAnalysisWindow", "Created"))
+        item = self.filescanTable.horizontalHeaderItem(5)
+        item.setText(_translate("MemoryAnalysisWindow", "Modified"))
+        self.fileTabWidget.setTabText(
+            self.fileTabWidget.indexOf(self.fileScanTab),
+            _translate("MemoryAnalysisWindow", "File Scan"),
+        )
+        self.rawMemoryTabWidget.setTabText(
+            self.rawMemoryTabWidget.indexOf(self.fileRegistryTab),
+            _translate("MemoryAnalysisWindow", "File Analysis"),
+        )
+        self.commandTabWidget.setTabText(
+            self.commandTabWidget.indexOf(self.commandHistoryTab),
+            _translate("MemoryAnalysisWindow", "Command History"),
+        )
+        self.rawMemoryTabWidget.setTabText(
+            self.rawMemoryTabWidget.indexOf(self.userActivityTab),
+            _translate("MemoryAnalysisWindow", "User Activity"),
+        )
+        self.credentialTabWidget.setTabText(
+            self.credentialTabWidget.indexOf(self.passwordHashesTab),
+            _translate("MemoryAnalysisWindow", "Password Hashes"),
+        )
+        self.rawMemoryTabWidget.setTabText(
+            self.rawMemoryTabWidget.indexOf(self.credentialsTab),
+            _translate("MemoryAnalysisWindow", "Credentials/Keys"),
+        )
+        self.rawMemoryTabWidget.setTabText(
+            self.rawMemoryTabWidget.indexOf(self.customPluginTab),
+            _translate("MemoryAnalysisWindow", "Custom Plugin Results"),
+        )
+        self.mainTabWidget.setTabText(
+            self.mainTabWidget.indexOf(self.rawMemoryTab),
+            _translate("MemoryAnalysisWindow", "Raw Memory Analysis"),
+        )
+        self.hibernationInfoGroup.setTitle(
+            _translate("MemoryAnalysisWindow", "Hibernation Information")
+        )
+        self.hibernationTypeLabel.setText(
+            _translate("MemoryAnalysisWindow", "Hibernation Type:")
+        )
+        self.hibernationTypeValue.setText(_translate("MemoryAnalysisWindow", "-"))
+        self.compressedSizeLabel.setText(
+            _translate("MemoryAnalysisWindow", "Compressed Size:")
+        )
+        self.compressedSizeValue.setText(_translate("MemoryAnalysisWindow", "-"))
+        self.originalSizeLabel.setText(
+            _translate("MemoryAnalysisWindow", "Original Size:")
+        )
+        self.originalSizeValue.setText(_translate("MemoryAnalysisWindow", "-"))
+        self.hibernationResultsGroup.setTitle(
+            _translate("MemoryAnalysisWindow", "Analysis Results")
+        )
+        self.hibernationResultsText.setPlaceholderText(
+            _translate(
+                "MemoryAnalysisWindow",
+                "Hibernation analysis results will appear here...",
+            )
+        )
+        self.mainTabWidget.setTabText(
+            self.mainTabWidget.indexOf(self.hibernationTab),
+            _translate("MemoryAnalysisWindow", "Hibernation Analysis"),
+        )
+        self.pageFileScanGroup.setTitle(
+            _translate("MemoryAnalysisWindow", "Page File Scan Results")
+        )
+        self.ResultsGroup.setTitle(
+            _translate("MemoryAnalysisWindow", "Analysis Results")
+        )
+        self.lineEdit_2.setPlaceholderText(
+            _translate("MemoryAnalysisWindow", "Search something")
+        )
+        self.mainTabWidget.setTabText(
+            self.mainTabWidget.indexOf(self.pageFileTab),
+            _translate("MemoryAnalysisWindow", "Page File Analysis"),
+        )
+        self.customCommandLabel.setText(
+            _translate("MemoryAnalysisWindow", "Advance Command:")
+        )
+        self.customCommandEdit.setPlaceholderText(
+            _translate(
+                "MemoryAnalysisWindow",
+                "Enter CDB command (e.g., !analyze -v, k, lm, etc.)",
+            )
+        )
+        self.addCustomCommandButton.setText(
+            _translate("MemoryAnalysisWindow", "Run command")
+        )
+        self.runningCommandLabel.setText(
+            _translate("MemoryAnalysisWindow", "Running CDB command:")
+        )
+        self.runningCommandEdit.setPlaceholderText(
+            _translate("MemoryAnalysisWindow", "Ready to run CDB commands...")
+        )
+        self.mainTabWidget.setTabText(
+            self.mainTabWidget.indexOf(self.crashDumpTab),
+            _translate("MemoryAnalysisWindow", "Crash Dump Analysis"),
+        )
+        self.aiSettingsGroup.setTitle(
+            _translate("MemoryAnalysisWindow", "AI Analysis Settings")
+        )
+        self.enableAICheckbox.setText(
+            _translate("MemoryAnalysisWindow", "Enable AI Analysis")
+        )
+        self.aiModelLabel.setText(_translate("MemoryAnalysisWindow", "Model:"))
+        self.aiModelCombo.setItemText(
+            0, _translate("MemoryAnalysisWindow", "Volmemlyzer ML")
+        )
+        self.aiModelCombo.setItemText(
+            1, _translate("MemoryAnalysisWindow", "Custom Model")
+        )
+        self.runAIAnalysisButton.setText(
+            _translate("MemoryAnalysisWindow", "Run AI Analysis")
+        )
+        self.aiResultsGroup.setTitle(
+            _translate("MemoryAnalysisWindow", "AI Analysis Results")
+        )
+        self.aiResultsText.setPlaceholderText(
+            _translate(
+                "MemoryAnalysisWindow", "AI analysis results will appear here..."
+            )
+        )
+        self.mainTabWidget.setTabText(
+            self.mainTabWidget.indexOf(self.aiAnalysisTab),
+            _translate("MemoryAnalysisWindow", "AI Analysis"),
+        )
+        self.volatilityOptionsGroup.setTitle(
+            _translate("MemoryAnalysisWindow", "Volatility Options")
+        )
+        self.pluginSearchEdit.setPlaceholderText(
+            _translate("MemoryAnalysisWindow", "Search plugin...")
+        )
+        item = self.pluginTableWidget.horizontalHeaderItem(0)
+        item.setText(_translate("MemoryAnalysisWindow", "Chọn"))
+        item = self.pluginTableWidget.horizontalHeaderItem(1)
+        item.setText(_translate("MemoryAnalysisWindow", "Tên plugin"))
+        item = self.pluginTableWidget.horizontalHeaderItem(2)
+        item.setText(_translate("MemoryAnalysisWindow", "Loại"))
+        item = self.pluginTableWidget.horizontalHeaderItem(3)
+        item.setText(_translate("MemoryAnalysisWindow", "Mô tả"))
+        self.outputOptionsGroup.setTitle(
+            _translate("MemoryAnalysisWindow", "Output Options")
+        )
+        self.outputFormatLabel.setText(
+            _translate("MemoryAnalysisWindow", "Output Format:")
+        )
+        self.outputFormatCombo.setItemText(
+            0, _translate("MemoryAnalysisWindow", "JSON")
+        )
+        self.outputFormatCombo.setItemText(1, _translate("MemoryAnalysisWindow", "CSV"))
+        self.outputFormatCombo.setItemText(2, _translate("MemoryAnalysisWindow", "XML"))
+        self.outputFormatCombo.setItemText(
+            3, _translate("MemoryAnalysisWindow", "Text")
+        )
+        self.outputDirLabel.setText(
+            _translate("MemoryAnalysisWindow", "Output Directory:")
+        )
+        self.outputDirEdit.setPlaceholderText(
+            _translate("MemoryAnalysisWindow", "Select output directory...")
+        )
+        self.outputDirButton.setText(_translate("MemoryAnalysisWindow", "Browse"))
+        self.saveRawOutputCheckbox.setText(
+            _translate("MemoryAnalysisWindow", "Save Raw Output")
+        )
+        self.generateReportCheckbox.setText(
+            _translate("MemoryAnalysisWindow", "Generate HTML Report")
+        )
+        self.advancedOptionsGroup.setTitle(
+            _translate("MemoryAnalysisWindow", "Advanced Options")
+        )
+        self.threadsLabel.setText(
+            _translate("MemoryAnalysisWindow", "Analysis Threads:")
+        )
+        self.timeoutLabel.setText(
+            _translate("MemoryAnalysisWindow", "Timeout (minutes):")
+        )
+        self.verboseCheckbox.setText(
+            _translate("MemoryAnalysisWindow", "Verbose Output")
+        )
+        self.debugCheckbox.setText(_translate("MemoryAnalysisWindow", "Debug Mode"))
+        self.mainTabWidget.setTabText(
+            self.mainTabWidget.indexOf(self.analysisOptionsTab),
+            _translate("MemoryAnalysisWindow", "Analysis Options"),
+        )
+        self.logLevelLabel.setText(_translate("MemoryAnalysisWindow", "Log Level:"))
+        self.logLevelCombo.setItemText(0, _translate("MemoryAnalysisWindow", "Debug"))
+        self.logLevelCombo.setItemText(1, _translate("MemoryAnalysisWindow", "Info"))
+        self.logLevelCombo.setItemText(2, _translate("MemoryAnalysisWindow", "Warning"))
+        self.logLevelCombo.setItemText(3, _translate("MemoryAnalysisWindow", "Error"))
+        self.clearLogButton.setText(_translate("MemoryAnalysisWindow", "Clear Log"))
+        self.saveLogButton.setText(_translate("MemoryAnalysisWindow", "Save Log"))
+        self.logTextEdit.setPlaceholderText(
+            _translate("MemoryAnalysisWindow", "Analysis log will appear here...")
+        )
+        self.mainTabWidget.setTabText(
+            self.mainTabWidget.indexOf(self.logTab),
+            _translate("MemoryAnalysisWindow", "Analysis Log"),
+        )
+        self.label.setText(_translate("MemoryAnalysisWindow", "Case name:"))
+        self.evidenceGroupBox.setTitle(_translate("MemoryAnalysisWindow", "Evidence"))
+        self.evidenceTypeLabel.setText(
+            _translate("MemoryAnalysisWindow", "Evidence Type:")
+        )
+        self.evidenceTypeCombo.setItemText(
+            0, _translate("MemoryAnalysisWindow", "Raw Memory (.raw, .mem, .vmem)")
+        )
+        self.evidenceTypeCombo.setItemText(
+            1, _translate("MemoryAnalysisWindow", "Hibernation File (hiberfil.sys)")
+        )
+        self.evidenceTypeCombo.setItemText(
+            2, _translate("MemoryAnalysisWindow", "Page File (pagefile.sys)")
+        )
+        self.evidenceTypeCombo.setItemText(
+            3, _translate("MemoryAnalysisWindow", "Crash Dump (.dmp)")
+        )
+        self.filePathEdit.setPlaceholderText(
+            _translate("MemoryAnalysisWindow", "Select evidence file...")
+        )
+        self.filePathLabel.setText(_translate("MemoryAnalysisWindow", "File Path:"))
+        self.label_2.setText(_translate("MemoryAnalysisWindow", "Evidence"))
+        self.statusGroupBox.setTitle(
+            _translate("MemoryAnalysisWindow", "Analysis Status")
+        )
+        self.startAnalysisButton.setText(
+            _translate("MemoryAnalysisWindow", "Start Analysis")
+        )
+        self.stopButton.setText(_translate("MemoryAnalysisWindow", "Stop Analysis"))
+        self.pushButton_2.setText(_translate("MemoryAnalysisWindow", "Save Results"))
+        self.pushButton.setText(_translate("MemoryAnalysisWindow", "Export Report"))
+        self.statusLabel.setText(_translate("MemoryAnalysisWindow", "Status"))
+        self.actionOpen_Evidence.setText(
+            _translate("MemoryAnalysisWindow", "Open Evidence")
+        )
+        self.actionOpen_Evidence.setToolTip(
+            _translate("MemoryAnalysisWindow", "Open evidence file for analysis")
+        )
+        self.actionOpen_Evidence.setShortcut(
+            _translate("MemoryAnalysisWindow", "Ctrl+O")
+        )
+        self.actionRecent_Files.setText(
+            _translate("MemoryAnalysisWindow", "Recent Files")
+        )
+        self.actionSave_Results.setText(
+            _translate("MemoryAnalysisWindow", "Save Results")
+        )
+        self.actionSave_Results.setToolTip(
+            _translate("MemoryAnalysisWindow", "Save analysis results")
+        )
+        self.actionSave_Results.setShortcut(
+            _translate("MemoryAnalysisWindow", "Ctrl+S")
+        )
+        self.actionExport_Report.setText(
+            _translate("MemoryAnalysisWindow", "Export Report")
+        )
+        self.actionExport_Report.setToolTip(
+            _translate("MemoryAnalysisWindow", "Export analysis report")
+        )
+        self.actionExport_Report.setShortcut(
+            _translate("MemoryAnalysisWindow", "Ctrl+E")
+        )
+        self.actionExit.setText(_translate("MemoryAnalysisWindow", "Exit"))
+        self.actionExit.setShortcut(_translate("MemoryAnalysisWindow", "Ctrl+Q"))
+        self.actionStart_Analysis.setText(
+            _translate("MemoryAnalysisWindow", "Start Analysis")
+        )
+        self.actionStart_Analysis.setToolTip(
+            _translate("MemoryAnalysisWindow", "Start memory analysis")
+        )
+        self.actionStart_Analysis.setShortcut(_translate("MemoryAnalysisWindow", "F5"))
+        self.actionStop_Analysis.setText(
+            _translate("MemoryAnalysisWindow", "Stop Analysis")
+        )
+        self.actionStop_Analysis.setToolTip(
+            _translate("MemoryAnalysisWindow", "Stop running analysis")
+        )
+        self.actionStop_Analysis.setShortcut(_translate("MemoryAnalysisWindow", "F6"))
+        self.actionQuick_Analysis.setText(
+            _translate("MemoryAnalysisWindow", "Quick Analysis")
+        )
+        self.actionQuick_Analysis.setToolTip(
+            _translate("MemoryAnalysisWindow", "Run quick analysis with basic plugins")
+        )
+        self.actionFull_Analysis.setText(
+            _translate("MemoryAnalysisWindow", "Full Analysis")
+        )
+        self.actionFull_Analysis.setToolTip(
+            _translate(
+                "MemoryAnalysisWindow", "Run comprehensive analysis with all plugins"
+            )
+        )
+        self.actionCustom_Plugin.setText(
+            _translate("MemoryAnalysisWindow", "Custom Plugin")
+        )
+        self.actionCustom_Plugin.setToolTip(
+            _translate("MemoryAnalysisWindow", "Run custom Volatility plugin")
+        )
+        self.actionVolatility_Settings.setText(
+            _translate("MemoryAnalysisWindow", "Volatility Settings")
+        )
+        self.actionYARA_Rules.setText(_translate("MemoryAnalysisWindow", "YARA Rules"))
+        self.actionPreferences.setText(
+            _translate("MemoryAnalysisWindow", "Preferences")
+        )
+        self.actionPreferences.setToolTip(
+            _translate("MemoryAnalysisWindow", "Application preferences")
+        )
+        self.actionShow_System_Info.setText(
+            _translate("MemoryAnalysisWindow", "System Info")
+        )
+        self.actionShow_Process_Tree.setText(
+            _translate("MemoryAnalysisWindow", "Process Tree")
+        )
+        self.actionShow_Network_Connections.setText(
+            _translate("MemoryAnalysisWindow", "Network Connections")
+        )
+        self.actionRefresh.setText(_translate("MemoryAnalysisWindow", "Refresh"))
+        self.actionRefresh.setShortcut(_translate("MemoryAnalysisWindow", "F5"))
+        self.actionUser_Manual.setText(
+            _translate("MemoryAnalysisWindow", "User Manual")
+        )
+        self.actionVolatility_Documentation.setText(
+            _translate("MemoryAnalysisWindow", "Volatility Documentation")
+        )
+        self.actionAbout.setText(_translate("MemoryAnalysisWindow", "About"))
 
 
 if __name__ == "__main__":
     import sys
+
     app = QtWidgets.QApplication(sys.argv)
-    MemoryAnalysisWidget = QtWidgets.QWidget()
-    ui = Ui_MemoryAnalysisWidget()
-    ui.setupUi(MemoryAnalysisWidget)
-    MemoryAnalysisWidget.show()
+    MemoryAnalysisWindow = QtWidgets.QMainWindow()
+    ui = Ui_MemoryAnalysisWindow()
+    ui.setupUi(MemoryAnalysisWindow)
+    MemoryAnalysisWindow.show()
     sys.exit(app.exec_())

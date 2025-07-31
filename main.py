@@ -1,4 +1,3 @@
-
 from PyQt5.QtWidgets import QApplication, QMainWindow, QMessageBox, QPushButton, QMenu
 from PyQt5.QtCore import pyqtSignal, QTimer, Qt
 from datetime import datetime
@@ -12,7 +11,7 @@ from pages_functions.case_management import Case
 from pages_functions.user_management import UserManagement
 from pages_functions.collect.volatile.volatile import Volatile
 from pages_functions.collect.nonvolatile.nonvolatile import NonVolatilePage
-from pages_functions.analysis.memory_analysis import MemoryAnalysisPage
+from pages_functions.analysis.memory_analysis import MemoryAnalysisWindow
 from pages_functions.analysis.registry_analysis import RegistryAnalysis
 from pages_functions.analysis.browser_analysis import BrowserAnalysis
 from pages_functions.analysis.file_analysis import FileAnalysis
@@ -88,7 +87,6 @@ class MyWindow(QMainWindow):
         self.update_timestamp()
         self.update_user_info()
 
-
         # Use a dictionary to store created instances to avoid re-creation
         self.opened_windows = {}
 
@@ -102,10 +100,10 @@ class MyWindow(QMainWindow):
             self.nonvolatile_btn: ("Non-Volatile", lambda: NonVolatilePage()),
             self.memory_btn: (
                 "Phân tích bộ nhớ",
-                lambda: MemoryAnalysisPage(parent=self),
+                lambda: MemoryAnalysisWindow(),
             ),
             self.registry_btn: ("Registry", lambda: RegistryAnalysis()),
-            self.browser_btn: ("Browser", lambda: BrowserAnalysis()),
+            self.browser_btn: ("Browser", lambda: BrowserAnalysis(main_window=self)),
             self.file_btn: ("File", lambda: FileAnalysis()),
             self.metadata_btn: ("Metadata", lambda: MetadataAnalysis()),
             self.eventlog_btn: ("Event Log", lambda: EventlogAnalysis()),
@@ -116,6 +114,8 @@ class MyWindow(QMainWindow):
 
         self.ui.tabWidget.setTabsClosable(True)
         self.ui.tabWidget.tabCloseRequested.connect(self.close_tab)
+        # Kết nối signal currentChanged để cập nhật menu khi tab thay đổi
+        self.ui.tabWidget.currentChanged.connect(self.on_tab_changed)
 
         self.dashboard_btn.clicked.connect(self.show_selected_window)
         self.case_btn.clicked.connect(self.show_selected_window)
@@ -133,11 +133,32 @@ class MyWindow(QMainWindow):
         self.user_label.mousePressEvent = self.user_label_clicked
         # self.logout_btn.clicked.connect(self.confirm_logout)
 
-
     def get_or_create_window(self, key, widget_factory):
         if key not in self.opened_windows:
             self.opened_windows[key] = widget_factory()
         return self.opened_windows[key]
+
+    def switch_to_browser_analysis_tab(self, case_id=None):
+        """Switches to the browser analysis tab and sets the case_id."""
+        # Switch to the browser analysis tab by simulating a button click
+        self.browser_btn.click()
+
+        def set_case_data():
+            # Find the browser analysis widget in the current tab
+            current_tab_index = self.ui.tabWidget.currentIndex()
+            if current_tab_index >= 0:
+                current_widget = self.ui.tabWidget.widget(current_tab_index)
+                # Check if the widget is an instance of BrowserAnalysis and has the load_case_data method
+                if (
+                    current_widget
+                    and isinstance(current_widget, BrowserAnalysis)
+                    and hasattr(current_widget, "load_case_data")
+                ):
+                    if case_id:
+                        current_widget.load_case_data(case_id)
+
+        # Delay to ensure the tab has been created before setting data
+        QTimer.singleShot(100, set_case_data)
 
     def switch_to_memory_analysis_tab(self, case_id=None):
         """Switches to the memory analysis tab and sets the case_id."""
@@ -152,7 +173,7 @@ class MyWindow(QMainWindow):
                 # Check if the widget is an instance of MemoryAnalysisPage and has the load_case_data method
                 if (
                     current_widget
-                    and isinstance(current_widget, MemoryAnalysisPage)
+                    and isinstance(current_widget, MemoryAnalysisWindow)
                     and hasattr(current_widget, "load_case_data")
                 ):
                     if case_id:
@@ -296,6 +317,7 @@ class MyWindow(QMainWindow):
         Function for showing the selected window
         """
         sender_btn = self.sender()
+
         # Danh sách các nút cần phải có case trước khi sử dụng
         require_case = {
             self.volatile_btn,
@@ -332,6 +354,13 @@ class MyWindow(QMainWindow):
                 curIndex = self.ui.tabWidget.addTab(widget, title)
                 self.ui.tabWidget.setCurrentIndex(curIndex)
                 self.ui.tabWidget.setVisible(True)
+        if sender_btn == self.browser_btn and self.current_case_id:
+            # Lấy widget của tab hiện tại
+            current_tab_index = self.ui.tabWidget.currentIndex()
+            if current_tab_index >= 0:
+                current_widget = self.ui.tabWidget.widget(current_tab_index)
+                if current_widget and hasattr(current_widget, "load_case_data"):
+                    current_widget.load_case_data(self.current_case_id)
 
     def close_tab(self, index):
         """
@@ -343,6 +372,8 @@ class MyWindow(QMainWindow):
 
         if self.ui.tabWidget.count() == 0:
             self.ui.toolBox.setCurrentIndex(0)
+            # Cập nhật menu khi đóng tab cuối cùng
+            self.set_btn_checked(self.case_btn)
             self.show_case_management_window()
 
     def set_btn_checked(self, btn):
@@ -357,7 +388,6 @@ class MyWindow(QMainWindow):
             else:
                 button.setChecked(True)
 
-
     def open_tab_flag(self, tab_title):
         """
         Check if tab is already open
@@ -367,6 +397,45 @@ class MyWindow(QMainWindow):
                 return True, i
         return False, -1
 
+    def on_tab_changed(self, index):
+        """
+        Xử lý khi tab thay đổi - cập nhật menu button tương ứng
+        """
+        if index < 0 or index >= self.ui.tabWidget.count():
+            return
+
+        current_tab_title = self.ui.tabWidget.tabText(index)
+
+        # Tìm button tương ứng với tab title
+        button_found = False
+        for button, (title, _) in self.menu_btns_list.items():
+            if title == current_tab_title:
+                self.set_btn_checked(button)
+                button_found = True
+
+                # Tự động expand section chứa button này
+                self.expand_section_for_button(button)
+                break
+
+        # Nếu không tìm thấy button tương ứng, uncheck tất cả buttons
+        if not button_found:
+            for button in self.menu_btns_list.keys():
+                button.setChecked(False)
+
+    def expand_section_for_button(self, target_button):
+        """
+        Tự động expand section chứa button được highlight
+        """
+        # Tìm section chứa button này
+        for i in range(self.ui.toolBox.count()):
+            page = self.ui.toolBox.widget(i)
+            if page:
+                # Tìm button trong page này
+                for child in page.findChildren(QtWidgets.QPushButton):
+                    if child == target_button:
+                        # Expand section này
+                        self.ui.toolBox.setCurrentIndex(i)
+                        return
 
     def user_label_clicked(self, ev):
         """

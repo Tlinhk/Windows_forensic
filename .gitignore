@@ -181,4 +181,6 @@ settings.ini
 *~ 
 
 
-tools/*.exe
+
+# Ignore all analysis output folders
+analysis_results/
