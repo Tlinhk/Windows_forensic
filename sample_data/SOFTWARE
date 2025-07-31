@@ -1,0 +1,6 @@
+# This is a mock SOFTWARE registry hive file for demonstration
+# In a real scenario, this would be a binary registry hive file
+# The Registry Analysis tool will generate mock data when RECmd is not available
+
+Mock SOFTWARE Registry Hive File
+Created for demonstration purposes

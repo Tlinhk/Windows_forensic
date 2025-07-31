@@ -28,6 +28,34 @@ class MyWindow(QMainWindow):
         super(MyWindow, self).__init__()
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
+
+        # Sau khi setupUi xong:
+        self.ui.tabWidget.setStyleSheet("""
+        QTabBar::tab {
+            background: #f3f3f3;
+            color: #2d3748;
+            border-radius: 10px;
+            padding: 10px 24px;
+            margin: 3px;
+            min-width: 150px;
+            min-height: 15px;
+            font-size: 15px;
+            font-family: "Segoe UI", "Arial", sans-serif;
+        }
+        QTabBar::tab:selected {
+            background: #3182ce;
+            color: white;
+        }
+        QTabBar::tab:hover {
+            background: #bee3f8;
+        }
+        QTabBar::close-button {
+            subcontrol-position: right;
+            margin-left: 10px;
+        }
+        """)
+
+
         # self.ui.menu_widget.setMinimumWidth(100)
         # self.ui.toolBox.setMinimumWidth(100)
         self.ui.splitter.setSizes([130, 900])
@@ -463,6 +491,14 @@ class MyWindow(QMainWindow):
             self.update_user_info(user_data["username"])
         else:
             self.update_user_info("Guest")
+            
+        # Ẩn/hiện nút quản lý người dùng dựa trên role
+        if user_data and "role" in user_data:
+            # Chỉ hiện nút quản lý người dùng nếu là ADMIN
+            self.user_management_btn.setVisible(user_data["role"] == "ADMIN")
+        else:
+            # Mặc định ẩn nếu không có thông tin role
+            self.user_management_btn.setVisible(False)
 
     def switch_mode(self, mode):
         """Chuyển đổi giữa collection mode và investigation mode"""

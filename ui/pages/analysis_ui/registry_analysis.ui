@@ -1,41 +1,1033 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>Form</class>
- <widget class="QWidget" name="Form">
+ <class>RegistryAnalysisWidget</class>
+ <widget class="QWidget" name="RegistryAnalysisWidget">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1038</width>
-    <height>597</height>
+    <width>1200</width>
+    <height>800</height>
    </rect>
   </property>
-  <property name="font">
-   <font>
-    <pointsize>10</pointsize>
-   </font>
-  </property>
   <property name="windowTitle">
-   <string>Form</string>
+   <string>Registry Analyzer v2.1.0</string>
   </property>
-  <layout class="QGridLayout" name="gridLayout">
-   <item row="0" column="0">
-    <widget class="QLabel" name="label">
-     <property name="font">
-      <font>
-       <pointsize>10</pointsize>
-      </font>
+  <property name="windowIcon">
+   <iconset>
+    <normaloff>:/icons/registry.ico</normaloff>:/icons/registry.ico</iconset>
+  </property>
+  <layout class="QVBoxLayout" name="mainVerticalLayout" stretch="0,5">
+   <property name="spacing">
+    <number>6</number>
+   </property>
+   <property name="leftMargin">
+    <number>6</number>
+   </property>
+   <property name="topMargin">
+    <number>6</number>
+   </property>
+   <property name="rightMargin">
+    <number>6</number>
+   </property>
+   <property name="bottomMargin">
+    <number>6</number>
+   </property>
+   <item>
+    <widget class="QFrame" name="toolbarFrame">
+     <property name="frameShape">
+      <enum>QFrame::StyledPanel</enum>
      </property>
-     <property name="text">
-      <string>Registry analysis</string>
+     <property name="frameShadow">
+      <enum>QFrame::Raised</enum>
      </property>
-     <property name="alignment">
-      <set>Qt::AlignCenter</set>
+     <layout class="QHBoxLayout" name="toolbarLayout">
+      <property name="spacing">
+       <number>8</number>
+      </property>
+      <property name="leftMargin">
+       <number>8</number>
+      </property>
+      <property name="topMargin">
+       <number>4</number>
+      </property>
+      <property name="rightMargin">
+       <number>8</number>
+      </property>
+      <property name="bottomMargin">
+       <number>4</number>
+      </property>
+      <item>
+       <widget class="QPushButton" name="btnLoadHive">
+        <property name="minimumSize">
+         <size>
+          <width>120</width>
+          <height>32</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>Load Hive</string>
+        </property>
+        <property name="icon">
+         <iconset>
+          <normaloff>:/icons/folder-open-32.ico</normaloff>:/icons/folder-open-32.ico</iconset>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="btnExportReport">
+        <property name="minimumSize">
+         <size>
+          <width>120</width>
+          <height>32</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>Export Report</string>
+        </property>
+        <property name="icon">
+         <iconset>
+          <normaloff>:/icons/file-export-32.ico</normaloff>:/icons/file-export-32.ico</iconset>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="btnSettings">
+        <property name="minimumSize">
+         <size>
+          <width>100</width>
+          <height>32</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>Settings</string>
+        </property>
+        <property name="icon">
+         <iconset>
+          <normaloff>:/icons/settings-32.ico</normaloff>:/icons/settings-32.ico</iconset>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="Line" name="line">
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="lblSearch">
+        <property name="text">
+         <string>Search:</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="txtGlobalSearch">
+        <property name="minimumSize">
+         <size>
+          <width>300</width>
+          <height>30</height>
+         </size>
+        </property>
+        <property name="placeholderText">
+         <string>Search for keys, values, or data across all loaded hives...</string>
+        </property>
+        <property name="clearButtonEnabled">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QToolButton" name="btnAdvancedSearch">
+        <property name="minimumSize">
+         <size>
+          <width>32</width>
+          <height>32</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>...</string>
+        </property>
+        <property name="icon">
+         <iconset>
+          <normaloff>:/icons/search-32.ico</normaloff>:/icons/search-32.ico</iconset>
+        </property>
+        <property name="popupMode">
+         <enum>QToolButton::InstantPopup</enum>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="chkRegEx">
+        <property name="text">
+         <string>RegEx</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="chkCaseSensitive">
+        <property name="text">
+         <string>Case</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="chkIncludeDeleted">
+        <property name="text">
+         <string>Deleted</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QToolButton" name="btnMenuMore">
+        <property name="text">
+         <string>...</string>
+        </property>
+        <property name="popupMode">
+         <enum>QToolButton::InstantPopup</enum>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QSplitter" name="verticalSplitter">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
      </property>
+     <widget class="QSplitter" name="horizontalSplitter">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="handleWidth">
+       <number>8</number>
+      </property>
+      <widget class="QFrame" name="controlPanelFrame">
+       <property name="frameShape">
+        <enum>QFrame::StyledPanel</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Raised</enum>
+       </property>
+       <layout class="QVBoxLayout" name="controlPanelLayout">
+        <property name="spacing">
+         <number>4</number>
+        </property>
+        <property name="leftMargin">
+         <number>4</number>
+        </property>
+        <property name="topMargin">
+         <number>4</number>
+        </property>
+        <property name="rightMargin">
+         <number>4</number>
+        </property>
+        <property name="bottomMargin">
+         <number>4</number>
+        </property>
+        <item>
+         <widget class="QFrame" name="controlPanelHeader">
+          <property name="frameShape">
+           <enum>QFrame::StyledPanel</enum>
+          </property>
+          <property name="frameShadow">
+           <enum>QFrame::Raised</enum>
+          </property>
+          <layout class="QHBoxLayout" name="horizontalLayout">
+           <property name="leftMargin">
+            <number>8</number>
+           </property>
+           <property name="topMargin">
+            <number>2</number>
+           </property>
+           <property name="rightMargin">
+            <number>8</number>
+           </property>
+           <property name="bottomMargin">
+            <number>2</number>
+           </property>
+           <item>
+            <widget class="QLabel" name="lblControlPanel">
+             <property name="font">
+              <font>
+               <pointsize>10</pointsize>
+               <weight>75</weight>
+               <bold>true</bold>
+              </font>
+             </property>
+             <property name="text">
+              <string>Registry Navigation</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="horizontalSpacer_2">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item>
+            <widget class="QComboBox" name="cmbHiveSelector">
+             <item>
+              <property name="text">
+               <string>All Hives</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>HKEY_LOCAL_MACHINE</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>HKEY_CURRENT_USER</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
+         <widget class="QTabWidget" name="navigationTabWidget">
+          <property name="currentIndex">
+           <number>0</number>
+          </property>
+          <widget class="QWidget" name="tabHiveTree">
+           <attribute name="title">
+            <string>Hive Tree</string>
+           </attribute>
+           <layout class="QVBoxLayout" name="verticalLayout">
+            <property name="leftMargin">
+             <number>2</number>
+            </property>
+            <property name="topMargin">
+             <number>2</number>
+            </property>
+            <property name="rightMargin">
+             <number>2</number>
+            </property>
+            <property name="bottomMargin">
+             <number>2</number>
+            </property>
+            <item>
+             <widget class="QTreeView" name="registryTreeView">
+              <property name="alternatingRowColors">
+               <bool>true</bool>
+              </property>
+              <property name="selectionMode">
+               <enum>QAbstractItemView::SingleSelection</enum>
+              </property>
+              <property name="rootIsDecorated">
+               <bool>true</bool>
+              </property>
+              <property name="uniformRowHeights">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+          <widget class="QWidget" name="tabBookmarks">
+           <attribute name="title">
+            <string>Forensic Bookmarks</string>
+           </attribute>
+           <layout class="QVBoxLayout" name="verticalLayout_2">
+            <property name="leftMargin">
+             <number>2</number>
+            </property>
+            <property name="topMargin">
+             <number>2</number>
+            </property>
+            <property name="rightMargin">
+             <number>2</number>
+            </property>
+            <property name="bottomMargin">
+             <number>2</number>
+            </property>
+            <item>
+             <widget class="QListWidget" name="bookmarksList">
+              <item>
+               <property name="text">
+                <string>🏃 Run Keys</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>👤 UserAssist</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>🖴 MRU Lists</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>🌐 USB Devices</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>🛠️ Services</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>🖥️ Startup</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>👥 ProfileList</string>
+               </property>
+              </item>
+             </widget>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="bookmarkButtonsLayout">
+              <item>
+               <widget class="QPushButton" name="btnAddBookmark">
+                <property name="text">
+                 <string>Add</string>
+                </property>
+                <property name="icon">
+                 <iconset>
+                  <normaloff>:/icons/plus-16.ico</normaloff>:/icons/plus-16.ico</iconset>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="btnRemoveBookmark">
+                <property name="text">
+                 <string>Remove</string>
+                </property>
+                <property name="icon">
+                 <iconset>
+                  <normaloff>:/icons/minus-16.ico</normaloff>:/icons/minus-16.ico</iconset>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+           </layout>
+          </widget>
+         </widget>
+        </item>
+        <item>
+         <widget class="QGroupBox" name="groupEvidenceInfo">
+          <property name="title">
+           <string>Evidence Information</string>
+          </property>
+          <layout class="QFormLayout" name="formLayout">
+           <item row="0" column="0">
+            <widget class="QLabel" name="lblHiveFile">
+             <property name="text">
+              <string>Hive File:</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QLabel" name="valueHiveFile">
+             <property name="text">
+              <string>SYSTEM</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="0">
+            <widget class="QLabel" name="lblPath">
+             <property name="text">
+              <string>Path:</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="1">
+            <widget class="QLabel" name="valuePath">
+             <property name="text">
+              <string>E:\evidence\case1\SYSTEM</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="0">
+            <widget class="QLabel" name="lblSize">
+             <property name="text">
+              <string>Size:</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="1">
+            <widget class="QLabel" name="valueSize">
+             <property name="text">
+              <string>10.2 MB</string>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="0">
+            <widget class="QLabel" name="lblStatus">
+             <property name="text">
+              <string>Status:</string>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="1">
+            <widget class="QLabel" name="valueStatus">
+             <property name="text">
+              <string>Clean (No transaction logs)</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QFrame" name="dataGridFrame">
+       <property name="frameShape">
+        <enum>QFrame::StyledPanel</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Raised</enum>
+       </property>
+       <layout class="QVBoxLayout" name="dataGridLayout">
+        <property name="spacing">
+         <number>4</number>
+        </property>
+        <property name="leftMargin">
+         <number>4</number>
+        </property>
+        <property name="topMargin">
+         <number>4</number>
+        </property>
+        <property name="rightMargin">
+         <number>4</number>
+        </property>
+        <property name="bottomMargin">
+         <number>4</number>
+        </property>
+        <item>
+         <widget class="QFrame" name="dataGridHeader">
+          <property name="frameShape">
+           <enum>QFrame::StyledPanel</enum>
+          </property>
+          <property name="frameShadow">
+           <enum>QFrame::Raised</enum>
+          </property>
+          <layout class="QHBoxLayout" name="horizontalLayout_2">
+           <property name="leftMargin">
+            <number>8</number>
+           </property>
+           <property name="topMargin">
+            <number>2</number>
+           </property>
+           <property name="rightMargin">
+            <number>8</number>
+           </property>
+           <property name="bottomMargin">
+            <number>2</number>
+           </property>
+           <item>
+            <widget class="QLabel" name="lblCurrentPath">
+             <property name="font">
+              <font>
+               <pointsize>10</pointsize>
+               <weight>75</weight>
+               <bold>true</bold>
+              </font>
+             </property>
+             <property name="text">
+              <string>HKLM\System\CurrentControlSet\Services</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="horizontalSpacer_3">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item>
+            <widget class="QPushButton" name="btnRefresh">
+             <property name="text">
+              <string>Refresh</string>
+             </property>
+             <property name="icon">
+              <iconset>
+               <normaloff>:/icons/refresh-16.ico</normaloff>:/icons/refresh-16.ico</iconset>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QComboBox" name="cmbViewType">
+             <item>
+              <property name="text">
+               <string>All Items</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Keys Only</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Values Only</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
+         <widget class="QTableView" name="registryValuesTable">
+          <property name="alternatingRowColors">
+           <bool>true</bool>
+          </property>
+          <property name="selectionBehavior">
+           <enum>QAbstractItemView::SelectRows</enum>
+          </property>
+          <property name="gridStyle">
+           <enum>Qt::SolidLine</enum>
+          </property>
+          <property name="sortingEnabled">
+           <bool>true</bool>
+          </property>
+          <attribute name="horizontalHeaderStretchLastSection">
+           <bool>true</bool>
+          </attribute>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </widget>
+     <widget class="QFrame" name="detailFrame">
+      <property name="frameShape">
+       <enum>QFrame::StyledPanel</enum>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Raised</enum>
+      </property>
+      <layout class="QVBoxLayout" name="detailLayout">
+       <property name="spacing">
+        <number>4</number>
+       </property>
+       <property name="leftMargin">
+        <number>4</number>
+       </property>
+       <property name="topMargin">
+        <number>4</number>
+       </property>
+       <property name="rightMargin">
+        <number>4</number>
+       </property>
+       <property name="bottomMargin">
+        <number>4</number>
+       </property>
+       <item>
+        <widget class="QFrame" name="detailHeader">
+         <property name="frameShape">
+          <enum>QFrame::StyledPanel</enum>
+         </property>
+         <property name="frameShadow">
+          <enum>QFrame::Raised</enum>
+         </property>
+         <layout class="QHBoxLayout" name="horizontalLayout_3">
+          <property name="leftMargin">
+           <number>8</number>
+          </property>
+          <property name="topMargin">
+           <number>2</number>
+          </property>
+          <property name="rightMargin">
+           <number>8</number>
+          </property>
+          <property name="bottomMargin">
+           <number>2</number>
+          </property>
+          <item>
+           <widget class="QLabel" name="lblDetailTitle">
+            <property name="font">
+             <font>
+              <pointsize>10</pointsize>
+              <weight>75</weight>
+              <bold>true</bold>
+             </font>
+            </property>
+            <property name="text">
+             <string>Detailed Analysis</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="lblCurrentSelection">
+            <property name="text">
+             <string>Selected Item: REG_SZ Start</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer_4">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="QPushButton" name="btnAddToReport">
+            <property name="text">
+             <string>Add to Report</string>
+            </property>
+            <property name="icon">
+             <iconset>
+              <normaloff>:/icons/add-to-report-16.ico</normaloff>:/icons/add-to-report-16.ico</iconset>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QTabWidget" name="detailTabWidget">
+         <property name="currentIndex">
+          <number>0</number>
+         </property>
+         <widget class="QWidget" name="tabHexView">
+          <attribute name="title">
+           <string>Hex View</string>
+          </attribute>
+          <layout class="QVBoxLayout" name="verticalLayout_3">
+           <item>
+            <widget class="QHexEdit" name="hexEditor" native="true"/>
+           </item>
+          </layout>
+         </widget>
+         <widget class="QWidget" name="tabDecoded">
+          <attribute name="title">
+           <string>Decoded Data</string>
+          </attribute>
+          <layout class="QVBoxLayout" name="verticalLayout_4">
+           <item>
+            <layout class="QHBoxLayout" name="decodedOptionsLayout">
+             <item>
+              <widget class="QLabel" name="lblDataFormat">
+               <property name="text">
+                <string>Data Format:</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QComboBox" name="cmbDataFormat">
+               <item>
+                <property name="text">
+                 <string>Auto-detect</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>UTF-8 String</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>UTF-16 String</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>DWORD</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>QWORD</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Windows Timestamp</string>
+                </property>
+               </item>
+              </widget>
+             </item>
+             <item>
+              <spacer name="horizontalSpacer_5">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <widget class="QTextEdit" name="txtDecodedData">
+             <property name="readOnly">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+         <widget class="QWidget" name="tabPluginResults">
+          <attribute name="title">
+           <string>Plugin Results</string>
+          </attribute>
+          <layout class="QVBoxLayout" name="verticalLayout_5">
+           <item>
+            <widget class="QLabel" name="lblPluginInfo">
+             <property name="font">
+              <font>
+               <weight>75</weight>
+               <bold>true</bold>
+              </font>
+             </property>
+             <property name="text">
+              <string>UserAssist Plugin - Program Execution History</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QTableWidget" name="pluginResultsTable">
+             <property name="alternatingRowColors">
+              <bool>true</bool>
+             </property>
+             <column>
+              <property name="text">
+               <string>Program Name</string>
+              </property>
+             </column>
+             <column>
+              <property name="text">
+               <string>Run Count</string>
+              </property>
+             </column>
+             <column>
+              <property name="text">
+               <string>Last Run Time</string>
+              </property>
+             </column>
+             <column>
+              <property name="text">
+               <string>Focus Time</string>
+              </property>
+             </column>
+             <column>
+              <property name="text">
+               <string>Additional Info</string>
+              </property>
+             </column>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+         <widget class="QWidget" name="tabNotes">
+          <attribute name="title">
+           <string>Investigator's Notes</string>
+          </attribute>
+          <layout class="QVBoxLayout" name="verticalLayout_6">
+           <item>
+            <widget class="QTextEdit" name="txtNotes">
+             <property name="placeholderText">
+              <string>Enter your notes about this registry key/value here...</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <layout class="QHBoxLayout" name="notesButtonLayout">
+             <item>
+              <spacer name="horizontalSpacer_6">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item>
+              <widget class="QPushButton" name="btnSaveNotes">
+               <property name="text">
+                <string>Save Notes</string>
+               </property>
+               <property name="icon">
+                <iconset>
+                 <normaloff>:/icons/save-16.ico</normaloff>:/icons/save-16.ico</iconset>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+          </layout>
+         </widget>
+        </widget>
+       </item>
+      </layout>
+     </widget>
     </widget>
    </item>
   </layout>
+  <action name="actionNew">
+   <property name="text">
+    <string>New</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+N</string>
+   </property>
+  </action>
+  <action name="actionOpen">
+   <property name="text">
+    <string>Open</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+O</string>
+   </property>
+  </action>
+  <action name="actionLoadHive">
+   <property name="text">
+    <string>Load Hive...</string>
+   </property>
+  </action>
+  <action name="actionUnloadHive">
+   <property name="text">
+    <string>Unload Hive</string>
+   </property>
+  </action>
+  <action name="actionExit">
+   <property name="text">
+    <string>Exit</string>
+   </property>
+   <property name="shortcut">
+    <string>Alt+F4</string>
+   </property>
+  </action>
+  <action name="actionFind">
+   <property name="text">
+    <string>Find...</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+F</string>
+   </property>
+  </action>
+  <action name="actionGoTo">
+   <property name="text">
+    <string>Go To...</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+G</string>
+   </property>
+  </action>
+  <action name="actionPermissions">
+   <property name="text">
+    <string>Permissions...</string>
+   </property>
+  </action>
+  <action name="actionPreferences">
+   <property name="text">
+    <string>Preferences...</string>
+   </property>
+  </action>
+  <action name="actionAddBookmark">
+   <property name="text">
+    <string>Add Bookmark</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+D</string>
+   </property>
+  </action>
+  <action name="actionManageBookmarks">
+   <property name="text">
+    <string>Manage Bookmarks...</string>
+   </property>
+  </action>
+  <action name="actionRefresh">
+   <property name="text">
+    <string>Refresh</string>
+   </property>
+   <property name="shortcut">
+    <string>F5</string>
+   </property>
+  </action>
+  <action name="actionStatusBar">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Status Bar</string>
+   </property>
+  </action>
+  <action name="actionAbout">
+   <property name="text">
+    <string>About</string>
+   </property>
+  </action>
+  <action name="actionHelpTopics">
+   <property name="text">
+    <string>Help Topics</string>
+   </property>
+   <property name="shortcut">
+    <string>F1</string>
+   </property>
+  </action>
  </widget>
- <resources/>
+ <customwidgets>
+  <customwidget>
+   <class>QHexEdit</class>
+   <extends>QWidget</extends>
+   <header>qhexedit.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources>
+  <include location="../../../static/resource.qrc"/>
+ </resources>
  <connections/>
 </ui>
