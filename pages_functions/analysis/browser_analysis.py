@@ -1,6 +1,9 @@
 import os
+from pydoc import visiblename
 import subprocess
 import mimetypes
+import webbrowser
+from datetime import datetime, timedelta
 
 mimetypes.add_type("font/woff2", ".woff2")
 mimetypes.add_type("font/woff", ".woff")
@@ -22,6 +25,8 @@ from PyQt5.QtWidgets import (
     QGridLayout,
     QPushButton,
     QMessageBox,
+    QMenu,
+    QInputDialog,
 )
 
 
@@ -47,6 +52,109 @@ class BrowserAnalysis(QWidget):
         )
         self.ui.pushButton_3.clicked.connect(self.extract_cache_files)
         self.ui.historySearchEdit.textChanged.connect(self.filter_history_combined)
+        self.ui.historyTable.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.ui.historyTable.customContextMenuRequested.connect(
+            self.show_history_context_menu
+        )
+        self.ui.historyFilterCombo.currentIndexChanged.connect(
+            self.on_history_filter_changed
+        )
+
+    def on_history_filter_changed(self, idx):
+        """
+        idx:
+        0=All Time, 1=Today, 2=Last 7 Days, 3=Last 30 Days, 4=Custom Range
+        """
+        tbl = self.ui.historyTable
+        today = datetime.now().date()
+
+        if idx == 0:
+            start_date = end_date = None
+        elif idx == 1:
+            start_date = end_date = today
+        elif idx == 2:
+            start_date = today - timedelta(days=7)
+            end_date = today
+        elif idx == 3:
+            start_date = today - timedelta(days=30)
+            end_date = today
+        else:
+            # ask user for a custom date range
+            txt, ok = QInputDialog.getText(
+                self,
+                "Custom Range",
+                "Enter start and end dates (dd/MM/yyyy - dd/MM/yyyy):",
+            )
+            if not ok or "-" not in txt:
+                return
+            s, e = [d.strip() for d in txt.split("-", 1)]
+            try:
+                start_date = datetime.strptime(s, "%d/%m/%Y").date()
+                end_date = datetime.strptime(e, "%d/%m/%Y").date()
+            except ValueError:
+                return
+        # find the “Visited On” column index
+        headers = [tbl.horizontalHeaderItem(c).text() for c in range(tbl.columnCount())]
+        date_col = None
+
+        if "Visited On" in headers:
+            date_col = headers.index("Visited On")
+
+        elif "Last Visit Date" in headers:
+            date_col = headers.index("Last Visit Date")
+
+        else:
+            return
+        # iterate rows
+        for r in range(tbl.rowCount()):
+            item = tbl.item(r, date_col)
+            if not item or item.text().upper().startswith("N/A"):
+                tbl.setRowHidden(r, False)
+                continue
+            # parse only the date portion
+            raw = item.text().split()[0]
+            try:
+                dt = datetime.strptime(raw, "%d/%m/%Y").date()
+            except ValueError:
+                tbl.setRowHidden(r, False)
+                continue
+
+            # decide visibility
+            if start_date and end_date:
+                show = start_date <= dt <= end_date
+            else:
+                show = True
+
+            tbl.setRowHidden(r, not show)
+        self.update_history_count()
+
+    def show_history_context_menu(self, pos):
+        table = self.ui.historyTable
+        item = table.itemAt(pos)
+        if not item:
+            return
+
+        row = item.row()
+        # find the URL column index (assuming header text is "URL")
+        headers = [
+            table.horizontalHeaderItem(i).text() for i in range(table.columnCount())
+        ]
+        try:
+            url_idx = headers.index("URL")
+        except ValueError:
+            QMessageBox.warning(self, "Lỗi", "Không tìm thấy cột URL.")
+            return
+
+        url = table.item(row, url_idx).text()
+        if not url:
+            QMessageBox.warning(self, "Lỗi", "Không có URL để mở.")
+            return
+
+        menu = QMenu(self)
+        open_action = menu.addAction("🌐 Open Link In Web Browser")
+        chosen = menu.exec_(table.viewport().mapToGlobal(pos))
+        if chosen == open_action:
+            webbrowser.open(url)
 
     def filter_history_combined(self):
         keyword = self.ui.historySearchEdit.text().strip().lower()
@@ -265,11 +373,9 @@ class BrowserAnalysis(QWidget):
         self.ui.label_4.setText(f"Tổng số lượng cache: {row_count}")
 
     def update_history_count(self):
-        row_count = self.ui.historyTable.rowCount()
-        self.ui.label_3.setText(f"Tổng số lượng history: {row_count}")
-
-    # def filter_by_type(self):
-    #    self.filter_cache_combined()
+        table = self.ui.historyTable
+        visible = sum(not table.isRowHidden(r) for r in range(table.rowCount()))
+        self.ui.label_3.setText(f"Tổng số lượng history: {visible}")
 
     def show_cache_properties(self, row, column):
         table = self.ui.cacheTable
