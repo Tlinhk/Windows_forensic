@@ -49,17 +49,19 @@ class BrowserAnalysis(QWidget):
     def extract_cache_files(self):
         from PyQt5.QtWidgets import QFileDialog
 
+        # 1) phải chạy Analyze để có cache_output_dir
+        if not hasattr(self, "cache_output_dir"):
+            QMessageBox.warning(self, "Lỗi", "Bạn hãy chạy Analyze trước.")
+            return
         cache_path = self.ui.profilePathEdit.text().strip()
         if not os.path.isdir(cache_path):
             QMessageBox.warning(self, "Lỗi", "Thư mục cache không hợp lệ.")
             return
-
-        # Tạo thư mục output
-        browser_type = "chrome"
+        # 2) tạo sẵn thư mục extracted_cache_files bên trong cache_output_dir
         default_out_dir = os.path.join(self.cache_output_dir, "extracted_cache_files")
         os.makedirs(default_out_dir, exist_ok=True)
 
-        # 2) Mở Folder Picker, bắt đầu ở default_out_dir, cho phép đổi tên/tạo mới
+        # 3) Mở Folder Picker, bắt đầu ở default_out_dir, cho phép đổi tên/tạo mới
         out_dir = QFileDialog.getExistingDirectory(
             self,
             "Chọn thư mục lưu kết quả",
@@ -70,19 +72,23 @@ class BrowserAnalysis(QWidget):
             # User bấm Cancel
             return
 
-        chrome_cacheview = os.path.abspath("tools/chromecacheview/chromecacheview.exe")
-        if not os.path.exists(chrome_cacheview):
+        browser = self.ui.browserTypeCombo.currentText().lower()
+        if "firefox" in browser:
+            exe_path = os.path.abspath("tools/mzcacheview/MZCacheView.exe")
+        else:
+            exe_path = os.path.abspath("tools/chromecacheview/ChromeCacheView.exe")
+        if not os.path.exists(exe_path):
             QMessageBox.critical(
                 self,
                 "Lỗi",
-                f"Không tìm thấy ChromeCacheView.exe tại:\n{chrome_cacheview}",
+                f"Không tìm thấy: {exe_path}",
             )
             return
 
         try:
             subprocess.run(
                 [
-                    chrome_cacheview,
+                    exe_path,
                     "-folder",
                     cache_path,
                     "/copycache",
@@ -96,7 +102,9 @@ class BrowserAnalysis(QWidget):
                 check=True,
             )
             QMessageBox.information(
-                self, "Thành công", f"Đã trích xuất cache vào:\n{out_dir}"
+                self,
+                "Thành công",
+                f"Đã trích xuất cache của {browser.title()} vào:\n{out_dir}",
             )
         except Exception as e:
             QMessageBox.critical(self, "Lỗi khi trích xuất", str(e))
@@ -172,10 +180,12 @@ class BrowserAnalysis(QWidget):
             return
 
         def matches_type(ct, group):
-            if not ct or not group:
+            group = (group or "").strip().lower()
+            if group == "all types":
+                return True
+            if not ct:
                 return False
             ct = ct.strip().lower()
-            group = group.strip().lower()
             if group == "images":
                 return ct.startswith("image/")
             elif group == "scripts":
@@ -190,8 +200,6 @@ class BrowserAnalysis(QWidget):
                 return ct in ["text/html", "application/pdf"]
             elif group == "fonts":
                 return ct.startswith("font/")
-            elif group == "all types":
-                return True
             return False
 
         filtered = []
@@ -240,14 +248,52 @@ class BrowserAnalysis(QWidget):
 
     def start_analysis(self):
         browser = self.ui.browserTypeCombo.currentText()
-        if browser.lower() == "google chrome":
-            self.analyze_chrome_cache()
+        if browser.lower() in ("google chrome", "microsoft edge"):
+            self.analyze_chrome_edge_cache()
+        elif browser.lower() in ("mozilla firefox"):
+            self.analyze_firefox_cache()
         else:
             QMessageBox.information(
                 self, "Chưa hỗ trợ", f"Trình duyệt {browser} chưa được xử lý"
             )
 
-    def analyze_chrome_cache(self):
+    def analyze_firefox_cache(self):
+        import datetime
+
+        cache_path = self.ui.profilePathEdit.text().strip()
+
+        if not os.path.isdir(cache_path):
+            QMessageBox.warning(self, "Lỗi", "Thư mục cache không hợp lệ.")
+            return
+        browser_type = "firefox"
+        timestamp = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+        output_dir = os.path.join(
+            os.getcwd(), "analysis_results", f"{browser_type}_{timestamp}"
+        )
+        os.makedirs(output_dir, exist_ok=True)
+        output_csv = os.path.join(output_dir, f"{browser_type}_cache_output.csv")
+        self.cache_output_dir = output_dir
+        # Đường dẫn đến FirefoxCacheView.exe (bạn nên để trong thư mục project, ví dụ: tools/)
+        firefox_cacheview_path = os.path.abspath("tools/mzcacheview/MZCacheView.exe")
+        if not os.path.exists(firefox_cacheview_path):
+            QMessageBox.critical(
+                self,
+                "Lỗi",
+                f"Không tìm thấy MZCacheView.exe tại:\n{firefox_cacheview_path}",
+            )
+            return
+        try:
+            subprocess.run(
+                [firefox_cacheview_path, "-folder", cache_path, "/scomma", output_csv],
+                check=True,
+            )
+        except Exception as e:
+            QMessageBox.critical(self, "Lỗi chạy MZCacheView", str(e))
+            return
+        # load CSV vào table chung
+        self.load_cache_results(output_csv)
+
+    def analyze_chrome_edge_cache(self):
         import datetime
 
         cache_path = self.ui.profilePathEdit.text().strip()
@@ -257,14 +303,21 @@ class BrowserAnalysis(QWidget):
             return
 
         # File đầu ra
-        browser_type = "chrome"
+        b = self.ui.browserTypeCombo.currentText().lower()
+        if "chrome" in b:
+            browser_type = "chrome"
+        elif "edge" in b:
+            browser_type = "edge"
+        else:
+            browser_type = b.replace(" ", "_")
+
         timestamp = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
         output_dir = os.path.join(
             os.getcwd(), "analysis_results", f"{browser_type}_{timestamp}"
         )
         os.makedirs(output_dir, exist_ok=True)
 
-        output_csv = os.path.join(output_dir, "chrome_cache_output.csv")
+        output_csv = os.path.join(output_dir, f"{browser_type}_cache_output.csv")
         self.cache_output_dir = output_dir
         # Đường dẫn đến ChromeCacheView.exe (bạn nên để trong thư mục project, ví dụ: tools/)
         chrome_cacheview_path = os.path.abspath(
@@ -339,20 +392,26 @@ class BrowserAnalysis(QWidget):
         msg_box.exec_()
 
         clicked = msg_box.clickedButton()
+        # 2) Lấy thư mục mặc định (lần chọn trước hoặc cwd)
+        default_dir = getattr(self, "last_browse_dir", os.getcwd())
 
         if clicked == file_button:
             file_path, _ = QFileDialog.getOpenFileName(
-                self, "Chọn tệp evidence", "", "Tất cả các tệp (*)"
+                self, "Chọn tệp evidence", default_dir, "Tất cả các tệp (*)"
             )
             if file_path:
                 self.ui.profilePathEdit.setText(file_path)
+                self.last_browse_dir = os.path.dirname(file_path)
 
         elif clicked == folder_button:
             folder_path = QFileDialog.getExistingDirectory(
-                self, "Chọn thư mục evidence", "", QFileDialog.ShowDirsOnly
+                self, "Chọn thư mục evidence", default_dir, QFileDialog.ShowDirsOnly
             )
             if folder_path:
                 self.ui.profilePathEdit.setText(folder_path)
+                self.last_browse_dir = folder_path
+        else:
+            return
 
     def load_case_data(self, case_id):
         """Load case data and populate browser evidence tree"""
