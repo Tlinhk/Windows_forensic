@@ -159,9 +159,7 @@ logs/
 ehthumbs.db
 Thumbs.db
 
-# Windows specific
-*.exe
-*.lnk
+
 
 # Temporary files
 temp/

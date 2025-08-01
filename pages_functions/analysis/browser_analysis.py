@@ -38,13 +38,49 @@ class BrowserAnalysis(QWidget):
         self.ui.browseProfileButton.clicked.connect(self.browse_path)
         self.ui.startAnalysisButton.clicked.connect(self.start_analysis)
         self.ui.cacheTable.cellDoubleClicked.connect(self.show_cache_properties)
-        self.ui.cacheFilterCombo.currentIndexChanged.connect(self.filter_by_type)
+        self.ui.historyTable.cellDoubleClicked.connect(self.show_history_properties)
+        # self.ui.cacheFilterCombo.currentIndexChanged.connect(self.filter_by_type)
         self.ui.cacheSearchEdit.textChanged.connect(self.filter_cache_combined)
         self.ui.cacheTable.setContextMenuPolicy(Qt.CustomContextMenu)
         self.ui.cacheTable.customContextMenuRequested.connect(
             self.show_cache_context_menu
         )
         self.ui.pushButton_3.clicked.connect(self.extract_cache_files)
+        self.ui.historySearchEdit.textChanged.connect(self.filter_history_combined)
+
+    def filter_history_combined(self):
+        keyword = self.ui.historySearchEdit.text().strip().lower()
+        headers = self.history_headers
+        data = self.history_data
+        table = self.ui.historyTable
+        headers_lower = [h.lower() for h in self.history_headers]
+        # Xác định cột URL và Title
+        try:
+            url_idx = headers_lower.index("url")
+            title_idx = headers_lower.index("title")
+        except ValueError:
+            # nếu tiêu đề khác, in ra headers để debug
+            print("History headers:", self.history_headers)
+            url_idx = title_idx = None
+
+        # Lọc
+        filtered = []
+        for row in data:
+            text_to_search = ""
+            if url_idx is not None and url_idx < len(row):
+                text_to_search += row[url_idx].lower()
+            if title_idx is not None and title_idx < len(row):
+                text_to_search += row[title_idx].lower()
+            if keyword in text_to_search:
+                filtered.append(row)
+
+        # Cập nhật bảng
+        table.setRowCount(len(filtered))
+        for r, row_vals in enumerate(filtered):
+            for c, cell in enumerate(row_vals):
+                table.setItem(r, c, QTableWidgetItem(cell))
+
+        self.update_history_count()
 
     def extract_cache_files(self):
         from PyQt5.QtWidgets import QFileDialog
@@ -228,8 +264,12 @@ class BrowserAnalysis(QWidget):
         row_count = self.ui.cacheTable.rowCount()
         self.ui.label_4.setText(f"Tổng số lượng cache: {row_count}")
 
-    def filter_by_type(self):
-        self.filter_cache_combined()
+    def update_history_count(self):
+        row_count = self.ui.historyTable.rowCount()
+        self.ui.label_3.setText(f"Tổng số lượng history: {row_count}")
+
+    # def filter_by_type(self):
+    #    self.filter_cache_combined()
 
     def show_cache_properties(self, row, column):
         table = self.ui.cacheTable
@@ -243,19 +283,197 @@ class BrowserAnalysis(QWidget):
             value = table.item(row, col).text() if table.item(row, col) else ""
             entry[key] = value
 
-        dialog = CacheEntryDialog(entry, self)
+        dialog = EntryDialog(entry, self)
+        dialog.exec_()
+
+    def show_history_properties(self, row, column):
+        table = self.ui.historyTable
+        headers = [
+            table.horizontalHeaderItem(i).text() for i in range(table.columnCount())
+        ]
+
+        entry = {}
+        for col in range(table.columnCount()):
+            key = headers[col]
+            value = table.item(row, col).text() if table.item(row, col) else ""
+            entry[key] = value
+
+        dialog = EntryDialog(entry, self)
         dialog.exec_()
 
     def start_analysis(self):
-        browser = self.ui.browserTypeCombo.currentText()
-        if browser.lower() in ("google chrome", "microsoft edge"):
-            self.analyze_chrome_edge_cache()
-        elif browser.lower() in ("mozilla firefox"):
-            self.analyze_firefox_cache()
-        else:
-            QMessageBox.information(
-                self, "Chưa hỗ trợ", f"Trình duyệt {browser} chưa được xử lý"
+        browser = self.ui.browserTypeCombo.currentText().lower()
+        do_cache = self.ui.cacheCheckBox.isChecked()
+        do_history = self.ui.historyCheckBox.isChecked()
+        do_downloads = self.ui.downloadsCheckBox.isChecked()
+        do_cookies = self.ui.cookiesCheckBox.isChecked()
+        if not any([do_cache, do_history, do_downloads, do_cookies]):
+            QMessageBox.warning(
+                self, "Chưa chọn mục nào", "Hãy chọn ít nhất một mục để phân tích."
             )
+            return
+        # chạy lần lượt từng mục
+        if do_cache:
+            if browser.lower() in ("google chrome", "microsoft edge"):
+                self.analyze_chrome_edge_cache()
+            elif browser.lower() in ("mozilla firefox"):
+                self.analyze_firefox_cache()
+            else:
+                QMessageBox.information(
+                    self, "Chưa hỗ trợ", f"Cache của {browser} chưa được xử lý"
+                )
+        if do_history:
+            if browser.lower() in ("google chrome", "microsoft edge"):
+                self.analyze_chrome_edge_history()
+            elif browser.lower() in ("mozilla firefox"):
+                self.analyze_firefox_history()
+            else:
+                QMessageBox.information(
+                    self, "Chưa hỗ trợ", f"History của {browser} chưa được xử lý"
+                )
+
+    def analyze_firefox_history(self):
+        import datetime
+
+        history_path = self.ui.profilePathEdit.text().strip()
+
+        if not os.path.exists(history_path):
+            QMessageBox.warning(self, "Lỗi", "Không tìm thấy file history.")
+            return
+
+        browser_type = "firefox"
+        timestamp = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+        output_dir = os.path.join(
+            os.getcwd(), "analysis_results", f"{browser_type}_{timestamp}"
+        )
+        os.makedirs(output_dir, exist_ok=True)
+
+        output_csv = os.path.join(output_dir, f"{browser_type}_history_output.csv")
+        self.history_output_dir = output_dir
+        # Đường dẫn đến ChromeCacheView.exe (bạn nên để trong thư mục project, ví dụ: tools/)
+        mozilla_history_view_path = os.path.abspath(
+            "tools/mozillahistoryview-x64/MozillaHistoryView.exe"
+        )
+
+        if not os.path.exists(mozilla_history_view_path):
+            QMessageBox.critical(
+                self,
+                "Lỗi",
+                f"Không tìm thấy MozillaHistoryView.exe tại:\n{mozilla_history_view_path}",
+            )
+            return
+
+        # Gọi ChromeCacheView
+        try:
+            subprocess.run(
+                [
+                    mozilla_history_view_path,
+                    "-file",
+                    history_path,
+                    "/scomma",
+                    output_csv,
+                ],
+                check=True,
+            )
+        except Exception as e:
+            QMessageBox.critical(self, "Lỗi chạy MozillaHistoryView", str(e))
+            return
+        # Load kết quả CSV
+        self.load_history_results(output_csv)
+
+    def analyze_chrome_edge_history(self):
+        import datetime
+
+        history_path = self.ui.profilePathEdit.text().strip()
+
+        if not os.path.exists(history_path):
+            QMessageBox.warning(self, "Lỗi", "Không tìm thấy file history.")
+            return
+
+        # File đầu ra
+        b = self.ui.browserTypeCombo.currentText().lower()
+        if "chrome" in b:
+            browser_type = "chrome"
+        elif "edge" in b:
+            browser_type = "edge"
+        else:
+            browser_type = b.replace(" ", "_")
+
+        timestamp = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+        output_dir = os.path.join(
+            os.getcwd(), "analysis_results", f"{browser_type}_{timestamp}"
+        )
+        os.makedirs(output_dir, exist_ok=True)
+
+        output_csv = os.path.join(output_dir, f"{browser_type}_history_output.csv")
+        self.history_output_dir = output_dir
+        # Đường dẫn đến ChromeCacheView.exe (bạn nên để trong thư mục project, ví dụ: tools/)
+        chrome_history_view_path = os.path.abspath(
+            "tools/chromehistoryview/ChromeHistoryView.exe"
+        )
+
+        if not os.path.exists(chrome_history_view_path):
+            QMessageBox.critical(
+                self,
+                "Lỗi",
+                f"Không tìm thấy ChromeHistoryView.exe tại:\n{chrome_history_view_path}",
+            )
+            return
+
+        # Gọi ChromeCacheView
+        try:
+            subprocess.run(
+                [
+                    chrome_history_view_path,
+                    "/UseHistoryFile",
+                    "1",
+                    "/HistoryFile",
+                    history_path,
+                    "/scomma",
+                    output_csv,
+                ],
+                check=True,
+            )
+        except Exception as e:
+            QMessageBox.critical(self, "Lỗi chạy ChromeHistoryView", str(e))
+            return
+        # Load kết quả CSV
+        self.load_history_results(output_csv)
+
+    def load_history_results(self, csv_path):
+        if not os.path.exists(csv_path):
+            QMessageBox.warning(
+                self, "Không có dữ liệu", f"Không tìm thấy file kết quả: {csv_path}"
+            )
+            return
+
+        with open(csv_path, "r", encoding="utf-8-sig", errors="ignore") as f:
+            reader = csv.reader(f)
+            rows = list(reader)
+
+        if not rows:
+            QMessageBox.information(self, "Trống", "Không có dữ liệu history.")
+            return
+
+        headers = rows[0]
+        data_rows = rows[1:]
+        # Lưu vào bộ nhớ để filter
+        self.history_headers = headers
+        self.history_data = data_rows
+
+        # Tạo bảng
+        table = self.ui.historyTable
+        table.clear()
+        table.setColumnCount(len(headers))
+        table.setRowCount(len(data_rows))
+        table.setHorizontalHeaderLabels(headers)
+
+        for row_idx, row_data in enumerate(data_rows):
+            for col_idx, cell in enumerate(row_data):
+                table.setItem(row_idx, col_idx, QTableWidgetItem(cell))
+
+        self.ui.mainTabWidget.setCurrentWidget(self.ui.historyTab)
+        self.filter_history_combined()
 
     def analyze_firefox_cache(self):
         import datetime
@@ -367,6 +585,7 @@ class BrowserAnalysis(QWidget):
 
         # Tạo bảng
         table = self.ui.cacheTable
+        table.clear()
         table.setColumnCount(len(headers))
         table.setRowCount(len(data_rows))
         table.setHorizontalHeaderLabels(headers)
@@ -617,7 +836,7 @@ class BrowserAnalysis(QWidget):
         return f"{size:.1f} PB"
 
 
-class CacheEntryDialog(QDialog):
+class EntryDialog(QDialog):
     def __init__(self, entry_dict, parent=None):
         super().__init__(parent)
         self.setWindowTitle("Properties")
