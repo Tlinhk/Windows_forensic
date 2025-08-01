@@ -1,13 +1,28 @@
 import os
+import subprocess
+import mimetypes
+
+mimetypes.add_type("font/woff2", ".woff2")
+mimetypes.add_type("font/woff", ".woff")
+import csv
 from PyQt5.QtWidgets import (
     QWidget,
     QMessageBox,
     QTreeWidgetItem,
+    QFileDialog,
 )
-from PyQt5.QtCore import Qt
-
+from PyQt5.QtCore import QMetaEnum, Qt
+from PyQt5.QtWidgets import QTableWidgetItem
 from ui.pages.analysis_ui.browser_analysis_ui import Ui_BrowserAnalysisWindow
 from database.db_manager import DatabaseManager
+from PyQt5.QtWidgets import (
+    QDialog,
+    QLabel,
+    QVBoxLayout,
+    QGridLayout,
+    QPushButton,
+    QMessageBox,
+)
 
 
 class BrowserAnalysis(QWidget):
@@ -20,6 +35,324 @@ class BrowserAnalysis(QWidget):
         self.current_case_id = None
         self.db = DatabaseManager()
         self.db.connect()
+        self.ui.browseProfileButton.clicked.connect(self.browse_path)
+        self.ui.startAnalysisButton.clicked.connect(self.start_analysis)
+        self.ui.cacheTable.cellDoubleClicked.connect(self.show_cache_properties)
+        self.ui.cacheFilterCombo.currentIndexChanged.connect(self.filter_by_type)
+        self.ui.cacheSearchEdit.textChanged.connect(self.filter_cache_combined)
+        self.ui.cacheTable.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.ui.cacheTable.customContextMenuRequested.connect(
+            self.show_cache_context_menu
+        )
+        self.ui.pushButton_3.clicked.connect(self.extract_cache_files)
+
+    def extract_cache_files(self):
+        from PyQt5.QtWidgets import QFileDialog
+
+        cache_path = self.ui.profilePathEdit.text().strip()
+        if not os.path.isdir(cache_path):
+            QMessageBox.warning(self, "Lỗi", "Thư mục cache không hợp lệ.")
+            return
+
+        # Tạo thư mục output
+        browser_type = "chrome"
+        default_out_dir = os.path.join(self.cache_output_dir, "extracted_cache_files")
+        os.makedirs(default_out_dir, exist_ok=True)
+
+        # 2) Mở Folder Picker, bắt đầu ở default_out_dir, cho phép đổi tên/tạo mới
+        out_dir = QFileDialog.getExistingDirectory(
+            self,
+            "Chọn thư mục lưu kết quả",
+            self.cache_output_dir,
+            QFileDialog.ShowDirsOnly,
+        )
+        if not out_dir:
+            # User bấm Cancel
+            return
+
+        chrome_cacheview = os.path.abspath("tools/chromecacheview/chromecacheview.exe")
+        if not os.path.exists(chrome_cacheview):
+            QMessageBox.critical(
+                self,
+                "Lỗi",
+                f"Không tìm thấy ChromeCacheView.exe tại:\n{chrome_cacheview}",
+            )
+            return
+
+        try:
+            subprocess.run(
+                [
+                    chrome_cacheview,
+                    "-folder",
+                    cache_path,
+                    "/copycache",
+                    "",
+                    "",
+                    "/CopyFilesFolder",
+                    out_dir,
+                    "/UseWebSiteDirStructure",
+                    "0",
+                ],
+                check=True,
+            )
+            QMessageBox.information(
+                self, "Thành công", f"Đã trích xuất cache vào:\n{out_dir}"
+            )
+        except Exception as e:
+            QMessageBox.critical(self, "Lỗi khi trích xuất", str(e))
+
+    def show_cache_context_menu(self, pos):
+        from PyQt5.QtWidgets import QMenu, QMessageBox
+        import subprocess
+
+        table = self.ui.cacheTable
+        item = table.itemAt(pos)
+        if not item:
+            return
+
+        row = item.row()
+        headers = [
+            table.horizontalHeaderItem(i).text() for i in range(table.columnCount())
+        ]
+        row_data = {headers[i]: table.item(row, i).text() for i in range(len(headers))}
+
+        filename = row_data.get("Filename")
+        if not filename:
+            QMessageBox.warning(self, "Lỗi", "Không tìm thấy tên file cache.")
+            return
+
+        # Tìm đường dẫn file thật
+        search_root = os.path.join(self.cache_output_dir, "extracted_cache_files")
+        matching_file = None
+        for root, _, files in os.walk(search_root):
+            for f in files:
+                if f == filename or f.startswith(filename):
+                    matching_file = os.path.join(root, f)
+                    break
+            if matching_file:
+                break
+
+        if not matching_file or not os.path.exists(matching_file):
+            QMessageBox.warning(
+                self,
+                "Chưa extract cache",
+                f"Extract files để trích xuất cache trước khi mở file",
+            )
+            return
+
+        # Hiển thị menu chuột phải
+        menu = QMenu(self)
+        open_action = menu.addAction("🗂 Open Selected Cache File")
+        open_with_action = menu.addAction(" 📂Open Selected Cache File With...")
+        selected_action = menu.exec_(table.viewport().mapToGlobal(pos))
+
+        try:
+            if selected_action == open_action:
+                os.startfile(matching_file)  # Mở với chương trình mặc định
+
+            elif selected_action == open_with_action:
+                subprocess.Popen(
+                    ["rundll32", "shell32.dll,OpenAs_RunDLL", matching_file]
+                )  # Hiển thị Open With
+        except Exception as e:
+            QMessageBox.critical(self, "Lỗi", f"Không thể mở file: {str(e)}")
+
+    def filter_cache_combined(self):
+        keyword = self.ui.cacheSearchEdit.text().strip().lower()
+        selected_type = self.ui.cacheFilterCombo.currentText()
+        table = self.ui.cacheTable
+
+        if not hasattr(self, "cache_data") or not hasattr(self, "cache_headers"):
+            return
+
+        try:
+            type_idx = self.cache_headers.index("Content Type")
+            name_idx = self.cache_headers.index("Filename")
+        except ValueError:
+            return
+
+        def matches_type(ct, group):
+            if not ct or not group:
+                return False
+            ct = ct.strip().lower()
+            group = group.strip().lower()
+            if group == "images":
+                return ct.startswith("image/")
+            elif group == "scripts":
+                return ct in [
+                    "application/javascript",
+                    "application/x-javascript",
+                    "text/javascript",
+                ]
+            elif group == "stylesheets":
+                return ct == "text/css"
+            elif group == "documents":
+                return ct in ["text/html", "application/pdf"]
+            elif group == "fonts":
+                return ct.startswith("font/")
+            elif group == "all types":
+                return True
+            return False
+
+        filtered = []
+        for row in self.cache_data:
+            if len(row) <= max(type_idx, name_idx):
+                continue
+            content_type = row[type_idx]
+            filename = row[name_idx].lower()
+
+            if matches_type(content_type, selected_type) and keyword in filename:
+                filtered.append(row)
+
+        # Cập nhật bảng
+        table.setRowCount(len(filtered))
+        table.setColumnCount(len(self.cache_headers))
+        table.setHorizontalHeaderLabels(self.cache_headers)
+
+        for row_idx, row_data in enumerate(filtered):
+            for col_idx, cell in enumerate(row_data):
+                table.setItem(row_idx, col_idx, QTableWidgetItem(cell))
+
+        # Cập nhật số lượng
+        self.update_cache_count()
+
+    def update_cache_count(self):
+        row_count = self.ui.cacheTable.rowCount()
+        self.ui.label_4.setText(f"Tổng số lượng cache: {row_count}")
+
+    def filter_by_type(self):
+        self.filter_cache_combined()
+
+    def show_cache_properties(self, row, column):
+        table = self.ui.cacheTable
+        headers = [
+            table.horizontalHeaderItem(i).text() for i in range(table.columnCount())
+        ]
+
+        entry = {}
+        for col in range(table.columnCount()):
+            key = headers[col]
+            value = table.item(row, col).text() if table.item(row, col) else ""
+            entry[key] = value
+
+        dialog = CacheEntryDialog(entry, self)
+        dialog.exec_()
+
+    def start_analysis(self):
+        browser = self.ui.browserTypeCombo.currentText()
+        if browser.lower() == "google chrome":
+            self.analyze_chrome_cache()
+        else:
+            QMessageBox.information(
+                self, "Chưa hỗ trợ", f"Trình duyệt {browser} chưa được xử lý"
+            )
+
+    def analyze_chrome_cache(self):
+        import datetime
+
+        cache_path = self.ui.profilePathEdit.text().strip()
+
+        if not os.path.isdir(cache_path):
+            QMessageBox.warning(self, "Lỗi", "Thư mục cache không hợp lệ.")
+            return
+
+        # File đầu ra
+        browser_type = "chrome"
+        timestamp = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+        output_dir = os.path.join(
+            os.getcwd(), "analysis_results", f"{browser_type}_{timestamp}"
+        )
+        os.makedirs(output_dir, exist_ok=True)
+
+        output_csv = os.path.join(output_dir, "chrome_cache_output.csv")
+        self.cache_output_dir = output_dir
+        # Đường dẫn đến ChromeCacheView.exe (bạn nên để trong thư mục project, ví dụ: tools/)
+        chrome_cacheview_path = os.path.abspath(
+            "tools/chromecacheview/chromecacheview.exe"
+        )
+
+        if not os.path.exists(chrome_cacheview_path):
+            QMessageBox.critical(
+                self,
+                "Lỗi",
+                f"Không tìm thấy chromecacheview.exe tại:\n{chrome_cacheview_path}",
+            )
+            return
+
+        # Gọi ChromeCacheView
+        try:
+            subprocess.run(
+                [chrome_cacheview_path, "-folder", cache_path, "/scomma", output_csv],
+                check=True,
+            )
+        except Exception as e:
+            QMessageBox.critical(self, "Lỗi chạy ChromeCacheView", str(e))
+            return
+        # Load kết quả CSV
+        self.load_cache_results(output_csv)
+
+    def load_cache_results(self, csv_path):
+        if not os.path.exists(csv_path):
+            QMessageBox.warning(
+                self, "Không có dữ liệu", f"Không tìm thấy file kết quả: {csv_path}"
+            )
+            return
+
+        with open(csv_path, "r", encoding="utf-8", errors="ignore") as f:
+            reader = csv.reader(f)
+            rows = list(reader)
+
+        if not rows:
+            QMessageBox.information(self, "Trống", "Không có dữ liệu cache.")
+            return
+
+        headers = rows[0]
+        data_rows = rows[1:]
+        # Lưu vào bộ nhớ để filter
+        self.cache_headers = headers
+        self.cache_data = data_rows
+
+        # Tạo bảng
+        table = self.ui.cacheTable
+        table.setColumnCount(len(headers))
+        table.setRowCount(len(data_rows))
+        table.setHorizontalHeaderLabels(headers)
+
+        for row_idx, row_data in enumerate(data_rows):
+            for col_idx, cell in enumerate(row_data):
+                table.setItem(row_idx, col_idx, QTableWidgetItem(cell))
+
+        self.ui.mainTabWidget.setCurrentWidget(self.ui.cacheTab)
+        self.filter_cache_combined()
+
+    def browse_path(self):
+        # Tạo QMessageBox với các nút tùy chỉnh
+        msg_box = QMessageBox(self)
+        msg_box.setWindowTitle("Chọn loại đường dẫn")
+        msg_box.setText("📂 Bạn muốn chọn tệp hay thư mục?")
+        msg_box.setIcon(QMessageBox.Question)
+
+        file_button = msg_box.addButton("📄 Chọn Tệp", QMessageBox.ActionRole)
+        folder_button = msg_box.addButton("📁 Chọn Thư Mục", QMessageBox.ActionRole)
+        cancel_button = msg_box.addButton("❌ Huỷ", QMessageBox.RejectRole)
+
+        msg_box.exec_()
+
+        clicked = msg_box.clickedButton()
+
+        if clicked == file_button:
+            file_path, _ = QFileDialog.getOpenFileName(
+                self, "Chọn tệp evidence", "", "Tất cả các tệp (*)"
+            )
+            if file_path:
+                self.ui.profilePathEdit.setText(file_path)
+
+        elif clicked == folder_button:
+            folder_path = QFileDialog.getExistingDirectory(
+                self, "Chọn thư mục evidence", "", QFileDialog.ShowDirsOnly
+            )
+            if folder_path:
+                self.ui.profilePathEdit.setText(folder_path)
 
     def load_case_data(self, case_id):
         """Load case data and populate browser evidence tree"""
@@ -223,3 +556,28 @@ class BrowserAnalysis(QWidget):
                 return f"{size:.1f} {unit}"
             size /= 1024
         return f"{size:.1f} PB"
+
+
+class CacheEntryDialog(QDialog):
+    def __init__(self, entry_dict, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle("Properties")
+
+        layout = QVBoxLayout()
+        grid = QGridLayout()
+
+        for i, (label, value) in enumerate(entry_dict.items()):
+            label_widget = QLabel(f"{label}:")
+            value_widget = QLabel(value)
+            value_widget.setTextInteractionFlags(Qt.TextSelectableByMouse)
+            grid.addWidget(label_widget, i, 0)
+            grid.addWidget(value_widget, i, 1)
+
+        layout.addLayout(grid)
+
+        ok_btn = QPushButton("OK")
+        ok_btn.clicked.connect(self.accept)
+        layout.addWidget(ok_btn)
+
+        self.setLayout(layout)
+        self.setMinimumWidth(500)
