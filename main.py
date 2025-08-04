@@ -97,7 +97,7 @@ class MyWindow(QMainWindow):
             self.case_btn: ("Quản lý vụ án", lambda: Case(main_window=self)),
             self.user_management_btn: ("User Management", lambda: UserManagement()),
             self.volatile_btn: ("Volatile", lambda: Volatile()),
-            self.nonvolatile_btn: ("Non-Volatile", lambda: NonVolatilePage()),
+            self.nonvolatile_btn: ("Thu thập dữ liệu bất biến", lambda: NonVolatilePage()),
             self.memory_btn: (
                 "Phân tích bộ nhớ",
                 lambda: MemoryAnalysisWindow(),
