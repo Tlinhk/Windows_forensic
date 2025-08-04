@@ -819,7 +819,7 @@ QTreeView QScrollBar::sub-line {
 }</string>
        </property>
        <property name="currentIndex">
-        <number>0</number>
+        <number>2</number>
        </property>
        <widget class="QWidget" name="historyTab">
         <attribute name="title">

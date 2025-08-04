@@ -44,7 +44,8 @@ class BrowserAnalysis(QWidget):
         self.ui.startAnalysisButton.clicked.connect(self.start_analysis)
         self.ui.cacheTable.cellDoubleClicked.connect(self.show_cache_properties)
         self.ui.historyTable.cellDoubleClicked.connect(self.show_history_properties)
-        # self.ui.cacheFilterCombo.currentIndexChanged.connect(self.filter_by_type)
+        self.ui.cookiesTable.cellDoubleClicked.connect(self.show_cookies_properties)
+        self.ui.cacheFilterCombo.currentIndexChanged.connect(self.filter_by_type)
         self.ui.cacheSearchEdit.textChanged.connect(self.filter_cache_combined)
         self.ui.cacheTable.setContextMenuPolicy(Qt.CustomContextMenu)
         self.ui.cacheTable.customContextMenuRequested.connect(
@@ -59,6 +60,44 @@ class BrowserAnalysis(QWidget):
         self.ui.historyFilterCombo.currentIndexChanged.connect(
             self.on_history_filter_changed
         )
+        self.ui.cookiesSearchEdit.textChanged.connect(self.filter_cookies_combined)
+
+    def filter_by_type(self, index):
+        self.filter_cache_combined()
+
+    def filter_cookies_combined(self):
+        keyword = self.ui.cookiesSearchEdit.text().strip().lower()
+        headers = self.cookies_headers
+        data = self.cookies_data
+        table = self.ui.cookiesTable
+        headers_lower = [h.lower() for h in self.cookies_headers]
+        # Xác định cột Domain/Host và Name
+        try:
+            domain_idx = headers_lower.index("host name")
+            name_idx = headers_lower.index("name")
+        except ValueError:
+            # nếu tiêu đề khác, in ra headers để debug
+            print("Cookies headers:", self.cookies_headers)
+            domain_idx = name_idx = None
+
+        # Lọc
+        filtered = []
+        for row in data:
+            text_to_search = ""
+            if domain_idx is not None and domain_idx < len(row):
+                text_to_search += row[domain_idx].lower()
+            if name_idx is not None and name_idx < len(row):
+                text_to_search += row[name_idx].lower()
+            if keyword in text_to_search:
+                filtered.append(row)
+
+        # Cập nhật bảng
+        table.setRowCount(len(filtered))
+        for r, row_vals in enumerate(filtered):
+            for c, cell in enumerate(row_vals):
+                table.setItem(r, c, QTableWidgetItem(cell))
+
+        self.update_cookies_count()
 
     def on_history_filter_changed(self, idx):
         """
@@ -377,6 +416,20 @@ class BrowserAnalysis(QWidget):
         visible = sum(not table.isRowHidden(r) for r in range(table.rowCount()))
         self.ui.label_3.setText(f"Tổng số lượng history: {visible}")
 
+    def show_cookies_properties(self, row, column):
+        table = self.ui.cookiesTable
+        headers = [
+            table.horizontalHeaderItem(i).text() for i in range(table.columnCount())
+        ]
+        entry = {}
+        for col in range(table.columnCount()):
+            key = headers[col]
+            value = table.item(row, col).text() if table.item(row, col) else ""
+            entry[key] = value
+
+        dialog = EntryDialog(entry, self)
+        dialog.exec_()
+
     def show_cache_properties(self, row, column):
         table = self.ui.cacheTable
         headers = [
@@ -437,6 +490,154 @@ class BrowserAnalysis(QWidget):
                 QMessageBox.information(
                     self, "Chưa hỗ trợ", f"History của {browser} chưa được xử lý"
                 )
+        if do_cookies:
+            if browser.lower() in ("google chrome", "microsoft edge"):
+                self.analyze_chrome_edge_cookies()
+            elif browser.lower() in ("mozilla firefox"):
+                self.analyze_firefox_cookies()
+            else:
+                QMessageBox.information(
+                    self, "Chưa hỗ trợ", f"Cookies của {browser} chưa được xử lý"
+                )
+
+    def analyze_chrome_edge_cookies(self):
+        profile_path = self.ui.profilePathEdit.text().strip()
+        cookie_file = os.path.join(profile_path, "Network", "Cookies")
+        if not os.path.exists(cookie_file):
+            QMessageBox.warning(
+                self, "Lỗi", f"Không tìm thấy file Cookies:\n{cookie_file}"
+            )
+            return
+        # File đầu ra
+        print(f"[Cookies] Start: {cookie_file}")
+        b = self.ui.browserTypeCombo.currentText().lower()
+        if "chrome" in b:
+            browser_type = "chrome"
+        elif "edge" in b:
+            browser_type = "edge"
+        else:
+            browser_type = b.replace(" ", "_")
+        # Tạo thư mục output
+        timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+        out_dir = os.path.join(
+            os.getcwd(), "analysis_results", f"{browser_type}_cookies_{timestamp}"
+        )
+        os.makedirs(out_dir, exist_ok=True)
+        output_csv = os.path.join(out_dir, f"{browser_type}_cookies.csv")
+        self.cookies_output_dir = out_dir
+
+        # Đường dẫn đến ChromeCookiesView.exe trong thư mục tools/
+        exe = os.path.abspath("tools/chromecookiesview-x64/ChromeCookiesView.exe")
+        if not os.path.exists(exe):
+            QMessageBox.critical(self, "Lỗi", f"Không tìm thấy:\n{exe}")
+            return
+
+        try:
+            subprocess.run(
+                [
+                    exe,
+                    "/CookiesFile",
+                    cookie_file,
+                    "/sort",
+                    "Host Name",
+                    "/scomma",
+                    output_csv,
+                ],
+                check=True,
+            )
+        except Exception as e:
+            print(f"[Cookies] Error: {e}")
+            QMessageBox.critical(self, "Lỗi chạy ChromeCookiesView", str(e))
+            return
+        print(f"[Cookies] Done, output at {output_csv}")
+        self.load_cookies_results(output_csv, delimiter=",")
+
+    def analyze_firefox_cookies(self):
+        profile_path = self.ui.profilePathEdit.text().strip()
+        cookie_file = os.path.join(profile_path, "cookies.sqlite")
+        if not os.path.exists(cookie_file):
+            QMessageBox.warning(
+                self, "Lỗi", f"Không tìm thấy file cookies.sqlite:\n{cookie_file}"
+            )
+            return
+
+        timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+        out_dir = os.path.join(
+            os.getcwd(), "analysis_results", f"firefox_cookies_{timestamp}"
+        )
+        os.makedirs(out_dir, exist_ok=True)
+        output_csv = os.path.join(out_dir, "firefox_cookies.tsv")
+        self.cookies_output_dir = out_dir
+
+        exe = os.path.abspath("tools/mzcv-x64/mzcv.exe")
+        if not os.path.exists(exe):
+            QMessageBox.critical(self, "Lỗi", f"Không tìm thấy:\n{exe}")
+            return
+
+        try:
+            subprocess.run(
+                [exe, "/stab", output_csv, "-cookiesfile", cookie_file, "/nosort"],
+                check=True,
+            )
+        except Exception as e:
+            QMessageBox.critical(self, "Lỗi chạy MZCookiesView", str(e))
+            return
+        # --- CHỖ NÀY: tự thêm header vào đầu file TSV ---
+        headers = [
+            "Host Name",
+            "Path",
+            "Name",
+            "Value",
+            "Expiration Date",
+            "Secure",
+            "Domain Access",
+            "Line/ID",
+            "Last Accessed",
+            "Created Time",
+        ]
+        with open(output_csv, "r", encoding="utf-8", errors="ignore") as f:
+            lines = f.readlines()
+        with open(output_csv, "w", encoding="utf-8", errors="ignore") as f:
+            f.write("\t".join(headers) + "\n")
+            f.writelines(lines)
+        self.load_cookies_results(output_csv, delimiter="\t")
+
+    def load_cookies_results(self, csv_path, delimiter=","):
+        if not os.path.exists(csv_path):
+            QMessageBox.warning(
+                self, "Không có dữ liệu", f"Không tìm thấy file kết quả:\n{csv_path}"
+            )
+            return
+
+        with open(csv_path, "r", encoding="utf-8", errors="ignore") as f:
+            reader = csv.reader(f, delimiter=delimiter)
+            rows = list(reader)
+
+        if not rows:
+            QMessageBox.information(self, "Trống", "Không có dữ liệu cookie.")
+            return
+
+        headers = rows[0]
+        data_rows = rows[1:]
+        self.cookies_headers = headers
+        self.cookies_data = data_rows
+
+        table = self.ui.cookiesTable
+        table.clear()
+        table.setColumnCount(len(headers))
+        table.setRowCount(len(data_rows))
+        table.setHorizontalHeaderLabels(headers)
+
+        for r, row in enumerate(data_rows):
+            for c, cell in enumerate(row):
+                table.setItem(r, c, QTableWidgetItem(cell))
+
+        self.ui.mainTabWidget.setCurrentWidget(self.ui.cookiesTab)
+        self.filter_cookies_combined()
+
+    def update_cookies_count(self):
+        row_count = self.ui.cookiesTable.rowCount()
+        self.ui.label_5.setText(f"Tổng số lượng cookies: {row_count}")
 
     def analyze_firefox_history(self):
         import datetime
