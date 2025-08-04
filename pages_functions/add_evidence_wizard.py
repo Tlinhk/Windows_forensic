@@ -7,6 +7,7 @@ from PyQt5.QtWidgets import (
     QMessageBox,
     QProgressDialog,
     QTableWidgetItem,
+    QButtonGroup,
 )
 from PyQt5.QtCore import QThread, pyqtSignal, Qt
 from ui.pages.add_evidence_wizard_ui import Ui_AddEvidenceWizard
@@ -56,7 +57,6 @@ class AddEvidenceWizard(QDialog):
 
         # Use global db instance to maintain user context
         from database.db_manager import db
-
         self.db_manager = db
 
         # Collection state tracking for collect mode
@@ -71,10 +71,15 @@ class AddEvidenceWizard(QDialog):
 
         # Timer for checking collection status
         from PyQt5.QtCore import QTimer
-
         self.collection_check_timer = QTimer()
         self.collection_check_timer.timeout.connect(self.check_collection_status)
         self.collection_check_timer.setSingleShot(False)
+
+        # Create button groups for radio buttons (since UI file doesn't include them)
+        self.setup_button_groups()
+        
+        # Setup table widget
+        self.setup_table_widget()
 
         # Setup connections
         self.setup_connections()
@@ -86,6 +91,31 @@ class AddEvidenceWizard(QDialog):
         # Center dialog
         if parent:
             self.setModal(True)
+
+    def setup_button_groups(self):
+        """Create button groups for radio buttons"""
+        # Mode selection button group
+        self.modeGroup = QButtonGroup()
+        self.modeGroup.addButton(self.ui.importModeRadio, 0)
+        self.modeGroup.addButton(self.ui.collectModeRadio, 1)
+        
+        # Evidence type button group
+        self.typeGroup = QButtonGroup()
+        self.typeGroup.addButton(self.ui.volatileTypeRadio, 0)
+        self.typeGroup.addButton(self.ui.nonvolatileTypeRadio, 1)
+
+    def setup_table_widget(self):
+        """Setup table widget for file list"""
+        # Set column widths
+        self.ui.fileListWidget.setColumnWidth(0, 50)   # Type column
+        self.ui.fileListWidget.setColumnWidth(1, 250)  # Name column
+        # Path column will stretch automatically
+        
+        # Make only Name column editable
+        self.ui.fileListWidget.setEditTriggers(
+            self.ui.fileListWidget.DoubleClicked | 
+            self.ui.fileListWidget.EditKeyPressed
+        )
 
     def setup_connections(self):
         """Setup signal connections"""
@@ -106,7 +136,41 @@ class AddEvidenceWizard(QDialog):
         self.ui.startNonvolatileBtn.clicked.connect(self.start_nonvolatile_collection)
 
         # Mode change - this is the key connection that updates step labels
-        self.ui.modeGroup.buttonClicked.connect(self.on_mode_changed)
+        self.modeGroup.buttonClicked.connect(self.on_mode_changed)
+        
+        # Evidence type change
+        self.typeGroup.buttonClicked.connect(self.on_type_changed)
+
+    def on_type_changed(self):
+        """Handle evidence type selection change"""
+        # Update UI visibility based on type selection
+        self.update_step3_visibility()
+
+    def update_step3_visibility(self):
+        """Update visibility of frames in step 3 based on mode and type selection"""
+        is_import_mode = self.ui.importModeRadio.isChecked()
+        
+        if is_import_mode:
+            # Import mode - always show import source frame
+            self.ui.importSourceFrame.setVisible(True)
+            self.ui.collectSourceFrame.setVisible(False)
+        else:
+            # Collect mode - show collect source frame
+            self.ui.importSourceFrame.setVisible(False)
+            self.ui.collectSourceFrame.setVisible(True)
+
+    def update_step4_visibility(self):
+        """Update visibility of frames in step 4 based on previous selections"""
+        is_import_mode = self.ui.importModeRadio.isChecked()
+        
+        if is_import_mode:
+            # Import mode - show processing options
+            self.ui.importConfigFrame.setVisible(True)
+            self.ui.collectConfigFrame.setVisible(False)
+        else:
+            # Collect mode - show collection config
+            self.ui.importConfigFrame.setVisible(False)
+            self.ui.collectConfigFrame.setVisible(True)
 
     def update_step_labels(self):
         """Update step labels based on current mode"""
@@ -155,6 +219,12 @@ class AddEvidenceWizard(QDialog):
 
         # Update stackedWidget
         self.ui.stackedWidget.setCurrentIndex(stacked_index)
+
+        # Update frame visibility based on current step
+        if stacked_index == 2:  # Step 3
+            self.update_step3_visibility()
+        elif stacked_index == 3:  # Step 4
+            self.update_step4_visibility()
 
         # Update step labels highlighting
         step_labels = [
@@ -345,11 +415,8 @@ class AddEvidenceWizard(QDialog):
         self.update_step_labels()
 
         # Update UI visibility for Step 3 and Step 4
-        self.ui.importSourceFrame.setVisible(is_import_mode)
-        self.ui.collectSourceFrame.setVisible(not is_import_mode)
-
-        self.ui.importConfigFrame.setVisible(is_import_mode)
-        self.ui.collectConfigFrame.setVisible(not is_import_mode)
+        self.update_step3_visibility()
+        self.update_step4_visibility()
 
         # Reset collection state when switching to collect mode
         if not is_import_mode:
@@ -363,6 +430,8 @@ class AddEvidenceWizard(QDialog):
         self.collection_state = {
             "volatile_completed": False,
             "nonvolatile_completed": False,
+            "volatile_started": False,
+            "nonvolatile_started": False,
             "output_path": "",
             "collected_files": [],
         }
@@ -394,9 +463,7 @@ class AddEvidenceWizard(QDialog):
                     ]
                     volatile_page = main_window.get_or_create_window(title, factory)
                     self.volatile_page = volatile_page
-                    # self.volatile_page.collection_finished.connect(
-                    #     self.on_collection_finished
-                    # )
+
                     # Set case data if method exists
                     if hasattr(volatile_page, "set_case_data") and self.case_id:
                         # Get case info from database
@@ -550,7 +617,6 @@ class AddEvidenceWizard(QDialog):
         except Exception as e:
             print(f"Error connecting volatile signals: {e}")
             import traceback
-
             traceback.print_exc()
 
     def wizard_collection_finished(
@@ -565,54 +631,6 @@ class AddEvidenceWizard(QDialog):
             self.on_volatile_collection_complete(success, message, package_path)
         elif collection_type == "nonvolatile":
             self.on_nonvolatile_collection_complete(package_path)
-
-    def connect_to_collection_signals(self):
-        """Connect to collection signals once collection starts"""
-        try:
-            # For volatile collection
-            if hasattr(self, "volatile_page"):
-                volatile_page = self.volatile_page
-                # The signal is actually in the collection_worker when it's created
-                # We need to hook into the page's start_collection method
-                if hasattr(volatile_page, "collection_worker"):
-                    worker = volatile_page.collection_worker
-                    if worker and hasattr(worker, "collection_finished"):
-                        # Safely disconnect existing connections
-                        try:
-                            worker.collection_finished.disconnect(
-                                self.on_volatile_collection_complete
-                            )
-                        except (TypeError, RuntimeError):
-                            pass
-                        # Connect our handler
-                        worker.collection_finished.connect(
-                            self.on_volatile_collection_complete
-                        )
-                        print("Connected to volatile collection worker signal")
-
-            # For non-volatile collection
-            if hasattr(self, "nonvolatile_page"):
-                nonvolatile_page = self.nonvolatile_page
-                # Similar approach for nonvolatile
-                if hasattr(nonvolatile_page, "collection_worker"):
-                    worker = nonvolatile_page.collection_worker
-                    if worker and hasattr(worker, "collection_finished"):
-                        # Safely disconnect existing connections
-                        try:
-                            worker.collection_finished.disconnect(
-                                self.on_nonvolatile_collection_complete
-                            )
-                        except (TypeError, RuntimeError):
-                            pass
-                        # Connect our handler
-                        worker.collection_finished.connect(
-                            self.on_nonvolatile_collection_complete
-                        )
-                        print("Connected to nonvolatile collection worker signal")
-
-        except Exception as e:
-            print(f"Error connecting to collection signals: {e}")
-            # Don't show error to user, just continue without signal connection
 
     def check_collection_status(self):
         """Check if collection is complete and handle accordingly"""
@@ -689,7 +707,6 @@ class AddEvidenceWizard(QDialog):
         except Exception as e:
             print(f"Error checking collection status: {e}")
             import traceback
-
             traceback.print_exc()
             # Continue checking
 
@@ -765,12 +782,10 @@ class AddEvidenceWizard(QDialog):
                     and hasattr(main_window, "nonvolatile_btn")
                     and main_window.nonvolatile_btn in main_window.menu_btns_list
                 ):
-                    nonvolatile_page = main_window.menu_btns_list[
+                    title, factory = main_window.menu_btns_list[
                         main_window.nonvolatile_btn
                     ]
-                    if isinstance(nonvolatile_page, tuple):
-                        nonvolatile_page = nonvolatile_page[0]
-                    # Store reference for later use when collection starts
+                    nonvolatile_page = main_window.get_or_create_window(title, factory)
                     self.nonvolatile_page = nonvolatile_page
 
                     # Set case data if method exists
@@ -815,29 +830,7 @@ class AddEvidenceWizard(QDialog):
 
         for file_path in file_paths:
             if file_path and file_path not in self.get_selected_files():
-                filename = os.path.basename(file_path)
-
-                # Add to table widget
-                row = self.ui.fileListWidget.rowCount()
-                self.ui.fileListWidget.insertRow(row)
-
-                # Type column (icon)
-                type_item = QTableWidgetItem("📄")
-                type_item.setFlags(
-                    type_item.flags() & ~Qt.ItemIsEditable
-                )  # Make read-only
-                self.ui.fileListWidget.setItem(row, 0, type_item)
-
-                # Name column (editable)
-                name_item = QTableWidgetItem(filename)
-                self.ui.fileListWidget.setItem(row, 1, name_item)
-
-                # Path column (read-only)
-                path_item = QTableWidgetItem(file_path)
-                path_item.setFlags(
-                    path_item.flags() & ~Qt.ItemIsEditable
-                )  # Make read-only
-                self.ui.fileListWidget.setItem(row, 2, path_item)
+                self.add_file_to_table(file_path)
 
     def add_folders(self):
         """Add folders to the list for import mode"""
@@ -846,25 +839,29 @@ class AddEvidenceWizard(QDialog):
         )
 
         if folder_path and folder_path not in self.get_selected_files():
-            foldername = os.path.basename(folder_path)
+            self.add_file_to_table(folder_path, is_folder=True)
 
-            # Add to table widget
-            row = self.ui.fileListWidget.rowCount()
-            self.ui.fileListWidget.insertRow(row)
+    def add_file_to_table(self, file_path, is_folder=False):
+        """Add a file or folder to the table widget"""
+        filename = os.path.basename(file_path)
 
-            # Type column (icon)
-            type_item = QTableWidgetItem("📁")
-            type_item.setFlags(type_item.flags() & ~Qt.ItemIsEditable)  # Make read-only
-            self.ui.fileListWidget.setItem(row, 0, type_item)
+        # Add to table widget
+        row = self.ui.fileListWidget.rowCount()
+        self.ui.fileListWidget.insertRow(row)
 
-            # Name column (editable)
-            name_item = QTableWidgetItem(foldername)
-            self.ui.fileListWidget.setItem(row, 1, name_item)
+        # Type column (icon)
+        type_item = QTableWidgetItem("📁" if is_folder else "📄")
+        type_item.setFlags(type_item.flags() & ~Qt.ItemIsEditable)  # Make read-only
+        self.ui.fileListWidget.setItem(row, 0, type_item)
 
-            # Path column (read-only)
-            path_item = QTableWidgetItem(folder_path)
-            path_item.setFlags(path_item.flags() & ~Qt.ItemIsEditable)  # Make read-only
-            self.ui.fileListWidget.setItem(row, 2, path_item)
+        # Name column (editable)
+        name_item = QTableWidgetItem(filename)
+        self.ui.fileListWidget.setItem(row, 1, name_item)
+
+        # Path column (read-only)
+        path_item = QTableWidgetItem(file_path)
+        path_item.setFlags(path_item.flags() & ~Qt.ItemIsEditable)  # Make read-only
+        self.ui.fileListWidget.setItem(row, 2, path_item)
 
     def remove_selected_file(self):
         """Remove selected file from list"""
@@ -946,7 +943,6 @@ class AddEvidenceWizard(QDialog):
 
                     # Process events to keep UI responsive
                     from PyQt5.QtWidgets import QApplication
-
                     QApplication.processEvents()
 
             progress.close()
@@ -964,7 +960,6 @@ class AddEvidenceWizard(QDialog):
             return "0 B"
         size_names = ["B", "KB", "MB", "GB", "TB"]
         import math
-
         i = int(math.floor(math.log(size_bytes, 1024)))
         p = math.pow(1024, i)
         s = round(size_bytes / p, 2)
@@ -1043,22 +1038,18 @@ class AddEvidenceWizard(QDialog):
                 }
             """
             )
-            self.ui.volatileStatusLabel.setWordWrap(True)
-            self.ui.volatileStatusLabel.setMaximumWidth(650)  # Increase width slightly
+            self.ui.volatileInfoLabel.setWordWrap(True)
+            self.ui.volatileInfoLabel.setMaximumWidth(650)
             self.ui.startVolatileBtn.setText("✅ Volatile Collection Complete")
             self.ui.startVolatileBtn.setEnabled(False)
 
             # Also show info on the description label for this step
-            if self.current_step == 2:  # Step 3 (0-indexed)
+            if self.current_step == 1:  # Collect mode step 2 (volatile collection)
                 self.ui.descriptionLabel.setText(
                     "✅ Volatile data collection completed successfully! "
                     "All volatile evidence has been collected and packaged. "
                     "Click Next to proceed to Non-volatile data collection."
                 )
-
-            # Hide the instruction info when completed
-            if hasattr(self.ui, "volatileInfoLabel"):
-                self.ui.volatileInfoLabel.setVisible(False)
 
         if nonvolatile_done:
             output_path = self.collection_state.get(
@@ -1070,7 +1061,7 @@ class AddEvidenceWizard(QDialog):
                 else "nonvolatile_collection.zip"
             )
 
-            self.ui.nonvolatileStatusLabel.setText(
+            self.ui.nonvolatileInfoLabel.setText(
                 f"✅ HOÀN THÀNH THU THẬP NON-VOLATILE DATA\n\n"
                 f"📦 Package: {package_name}\n"
                 f"📁 Đường dẫn: {output_path}\n"
@@ -1079,7 +1070,7 @@ class AddEvidenceWizard(QDialog):
                 f"🎉 TẤT CẢ EVIDENCE ĐÃ THU THẬP HOÀN TẤT!\n"
                 f"➡️ Bấm Finish để hoàn thành wizard"
             )
-            self.ui.nonvolatileStatusLabel.setStyleSheet(
+            self.ui.nonvolatileInfoLabel.setStyleSheet(
                 """
                 QLabel {
                     font-size: 13px;
@@ -1094,24 +1085,18 @@ class AddEvidenceWizard(QDialog):
                 }
             """
             )
-            self.ui.nonvolatileStatusLabel.setWordWrap(True)
-            self.ui.nonvolatileStatusLabel.setMaximumWidth(
-                650
-            )  # Increase width slightly
+            self.ui.nonvolatileInfoLabel.setWordWrap(True)
+            self.ui.nonvolatileInfoLabel.setMaximumWidth(650)
             self.ui.startNonvolatileBtn.setText("✅ Non-volatile Collection Complete")
             self.ui.startNonvolatileBtn.setEnabled(False)
 
             # Also show info on the description label for this step
-            if self.current_step == 3:  # Step 4 (0-indexed)
+            if self.current_step == 2:  # Collect mode step 3 (non-volatile collection)
                 self.ui.descriptionLabel.setText(
                     "🎉 All evidence collection completed successfully! "
                     "Both volatile and non-volatile data have been collected and packaged. "
                     "Click Finish to complete the wizard and proceed to analysis."
                 )
-
-            # Hide the instruction info when completed
-            if hasattr(self.ui, "nonvolatileInfoLabel"):
-                self.ui.nonvolatileInfoLabel.setVisible(False)
 
     def get_wizard_data(self):
         """Collect all wizard data"""
