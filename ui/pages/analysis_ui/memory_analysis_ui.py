@@ -278,164 +278,9 @@ class Ui_MemoryAnalysisWindow(object):
         self.systemContextTab.setObjectName("systemContextTab")
         self.systemContextVBox = QtWidgets.QVBoxLayout(self.systemContextTab)
         self.systemContextVBox.setObjectName("systemContextVBox")
-        self.systemContextLayout = QtWidgets.QFormLayout()
-        self.systemContextLayout.setContentsMargins(35, 15, -1, -1)
-        self.systemContextLayout.setObjectName("systemContextLayout")
-        self.osVersionLabel = QtWidgets.QLabel(self.systemContextTab)
-        font = QtGui.QFont()
-        font.setPointSize(8)
-        self.osVersionLabel.setFont(font)
-        self.osVersionLabel.setObjectName("osVersionLabel")
-        self.systemContextLayout.setWidget(
-            0, QtWidgets.QFormLayout.LabelRole, self.osVersionLabel
-        )
-        self.osVersionValue = QtWidgets.QLabel(self.systemContextTab)
-        font = QtGui.QFont()
-        font.setPointSize(8)
-        self.osVersionValue.setFont(font)
-        self.osVersionValue.setObjectName("osVersionValue")
-        self.systemContextLayout.setWidget(
-            0, QtWidgets.QFormLayout.FieldRole, self.osVersionValue
-        )
-        self.architectureLabel = QtWidgets.QLabel(self.systemContextTab)
-        font = QtGui.QFont()
-        font.setPointSize(8)
-        self.architectureLabel.setFont(font)
-        self.architectureLabel.setObjectName("architectureLabel")
-        self.systemContextLayout.setWidget(
-            1, QtWidgets.QFormLayout.LabelRole, self.architectureLabel
-        )
-        self.architectureValue = QtWidgets.QLabel(self.systemContextTab)
-        font = QtGui.QFont()
-        font.setPointSize(8)
-        self.architectureValue.setFont(font)
-        self.architectureValue.setObjectName("architectureValue")
-        self.systemContextLayout.setWidget(
-            1, QtWidgets.QFormLayout.FieldRole, self.architectureValue
-        )
-        self.timestampLabel = QtWidgets.QLabel(self.systemContextTab)
-        font = QtGui.QFont()
-        font.setPointSize(8)
-        self.timestampLabel.setFont(font)
-        self.timestampLabel.setObjectName("timestampLabel")
-        self.systemContextLayout.setWidget(
-            2, QtWidgets.QFormLayout.LabelRole, self.timestampLabel
-        )
-        self.timestampValue = QtWidgets.QLabel(self.systemContextTab)
-        font = QtGui.QFont()
-        font.setPointSize(8)
-        self.timestampValue.setFont(font)
-        self.timestampValue.setObjectName("timestampValue")
-        self.systemContextLayout.setWidget(
-            2, QtWidgets.QFormLayout.FieldRole, self.timestampValue
-        )
-        self.profileLabel = QtWidgets.QLabel(self.systemContextTab)
-        font = QtGui.QFont()
-        font.setPointSize(8)
-        self.profileLabel.setFont(font)
-        self.profileLabel.setObjectName("profileLabel")
-        self.systemContextLayout.setWidget(
-            3, QtWidgets.QFormLayout.LabelRole, self.profileLabel
-        )
-        self.profileValue = QtWidgets.QLabel(self.systemContextTab)
-        font = QtGui.QFont()
-        font.setPointSize(8)
-        self.profileValue.setFont(font)
-        self.profileValue.setObjectName("profileValue")
-        self.systemContextLayout.setWidget(
-            3, QtWidgets.QFormLayout.FieldRole, self.profileValue
-        )
-        self.kernelBaseLabel = QtWidgets.QLabel(self.systemContextTab)
-        font = QtGui.QFont()
-        font.setPointSize(8)
-        self.kernelBaseLabel.setFont(font)
-        self.kernelBaseLabel.setObjectName("kernelBaseLabel")
-        self.systemContextLayout.setWidget(
-            4, QtWidgets.QFormLayout.LabelRole, self.kernelBaseLabel
-        )
-        self.kernelBaseValue = QtWidgets.QLabel(self.systemContextTab)
-        font = QtGui.QFont()
-        font.setPointSize(8)
-        self.kernelBaseValue.setFont(font)
-        self.kernelBaseValue.setObjectName("kernelBaseValue")
-        self.systemContextLayout.setWidget(
-            4, QtWidgets.QFormLayout.FieldRole, self.kernelBaseValue
-        )
-        self.systemContextVBox.addLayout(self.systemContextLayout)
-        self.pluginDetailButtonLayout = QtWidgets.QHBoxLayout()
-        self.pluginDetailButtonLayout.setObjectName("pluginDetailButtonLayout")
-        self.btnKdbgscanDetail = QtWidgets.QPushButton(self.systemContextTab)
-        font = QtGui.QFont()
-        font.setPointSize(8)
-        self.btnKdbgscanDetail.setFont(font)
-        self.btnKdbgscanDetail.setStyleSheet(
-            "/* QPushButton */\n"
-            "QPushButton {\n"
-            "    background-color: #4a90e2;\n"
-            "    border: none;\n"
-            "    border-radius: 4px;\n"
-            "    padding: 6px 12px;\n"
-            "    color: #fff;\n"
-            "}\n"
-            "QPushButton:hover {\n"
-            "    background-color: #5aa0f2;\n"
-            "}\n"
-            "QPushButton:pressed {\n"
-            "    background-color: #3a7fcc;\n"
-            "}"
-        )
-        self.btnKdbgscanDetail.setObjectName("btnKdbgscanDetail")
-        self.pluginDetailButtonLayout.addWidget(self.btnKdbgscanDetail)
-        self.btnImageinfoDetail = QtWidgets.QPushButton(self.systemContextTab)
-        font = QtGui.QFont()
-        font.setPointSize(8)
-        self.btnImageinfoDetail.setFont(font)
-        self.btnImageinfoDetail.setStyleSheet(
-            "/* QPushButton */\n"
-            "QPushButton {\n"
-            "    background-color: #4a90e2;\n"
-            "    border: none;\n"
-            "    border-radius: 4px;\n"
-            "    padding: 6px 12px;\n"
-            "    color: #fff;\n"
-            "}\n"
-            "QPushButton:hover {\n"
-            "    background-color: #5aa0f2;\n"
-            "}\n"
-            "QPushButton:pressed {\n"
-            "    background-color: #3a7fcc;\n"
-            "}"
-        )
-        self.btnImageinfoDetail.setObjectName("btnImageinfoDetail")
-        self.pluginDetailButtonLayout.addWidget(self.btnImageinfoDetail)
-        self.btnWindowsInfoDetail = QtWidgets.QPushButton(self.systemContextTab)
-        font = QtGui.QFont()
-        font.setPointSize(8)
-        self.btnWindowsInfoDetail.setFont(font)
-        self.btnWindowsInfoDetail.setStyleSheet(
-            "/* QPushButton */\n"
-            "QPushButton {\n"
-            "    background-color: #4a90e2;\n"
-            "    border: none;\n"
-            "    border-radius: 4px;\n"
-            "    padding: 6px 12px;\n"
-            "    color: #fff;\n"
-            "}\n"
-            "QPushButton:hover {\n"
-            "    background-color: #5aa0f2;\n"
-            "}\n"
-            "QPushButton:pressed {\n"
-            "    background-color: #3a7fcc;\n"
-            "}"
-        )
-        self.btnWindowsInfoDetail.setObjectName("btnWindowsInfoDetail")
-        self.pluginDetailButtonLayout.addWidget(self.btnWindowsInfoDetail)
-        self.systemContextVBox.addLayout(self.pluginDetailButtonLayout)
-        self.pluginDetailText = QtWidgets.QTextEdit(self.systemContextTab)
-        self.pluginDetailText.setVisible(False)
-        self.pluginDetailText.setReadOnly(True)
-        self.pluginDetailText.setObjectName("pluginDetailText")
-        self.systemContextVBox.addWidget(self.pluginDetailText)
+        self.infoText = QtWidgets.QTextEdit(self.systemContextTab)
+        self.infoText.setObjectName("infoText")
+        self.systemContextVBox.addWidget(self.infoText)
         self.rawMemoryTabWidget.addTab(self.systemContextTab, "")
         self.processAnalysisTab = QtWidgets.QWidget()
         self.processAnalysisTab.setObjectName("processAnalysisTab")
@@ -562,12 +407,11 @@ class Ui_MemoryAnalysisWindow(object):
         self.passwordHashesTab.setObjectName("passwordHashesTab")
         self.passwordHashesLayout = QtWidgets.QVBoxLayout(self.passwordHashesTab)
         self.passwordHashesLayout.setObjectName("passwordHashesLayout")
-        self.hashdumpText = QtWidgets.QTextEdit(self.passwordHashesTab)
-        font = QtGui.QFont()
-        font.setPointSize(8)
-        self.hashdumpText.setFont(font)
-        self.hashdumpText.setObjectName("hashdumpText")
-        self.passwordHashesLayout.addWidget(self.hashdumpText)
+        self.hashdumpTable = QtWidgets.QTableWidget(self.passwordHashesTab)
+        self.hashdumpTable.setObjectName("hashdumpTable")
+        self.hashdumpTable.setColumnCount(0)
+        self.hashdumpTable.setRowCount(0)
+        self.passwordHashesLayout.addWidget(self.hashdumpTable)
         self.credentialTabWidget.addTab(self.passwordHashesTab, "")
         self.credentialsLayout.addWidget(self.credentialTabWidget)
         self.rawMemoryTabWidget.addTab(self.credentialsTab, "")
@@ -1991,17 +1835,17 @@ class Ui_MemoryAnalysisWindow(object):
         self.actionAbout.setObjectName("actionAbout")
 
         self.retranslateUi(MemoryAnalysisWindow)
-        self.mainTabWidget.setCurrentIndex(6)
-        self.rawMemoryTabWidget.setCurrentIndex(0)
-        self.processTabWidget.setCurrentIndex(2)
+        self.mainTabWidget.setCurrentIndex(0)
+        self.rawMemoryTabWidget.setCurrentIndex(5)
+        self.processTabWidget.setCurrentIndex(0)
         self.fileTabWidget.setCurrentIndex(0)
         self.commandTabWidget.setCurrentIndex(0)
         self.credentialTabWidget.setCurrentIndex(0)
         self.crashAnalysisTabWidget.setCurrentIndex(-1)
         #  self.startAnalysisButton.clicked.connect(MemoryAnalysisWindow.start_analysis) # type: ignore
-        #   self.stopButton.clicked.connect(MemoryAnalysisWindow.stop_analysis) # type: ignore
-        #   self.evidenceTypeCombo.currentTextChanged['QString'].connect(MemoryAnalysisWindow.evidence_type_changed) # type: ignore
-        #   self.outputDirButton.clicked.connect(MemoryAnalysisWindow.browse_output_directory) # type: ignore
+        #  self.stopButton.clicked.connect(MemoryAnalysisWindow.stop_analysis) # type: ignore
+        #  self.evidenceTypeCombo.currentTextChanged['QString'].connect(MemoryAnalysisWindow.evidence_type_changed) # type: ignore
+        #  self.outputDirButton.clicked.connect(MemoryAnalysisWindow.browse_output_directory) # type: ignore
         self.clearLogButton.clicked.connect(MemoryAnalysisWindow.clear_log)  # type: ignore
         self.saveLogButton.clicked.connect(MemoryAnalysisWindow.save_log)  # type: ignore
         self.runAIAnalysisButton.clicked.connect(MemoryAnalysisWindow.run_ai_analysis)  # type: ignore
@@ -2013,30 +1857,6 @@ class Ui_MemoryAnalysisWindow(object):
             _translate(
                 "MemoryAnalysisWindow", "Memory Analysis System - Digital Forensics"
             )
-        )
-        self.osVersionLabel.setText(_translate("MemoryAnalysisWindow", "OS Version:"))
-        self.osVersionValue.setText(_translate("MemoryAnalysisWindow", "-"))
-        self.architectureLabel.setText(
-            _translate("MemoryAnalysisWindow", "Architecture:")
-        )
-        self.architectureValue.setText(_translate("MemoryAnalysisWindow", "-"))
-        self.timestampLabel.setText(_translate("MemoryAnalysisWindow", "Capture Time:"))
-        self.timestampValue.setText(_translate("MemoryAnalysisWindow", "-"))
-        self.profileLabel.setText(_translate("MemoryAnalysisWindow", "Profile:"))
-        self.profileValue.setText(_translate("MemoryAnalysisWindow", "-"))
-        self.kernelBaseLabel.setText(_translate("MemoryAnalysisWindow", "Kernel Base:"))
-        self.kernelBaseValue.setText(_translate("MemoryAnalysisWindow", "-"))
-        self.btnKdbgscanDetail.setText(
-            _translate("MemoryAnalysisWindow", "Xem chi tiết kdbgscan")
-        )
-        self.btnImageinfoDetail.setText(
-            _translate("MemoryAnalysisWindow", "Xem chi tiết imageinfo")
-        )
-        self.btnWindowsInfoDetail.setText(
-            _translate("MemoryAnalysisWindow", "Xem chi tiết windows.info")
-        )
-        self.pluginDetailText.setPlaceholderText(
-            _translate("MemoryAnalysisWindow", "Chi tiết plugin sẽ hiển thị ở đây...")
         )
         self.rawMemoryTabWidget.setTabText(
             self.rawMemoryTabWidget.indexOf(self.systemContextTab),

@@ -261,7 +261,7 @@ QComboBox QAbstractItemView QScrollBar::sub-line {
        </font>
       </property>
       <property name="currentIndex">
-       <number>6</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="rawMemoryTab">
        <property name="sizePolicy">
@@ -297,7 +297,7 @@ QComboBox QAbstractItemView QScrollBar::sub-line {
            </font>
           </property>
           <property name="currentIndex">
-           <number>0</number>
+           <number>5</number>
           </property>
           <widget class="QWidget" name="systemContextTab">
            <attribute name="title">
@@ -305,235 +305,7 @@ QComboBox QAbstractItemView QScrollBar::sub-line {
            </attribute>
            <layout class="QVBoxLayout" name="systemContextVBox">
             <item>
-             <layout class="QFormLayout" name="systemContextLayout">
-              <property name="leftMargin">
-               <number>35</number>
-              </property>
-              <property name="topMargin">
-               <number>15</number>
-              </property>
-              <item row="0" column="0">
-               <widget class="QLabel" name="osVersionLabel">
-                <property name="font">
-                 <font>
-                  <pointsize>8</pointsize>
-                 </font>
-                </property>
-                <property name="text">
-                 <string>OS Version:</string>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="1">
-               <widget class="QLabel" name="osVersionValue">
-                <property name="font">
-                 <font>
-                  <pointsize>8</pointsize>
-                 </font>
-                </property>
-                <property name="text">
-                 <string>-</string>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="0">
-               <widget class="QLabel" name="architectureLabel">
-                <property name="font">
-                 <font>
-                  <pointsize>8</pointsize>
-                 </font>
-                </property>
-                <property name="text">
-                 <string>Architecture:</string>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="1">
-               <widget class="QLabel" name="architectureValue">
-                <property name="font">
-                 <font>
-                  <pointsize>8</pointsize>
-                 </font>
-                </property>
-                <property name="text">
-                 <string>-</string>
-                </property>
-               </widget>
-              </item>
-              <item row="2" column="0">
-               <widget class="QLabel" name="timestampLabel">
-                <property name="font">
-                 <font>
-                  <pointsize>8</pointsize>
-                 </font>
-                </property>
-                <property name="text">
-                 <string>Capture Time:</string>
-                </property>
-               </widget>
-              </item>
-              <item row="2" column="1">
-               <widget class="QLabel" name="timestampValue">
-                <property name="font">
-                 <font>
-                  <pointsize>8</pointsize>
-                 </font>
-                </property>
-                <property name="text">
-                 <string>-</string>
-                </property>
-               </widget>
-              </item>
-              <item row="3" column="0">
-               <widget class="QLabel" name="profileLabel">
-                <property name="font">
-                 <font>
-                  <pointsize>8</pointsize>
-                 </font>
-                </property>
-                <property name="text">
-                 <string>Profile:</string>
-                </property>
-               </widget>
-              </item>
-              <item row="3" column="1">
-               <widget class="QLabel" name="profileValue">
-                <property name="font">
-                 <font>
-                  <pointsize>8</pointsize>
-                 </font>
-                </property>
-                <property name="text">
-                 <string>-</string>
-                </property>
-               </widget>
-              </item>
-              <item row="4" column="0">
-               <widget class="QLabel" name="kernelBaseLabel">
-                <property name="font">
-                 <font>
-                  <pointsize>8</pointsize>
-                 </font>
-                </property>
-                <property name="text">
-                 <string>Kernel Base:</string>
-                </property>
-               </widget>
-              </item>
-              <item row="4" column="1">
-               <widget class="QLabel" name="kernelBaseValue">
-                <property name="font">
-                 <font>
-                  <pointsize>8</pointsize>
-                 </font>
-                </property>
-                <property name="text">
-                 <string>-</string>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </item>
-            <item>
-             <layout class="QHBoxLayout" name="pluginDetailButtonLayout">
-              <item>
-               <widget class="QPushButton" name="btnKdbgscanDetail">
-                <property name="font">
-                 <font>
-                  <pointsize>8</pointsize>
-                 </font>
-                </property>
-                <property name="styleSheet">
-                 <string notr="true">/* QPushButton */
-QPushButton {
-    background-color: #4a90e2;
-    border: none;
-    border-radius: 4px;
-    padding: 6px 12px;
-    color: #fff;
-}
-QPushButton:hover {
-    background-color: #5aa0f2;
-}
-QPushButton:pressed {
-    background-color: #3a7fcc;
-}</string>
-                </property>
-                <property name="text">
-                 <string>Xem chi tiết kdbgscan</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QPushButton" name="btnImageinfoDetail">
-                <property name="font">
-                 <font>
-                  <pointsize>8</pointsize>
-                 </font>
-                </property>
-                <property name="styleSheet">
-                 <string notr="true">/* QPushButton */
-QPushButton {
-    background-color: #4a90e2;
-    border: none;
-    border-radius: 4px;
-    padding: 6px 12px;
-    color: #fff;
-}
-QPushButton:hover {
-    background-color: #5aa0f2;
-}
-QPushButton:pressed {
-    background-color: #3a7fcc;
-}</string>
-                </property>
-                <property name="text">
-                 <string>Xem chi tiết imageinfo</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QPushButton" name="btnWindowsInfoDetail">
-                <property name="font">
-                 <font>
-                  <pointsize>8</pointsize>
-                 </font>
-                </property>
-                <property name="styleSheet">
-                 <string notr="true">/* QPushButton */
-QPushButton {
-    background-color: #4a90e2;
-    border: none;
-    border-radius: 4px;
-    padding: 6px 12px;
-    color: #fff;
-}
-QPushButton:hover {
-    background-color: #5aa0f2;
-}
-QPushButton:pressed {
-    background-color: #3a7fcc;
-}</string>
-                </property>
-                <property name="text">
-                 <string>Xem chi tiết windows.info</string>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </item>
-            <item>
-             <widget class="QTextEdit" name="pluginDetailText">
-              <property name="visible">
-               <bool>false</bool>
-              </property>
-              <property name="readOnly">
-               <bool>true</bool>
-              </property>
-              <property name="placeholderText">
-               <string>Chi tiết plugin sẽ hiển thị ở đây...</string>
-              </property>
-             </widget>
+             <widget class="QTextEdit" name="infoText"/>
             </item>
            </layout>
           </widget>
@@ -550,7 +322,7 @@ QPushButton:pressed {
                </font>
               </property>
               <property name="currentIndex">
-               <number>2</number>
+               <number>0</number>
               </property>
               <widget class="QWidget" name="processListTab">
                <attribute name="title">
@@ -732,13 +504,7 @@ QPushButton:pressed {
                </attribute>
                <layout class="QVBoxLayout" name="passwordHashesLayout">
                 <item>
-                 <widget class="QTextEdit" name="hashdumpText">
-                  <property name="font">
-                   <font>
-                    <pointsize>8</pointsize>
-                   </font>
-                  </property>
-                 </widget>
+                 <widget class="QTableWidget" name="hashdumpTable"/>
                 </item>
                </layout>
               </widget>

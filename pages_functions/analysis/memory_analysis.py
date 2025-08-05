@@ -259,6 +259,26 @@ class MemoryAnalysisWindow(QMainWindow):
         else:
             return pretty
 
+    def format_info_output(self, json_data, title: str = "") -> str:
+        """
+        Chuyển json_data của plugin 'info' thành table text:
+        Variable           Value
+        Kernel Base        0xf8000145e000
+        DTB                0x187000
+        ...
+        """
+        # json_data thường là list of dict
+        rows = json_data if isinstance(json_data, list) else json_data.get("data", [])
+        # Tính độ rộng cột Variable
+        max_var = max((len(item.get("Variable", "")) for item in rows), default=8)
+        header = f"{'Variable'.ljust(max_var)}   Value"
+        lines = [header, "-" * len(header)]
+        for item in rows:
+            var = item.get("Variable", "")
+            val = item.get("Value", "")
+            lines.append(f"{var.ljust(max_var)}   {val}")
+        return "\n".join(lines)
+
     def setup_connections(self):
         # Removed browse button connection - no browse button needed
         self.ui.startAnalysisButton.clicked.connect(self.start_analysis)
@@ -385,6 +405,7 @@ class MemoryAnalysisWindow(QMainWindow):
         table.setRowCount(0)
         default_plugins = {
             # Process plugins
+            "info",
             "pslist",
             "pstree",
             "psscan",
@@ -394,6 +415,12 @@ class MemoryAnalysisWindow(QMainWindow):
             "netscan",
             # File plugins
             "filescan",
+            "cmdline",
+            "hashdump",
+            "cachedump",
+            "lsadump",
+            "consoles",
+            "cmdscan",
         }
         for p in self.all_plugins:
             if (
@@ -575,7 +602,10 @@ class MemoryAnalysisWindow(QMainWindow):
         """
         # 1) Chạy plugin
         json_data = run_volatility3_plugin(memory_path, plugin_name)
-
+        if plugin_name == "info":
+            output = self.format_info_output(json_data)
+            self.ui.infoText.setText(output)
+            return
         # 2) Xác định widget đã được define trong .ui
         cat = self.plugin_types.get(
             plugin_name, "Khác"
@@ -630,6 +660,10 @@ class MemoryAnalysisWindow(QMainWindow):
             with open(path, "r", encoding="utf-8") as f:
                 data = json.load(f)
 
+            if plugin == "info":
+                output = self.format_info_output(data)
+                self.ui.infoText.setText(output)
+                continue
             # điền vào widget có sẵn hoặc tạo tab mới
             filled = False
             for suffix, filler in (
@@ -768,9 +802,9 @@ class MemoryAnalysisWindow(QMainWindow):
 
     def mock_reset_ui(self):
         # Reset all result widgets to default/empty
-        self.ui.osVersionValue.setText("-")
-        self.ui.architectureValue.setText("-")
-        self.ui.timestampValue.setText("-")
+        # self.ui.osVersionValue.setText("-")
+        # self.ui.architectureValue.setText("-")
+        # self.ui.timestampValue.setText("-")
         self.ui.pslistTable.setRowCount(0)
         self.ui.malfindText.clear()
         self.ui.netscanTable.setRowCount(0)
