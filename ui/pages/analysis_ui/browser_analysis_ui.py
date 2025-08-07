@@ -14,7 +14,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_BrowserAnalysisWindow(object):
     def setupUi(self, BrowserAnalysisWindow):
         BrowserAnalysisWindow.setObjectName("BrowserAnalysisWindow")
-        BrowserAnalysisWindow.resize(1657, 588)
+        BrowserAnalysisWindow.resize(1451, 716)
         font = QtGui.QFont()
         font.setPointSize(10)
         BrowserAnalysisWindow.setFont(font)
@@ -22,15 +22,14 @@ class Ui_BrowserAnalysisWindow(object):
         self.gridLayout_4.setObjectName("gridLayout_4")
         self.configurationGroupBox = QtWidgets.QGroupBox(BrowserAnalysisWindow)
         font = QtGui.QFont()
-        font.setPointSize(8)
-        font.setBold(False)
-        font.setWeight(50)
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
         self.configurationGroupBox.setFont(font)
-        self.configurationGroupBox.setTitle("")
         self.configurationGroupBox.setObjectName("configurationGroupBox")
         self.gridLayout_3 = QtWidgets.QGridLayout(self.configurationGroupBox)
-        self.gridLayout_3.setContentsMargins(50, 0, 10, 0)
-        self.gridLayout_3.setHorizontalSpacing(20)
+        self.gridLayout_3.setContentsMargins(50, 5, 10, 0)
+        self.gridLayout_3.setHorizontalSpacing(10)
         self.gridLayout_3.setVerticalSpacing(5)
         self.gridLayout_3.setObjectName("gridLayout_3")
         self.frame = QtWidgets.QFrame(self.configurationGroupBox)
@@ -88,110 +87,11 @@ class Ui_BrowserAnalysisWindow(object):
         self.horizontalLayout_4.setObjectName("horizontalLayout_4")
         self.verticalLayout.addLayout(self.horizontalLayout_4)
         self.gridLayout_3.addWidget(self.frame, 3, 2, 1, 4)
-        self.label_9 = QtWidgets.QLabel(self.configurationGroupBox)
-        font = QtGui.QFont()
-        font.setPointSize(8)
-        self.label_9.setFont(font)
-        self.label_9.setObjectName("label_9")
-        self.gridLayout_3.addWidget(self.label_9, 0, 0, 1, 2)
-        self.comboBox_2 = QtWidgets.QComboBox(self.configurationGroupBox)
-        font = QtGui.QFont()
-        font.setPointSize(8)
-        self.comboBox_2.setFont(font)
-        self.comboBox_2.setStyleSheet("/* ==== QComboBox ==== */\n"
-"QComboBox {\n"
-"    /* nền trắng, bo góc và viền xám nhạt giống QLineEdit */\n"
-"    background-color: #ffffff;\n"
-"    border: 1px solid #c0c4c8;\n"
-"    border-radius: 4px;\n"
-"    padding: 4px 30px 4px 8px; /* để chừa chỗ cho mũi tên */\n"
-"    min-height: 24px;\n"
-"    /* font đã định ở đầu styles.qss sẽ áp dụng */\n"
-"}\n"
-"\n"
-"/* Khi hover đổi nhẹ viền */\n"
-"QComboBox:hover {\n"
-"    border: 1px solid #a0a4a8;\n"
-"}\n"
-"\n"
-"/* Khi focus (đang chọn) đổi viền xanh */\n"
-"QComboBox:focus {\n"
-"    border: 1px solid #4a90e2;\n"
-"}\n"
-"\n"
-"/* Popup list (QAbstractItemView) */\n"
-"QComboBox QAbstractItemView {\n"
-"    background-color: #ffffff;\n"
-"    border: 1px solid #c0c4c8;\n"
-"    border-radius: 4px;\n"
-"    padding: 4px;\n"
-"    outline: none;\n"
-"    selection-background-color: #cce4f7;\n"
-"    selection-color: #000;\n"
-"}\n"
-"\n"
-"/* Các item trong list khi hover */\n"
-"QComboBox QAbstractItemView::item:hover {\n"
-"    background-color: #e8f1fb;\n"
-"}\n"
-"\n"
-"/* Scrollbar nhỏ gọn trong popup */\n"
-"QComboBox QAbstractItemView QScrollBar:vertical {\n"
-"    background: transparent;\n"
-"    width: 8px;\n"
-"    margin: 0px;\n"
-"}\n"
-"QComboBox QAbstractItemView QScrollBar::handle:vertical {\n"
-"    background: #c0c4c8;\n"
-"    min-height: 20px;\n"
-"    border-radius: 4px;\n"
-"}\n"
-"QComboBox QAbstractItemView QScrollBar::add-line,\n"
-"QComboBox QAbstractItemView QScrollBar::sub-line {\n"
-"    height: 0;\n"
-"}\n"
-"")
-        self.comboBox_2.setObjectName("comboBox_2")
-        self.gridLayout_3.addWidget(self.comboBox_2, 0, 2, 1, 1)
-        self.pushButton_9 = QtWidgets.QPushButton(self.configurationGroupBox)
-        font = QtGui.QFont()
-        font.setPointSize(8)
-        self.pushButton_9.setFont(font)
-        self.pushButton_9.setStyleSheet("/* QPushButton */\n"
-"QPushButton {\n"
-"    background-color: #4a90e2;\n"
-"    border: none;\n"
-"    border-radius: 4px;\n"
-"    padding: 6px 12px;\n"
-"    color: #fff;\n"
-"\n"
-"}\n"
-"QPushButton:hover {\n"
-"    background-color: #5aa0f2;\n"
-"}\n"
-"QPushButton:pressed {\n"
-"    background-color: #3a7fcc;\n"
-"}")
-        self.pushButton_9.setObjectName("pushButton_9")
-        self.gridLayout_3.addWidget(self.pushButton_9, 0, 3, 1, 1)
-        self.label_10 = QtWidgets.QLabel(self.configurationGroupBox)
-        font = QtGui.QFont()
-        font.setPointSize(8)
-        font.setItalic(True)
-        font.setUnderline(False)
-        font.setStrikeOut(False)
-        self.label_10.setFont(font)
-        self.label_10.setObjectName("label_10")
-        self.gridLayout_3.addWidget(self.label_10, 0, 6, 1, 1)
-        self.statusLabel = QtWidgets.QLabel(self.configurationGroupBox)
-        font = QtGui.QFont()
-        font.setPointSize(8)
-        self.statusLabel.setFont(font)
-        self.statusLabel.setObjectName("statusLabel")
-        self.gridLayout_3.addWidget(self.statusLabel, 0, 8, 1, 1)
         self.profilePathLabel = QtWidgets.QLabel(self.configurationGroupBox)
         font = QtGui.QFont()
         font.setPointSize(8)
+        font.setBold(False)
+        font.setWeight(50)
         self.profilePathLabel.setFont(font)
         self.profilePathLabel.setObjectName("profilePathLabel")
         self.gridLayout_3.addWidget(self.profilePathLabel, 1, 3, 1, 1)
@@ -253,29 +153,16 @@ class Ui_BrowserAnalysisWindow(object):
         self.browserTypeLabel = QtWidgets.QLabel(self.configurationGroupBox)
         font = QtGui.QFont()
         font.setPointSize(8)
+        font.setBold(False)
+        font.setWeight(50)
         self.browserTypeLabel.setFont(font)
         self.browserTypeLabel.setObjectName("browserTypeLabel")
         self.gridLayout_3.addWidget(self.browserTypeLabel, 1, 0, 1, 2)
-        self.progressBar = QtWidgets.QProgressBar(self.configurationGroupBox)
-        font = QtGui.QFont()
-        font.setPointSize(8)
-        self.progressBar.setFont(font)
-        self.progressBar.setStyleSheet("/* QProgressBar */\n"
-"QProgressBar {\n"
-"    border: 1px solid #a0a4a8;\n"
-"    border-radius: 6px;\n"
-"    text-align: center;\n"
-"}\n"
-"QProgressBar::chunk {\n"
-"    background-color: #4a90e2;\n"
-"    border-radius: 6px;\n"
-"}")
-        self.progressBar.setProperty("value", 0)
-        self.progressBar.setObjectName("progressBar")
-        self.gridLayout_3.addWidget(self.progressBar, 1, 8, 1, 1)
         self.pushButton_10 = QtWidgets.QPushButton(self.configurationGroupBox)
         font = QtGui.QFont()
         font.setPointSize(8)
+        font.setBold(False)
+        font.setWeight(50)
         self.pushButton_10.setFont(font)
         self.pushButton_10.setStyleSheet("/* QPushButton */\n"
 "QPushButton {\n"
@@ -299,6 +186,8 @@ class Ui_BrowserAnalysisWindow(object):
         self.pushButton_11 = QtWidgets.QPushButton(self.configurationGroupBox)
         font = QtGui.QFont()
         font.setPointSize(8)
+        font.setBold(False)
+        font.setWeight(50)
         self.pushButton_11.setFont(font)
         self.pushButton_11.setStyleSheet("/* QPushButton */\n"
 "QPushButton {\n"
@@ -319,31 +208,12 @@ class Ui_BrowserAnalysisWindow(object):
 "")
         self.pushButton_11.setObjectName("pushButton_11")
         self.gridLayout_3.addWidget(self.pushButton_11, 3, 7, 1, 1)
-        self.lineEdit = QtWidgets.QLineEdit(self.configurationGroupBox)
-        self.lineEdit.setEnabled(False)
-        font = QtGui.QFont()
-        font.setPointSize(8)
-        self.lineEdit.setFont(font)
-        self.lineEdit.setStyleSheet("/* ==== CHUNG CHO CÁC TEXT INPUT / TEXT EDIT ==== */\n"
-"QLineEdit,\n"
-"QTextEdit,\n"
-"QPlainTextEdit {\n"
-"    background-color: #ffffff;\n"
-"    border: 1px solid #c0c4c8;      /* viền xám nhạt */\n"
-"    border-radius: 4px;             /* bo góc mềm */\n"
-"    padding: 4px 6px;               /* khoảng đệm bên trong */\n"
-"    selection-background-color: #cce4f7;\n"
-"    selection-color: #000;\n"
-"     color: #999999;\n"
-"\n"
-"}\n"
-"")
-        self.lineEdit.setObjectName("lineEdit")
-        self.gridLayout_3.addWidget(self.lineEdit, 0, 5, 1, 1)
         self.browserTypeCombo = QtWidgets.QComboBox(self.configurationGroupBox)
         self.browserTypeCombo.setMinimumSize(QtCore.QSize(200, 34))
         font = QtGui.QFont()
         font.setPointSize(8)
+        font.setBold(False)
+        font.setWeight(50)
         self.browserTypeCombo.setFont(font)
         self.browserTypeCombo.setStyleSheet("/* ==== QComboBox ==== */\n"
 "QComboBox {\n"
@@ -464,12 +334,39 @@ class Ui_BrowserAnalysisWindow(object):
         self.analysisOptionsLabel = QtWidgets.QLabel(self.configurationGroupBox)
         font = QtGui.QFont()
         font.setPointSize(8)
+        font.setBold(False)
+        font.setWeight(50)
         self.analysisOptionsLabel.setFont(font)
         self.analysisOptionsLabel.setObjectName("analysisOptionsLabel")
         self.gridLayout_3.addWidget(self.analysisOptionsLabel, 3, 0, 4, 2)
-        self.gridLayout_4.addWidget(self.configurationGroupBox, 0, 0, 1, 1)
-        self.horizontalLayout_5 = QtWidgets.QHBoxLayout()
-        self.horizontalLayout_5.setObjectName("horizontalLayout_5")
+        self.progressBar = QtWidgets.QProgressBar(self.configurationGroupBox)
+        font = QtGui.QFont()
+        font.setPointSize(8)
+        font.setBold(False)
+        font.setWeight(50)
+        self.progressBar.setFont(font)
+        self.progressBar.setStyleSheet("/* QProgressBar */\n"
+"QProgressBar {\n"
+"    border: 1px solid #a0a4a8;\n"
+"    border-radius: 6px;\n"
+"    text-align: center;\n"
+"}\n"
+"QProgressBar::chunk {\n"
+"    background-color: #4a90e2;\n"
+"    border-radius: 6px;\n"
+"}")
+        self.progressBar.setProperty("value", 0)
+        self.progressBar.setObjectName("progressBar")
+        self.gridLayout_3.addWidget(self.progressBar, 3, 8, 1, 1)
+        self.statusLabel = QtWidgets.QLabel(self.configurationGroupBox)
+        font = QtGui.QFont()
+        font.setPointSize(8)
+        font.setBold(False)
+        font.setWeight(50)
+        self.statusLabel.setFont(font)
+        self.statusLabel.setObjectName("statusLabel")
+        self.gridLayout_3.addWidget(self.statusLabel, 1, 8, 1, 1)
+        self.gridLayout_4.addWidget(self.configurationGroupBox, 0, 0, 1, 2)
         self.widget = QtWidgets.QWidget(BrowserAnalysisWindow)
         self.widget.setMaximumSize(QtCore.QSize(350, 16777215))
         self.widget.setObjectName("widget")
@@ -564,7 +461,17 @@ class Ui_BrowserAnalysisWindow(object):
         self.label_11.setAlignment(QtCore.Qt.AlignCenter)
         self.label_11.setObjectName("label_11")
         self.gridLayout_2.addWidget(self.label_11, 0, 0, 1, 1)
-        self.horizontalLayout_5.addWidget(self.widget)
+        self.gridLayout_4.addWidget(self.widget, 1, 0, 1, 1)
+        self.verticalLayout_4 = QtWidgets.QVBoxLayout()
+        self.verticalLayout_4.setObjectName("verticalLayout_4")
+        self.label_6 = QtWidgets.QLabel(BrowserAnalysisWindow)
+        font = QtGui.QFont()
+        font.setBold(True)
+        font.setWeight(75)
+        self.label_6.setFont(font)
+        self.label_6.setAlignment(QtCore.Qt.AlignCenter)
+        self.label_6.setObjectName("label_6")
+        self.verticalLayout_4.addWidget(self.label_6)
         self.mainTabWidget = QtWidgets.QTabWidget(BrowserAnalysisWindow)
         font = QtGui.QFont()
         font.setPointSize(8)
@@ -579,8 +486,8 @@ class Ui_BrowserAnalysisWindow(object):
         self.mainTabWidget.setObjectName("mainTabWidget")
         self.historyTab = QtWidgets.QWidget()
         self.historyTab.setObjectName("historyTab")
-        self.historyLayout = QtWidgets.QVBoxLayout(self.historyTab)
-        self.historyLayout.setObjectName("historyLayout")
+        self.gridLayout_5 = QtWidgets.QGridLayout(self.historyTab)
+        self.gridLayout_5.setObjectName("gridLayout_5")
         self.historySearchLayout = QtWidgets.QHBoxLayout()
         self.historySearchLayout.setObjectName("historySearchLayout")
         self.historySearchLabel = QtWidgets.QLabel(self.historyTab)
@@ -744,7 +651,7 @@ class Ui_BrowserAnalysisWindow(object):
         self.label_3.setFont(font)
         self.label_3.setObjectName("label_3")
         self.historySearchLayout.addWidget(self.label_3)
-        self.historyLayout.addLayout(self.historySearchLayout)
+        self.gridLayout_5.addLayout(self.historySearchLayout, 0, 0, 1, 1)
         self.historyTable = QtWidgets.QTableWidget(self.historyTab)
         font = QtGui.QFont()
         font.setPointSize(9)
@@ -831,7 +738,7 @@ class Ui_BrowserAnalysisWindow(object):
         self.historyTable.setObjectName("historyTable")
         self.historyTable.setColumnCount(0)
         self.historyTable.setRowCount(0)
-        self.historyLayout.addWidget(self.historyTable)
+        self.gridLayout_5.addWidget(self.historyTable, 1, 0, 1, 1)
         self.mainTabWidget.addTab(self.historyTab, "")
         self.downloadsTab = QtWidgets.QWidget()
         self.downloadsTab.setObjectName("downloadsTab")
@@ -1614,309 +1521,6 @@ class Ui_BrowserAnalysisWindow(object):
         self.cacheTable.setRowCount(0)
         self.cacheLayout.addWidget(self.cacheTable)
         self.mainTabWidget.addTab(self.cacheTab, "")
-        self.extensionsTab = QtWidgets.QWidget()
-        self.extensionsTab.setObjectName("extensionsTab")
-        self.extensionsLayout = QtWidgets.QVBoxLayout(self.extensionsTab)
-        self.extensionsLayout.setObjectName("extensionsLayout")
-        self.extensionsTable = QtWidgets.QTableWidget(self.extensionsTab)
-        self.extensionsTable.setStyleSheet("/* ==== QTableWidget / QTableView ==== */\n"
-"QTableWidget,\n"
-"QTableView {\n"
-"    background-color: #ffffff;           /* nền trắng */\n"
-"    border: 1px solid #c0c4c8;           /* viền xám nhạt */\n"
-"    gridline-color: #e0e3e6;             /* màu lưới */\n"
-"    border-radius: 6px;                  /* bo góc toàn widget */\n"
-"    selection-background-color: #cce4f7; /* màu nền khi chọn */\n"
-"    selection-color: #000000;            /* màu chữ khi chọn */\n"
-"}\n"
-"\n"
-"/* Alternating row colors */\n"
-"QTableWidget {\n"
-"    alternate-background-color: #f9fbfc;\n"
-"}\n"
-"QTableWidget::item:alternate,\n"
-"QTableView::item:alternate {\n"
-"    background-color: #f9fbfc;\n"
-"}\n"
-"\n"
-"/* Header (cột và hàng) */\n"
-"QHeaderView::section {\n"
-"    background-color: #e1e5ea;\n"
-"    padding: 6px;\n"
-"    border: none;\n"
-"    border-bottom: 1px solid #c0c4c8;\n"
-"    border-right: 1px solid #c0c4c8;\n"
-"    font-weight: bold;\n"
-"}\n"
-"QHeaderView::section:last,\n"
-"QHeaderView::section:last {\n"
-"    border-right: none;\n"
-"}\n"
-"\n"
-"/* Cell hover */\n"
-"QTableWidget::item:hover,\n"
-"QTableView::item:hover {\n"
-"    background-color: #e8f1fb;\n"
-"}\n"
-"\n"
-"/* Remove focus rectangle */\n"
-"QTableWidget::item:focus,\n"
-"QTableView::item:focus {\n"
-"    outline: none;\n"
-"}\n"
-"\n"
-"/* Scrollbar trong table */\n"
-"QTableWidget QScrollBar:vertical,\n"
-"QTableView QScrollBar:vertical {\n"
-"    background: transparent;\n"
-"    width: 8px;\n"
-"    margin: 0px;\n"
-"}\n"
-"QTableWidget QScrollBar::handle:vertical,\n"
-"QTableView QScrollBar::handle:vertical {\n"
-"    background: #c0c4c8;\n"
-"    min-height: 20px;\n"
-"    border-radius: 4px;\n"
-"}\n"
-"QTableWidget QScrollBar::add-line,\n"
-"QTableWidget QScrollBar::sub-line,\n"
-"QTableView QScrollBar::add-line,\n"
-"QTableView QScrollBar::sub-line {\n"
-"    height: 0;\n"
-"}\n"
-"\n"
-"/* Focused cell viền xanh nhẹ */\n"
-"QTableWidget::item:selected:active,\n"
-"QTableView::item:selected:active {\n"
-"    border: 1px solid #4a90e2;\n"
-"}\n"
-"\n"
-"/* Header hover (nếu muốn) */\n"
-"QHeaderView::section:hover {\n"
-"    background-color: #d7dae0;\n"
-"}\n"
-"")
-        self.extensionsTable.setAlternatingRowColors(True)
-        self.extensionsTable.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
-        self.extensionsTable.setObjectName("extensionsTable")
-        self.extensionsTable.setColumnCount(6)
-        self.extensionsTable.setRowCount(0)
-        item = QtWidgets.QTableWidgetItem()
-        self.extensionsTable.setHorizontalHeaderItem(0, item)
-        item = QtWidgets.QTableWidgetItem()
-        self.extensionsTable.setHorizontalHeaderItem(1, item)
-        item = QtWidgets.QTableWidgetItem()
-        self.extensionsTable.setHorizontalHeaderItem(2, item)
-        item = QtWidgets.QTableWidgetItem()
-        self.extensionsTable.setHorizontalHeaderItem(3, item)
-        item = QtWidgets.QTableWidgetItem()
-        self.extensionsTable.setHorizontalHeaderItem(4, item)
-        item = QtWidgets.QTableWidgetItem()
-        self.extensionsTable.setHorizontalHeaderItem(5, item)
-        self.extensionsLayout.addWidget(self.extensionsTable)
-        self.mainTabWidget.addTab(self.extensionsTab, "")
-        self.formDataTab = QtWidgets.QWidget()
-        self.formDataTab.setObjectName("formDataTab")
-        self.formDataLayout = QtWidgets.QVBoxLayout(self.formDataTab)
-        self.formDataLayout.setObjectName("formDataLayout")
-        self.label_6 = QtWidgets.QLabel(self.formDataTab)
-        font = QtGui.QFont()
-        font.setPointSize(9)
-        font.setBold(True)
-        font.setWeight(75)
-        self.label_6.setFont(font)
-        self.label_6.setStyleSheet("color: #e67e22; font-weight: bold; padding: 5px; background-color: #fdf2e9; border-radius: 3px;")
-        self.label_6.setObjectName("label_6")
-        self.formDataLayout.addWidget(self.label_6)
-        self.formDataSearchLayout = QtWidgets.QHBoxLayout()
-        self.formDataSearchLayout.setObjectName("formDataSearchLayout")
-        self.formDataSearchLabel = QtWidgets.QLabel(self.formDataTab)
-        font = QtGui.QFont()
-        font.setPointSize(9)
-        self.formDataSearchLabel.setFont(font)
-        self.formDataSearchLabel.setObjectName("formDataSearchLabel")
-        self.formDataSearchLayout.addWidget(self.formDataSearchLabel)
-        self.formDataSearchEdit = QtWidgets.QLineEdit(self.formDataTab)
-        font = QtGui.QFont()
-        font.setPointSize(9)
-        self.formDataSearchEdit.setFont(font)
-        self.formDataSearchEdit.setStyleSheet("/* ==== CHUNG CHO CÁC TEXT INPUT / TEXT EDIT ==== */\n"
-"QLineEdit,\n"
-"QTextEdit,\n"
-"QPlainTextEdit {\n"
-"    background-color: #ffffff;\n"
-"    border: 1px solid #c0c4c8;      /* viền xám nhạt */\n"
-"    border-radius: 4px;             /* bo góc mềm */\n"
-"    padding: 4px 6px;               /* khoảng đệm bên trong */\n"
-"    selection-background-color: #cce4f7;\n"
-"    selection-color: #000;\n"
-"\n"
-"}\n"
-"\n"
-"/* Khi focus chuyển viền sang xanh */\n"
-"QLineEdit:focus,\n"
-"QTextEdit:focus,\n"
-"QPlainTextEdit:focus {\n"
-"    border: 1px solid #4a90e2;\n"
-"}\n"
-"\n"
-"\n"
-"\n"
-"/* ReadOnly thì nền hơi xám */\n"
-"QLineEdit[readOnly=\"true\"],\n"
-"QTextEdit[readOnly=\"true\"] {\n"
-"    background-color: #f0f2f5;\n"
-"}\n"
-"\n"
-"/* Thanh cuộn bên trong QTextEdit bo góc & nhỏ gọn */\n"
-"QTextEdit QScrollBar:vertical,\n"
-"QPlainTextEdit QScrollBar:vertical {\n"
-"    background: transparent;\n"
-"    width: 8px;\n"
-"    margin: 0px;\n"
-"}\n"
-"QTextEdit QScrollBar::handle:vertical,\n"
-"QPlainTextEdit QScrollBar::handle:vertical {\n"
-"    background: #c0c4c8;\n"
-"    min-height: 20px;\n"
-"    border-radius: 4px;\n"
-"}\n"
-"QTextEdit QScrollBar::add-line, QTextEdit QScrollBar::sub-line,\n"
-"QPlainTextEdit QScrollBar::add-line, QPlainTextEdit QScrollBar::sub-line {\n"
-"    height: 0;\n"
-"}\n"
-"")
-        self.formDataSearchEdit.setObjectName("formDataSearchEdit")
-        self.formDataSearchLayout.addWidget(self.formDataSearchEdit)
-        self.showPasswordsCheckBox = QtWidgets.QCheckBox(self.formDataTab)
-        font = QtGui.QFont()
-        font.setPointSize(9)
-        self.showPasswordsCheckBox.setFont(font)
-        self.showPasswordsCheckBox.setObjectName("showPasswordsCheckBox")
-        self.formDataSearchLayout.addWidget(self.showPasswordsCheckBox)
-        self.pushButton_6 = QtWidgets.QPushButton(self.formDataTab)
-        self.pushButton_6.setMinimumSize(QtCore.QSize(150, 0))
-        font = QtGui.QFont()
-        font.setPointSize(9)
-        self.pushButton_6.setFont(font)
-        self.pushButton_6.setStyleSheet("/* QPushButton */\n"
-"QPushButton {\n"
-"    background-color: #4a90e2;\n"
-"    border: none;\n"
-"    border-radius: 4px;\n"
-"    padding: 6px 12px;\n"
-"    color: #fff;\n"
-"}\n"
-"QPushButton:hover {\n"
-"    background-color: #5aa0f2;\n"
-"}\n"
-"QPushButton:pressed {\n"
-"    background-color: #3a7fcc;\n"
-"}")
-        self.pushButton_6.setObjectName("pushButton_6")
-        self.formDataSearchLayout.addWidget(self.pushButton_6)
-        self.label_7 = QtWidgets.QLabel(self.formDataTab)
-        font = QtGui.QFont()
-        font.setPointSize(9)
-        self.label_7.setFont(font)
-        self.label_7.setObjectName("label_7")
-        self.formDataSearchLayout.addWidget(self.label_7)
-        self.formDataLayout.addLayout(self.formDataSearchLayout)
-        self.formDataTable = QtWidgets.QTableWidget(self.formDataTab)
-        self.formDataTable.setStyleSheet("/* ==== QTableWidget / QTableView ==== */\n"
-"QTableWidget,\n"
-"QTableView {\n"
-"    background-color: #ffffff;           /* nền trắng */\n"
-"    border: 1px solid #c0c4c8;           /* viền xám nhạt */\n"
-"    gridline-color: #e0e3e6;             /* màu lưới */\n"
-"    border-radius: 6px;                  /* bo góc toàn widget */\n"
-"    selection-background-color: #cce4f7; /* màu nền khi chọn */\n"
-"    selection-color: #000000;            /* màu chữ khi chọn */\n"
-"}\n"
-"\n"
-"/* Alternating row colors */\n"
-"QTableWidget {\n"
-"    alternate-background-color: #f9fbfc;\n"
-"}\n"
-"QTableWidget::item:alternate,\n"
-"QTableView::item:alternate {\n"
-"    background-color: #f9fbfc;\n"
-"}\n"
-"\n"
-"/* Header (cột và hàng) */\n"
-"QHeaderView::section {\n"
-"    background-color: #e1e5ea;\n"
-"    padding: 6px;\n"
-"    border: none;\n"
-"    border-bottom: 1px solid #c0c4c8;\n"
-"    border-right: 1px solid #c0c4c8;\n"
-"    font-weight: bold;\n"
-"}\n"
-"QHeaderView::section:last,\n"
-"QHeaderView::section:last {\n"
-"    border-right: none;\n"
-"}\n"
-"\n"
-"/* Cell hover */\n"
-"QTableWidget::item:hover,\n"
-"QTableView::item:hover {\n"
-"    background-color: #e8f1fb;\n"
-"}\n"
-"\n"
-"/* Remove focus rectangle */\n"
-"QTableWidget::item:focus,\n"
-"QTableView::item:focus {\n"
-"    outline: none;\n"
-"}\n"
-"\n"
-"/* Scrollbar trong table */\n"
-"QTableWidget QScrollBar:vertical,\n"
-"QTableView QScrollBar:vertical {\n"
-"    background: transparent;\n"
-"    width: 8px;\n"
-"    margin: 0px;\n"
-"}\n"
-"QTableWidget QScrollBar::handle:vertical,\n"
-"QTableView QScrollBar::handle:vertical {\n"
-"    background: #c0c4c8;\n"
-"    min-height: 20px;\n"
-"    border-radius: 4px;\n"
-"}\n"
-"QTableWidget QScrollBar::add-line,\n"
-"QTableWidget QScrollBar::sub-line,\n"
-"QTableView QScrollBar::add-line,\n"
-"QTableView QScrollBar::sub-line {\n"
-"    height: 0;\n"
-"}\n"
-"\n"
-"/* Focused cell viền xanh nhẹ */\n"
-"QTableWidget::item:selected:active,\n"
-"QTableView::item:selected:active {\n"
-"    border: 1px solid #4a90e2;\n"
-"}\n"
-"\n"
-"/* Header hover (nếu muốn) */\n"
-"QHeaderView::section:hover {\n"
-"    background-color: #d7dae0;\n"
-"}\n"
-"")
-        self.formDataTable.setAlternatingRowColors(True)
-        self.formDataTable.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
-        self.formDataTable.setObjectName("formDataTable")
-        self.formDataTable.setColumnCount(5)
-        self.formDataTable.setRowCount(0)
-        item = QtWidgets.QTableWidgetItem()
-        self.formDataTable.setHorizontalHeaderItem(0, item)
-        item = QtWidgets.QTableWidgetItem()
-        self.formDataTable.setHorizontalHeaderItem(1, item)
-        item = QtWidgets.QTableWidgetItem()
-        self.formDataTable.setHorizontalHeaderItem(2, item)
-        item = QtWidgets.QTableWidgetItem()
-        self.formDataTable.setHorizontalHeaderItem(3, item)
-        item = QtWidgets.QTableWidgetItem()
-        self.formDataTable.setHorizontalHeaderItem(4, item)
-        self.formDataLayout.addWidget(self.formDataTable)
-        self.mainTabWidget.addTab(self.formDataTab, "")
         self.timelineTab = QtWidgets.QWidget()
         self.timelineTab.setObjectName("timelineTab")
         self.timelineLayout = QtWidgets.QVBoxLayout(self.timelineTab)
@@ -2602,8 +2206,8 @@ class Ui_BrowserAnalysisWindow(object):
         self.exportButtonsLayout.addItem(spacerItem2)
         self.exportLayout.addLayout(self.exportButtonsLayout)
         self.mainTabWidget.addTab(self.exportTab, "")
-        self.horizontalLayout_5.addWidget(self.mainTabWidget)
-        self.gridLayout_4.addLayout(self.horizontalLayout_5, 1, 0, 1, 1)
+        self.verticalLayout_4.addWidget(self.mainTabWidget)
+        self.gridLayout_4.addLayout(self.verticalLayout_4, 1, 1, 1, 1)
 
         self.retranslateUi(BrowserAnalysisWindow)
         self.mainTabWidget.setCurrentIndex(0)
@@ -2612,28 +2216,26 @@ class Ui_BrowserAnalysisWindow(object):
     def retranslateUi(self, BrowserAnalysisWindow):
         _translate = QtCore.QCoreApplication.translate
         BrowserAnalysisWindow.setWindowTitle(_translate("BrowserAnalysisWindow", "Browser Analysis"))
+        self.configurationGroupBox.setTitle(_translate("BrowserAnalysisWindow", "Configuration Analysis"))
         self.cacheCheckBox.setText(_translate("BrowserAnalysisWindow", "Cache Files"))
         self.downloadsCheckBox.setText(_translate("BrowserAnalysisWindow", "Downloads"))
         self.historyCheckBox.setText(_translate("BrowserAnalysisWindow", "History Analysis"))
         self.cookiesCheckBox.setText(_translate("BrowserAnalysisWindow", "Cookies Analysis"))
-        self.label_9.setText(_translate("BrowserAnalysisWindow", "Evidence:"))
-        self.pushButton_9.setText(_translate("BrowserAnalysisWindow", "Refresh"))
-        self.label_10.setText(_translate("BrowserAnalysisWindow", "(Evidence Path)"))
-        self.statusLabel.setText(_translate("BrowserAnalysisWindow", "Status: Ready"))
-        self.profilePathLabel.setText(_translate("BrowserAnalysisWindow", "Profile Path:"))
+        self.profilePathLabel.setText(_translate("BrowserAnalysisWindow", "Evidence Path:"))
         self.browseProfileButton.setText(_translate("BrowserAnalysisWindow", "Browse"))
         self.startAnalysisButton.setText(_translate("BrowserAnalysisWindow", "Start Analysis"))
         self.browserTypeLabel.setText(_translate("BrowserAnalysisWindow", "Browser Type:"))
         self.pushButton_10.setText(_translate("BrowserAnalysisWindow", "Chọn tất cả"))
         self.pushButton_11.setText(_translate("BrowserAnalysisWindow", "Bỏ chọn tất cả"))
-        self.lineEdit.setText(_translate("BrowserAnalysisWindow", "C:\\Users\\halin\\AppData\\Local\\Google\\Chrome\\User Data\\Default"))
         self.browserTypeCombo.setItemText(0, _translate("BrowserAnalysisWindow", "Google Chrome"))
         self.browserTypeCombo.setItemText(1, _translate("BrowserAnalysisWindow", "Microsoft Edge"))
         self.browserTypeCombo.setItemText(2, _translate("BrowserAnalysisWindow", "Mozilla Firefox"))
         self.browserTypeCombo.setItemText(3, _translate("BrowserAnalysisWindow", "Internet Explorer"))
         self.profilePathEdit.setPlaceholderText(_translate("BrowserAnalysisWindow", "C:\\Users\\...\\AppData\\Local\\Google\\Chrome\\User Data\\Default"))
         self.analysisOptionsLabel.setText(_translate("BrowserAnalysisWindow", "Analysis Options:"))
+        self.statusLabel.setText(_translate("BrowserAnalysisWindow", "Status: Ready"))
         self.label_11.setText(_translate("BrowserAnalysisWindow", "Evidences Browser of Case"))
+        self.label_6.setText(_translate("BrowserAnalysisWindow", "Detail analysis"))
         self.historySearchLabel.setText(_translate("BrowserAnalysisWindow", "Search:"))
         self.historySearchEdit.setPlaceholderText(_translate("BrowserAnalysisWindow", "Search URLs, titles..."))
         self.pushButton_2.setText(_translate("BrowserAnalysisWindow", "Export"))
@@ -2690,38 +2292,6 @@ class Ui_BrowserAnalysisWindow(object):
         self.label_4.setText(_translate("BrowserAnalysisWindow", "0 files"))
         self.cacheTable.setSortingEnabled(True)
         self.mainTabWidget.setTabText(self.mainTabWidget.indexOf(self.cacheTab), _translate("BrowserAnalysisWindow", "Cache Analysis"))
-        self.extensionsTable.setSortingEnabled(True)
-        item = self.extensionsTable.horizontalHeaderItem(0)
-        item.setText(_translate("BrowserAnalysisWindow", "Extension Name"))
-        item = self.extensionsTable.horizontalHeaderItem(1)
-        item.setText(_translate("BrowserAnalysisWindow", "Version"))
-        item = self.extensionsTable.horizontalHeaderItem(2)
-        item.setText(_translate("BrowserAnalysisWindow", "ID"))
-        item = self.extensionsTable.horizontalHeaderItem(3)
-        item.setText(_translate("BrowserAnalysisWindow", "Permissions"))
-        item = self.extensionsTable.horizontalHeaderItem(4)
-        item.setText(_translate("BrowserAnalysisWindow", "Enabled"))
-        item = self.extensionsTable.horizontalHeaderItem(5)
-        item.setText(_translate("BrowserAnalysisWindow", "Install Date"))
-        self.mainTabWidget.setTabText(self.mainTabWidget.indexOf(self.extensionsTab), _translate("BrowserAnalysisWindow", "Extensions & Add-ons"))
-        self.label_6.setText(_translate("BrowserAnalysisWindow", "⚠️ Warning: Password analysis requires elevated privileges and may be restricted by security policies."))
-        self.formDataSearchLabel.setText(_translate("BrowserAnalysisWindow", "Search:"))
-        self.formDataSearchEdit.setPlaceholderText(_translate("BrowserAnalysisWindow", "Search URLs, usernames..."))
-        self.showPasswordsCheckBox.setText(_translate("BrowserAnalysisWindow", "Show Passwords"))
-        self.pushButton_6.setText(_translate("BrowserAnalysisWindow", "Export "))
-        self.label_7.setText(_translate("BrowserAnalysisWindow", "0 passwords"))
-        self.formDataTable.setSortingEnabled(True)
-        item = self.formDataTable.horizontalHeaderItem(0)
-        item.setText(_translate("BrowserAnalysisWindow", "URL"))
-        item = self.formDataTable.horizontalHeaderItem(1)
-        item.setText(_translate("BrowserAnalysisWindow", "Username"))
-        item = self.formDataTable.horizontalHeaderItem(2)
-        item.setText(_translate("BrowserAnalysisWindow", "Password"))
-        item = self.formDataTable.horizontalHeaderItem(3)
-        item.setText(_translate("BrowserAnalysisWindow", "Last Used"))
-        item = self.formDataTable.horizontalHeaderItem(4)
-        item.setText(_translate("BrowserAnalysisWindow", "Field Type"))
-        self.mainTabWidget.setTabText(self.mainTabWidget.indexOf(self.formDataTab), _translate("BrowserAnalysisWindow", "Form Data & Passwords"))
         self.comboBox.setItemText(0, _translate("BrowserAnalysisWindow", "All Activities"))
         self.comboBox.setItemText(1, _translate("BrowserAnalysisWindow", "History Only"))
         self.comboBox.setItemText(2, _translate("BrowserAnalysisWindow", "Downloads Only"))

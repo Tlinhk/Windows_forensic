@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1408</width>
-    <height>588</height>
+    <width>1451</width>
+    <height>716</height>
    </rect>
   </property>
   <property name="font">
@@ -19,24 +19,24 @@
    <string>Browser Analysis</string>
   </property>
   <layout class="QGridLayout" name="gridLayout_4">
-   <item row="0" column="0">
+   <item row="0" column="0" colspan="2">
     <widget class="QGroupBox" name="configurationGroupBox">
      <property name="font">
       <font>
-       <pointsize>8</pointsize>
-       <weight>50</weight>
-       <bold>false</bold>
+       <pointsize>10</pointsize>
+       <weight>75</weight>
+       <bold>true</bold>
       </font>
      </property>
      <property name="title">
-      <string/>
+      <string>Configuration Analysis</string>
      </property>
      <layout class="QGridLayout" name="gridLayout_3">
       <property name="leftMargin">
        <number>50</number>
       </property>
       <property name="topMargin">
-       <number>0</number>
+       <number>5</number>
       </property>
       <property name="rightMargin">
        <number>10</number>
@@ -45,7 +45,7 @@
        <number>0</number>
       </property>
       <property name="horizontalSpacing">
-       <number>20</number>
+       <number>10</number>
       </property>
       <property name="verticalSpacing">
        <number>5</number>
@@ -151,147 +151,17 @@
         </layout>
        </widget>
       </item>
-      <item row="0" column="0" colspan="2">
-       <widget class="QLabel" name="label_9">
-        <property name="font">
-         <font>
-          <pointsize>8</pointsize>
-         </font>
-        </property>
-        <property name="text">
-         <string>Evidence:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="2">
-       <widget class="QComboBox" name="comboBox_2">
-        <property name="font">
-         <font>
-          <pointsize>8</pointsize>
-         </font>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">/* ==== QComboBox ==== */
-QComboBox {
-    /* nền trắng, bo góc và viền xám nhạt giống QLineEdit */
-    background-color: #ffffff;
-    border: 1px solid #c0c4c8;
-    border-radius: 4px;
-    padding: 4px 30px 4px 8px; /* để chừa chỗ cho mũi tên */
-    min-height: 24px;
-    /* font đã định ở đầu styles.qss sẽ áp dụng */
-}
-
-/* Khi hover đổi nhẹ viền */
-QComboBox:hover {
-    border: 1px solid #a0a4a8;
-}
-
-/* Khi focus (đang chọn) đổi viền xanh */
-QComboBox:focus {
-    border: 1px solid #4a90e2;
-}
-
-/* Popup list (QAbstractItemView) */
-QComboBox QAbstractItemView {
-    background-color: #ffffff;
-    border: 1px solid #c0c4c8;
-    border-radius: 4px;
-    padding: 4px;
-    outline: none;
-    selection-background-color: #cce4f7;
-    selection-color: #000;
-}
-
-/* Các item trong list khi hover */
-QComboBox QAbstractItemView::item:hover {
-    background-color: #e8f1fb;
-}
-
-/* Scrollbar nhỏ gọn trong popup */
-QComboBox QAbstractItemView QScrollBar:vertical {
-    background: transparent;
-    width: 8px;
-    margin: 0px;
-}
-QComboBox QAbstractItemView QScrollBar::handle:vertical {
-    background: #c0c4c8;
-    min-height: 20px;
-    border-radius: 4px;
-}
-QComboBox QAbstractItemView QScrollBar::add-line,
-QComboBox QAbstractItemView QScrollBar::sub-line {
-    height: 0;
-}
-</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="3">
-       <widget class="QPushButton" name="pushButton_9">
-        <property name="font">
-         <font>
-          <pointsize>8</pointsize>
-         </font>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">/* QPushButton */
-QPushButton {
-    background-color: #4a90e2;
-    border: none;
-    border-radius: 4px;
-    padding: 6px 12px;
-    color: #fff;
-
-}
-QPushButton:hover {
-    background-color: #5aa0f2;
-}
-QPushButton:pressed {
-    background-color: #3a7fcc;
-}</string>
-        </property>
-        <property name="text">
-         <string>Refresh</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="6">
-       <widget class="QLabel" name="label_10">
-        <property name="font">
-         <font>
-          <pointsize>8</pointsize>
-          <italic>true</italic>
-          <underline>false</underline>
-          <strikeout>false</strikeout>
-         </font>
-        </property>
-        <property name="text">
-         <string>(Evidence Path)</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="8">
-       <widget class="QLabel" name="statusLabel">
-        <property name="font">
-         <font>
-          <pointsize>8</pointsize>
-         </font>
-        </property>
-        <property name="text">
-         <string>Status: Ready</string>
-        </property>
-       </widget>
-      </item>
       <item row="1" column="3">
        <widget class="QLabel" name="profilePathLabel">
         <property name="font">
          <font>
           <pointsize>8</pointsize>
+          <weight>50</weight>
+          <bold>false</bold>
          </font>
         </property>
         <property name="text">
-         <string>Profile Path:</string>
+         <string>Evidence Path:</string>
         </property>
        </widget>
       </item>
@@ -383,34 +253,12 @@ QPushButton:pressed {
         <property name="font">
          <font>
           <pointsize>8</pointsize>
+          <weight>50</weight>
+          <bold>false</bold>
          </font>
         </property>
         <property name="text">
          <string>Browser Type:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="8">
-       <widget class="QProgressBar" name="progressBar">
-        <property name="font">
-         <font>
-          <pointsize>8</pointsize>
-         </font>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">/* QProgressBar */
-QProgressBar {
-    border: 1px solid #a0a4a8;
-    border-radius: 6px;
-    text-align: center;
-}
-QProgressBar::chunk {
-    background-color: #4a90e2;
-    border-radius: 6px;
-}</string>
-        </property>
-        <property name="value">
-         <number>0</number>
         </property>
        </widget>
       </item>
@@ -419,6 +267,8 @@ QProgressBar::chunk {
         <property name="font">
          <font>
           <pointsize>8</pointsize>
+          <weight>50</weight>
+          <bold>false</bold>
          </font>
         </property>
         <property name="styleSheet">
@@ -450,6 +300,8 @@ QPushButton:pressed {
         <property name="font">
          <font>
           <pointsize>8</pointsize>
+          <weight>50</weight>
+          <bold>false</bold>
          </font>
         </property>
         <property name="styleSheet">
@@ -476,37 +328,6 @@ QPushButton:pressed {
         </property>
        </widget>
       </item>
-      <item row="0" column="5">
-       <widget class="QLineEdit" name="lineEdit">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>8</pointsize>
-         </font>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">/* ==== CHUNG CHO CÁC TEXT INPUT / TEXT EDIT ==== */
-QLineEdit,
-QTextEdit,
-QPlainTextEdit {
-    background-color: #ffffff;
-    border: 1px solid #c0c4c8;      /* viền xám nhạt */
-    border-radius: 4px;             /* bo góc mềm */
-    padding: 4px 6px;               /* khoảng đệm bên trong */
-    selection-background-color: #cce4f7;
-    selection-color: #000;
-	 color: #999999;
-
-}
-</string>
-        </property>
-        <property name="text">
-         <string>C:\Users\halin\AppData\Local\Google\Chrome\User Data\Default</string>
-        </property>
-       </widget>
-      </item>
       <item row="1" column="2">
        <widget class="QComboBox" name="browserTypeCombo">
         <property name="minimumSize">
@@ -518,6 +339,8 @@ QPlainTextEdit {
         <property name="font">
          <font>
           <pointsize>8</pointsize>
+          <weight>50</weight>
+          <bold>false</bold>
          </font>
         </property>
         <property name="styleSheet">
@@ -674,6 +497,8 @@ QPlainTextEdit QScrollBar::add-line, QPlainTextEdit QScrollBar::sub-line {
         <property name="font">
          <font>
           <pointsize>8</pointsize>
+          <weight>50</weight>
+          <bold>false</bold>
          </font>
         </property>
         <property name="text">
@@ -681,24 +506,62 @@ QPlainTextEdit QScrollBar::add-line, QPlainTextEdit QScrollBar::sub-line {
         </property>
        </widget>
       </item>
+      <item row="3" column="8">
+       <widget class="QProgressBar" name="progressBar">
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+          <weight>50</weight>
+          <bold>false</bold>
+         </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">/* QProgressBar */
+QProgressBar {
+    border: 1px solid #a0a4a8;
+    border-radius: 6px;
+    text-align: center;
+}
+QProgressBar::chunk {
+    background-color: #4a90e2;
+    border-radius: 6px;
+}</string>
+        </property>
+        <property name="value">
+         <number>0</number>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="8">
+       <widget class="QLabel" name="statusLabel">
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+          <weight>50</weight>
+          <bold>false</bold>
+         </font>
+        </property>
+        <property name="text">
+         <string>Status: Ready</string>
+        </property>
+       </widget>
+      </item>
      </layout>
     </widget>
    </item>
    <item row="1" column="0">
-    <layout class="QHBoxLayout" name="horizontalLayout_5">
-     <item>
-      <widget class="QWidget" name="widget" native="true">
-       <property name="maximumSize">
-        <size>
-         <width>350</width>
-         <height>16777215</height>
-        </size>
-       </property>
-       <layout class="QGridLayout" name="gridLayout_2">
-        <item row="1" column="0">
-         <widget class="QTreeWidget" name="treeWidget">
-          <property name="styleSheet">
-           <string notr="true">/* ==== QTreeWidget / QTreeView ==== */
+    <widget class="QWidget" name="widget" native="true">
+     <property name="maximumSize">
+      <size>
+       <width>350</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_2">
+      <item row="1" column="0">
+       <widget class="QTreeWidget" name="treeWidget">
+        <property name="styleSheet">
+         <string notr="true">/* ==== QTreeWidget / QTreeView ==== */
 QTreeWidget,
 QTreeView {
     background-color: #ffffff;             /* nền trắng */
@@ -775,31 +638,49 @@ QTreeView QScrollBar::sub-line {
     height: 0;
 }
 </string>
-          </property>
-          <column>
-           <property name="text">
-            <string notr="true">Browsers</string>
-           </property>
-          </column>
-         </widget>
-        </item>
-        <item row="0" column="0">
-         <widget class="QLabel" name="label_11">
-          <property name="font">
-           <font>
-            <weight>75</weight>
-            <bold>true</bold>
-           </font>
-          </property>
-          <property name="text">
-           <string>Evidences Browser of Case</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignCenter</set>
-          </property>
-         </widget>
-        </item>
-       </layout>
+        </property>
+        <column>
+         <property name="text">
+          <string notr="true">Browsers</string>
+         </property>
+        </column>
+       </widget>
+      </item>
+      <item row="0" column="0">
+       <widget class="QLabel" name="label_11">
+        <property name="font">
+         <font>
+          <weight>75</weight>
+          <bold>true</bold>
+         </font>
+        </property>
+        <property name="text">
+         <string>Evidences Browser of Case</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="1" column="1">
+    <layout class="QVBoxLayout" name="verticalLayout_4">
+     <item>
+      <widget class="QLabel" name="label_6">
+       <property name="font">
+        <font>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string>Detail analysis</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
       </widget>
      </item>
      <item>
@@ -819,14 +700,14 @@ QTreeView QScrollBar::sub-line {
 }</string>
        </property>
        <property name="currentIndex">
-        <number>2</number>
+        <number>0</number>
        </property>
        <widget class="QWidget" name="historyTab">
         <attribute name="title">
          <string>Browsing History</string>
         </attribute>
-        <layout class="QVBoxLayout" name="historyLayout">
-         <item>
+        <layout class="QGridLayout" name="gridLayout_5">
+         <item row="0" column="0">
           <layout class="QHBoxLayout" name="historySearchLayout">
            <item>
             <widget class="QLabel" name="historySearchLabel">
@@ -1056,7 +937,7 @@ QComboBox QAbstractItemView QScrollBar::sub-line {
            </item>
           </layout>
          </item>
-         <item>
+         <item row="1" column="0">
           <widget class="QTableWidget" name="historyTable">
            <property name="font">
             <font>
@@ -2186,410 +2067,6 @@ QHeaderView::section:hover {
            <property name="sortingEnabled">
             <bool>true</bool>
            </property>
-          </widget>
-         </item>
-        </layout>
-       </widget>
-       <widget class="QWidget" name="extensionsTab">
-        <attribute name="title">
-         <string>Extensions &amp; Add-ons</string>
-        </attribute>
-        <layout class="QVBoxLayout" name="extensionsLayout">
-         <item>
-          <widget class="QTableWidget" name="extensionsTable">
-           <property name="styleSheet">
-            <string notr="true">/* ==== QTableWidget / QTableView ==== */
-QTableWidget,
-QTableView {
-    background-color: #ffffff;           /* nền trắng */
-    border: 1px solid #c0c4c8;           /* viền xám nhạt */
-    gridline-color: #e0e3e6;             /* màu lưới */
-    border-radius: 6px;                  /* bo góc toàn widget */
-    selection-background-color: #cce4f7; /* màu nền khi chọn */
-    selection-color: #000000;            /* màu chữ khi chọn */
-}
-
-/* Alternating row colors */
-QTableWidget {
-    alternate-background-color: #f9fbfc;
-}
-QTableWidget::item:alternate,
-QTableView::item:alternate {
-    background-color: #f9fbfc;
-}
-
-/* Header (cột và hàng) */
-QHeaderView::section {
-    background-color: #e1e5ea;
-    padding: 6px;
-    border: none;
-    border-bottom: 1px solid #c0c4c8;
-    border-right: 1px solid #c0c4c8;
-    font-weight: bold;
-}
-QHeaderView::section:last,
-QHeaderView::section:last {
-    border-right: none;
-}
-
-/* Cell hover */
-QTableWidget::item:hover,
-QTableView::item:hover {
-    background-color: #e8f1fb;
-}
-
-/* Remove focus rectangle */
-QTableWidget::item:focus,
-QTableView::item:focus {
-    outline: none;
-}
-
-/* Scrollbar trong table */
-QTableWidget QScrollBar:vertical,
-QTableView QScrollBar:vertical {
-    background: transparent;
-    width: 8px;
-    margin: 0px;
-}
-QTableWidget QScrollBar::handle:vertical,
-QTableView QScrollBar::handle:vertical {
-    background: #c0c4c8;
-    min-height: 20px;
-    border-radius: 4px;
-}
-QTableWidget QScrollBar::add-line,
-QTableWidget QScrollBar::sub-line,
-QTableView QScrollBar::add-line,
-QTableView QScrollBar::sub-line {
-    height: 0;
-}
-
-/* Focused cell viền xanh nhẹ */
-QTableWidget::item:selected:active,
-QTableView::item:selected:active {
-    border: 1px solid #4a90e2;
-}
-
-/* Header hover (nếu muốn) */
-QHeaderView::section:hover {
-    background-color: #d7dae0;
-}
-</string>
-           </property>
-           <property name="alternatingRowColors">
-            <bool>true</bool>
-           </property>
-           <property name="selectionBehavior">
-            <enum>QAbstractItemView::SelectRows</enum>
-           </property>
-           <property name="sortingEnabled">
-            <bool>true</bool>
-           </property>
-           <column>
-            <property name="text">
-             <string>Extension Name</string>
-            </property>
-           </column>
-           <column>
-            <property name="text">
-             <string>Version</string>
-            </property>
-           </column>
-           <column>
-            <property name="text">
-             <string>ID</string>
-            </property>
-           </column>
-           <column>
-            <property name="text">
-             <string>Permissions</string>
-            </property>
-           </column>
-           <column>
-            <property name="text">
-             <string>Enabled</string>
-            </property>
-           </column>
-           <column>
-            <property name="text">
-             <string>Install Date</string>
-            </property>
-           </column>
-          </widget>
-         </item>
-        </layout>
-       </widget>
-       <widget class="QWidget" name="formDataTab">
-        <attribute name="title">
-         <string>Form Data &amp; Passwords</string>
-        </attribute>
-        <layout class="QVBoxLayout" name="formDataLayout">
-         <item>
-          <widget class="QLabel" name="label_6">
-           <property name="font">
-            <font>
-             <pointsize>9</pointsize>
-             <weight>75</weight>
-             <bold>true</bold>
-            </font>
-           </property>
-           <property name="styleSheet">
-            <string notr="true">color: #e67e22; font-weight: bold; padding: 5px; background-color: #fdf2e9; border-radius: 3px;</string>
-           </property>
-           <property name="text">
-            <string>⚠️ Warning: Password analysis requires elevated privileges and may be restricted by security policies.</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <layout class="QHBoxLayout" name="formDataSearchLayout">
-           <item>
-            <widget class="QLabel" name="formDataSearchLabel">
-             <property name="font">
-              <font>
-               <pointsize>9</pointsize>
-              </font>
-             </property>
-             <property name="text">
-              <string>Search:</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QLineEdit" name="formDataSearchEdit">
-             <property name="font">
-              <font>
-               <pointsize>9</pointsize>
-              </font>
-             </property>
-             <property name="styleSheet">
-              <string notr="true">/* ==== CHUNG CHO CÁC TEXT INPUT / TEXT EDIT ==== */
-QLineEdit,
-QTextEdit,
-QPlainTextEdit {
-    background-color: #ffffff;
-    border: 1px solid #c0c4c8;      /* viền xám nhạt */
-    border-radius: 4px;             /* bo góc mềm */
-    padding: 4px 6px;               /* khoảng đệm bên trong */
-    selection-background-color: #cce4f7;
-    selection-color: #000;
-
-}
-
-/* Khi focus chuyển viền sang xanh */
-QLineEdit:focus,
-QTextEdit:focus,
-QPlainTextEdit:focus {
-    border: 1px solid #4a90e2;
-}
-
-
-
-/* ReadOnly thì nền hơi xám */
-QLineEdit[readOnly=&quot;true&quot;],
-QTextEdit[readOnly=&quot;true&quot;] {
-    background-color: #f0f2f5;
-}
-
-/* Thanh cuộn bên trong QTextEdit bo góc &amp; nhỏ gọn */
-QTextEdit QScrollBar:vertical,
-QPlainTextEdit QScrollBar:vertical {
-    background: transparent;
-    width: 8px;
-    margin: 0px;
-}
-QTextEdit QScrollBar::handle:vertical,
-QPlainTextEdit QScrollBar::handle:vertical {
-    background: #c0c4c8;
-    min-height: 20px;
-    border-radius: 4px;
-}
-QTextEdit QScrollBar::add-line, QTextEdit QScrollBar::sub-line,
-QPlainTextEdit QScrollBar::add-line, QPlainTextEdit QScrollBar::sub-line {
-    height: 0;
-}
-</string>
-             </property>
-             <property name="placeholderText">
-              <string>Search URLs, usernames...</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QCheckBox" name="showPasswordsCheckBox">
-             <property name="font">
-              <font>
-               <pointsize>9</pointsize>
-              </font>
-             </property>
-             <property name="text">
-              <string>Show Passwords</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QPushButton" name="pushButton_6">
-             <property name="minimumSize">
-              <size>
-               <width>150</width>
-               <height>0</height>
-              </size>
-             </property>
-             <property name="font">
-              <font>
-               <pointsize>9</pointsize>
-              </font>
-             </property>
-             <property name="styleSheet">
-              <string notr="true">/* QPushButton */
-QPushButton {
-    background-color: #4a90e2;
-    border: none;
-    border-radius: 4px;
-    padding: 6px 12px;
-    color: #fff;
-}
-QPushButton:hover {
-    background-color: #5aa0f2;
-}
-QPushButton:pressed {
-    background-color: #3a7fcc;
-}</string>
-             </property>
-             <property name="text">
-              <string>Export </string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QLabel" name="label_7">
-             <property name="font">
-              <font>
-               <pointsize>9</pointsize>
-              </font>
-             </property>
-             <property name="text">
-              <string>0 passwords</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </item>
-         <item>
-          <widget class="QTableWidget" name="formDataTable">
-           <property name="styleSheet">
-            <string notr="true">/* ==== QTableWidget / QTableView ==== */
-QTableWidget,
-QTableView {
-    background-color: #ffffff;           /* nền trắng */
-    border: 1px solid #c0c4c8;           /* viền xám nhạt */
-    gridline-color: #e0e3e6;             /* màu lưới */
-    border-radius: 6px;                  /* bo góc toàn widget */
-    selection-background-color: #cce4f7; /* màu nền khi chọn */
-    selection-color: #000000;            /* màu chữ khi chọn */
-}
-
-/* Alternating row colors */
-QTableWidget {
-    alternate-background-color: #f9fbfc;
-}
-QTableWidget::item:alternate,
-QTableView::item:alternate {
-    background-color: #f9fbfc;
-}
-
-/* Header (cột và hàng) */
-QHeaderView::section {
-    background-color: #e1e5ea;
-    padding: 6px;
-    border: none;
-    border-bottom: 1px solid #c0c4c8;
-    border-right: 1px solid #c0c4c8;
-    font-weight: bold;
-}
-QHeaderView::section:last,
-QHeaderView::section:last {
-    border-right: none;
-}
-
-/* Cell hover */
-QTableWidget::item:hover,
-QTableView::item:hover {
-    background-color: #e8f1fb;
-}
-
-/* Remove focus rectangle */
-QTableWidget::item:focus,
-QTableView::item:focus {
-    outline: none;
-}
-
-/* Scrollbar trong table */
-QTableWidget QScrollBar:vertical,
-QTableView QScrollBar:vertical {
-    background: transparent;
-    width: 8px;
-    margin: 0px;
-}
-QTableWidget QScrollBar::handle:vertical,
-QTableView QScrollBar::handle:vertical {
-    background: #c0c4c8;
-    min-height: 20px;
-    border-radius: 4px;
-}
-QTableWidget QScrollBar::add-line,
-QTableWidget QScrollBar::sub-line,
-QTableView QScrollBar::add-line,
-QTableView QScrollBar::sub-line {
-    height: 0;
-}
-
-/* Focused cell viền xanh nhẹ */
-QTableWidget::item:selected:active,
-QTableView::item:selected:active {
-    border: 1px solid #4a90e2;
-}
-
-/* Header hover (nếu muốn) */
-QHeaderView::section:hover {
-    background-color: #d7dae0;
-}
-</string>
-           </property>
-           <property name="alternatingRowColors">
-            <bool>true</bool>
-           </property>
-           <property name="selectionBehavior">
-            <enum>QAbstractItemView::SelectRows</enum>
-           </property>
-           <property name="sortingEnabled">
-            <bool>true</bool>
-           </property>
-           <column>
-            <property name="text">
-             <string>URL</string>
-            </property>
-           </column>
-           <column>
-            <property name="text">
-             <string>Username</string>
-            </property>
-           </column>
-           <column>
-            <property name="text">
-             <string>Password</string>
-            </property>
-           </column>
-           <column>
-            <property name="text">
-             <string>Last Used</string>
-            </property>
-           </column>
-           <column>
-            <property name="text">
-             <string>Field Type</string>
-            </property>
-           </column>
           </widget>
          </item>
         </layout>

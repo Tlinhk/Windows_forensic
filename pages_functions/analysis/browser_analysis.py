@@ -13,6 +13,8 @@ from PyQt5.QtWidgets import (
     QMessageBox,
     QTreeWidgetItem,
     QFileDialog,
+    QHBoxLayout,
+    QScrollArea,
 )
 from PyQt5.QtCore import QMetaEnum, Qt
 from PyQt5.QtWidgets import QTableWidgetItem
@@ -28,6 +30,7 @@ from PyQt5.QtWidgets import (
     QMenu,
     QInputDialog,
 )
+from PyQt5.QtGui import QBrush, QColor
 
 
 class BrowserAnalysis(QWidget):
@@ -61,6 +64,33 @@ class BrowserAnalysis(QWidget):
             self.on_history_filter_changed
         )
         self.ui.cookiesSearchEdit.textChanged.connect(self.filter_cookies_combined)
+        self.ui.treeWidget.currentItemChanged.connect(self.on_current_item_changed)
+
+    def on_current_item_changed(self, current, previous):
+        if current:
+            self.ui.profilePathEdit.setText(current.text(3))
+            top = current
+            while top.parent() is not None:
+                top = top.parent()
+            browser_name = top.text(0)
+            idx = self.ui.browserTypeCombo.findText(browser_name, Qt.MatchContains)
+            if idx != -1:
+                self.ui.browserTypeCombo.setCurrentIndex(idx)
+
+            self.ui.cacheCheckBox.setChecked(False)
+            self.ui.historyCheckBox.setChecked(False)
+            self.ui.cookiesCheckBox.setChecked(False)
+            self.ui.downloadsCheckBox.setChecked(False)
+
+            path = current.text(3).lower()
+            if "cache" in path:
+                self.ui.cacheCheckBox.setChecked(True)
+            elif "history" in path:
+                self.ui.historyCheckBox.setChecked(True)
+            elif "cookies" in path:
+                self.ui.cookiesCheckBox.setChecked(True)
+            elif "downloads" in path:
+                self.ui.downloadsCheckBox.setChecked(True)
 
     def filter_by_type(self, index):
         self.filter_cache_combined()
@@ -970,6 +1000,7 @@ class BrowserAnalysis(QWidget):
                 root_item = QTreeWidgetItem(self.ui.treeWidget)
                 root_item.setText(0, "Không có evidence trình duyệt cho case này")
                 return
+
             # Nhóm theo browser type
             browser_groups = {}
             for artifact in browser_artifacts:
@@ -989,45 +1020,44 @@ class BrowserAnalysis(QWidget):
                 if browser_type not in browser_groups:
                     browser_groups[browser_type] = []
                 browser_groups[browser_type].append(artifact)
-            # Tạo tree: browser -> category -> artifact
+
+            # Tạo tree: browser -> evidence path
             for browser_type, artifacts in browser_groups.items():
                 browser_item = QTreeWidgetItem(self.ui.treeWidget)
                 browser_item.setText(0, f"{browser_type}")
-                # Nhóm theo category (history, cookies, cache...)
-                category_groups = {}
+                browser_item.setBackground(0, QBrush(QColor(200, 220, 240)))
+
+                # Nhóm theo đường dẫn evidence
+                path_groups = {}
                 for artifact in artifacts:
-                    etype = artifact.get("evidence_type", "Unknown")
-                    # Tìm category
-                    cat = "Other"
-                    for c in [
-                        "history",
-                        "cookie",
-                        "cache",
-                        "download",
-                        "bookmark",
-                        "password",
-                        "session",
-                        "extension",
-                        "form",
-                    ]:
-                        if c in etype.lower():
-                            cat = c.capitalize()
-                            break
-                    if cat not in category_groups:
-                        category_groups[cat] = []
-                    category_groups[cat].append(artifact)
-                for cat, cat_artifacts in category_groups.items():
-                    for artifact in cat_artifacts:
-                        source_path = artifact.get("source_path", "")
-                        # Kiểm tra xem có phải là folder không
+                    source_path = artifact.get("source_path", "")
+                    if source_path:
+                        # Lấy thư mục gốc của evidence
                         if os.path.isdir(source_path):
-                            self._add_browser_profile_structure(
-                                browser_item, source_path
-                            )
+                            root_path = source_path
                         else:
-                            cat_item = QTreeWidgetItem(browser_item)
-                            cat_item.setText(0, cat)
-                            art_item = QTreeWidgetItem(cat_item)
+                            root_path = os.path.dirname(source_path)
+
+                        if root_path not in path_groups:
+                            path_groups[root_path] = []
+                        path_groups[root_path].append(artifact)
+
+                # Tạo tree từ đường dẫn evidence
+                for root_path, artifacts in path_groups.items():
+                    if os.path.exists(root_path):
+                        # Tạo item cho thư mục gốc
+                        root_item = QTreeWidgetItem(browser_item)
+                        root_item.setText(0, os.path.basename(root_path))
+                        root_item.setText(1, "Evidence Path")
+                        root_item.setText(2, "")
+                        root_item.setText(3, root_path)
+
+                        # Mở rộng cấu trúc thư mục
+                        self._add_folder_structure(root_item, root_path, max_depth=3)
+                    else:
+                        # Nếu đường dẫn không tồn tại, hiển thị artifact trực tiếp
+                        for artifact in artifacts:
+                            art_item = QTreeWidgetItem(browser_item)
                             art_item.setText(0, artifact.get("name", "Unknown"))
                             art_item.setText(1, artifact.get("evidence_type", ""))
                             size = artifact.get("size")
@@ -1035,72 +1065,39 @@ class BrowserAnalysis(QWidget):
                                 art_item.setText(2, self._format_size(size))
                             else:
                                 art_item.setText(2, "?")
-                            art_item.setText(3, source_path)
-            self.ui.treeWidget.expandAll()
+                            art_item.setText(3, artifact.get("source_path", ""))
+
+            self.ui.treeWidget.collapseAll()
+            self.ui.treeWidget.expandToDepth(0)
+
+            for i in range(self.ui.treeWidget.topLevelItemCount()):
+                root = self.ui.treeWidget.topLevelItem(i)
+                root.setBackground(0, QBrush(QColor(200, 220, 240)))
+
         except Exception as e:
             QMessageBox.warning(
                 self, "Error", f"Lỗi khi load evidence trình duyệt: {str(e)}"
             )
 
-    def _add_browser_profile_structure(self, parent_item, browser_path):
-        try:
-            items = os.listdir(browser_path)
-            profiles = []
-            other_items = []
-            for item in items:
-                item_path = os.path.join(browser_path, item)
-                if os.path.isdir(item_path):
-                    if (
-                        item.lower() == "default"
-                        or item.lower().startswith("profile")
-                        or item.lower().startswith("user data")
-                    ):
-                        profiles.append(item)
-                    else:
-                        other_items.append(item)
-            for profile_name in sorted(profiles):
-                profile_path = os.path.join(browser_path, profile_name)
-                profile_item = QTreeWidgetItem(parent_item)
-                profile_item.setText(0, profile_name)
-                profile_item.setText(1, "Profile")
-                profile_item.setText(2, "")
-                profile_item.setText(3, profile_path)
-                self._add_folder_contents(
-                    profile_item, profile_path, max_depth=2, current_depth=0
-                )
-            for item_name in sorted(other_items):
-                item_path = os.path.join(browser_path, item_name)
-                if os.path.isdir(item_path):
-                    item_tree_item = QTreeWidgetItem(parent_item)
-                    item_tree_item.setText(0, item_name)
-                    item_tree_item.setText(1, "Folder")
-                    item_tree_item.setText(2, "")
-                    item_tree_item.setText(3, item_path)
-                    self._add_folder_contents(
-                        item_tree_item, item_path, max_depth=2, current_depth=0
-                    )
-        except Exception as e:
-            error_item = QTreeWidgetItem(parent_item)
-            error_item.setText(0, f"Error loading profiles: {str(e)}")
-            error_item.setText(1, "Error")
-            error_item.setText(2, "")
-            error_item.setText(3, "")
-
-    def _add_folder_contents(
+    def _add_folder_structure(
         self, parent_item, folder_path, max_depth=3, current_depth=0
     ):
+        """Add folder structure to tree, simplified version"""
         if current_depth >= max_depth:
             return
         try:
             items = os.listdir(folder_path)
             folders = []
             files = []
+
             for item in items:
                 item_path = os.path.join(folder_path, item)
                 if os.path.isdir(item_path):
                     folders.append(item)
                 else:
                     files.append(item)
+
+            # Thêm thư mục trước
             for folder_name in sorted(folders):
                 folder_path_full = os.path.join(folder_path, folder_name)
                 folder_item = QTreeWidgetItem(parent_item)
@@ -1108,9 +1105,13 @@ class BrowserAnalysis(QWidget):
                 folder_item.setText(1, "Folder")
                 folder_item.setText(2, "")
                 folder_item.setText(3, folder_path_full)
-                self._add_folder_contents(
+
+                # Đệ quy thêm nội dung thư mục
+                self._add_folder_structure(
                     folder_item, folder_path_full, max_depth, current_depth + 1
                 )
+
+            # Thêm file sau
             for file_name in sorted(files):
                 file_path_full = os.path.join(folder_path, file_name)
                 file_item = QTreeWidgetItem(parent_item)
@@ -1122,6 +1123,7 @@ class BrowserAnalysis(QWidget):
                 except:
                     file_item.setText(2, "?")
                 file_item.setText(3, file_path_full)
+
         except PermissionError:
             error_item = QTreeWidgetItem(parent_item)
             error_item.setText(0, "Access Denied")
@@ -1147,22 +1149,137 @@ class EntryDialog(QDialog):
     def __init__(self, entry_dict, parent=None):
         super().__init__(parent)
         self.setWindowTitle("Properties")
+        self.setWindowIcon(parent.windowIcon() if parent else None)
 
-        layout = QVBoxLayout()
-        grid = QGridLayout()
+        # Thiết lập kích thước và style
+        self.setMinimumSize(1000, 700)
+        self.setMaximumSize(1400, 900)
+        self.setStyleSheet(
+            """
+            QDialog {
+                background-color: #f8f9fa;
+                border: 1px solid #dee2e6;
+                border-radius: 8px;
+            }
+            QLabel {
+                color: #495057;
+                font-size: 12px;
+            }
+            
+                         QLabel[class="label"] {
+                 font-weight: bold;
+                 color: #495057;
+                 background-color: #e3f2fd;
+                 padding: 6px 10px;
+                 border-left: 3px solid #2196f3;
+                 border-radius: 4px;
+                 margin-right: 8px;
+                 font-size: 13px;
+             }
+             QLabel[class="value"] {
+                 background-color: white;
+                 border: 1px solid #dee2e6;
+                 border-radius: 4px;
+                 padding: 6px 10px;
+                 color: #212529;
+                 font-family: 'Segoe UI', 'Arial', sans-serif;
+                 font-size: 13px;
+                 min-height: 20px;
+             }
+            QPushButton {
+                background-color: #007bff;
+                color: white;
+                border: none;
+                padding: 8px 16px;
+                border-radius: 4px;
+                font-weight: bold;
+                min-width: 80px;
+            }
+            QPushButton:hover {
+                background-color: #0056b3;
+            }
+                         QPushButton:pressed {
+                 background-color: #004085;
+             }
+             QScrollArea {
+                 border: none;
+                 background-color: transparent;
+             }
+             QWidget#scrollAreaWidgetContents {
+                 background-color: transparent;
+             }
+             
+         """
+        )
 
-        for i, (label, value) in enumerate(entry_dict.items()):
-            label_widget = QLabel(f"{label}:")
-            value_widget = QLabel(value)
+        # Layout chính
+        main_layout = QVBoxLayout()
+        main_layout.setSpacing(8)
+        main_layout.setContentsMargins(15, 15, 15, 15)
+
+        # Scroll area cho nội dung
+        scroll_area = QScrollArea()
+        scroll_area.setWidgetResizable(True)
+        scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+        scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+
+        # Widget chứa nội dung
+        content_widget = QWidget()
+        content_layout = QVBoxLayout(content_widget)
+        content_layout.setSpacing(6)
+        content_layout.setContentsMargins(0, 0, 0, 0)
+
+        # Tạo bảng key-value ngang
+        for label, value in entry_dict.items():
+            # Container cho mỗi dòng
+            row_container = QWidget()
+            row_layout = QHBoxLayout(row_container)
+            row_layout.setSpacing(8)
+            row_layout.setContentsMargins(0, 2, 0, 2)
+
+            # Label (cột trái)
+            label_widget = QLabel(f"🔹 {label}:")
+            label_widget.setProperty("class", "label")
+            label_widget.setMinimumWidth(140)
+            label_widget.setMaximumWidth(180)
+            label_widget.setWordWrap(True)
+            row_layout.addWidget(label_widget)
+
+            # Value (cột phải)
+            value_widget = QLabel(value if value else "N/A")
+            value_widget.setProperty("class", "value")
             value_widget.setTextInteractionFlags(Qt.TextSelectableByMouse)
-            grid.addWidget(label_widget, i, 0)
-            grid.addWidget(value_widget, i, 1)
+            value_widget.setWordWrap(True)
+            value_widget.setMinimumHeight(22)
+            row_layout.addWidget(value_widget)
 
-        layout.addLayout(grid)
+            # Tỷ lệ 1:3 cho label:value
+            row_layout.setStretch(0, 1)  # Label
+            row_layout.setStretch(1, 3)  # Value
 
-        ok_btn = QPushButton("OK")
+            content_layout.addWidget(row_container)
+
+        # Thêm content widget vào scroll area
+        scroll_area.setWidget(content_widget)
+        main_layout.addWidget(scroll_area)
+
+        # Button container
+        button_container = QWidget()
+        button_layout = QHBoxLayout(button_container)
+        button_layout.setContentsMargins(0, 10, 0, 0)
+
+        # Spacer để đẩy button về bên phải
+        button_layout.addStretch()
+
+        # OK button
+        ok_btn = QPushButton("✅ OK")
+        ok_btn.setDefault(True)
         ok_btn.clicked.connect(self.accept)
-        layout.addWidget(ok_btn)
+        button_layout.addWidget(ok_btn)
 
-        self.setLayout(layout)
-        self.setMinimumWidth(500)
+        main_layout.addWidget(button_container)
+
+        self.setLayout(main_layout)
+
+        # Đặt focus vào OK button
+        ok_btn.setFocus()
