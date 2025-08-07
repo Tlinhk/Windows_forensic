@@ -16,17 +16,8 @@ from ui.pages.analysis_ui.file_analysis_ui import Ui_EvidenceAnalysisWidget
 try:
     import pytsk3
     PYTSK3_AVAILABLE = True
-    print("✅ pytsk3 available")
-    
-    # Debug: Print available constants
-    print("Available pytsk3 constants:")
-    for attr in dir(pytsk3):
-        if 'DATA' in attr and 'TYPE' in attr:
-            print(f"  {attr}")
-            
 except ImportError:
     PYTSK3_AVAILABLE = False
-    print("❌ pytsk3 not available. Install with: pip install pytsk3")
 
 class FileAnalysis(QWidget):
     def __init__(self, main_window=None):
@@ -80,32 +71,27 @@ class FileAnalysis(QWidget):
             table_files.horizontalHeader().setSectionResizeMode(1, QHeaderView.ResizeToContents)  # Size
             table_files.horizontalHeader().setSectionResizeMode(6, QHeaderView.ResizeToContents)  # Type
             table_files.setSortingEnabled(True)
-            print("✅ File table configured")
         
         # Timeline table
         table_timeline = self.get_ui_component('tableTimeline')
         if table_timeline:
             table_timeline.horizontalHeader().setSectionResizeMode(3, QHeaderView.Stretch)  # Description
             table_timeline.setSortingEnabled(True)
-            print("✅ Timeline table configured")
         
         # Search results table
         table_search = self.get_ui_component('tableSearchResults')
         if table_search:
             table_search.horizontalHeader().setSectionResizeMode(1, QHeaderView.Stretch)  # Path
             table_search.setSortingEnabled(True)
-            print("✅ Search table configured")
         
         # Metadata and properties tables
         table_metadata = self.get_ui_component('tableMetadata')
         if table_metadata:
             table_metadata.horizontalHeader().setSectionResizeMode(1, QHeaderView.Stretch)
-            print("✅ Metadata table configured")
         
         table_properties = self.get_ui_component('tableProperties')
         if table_properties:
             table_properties.horizontalHeader().setSectionResizeMode(1, QHeaderView.Stretch)
-            print("✅ Properties table configured")
     
     def setup_connections(self):
         """Setup signal connections"""
@@ -114,40 +100,34 @@ class FileAnalysis(QWidget):
             btn_load = self.get_ui_component('btnLoadEvidence')
             if btn_load:
                 btn_load.clicked.connect(self.load_evidence_dialog)
-                print("✅ Connected load evidence button")
             
             # Tree widget
             tree = self.get_ui_component('treeInvestigation')
             if tree:
                 tree.itemClicked.connect(self.on_tree_item_clicked)
                 tree.itemExpanded.connect(self.on_tree_item_expanded)
-                print("✅ Connected tree widget")
             
             # File table
             table_files = self.get_ui_component('tableFiles')
             if table_files:
                 table_files.itemSelectionChanged.connect(self.on_file_selected)
-                print("✅ Connected file table")
             
             # Search controls
             btn_search = self.get_ui_component('btnSearch')
             if btn_search:
                 btn_search.clicked.connect(self.perform_search)
-                print("✅ Connected search button")
             
             line_search = self.get_ui_component('lineEditSearch')
             if line_search:
                 line_search.returnPressed.connect(self.perform_search)
-                print("✅ Connected search line edit")
             
             # Timeline table
             table_timeline = self.get_ui_component('tableTimeline')
             if table_timeline:
                 table_timeline.itemSelectionChanged.connect(self.on_timeline_selected)
-                print("✅ Connected timeline table")
                 
         except Exception as e:
-            print(f"❌ Error in setup_connections: {e}")
+            pass
     
     def initialize_empty_state(self):
         """Initialize empty state - Clear pre-populated tree"""
@@ -200,8 +180,6 @@ class FileAnalysis(QWidget):
         label_case = self.get_ui_component('labelCaseInfo')
         if label_case:
             label_case.setText("File Analysis - No evidence loaded")
-        
-        print("✅ Initialized empty state")
     
     def load_case_data(self, case_id):
         """Load case data"""
@@ -220,7 +198,7 @@ class FileAnalysis(QWidget):
                     label_case.setText(text)
                     
         except Exception as e:
-            print(f"Error loading case: {e}")
+            pass
     
     def load_evidence_dialog(self):
         """Show load evidence dialog"""
@@ -234,10 +212,7 @@ class FileAnalysis(QWidget):
         )
         
         if file_path and os.path.exists(file_path):
-            print(f"🔍 Selected evidence file: {file_path}")
             self.load_evidence_file(file_path)
-        else:
-            print("❌ No valid file selected")
     
     def load_evidence_file(self, file_path):
         """Load and analyze evidence file"""
@@ -260,8 +235,6 @@ class FileAnalysis(QWidget):
             self.current_evidence_path = file_path
             file_name = os.path.basename(file_path)
             
-            print(f"🔍 Starting analysis of: {file_name}")
-            
             # Clear previous data
             self.initialize_empty_state()
             
@@ -278,41 +251,30 @@ class FileAnalysis(QWidget):
             QApplication.processEvents()
             
             # Step 1: Open image with pytsk3
-            print("📂 Opening disk image...")
             self.img_info = pytsk3.Img_Info(file_path)
             image_size = self.img_info.get_size()
-            print(f"✅ Image opened - Size: {self.format_file_size(image_size)}")
             
             progress.setValue(40)
             QApplication.processEvents()
             
             # Step 2: Get volume/partition info
-            print("🗂️ Analyzing partitions...")
             partitions = []
             try:
                 self.volume_info = pytsk3.Volume_Info(self.img_info)
                 partitions = list(self.volume_info)
-                print(f"✅ Found {len(partitions)} partitions")
-                for i, part in enumerate(partitions):
-                    desc = part.desc.decode('utf-8', errors='ignore').strip() if part.desc else "Unknown"
-                    size = part.len * 512 if hasattr(part, 'len') else 0
-                    print(f"   Partition {i+1}: {desc} - {self.format_file_size(size)}")
             except:
-                print("⚠️ No partition table found, treating as single filesystem")
                 partitions = [None]  # Single filesystem
             
             progress.setValue(60)
             QApplication.processEvents()
             
             # Step 3: Build evidence tree
-            print("🌳 Building evidence tree...")
             self.build_evidence_tree(file_name, partitions)
             
             progress.setValue(80)
             QApplication.processEvents()
             
             # Step 4: Load initial file list
-            print("📁 Loading initial file list...")
             if partitions and partitions[0] is not None:
                 self.load_partition_root(partitions[0])
             else:
@@ -335,24 +297,18 @@ class FileAnalysis(QWidget):
                 f"Use the tree view to navigate and explore the evidence."
             )
             
-            print(f"🎉 Evidence analysis complete! Found {len(self.file_list)} files")
-            
         except Exception as e:
             if 'progress' in locals():
                 progress.close()
             
             error_msg = f"Failed to load evidence file:\n\n{str(e)}"
             QMessageBox.critical(self, "Error Loading Evidence", error_msg)
-            print(f"❌ Error loading evidence: {e}")
-            import traceback
-            traceback.print_exc()
     
     def build_evidence_tree(self, evidence_name, partitions):
         """Build evidence tree structure like Autopsy"""
         
         tree = self.get_ui_component('treeInvestigation')
         if not tree:
-            print("❌ Tree widget not found")
             return
         
         # Clear tree completely
@@ -363,8 +319,6 @@ class FileAnalysis(QWidget):
         root_item = QTreeWidgetItem(tree, [evidence_name])
         root_item.setData(0, Qt.UserRole, {'type': 'evidence', 'path': self.current_evidence_path})
         root_item.setExpanded(True)
-        
-        print(f"🌳 Building tree for: {evidence_name}")
         
         # Build partition structure
         if partitions and partitions[0] is not None:
@@ -404,13 +358,11 @@ class FileAnalysis(QWidget):
                         # Add navigation folders
                         self.add_navigation_folders(fs_item, fs_info)
                         
-                        print(f"  ✅ Partition {i+1}: {fs_type} - {self.format_file_size(part_size)}")
-                        
                     except Exception as fs_error:
-                        print(f"  ⚠️ Could not read filesystem on partition {i+1}: {fs_error}")
+                        pass
                         
                 except Exception as part_error:
-                    print(f"  ❌ Error processing partition {i}: {part_error}")
+                    pass
         else:
             # Single filesystem
             try:
@@ -427,10 +379,8 @@ class FileAnalysis(QWidget):
                 # Add navigation folders
                 self.add_navigation_folders(fs_item, fs_info)
                 
-                print(f"  ✅ Single filesystem: {fs_type}")
-                
             except Exception as fs_error:
-                print(f"  ❌ Error reading single filesystem: {fs_error}")
+                pass
         
         # Add Views section (like Autopsy)
         views_item = QTreeWidgetItem(tree, ["Views"])
@@ -505,8 +455,6 @@ class FileAnalysis(QWidget):
         deleted_item = QTreeWidgetItem(views_item, [deleted_label])
         deleted_item.setData(0, Qt.UserRole, {'type': 'deleted_files'})
         deleted_item.setIcon(0, self.style().standardIcon(QStyle.SP_TrashIcon))
-        
-        print("✅ Evidence tree built successfully")
     
     def add_navigation_folders(self, parent_item, fs_info):
         """Add navigation folders to filesystem"""
@@ -516,7 +464,7 @@ class FileAnalysis(QWidget):
             self.populate_directory_tree(parent_item, fs_info, "/", depth=0, max_depth=2)
             
         except Exception as e:
-            print(f"⚠️ Error adding navigation folders: {e}")
+            pass
     
     def populate_directory_tree(self, parent_item, fs_info, path="/", depth=0, max_depth=2):
         """Recursively populate directory tree with file counts"""
@@ -611,7 +559,7 @@ class FileAnalysis(QWidget):
                 more_item.setForeground(0, QColor(128, 128, 128))
             
         except Exception as e:
-            print(f"⚠️ Error populating directory tree for {path}: {e}")
+            pass
     
     def on_tree_item_expanded(self, item):
         """Handle tree item expansion for lazy loading"""
@@ -684,7 +632,7 @@ class FileAnalysis(QWidget):
                     item.setData(0, Qt.UserRole, data)
                     
                 except Exception as e:
-                    print(f"⚠️ Error loading directory {path}: {e}")
+                    pass
     
     def on_tree_item_clicked(self, item, column):
         """Handle tree item clicks"""
@@ -695,7 +643,6 @@ class FileAnalysis(QWidget):
         
         item_type = data.get('type')
         item_text = item.text(0)
-        print(f"🖱️ Tree item clicked: {item_text} (type: {item_type})")
         
         try:
             if item_type == 'filesystem':
@@ -727,7 +674,6 @@ class FileAnalysis(QWidget):
                     self.load_partition_root(partition)
                     
         except Exception as e:
-            print(f"❌ Error handling tree click: {e}")
             QMessageBox.warning(self, "Error", f"Error loading data: {str(e)}")
     
     def find_filesystem_info(self):
@@ -757,32 +703,27 @@ class FileAnalysis(QWidget):
     
     def load_filesystem_root(self, fs_info):
         """Load root directory of filesystem"""
-        print("📁 Loading filesystem root...")
         self.load_directory_files(fs_info, "/")
     
     def load_partition_root(self, partition):
         """Load root directory of partition"""
-        print(f"🗂️ Loading partition root...")
         try:
             offset = partition.start * 512 if hasattr(partition, 'start') else 0
             fs_info = pytsk3.FS_Info(self.img_info, offset=offset)
             self.load_directory_files(fs_info, "/")
         except Exception as e:
-            print(f"❌ Error loading partition root: {e}")
+            pass
     
     def load_single_filesystem_root(self):
         """Load root of single filesystem"""
-        print("📁 Loading single filesystem root...")
         try:
             fs_info = pytsk3.FS_Info(self.img_info)
             self.load_directory_files(fs_info, "/")
         except Exception as e:
-            print(f"❌ Error loading single filesystem: {e}")
+            pass
     
     def load_directory_files(self, fs_info, path="/"):
         """Load files from specific directory including deleted files"""
-        
-        print(f"📂 Loading directory: {path}")
         
         try:
             self.file_list = []
@@ -805,37 +746,28 @@ class FileAnalysis(QWidget):
                             self.file_list.append(file_info)
                             
                     except Exception as e:
-                        print(f"⚠️ Error processing file entry: {e}")
                         continue
             except Exception as e:
-                print(f"⚠️ Error reading directory normally: {e}")
+                pass
             
             # Method 2: Scan for deleted files in current directory using inode walking
             if path == "/":  # Only scan unallocated at root level to avoid duplicates
                 try:
                     self.scan_unallocated_inodes(fs_info)
                 except Exception as e:
-                    print(f"⚠️ Error scanning unallocated: {e}")
+                    pass
             
             # Sort files: directories first, then by name
             self.file_list.sort(key=lambda x: (x['type'] != 'Directory', x['name'].lower()))
-            
-            print(f"✅ Loaded {len(self.file_list)} files from {path}")
-            deleted_count = len([f for f in self.file_list if f.get('deleted', False)])
-            if deleted_count > 0:
-                print(f"   🗑️ Including {deleted_count} deleted files")
             
             self.update_file_table()
             self.generate_timeline()
             
         except Exception as e:
-            print(f"❌ Error loading directory {path}: {e}")
             QMessageBox.warning(self, "Error", f"Error loading directory: {str(e)}")
     
     def load_deleted_files(self, fs_info):
         """Load all deleted files from filesystem using inode scanning"""
-        
-        print("🗑️ Scanning for deleted files...")
         
         try:
             self.file_list = []
@@ -847,11 +779,9 @@ class FileAnalysis(QWidget):
             progress.show()
             
             # Method 1: Scan unallocated inodes
-            print("   Scanning unallocated inodes...")
             self.scan_unallocated_inodes(fs_info, show_progress=progress)
             
             # Method 2: Walk filesystem looking for unallocated entries
-            print("   Walking filesystem for deleted entries...")
             progress.setLabelText("Walking filesystem for deleted entries...")
             self.walk_deleted_entries(fs_info, progress)
             
@@ -864,8 +794,6 @@ class FileAnalysis(QWidget):
                 if key not in unique_files:
                     unique_files[key] = file
             self.file_list = list(unique_files.values())
-            
-            print(f"✅ Found {len(self.file_list)} unique deleted files")
             
             if len(self.file_list) > 0:
                 self.update_file_table()
@@ -883,15 +811,12 @@ class FileAnalysis(QWidget):
                 )
             
         except Exception as e:
-            print(f"❌ Error loading deleted files: {e}")
             if 'progress' in locals():
                 progress.close()
             QMessageBox.warning(self, "Error", f"Error loading deleted files: {str(e)}")
     
     def load_files_by_type(self, fs_info, file_type):
         """Load files by type"""
-        
-        print(f"📋 Loading files by type: {file_type}")
         
         try:
             self.file_list = []
@@ -975,17 +900,15 @@ class FileAnalysis(QWidget):
                             continue
                             
                 except Exception as e:
-                    print(f"⚠️ Error in find_files_by_type: {e}")
+                    pass
             
             # Start search
             root_dir = fs_info.open_dir(path="/")
             find_files_by_type(root_dir)
             
-            print(f"✅ Found {len(self.file_list)} {file_type} files")
             self.update_file_table()
             
         except Exception as e:
-            print(f"❌ Error loading files by type: {e}")
             QMessageBox.warning(self, "Error", f"Error loading files by type: {str(e)}")
     
     def extract_file_info_safe(self, entry, fs_info, current_path):
@@ -1044,7 +967,6 @@ class FileAnalysis(QWidget):
             }
             
         except Exception as e:
-            print(f"⚠️ Error extracting file info: {e}")
             return None
     
     def extract_timestamps_safe(self, entry):
@@ -1135,7 +1057,6 @@ class FileAnalysis(QWidget):
         
         table_files = self.get_ui_component('tableFiles')
         if not table_files:
-            print("❌ File table not found")
             return
         
         table_files.setRowCount(len(self.file_list))
@@ -1158,8 +1079,6 @@ class FileAnalysis(QWidget):
                     if item:
                         item.setBackground(QColor(255, 200, 200))
                         item.setToolTip("🗑️ Deleted file")
-        
-        print(f"✅ Updated file table with {len(self.file_list)} files")
     
     def generate_timeline(self):
         """Generate timeline from current file list"""
@@ -1190,8 +1109,6 @@ class FileAnalysis(QWidget):
         
         # Update timeline table
         self.update_timeline_table()
-        
-        print(f"✅ Generated timeline with {len(self.timeline_data)} events")
     
     def update_timeline_table(self):
         """Update timeline table"""
@@ -1219,7 +1136,6 @@ class FileAnalysis(QWidget):
         current_row = table_files.currentRow()
         if 0 <= current_row < len(self.file_list):
             file_info = self.file_list[current_row]
-            print(f"📄 Selected file: {file_info['name']}")
             self.show_file_details(file_info)
     
     def show_file_details(self, file_info):
@@ -1377,10 +1293,8 @@ class FileAnalysis(QWidget):
                 if hasattr(entry, 'read_random'):
                     size_to_read = min(file_info['size'], 50000) if file_info['size'] > 0 else 50000
                     file_data = entry.read_random(0, size_to_read)
-                    if file_data:
-                        print(f"✅ Read {len(file_data)} bytes using read_random")
             except Exception as e:
-                print(f"⚠️ read_random failed: {e}")
+                pass
             
             # Method 2: Try attribute-based reading for NTFS
             if not file_data:
@@ -1394,10 +1308,9 @@ class FileAnalysis(QWidget):
                                     size_to_read = min(attr.info.size, 50000) if hasattr(attr.info, 'size') else 50000
                                     file_data = attr.read_random(0, size_to_read)
                                     if file_data:
-                                        print(f"✅ Read {len(file_data)} bytes from $DATA attribute")
                                         break
                 except Exception as e:
-                    print(f"⚠️ Attribute reading failed: {e}")
+                    pass
             
             # Method 3: Try filesystem-level reading
             if not file_data and hasattr(entry.info, 'meta') and hasattr(entry.info.meta, 'addr'):
@@ -1408,10 +1321,8 @@ class FileAnalysis(QWidget):
                         if file_obj:
                             size_to_read = min(file_info['size'], 50000) if file_info['size'] > 0 else 50000
                             file_data = file_obj.read_random(0, size_to_read)
-                            if file_data:
-                                print(f"✅ Read {len(file_data)} bytes using fs_info.open_meta")
                 except Exception as e:
-                    print(f"⚠️ fs_info read failed: {e}")
+                    pass
             
             if file_data:
                 # Try to decode as text
@@ -1429,9 +1340,6 @@ class FileAnalysis(QWidget):
             return "No content data found (file may be resident in MFT or empty)"
             
         except Exception as e:
-            print(f"❌ Error extracting file content: {e}")
-            import traceback
-            traceback.print_exc()
             return f"Content extraction error: {str(e)}"
     
     def generate_hex_view(self, content):
@@ -1495,8 +1403,6 @@ class FileAnalysis(QWidget):
         if not keyword:
             QMessageBox.warning(self, "Search", "Please enter a search keyword.")
             return
-        
-        print(f"🔍 Searching for: {keyword}")
         
         self.search_results = []
         
@@ -1662,21 +1568,15 @@ class FileAnalysis(QWidget):
             
             return None
         except Exception as e:
-            print(f"❌ Error extracting raw content: {e}")
             return None
     
     def scan_unallocated_inodes(self, fs_info, show_progress=None):
         """Scan filesystem for unallocated inodes (deleted files)"""
         try:
-            print("🔍 Scanning unallocated inodes...")
-            
             # Get filesystem info
             fs_type = fs_info.info.ftype if hasattr(fs_info.info, 'ftype') else 0
             last_inum = fs_info.info.last_inum if hasattr(fs_info.info, 'last_inum') else 0
             first_inum = fs_info.info.first_inum if hasattr(fs_info.info, 'first_inum') else 0
-            
-            print(f"   Filesystem type: {fs_type}")
-            print(f"   Inode range: {first_inum} - {last_inum}")
             
             if last_inum == 0:
                 last_inum = 100000  # Default for testing
@@ -1771,9 +1671,6 @@ class FileAnalysis(QWidget):
                                 
                                 self.file_list.append(file_info)
                                 deleted_count += 1
-                                
-                                if deleted_count % 10 == 0:
-                                    print(f"   Found {deleted_count} deleted files...")
                         
                         checked_count += 1
                         
@@ -1781,10 +1678,8 @@ class FileAnalysis(QWidget):
                         # Inode doesn't exist or can't be read
                         pass
             
-            print(f"   ✅ Found {deleted_count} deleted files from {checked_count} inodes checked")
-            
         except Exception as e:
-            print(f"   ❌ Error scanning unallocated inodes: {e}")
+            pass
     
     def walk_deleted_entries(self, fs_info, progress=None):
         """Walk filesystem directories looking for deleted entries"""
@@ -1832,7 +1727,7 @@ class FileAnalysis(QWidget):
             scan_directory(root_dir)
             
         except Exception as e:
-            print(f"   ❌ Error walking deleted entries: {e}")
+            pass
     
     def get_file_type_from_meta(self, meta):
         """Determine file type from metadata"""
@@ -1929,7 +1824,6 @@ class FileAnalysis(QWidget):
             return result
             
         except Exception as e:
-            print(f"⚠️ Error finding deleted filename: {e}")
             return None
     
     def guess_file_extension(self, file_obj):
@@ -2126,7 +2020,7 @@ class FileAnalysis(QWidget):
                 pass
             
         except Exception as e:
-            print(f"⚠️ Error counting files by type: {e}")
+            pass
         
         return counts
     
