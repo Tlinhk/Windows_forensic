@@ -423,7 +423,7 @@ class Ui_MainWindow(object):
             _translate("MainWindow", "Điều tra máy tính"),
         )
         self.pushButton_4.setText(_translate("MainWindow", "Dữ liệu khả biến"))
-        self.pushButton_5.setText(_translate("MainWindow", "Dữ liệu bất biển"))
+        self.pushButton_5.setText(_translate("MainWindow", "Dữ liệu bất biến"))
         self.toolBox.setItemText(
             self.toolBox.indexOf(self.page_4),
             _translate("MainWindow", "Thu thập dữ liệu"),
