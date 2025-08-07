@@ -1,21 +1,34 @@
-PyQt5>=5.15.0
-python-registry>=1.3.1
-regipy>=3.1.6
-pandas>=1.3.0
-tqdm>=4.62.0
-pywin32>=300; sys_platform == 'win32'
-psutil>=5.8.0
-matplotlib>=3.4.0
-pyewf>=20210625; sys_platform == 'win32'
+# Core GUI Framework
+PyQt5==5.15.9
+PyQt5-Qt5==5.15.2
+PyQt5-sip==12.12.1
 
+# Database
+sqlite3
 
-# Database (SQLite3 is built-in with Python)
-# hashlib is built-in with Python
+# Forensics Analysis Libraries
+pytsk3==20230918
+pyewf==20231231
+Pillow==10.0.1
+PyPDF2==3.0.1
+python-docx==0.8.11
 
-# Development tools (optional)
-# pytest==7.4.3
-# black==23.11.0
-# flake8==6.1.0
+# Additional Analysis Tools
+pefile==2023.2.7
+yara-python==4.3.1
+python-magic==0.4.27
 
-# Documentation (optional)
-# sphinx==7.2.6 
+# Data Processing
+pandas==2.0.3
+numpy==1.24.3
+
+# Utilities
+psutil==5.9.5
+requests==2.31.0
+python-dateutil==2.8.2
+
+# Optional: For advanced image analysis
+opencv-python==4.8.1.78
+
+# Optional: For network analysis
+scapy==2.5.0

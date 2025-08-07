@@ -2,6 +2,7 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QMessageBox, QPushButton,
 from PyQt5.QtCore import pyqtSignal, QTimer, Qt
 from datetime import datetime
 from PyQt5 import QtWidgets
+from PyQt5.QtWidgets import QSizePolicy
 
 
 from login_window import LoginWindow
@@ -29,31 +30,43 @@ class MyWindow(QMainWindow):
         self.ui.setupUi(self)
 
         # Sau khi setupUi xong:
+        self.ui.tabWidget.tabBar().setElideMode(Qt.ElideNone)
+        self.ui.tabWidget.tabBar().setUsesScrollButtons(True)
         self.ui.tabWidget.setStyleSheet("""
+        QTabWidget::pane {
+            border: 1px solid #ddd;
+            background-color: white;
+        }
+
         QTabBar::tab {
-            background: #f3f3f3;
-            color: #2d3748;
-            border-radius: 10px;
-            padding: 10px 24px;
-            margin: 3px;
-            min-width: 150px;
-            min-height: 15px;
-            font-size: 15px;
+            background-color: #ecf0f1;
+            padding: 6px 12px;
+            margin-right: 2px;
+            border-top-left-radius: 4px;
+            border-top-right-radius: 4px;
+            color: #2c3e50;
+            font-size: 14px;
             font-family: "Segoe UI", "Arial", sans-serif;
+            min-width: 120px;
         }
+
         QTabBar::tab:selected {
-            background: #3182ce;
-            color: white;
+            background-color: white;
+            border-bottom: 2px solid #3498db;
+            color: #3498db;
         }
+
         QTabBar::tab:hover {
-            background: #bee3f8;
+            background-color: #dfe6e9;
         }
+
         QTabBar::close-button {
             subcontrol-position: right;
-            margin-left: 10px;
+            margin-left: 8px;
         }
         """)
-
+        
+        self.ui.tabWidget.tabBar().setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
 
         # self.ui.menu_widget.setMinimumWidth(100)
         # self.ui.toolBox.setMinimumWidth(100)
@@ -104,7 +117,7 @@ class MyWindow(QMainWindow):
             ),
             self.registry_btn: ("Registry", lambda: RegistryAnalysis()),
             self.browser_btn: ("Browser", lambda: BrowserAnalysis(main_window=self)),
-            self.file_btn: ("File", lambda: FileAnalysis()),
+            self.file_btn: ("File", lambda: FileAnalysis(main_window=self)),
             self.metadata_btn: ("Metadata", lambda: MetadataAnalysis()),
             self.eventlog_btn: ("Event Log", lambda: EventlogAnalysis()),
             self.report_btn: ("Report", lambda: Report()),

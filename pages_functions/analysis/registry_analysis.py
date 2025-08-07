@@ -1,10 +1,5 @@
 # -*- coding: utf-8 -*-
 
-"""
-Công cụ forensic để phân tích các file registry hive của Windows
-Sử dụng RECmd để phân tích và PyQt5 để hiển thị giao diện
-"""
-
 # ====================================================
 # 📚 1. NHẬP THƯ VIỆN & NẠP UI
 # ====================================================
@@ -41,8 +36,6 @@ def format_as_hex(data):
         data: Dữ liệu cần định dạng (bytes hoặc str)
     Returns:
         str: Dữ liệu đã định dạng theo kiểu hex dump    
-    Example:
-        00000000  48 65 6C 6C 6F 20 57 6F 72 6C 64 00              |Hello World.|
     """
     if not data:
         return "Không có dữ liệu"
@@ -111,25 +104,22 @@ def auto_decode_data(data):
         return "Không có dữ liệu"
     
     try:
-        # Kiểm tra xem có phải số nguyên không
-        if str(data).isdigit():
+        if str(data).isdigit(): # Kiểm tra xem có phải số nguyên không
             num = int(data)
             return f"Thập phân: {num}\nHex: 0x{num:X}\nBinary: {bin(num)}"
         
-        # Thử decode UTF-8
-        if isinstance(data, str):
+        if isinstance(data, str): # Thử decode UTF-8
             return f"String: {data}"
         
-        # Thử decode bytes
         if isinstance(data, bytes):
-            try:
+            try: # Thử decode bytes
                 utf8_result = data.decode('utf-8', errors='ignore')
                 if utf8_result.isprintable():
                     return f"UTF-8 String: {utf8_result}"
             except:
                 pass
             
-            try:
+            try: # Thử decode UTF-16
                 utf16_result = data.decode('utf-16le', errors='ignore')
                 if utf16_result.isprintable():
                     return f"UTF-16 String: {utf16_result}"
@@ -190,26 +180,22 @@ def decode_filetime(data):
     """
     try:
         if isinstance(data, bytes) and len(data) == 8:
-            # FILETIME là little-endian 64-bit integer
-            filetime = int.from_bytes(data, byteorder='little')
+            filetime = int.from_bytes(data, byteorder='little') # FILETIME là little-endian 64-bit integer
             
             # Chuyển đổi từ FILETIME sang Unix timestamp
             # FILETIME epoch: 1601-01-01, Unix epoch: 1970-01-01
-            # Khác biệt: 11644473600 giây
-            FILETIME_EPOCH_DIFF = 11644473600
+            FILETIME_EPOCH_DIFF = 11644473600 # Khác biệt: 11644473600 giây
             
-            # Chuyển từ 100-nanosecond intervals sang giây
-            unix_timestamp = (filetime / 10000000) - FILETIME_EPOCH_DIFF
-            
+            unix_timestamp = (filetime / 10000000) - FILETIME_EPOCH_DIFF # Chuyển từ 100-nanosecond intervals sang giây
             if unix_timestamp > 0:
                 dt = datetime.fromtimestamp(unix_timestamp)
-                return f"FILETIME: {dt.strftime('%Y-%m-%d %H:%M:%S')}\nRaw: {filetime}\nUnix: {unix_timestamp}"
+                return f"FILETIME: {dt.strftime('%Y-%m-%d %H:%M:%S')}\nRaw: {filetime}\nUnix: {unix_timestamp}" # Chuyển đổi từ FILETIME sang Unix timestamp
             else:
-                return f"FILETIME (invalid): {filetime}"
+                return f"FILETIME (invalid): {filetime}" # Trả về thông báo lỗi nếu FILETIME không hợp lệ
         
-        return f"FILETIME (raw): {data}"
+        return f"FILETIME (raw): {data}" # Trả về thông báo lỗi nếu FILETIME không hợp lệ
     except Exception as e:
-        return f"Lỗi decode FILETIME: {str(e)}"
+        return f"Lỗi decode FILETIME: {str(e)}" # Trả về thông báo lỗi nếu có lỗi xảy ra        
 
 # ====================================================
 # 🧵 3. RegistryAnalysisThread  ➜  LUỒNG PHÂN TÍCH RECmd
@@ -245,15 +231,13 @@ class RegistryAnalysisThread(QThread):
         
     def cancel(self):
         """
-        Hủy bỏ quá trình phân tích đang chạy
-        Đặt flag để dừng vòng lặp phân tích
+        Hủy bỏ quá trình phân tích đang chạy, đặt flag để dừng vòng lặp phân tích
         """
         self.is_cancelled = True
         
     def run(self):
         """
-        Phương thức chính của thread - chạy phân tích cho tất cả hive files
-        Phân tích từng file một và báo cáo tiến độ
+        Phương thức chính của thread - chạy phân tích cho tất cả hive files, phân tích từng file một và báo cáo tiến độ
         """
         try:
             total_hives = len(self.hive_files)
@@ -266,20 +250,18 @@ class RegistryAnalysisThread(QThread):
                 hive_name = os.path.basename(hive_file)
                 self.status_updated.emit(f"Đang phân tích {hive_name}...")
                 
-                # Chạy RECmd cho từng hive
-                result = self.run_recmd_analysis(hive_file)
+                result = self.run_recmd_analysis(hive_file) # Chạy phân tích RECmd trên một file hive cụ thể
                 if result:
                     results[hive_file] = result
                 
-                # Cập nhật tiến độ
-                progress = int((i + 1) / total_hives * 100)
+                progress = int((i + 1) / total_hives * 100) # Cập nhật tiến độ
                 self.progress_updated.emit(progress)
             
-            if not self.is_cancelled:
-                self.analysis_completed.emit(results)
+            if not self.is_cancelled: # Nếu không bị hủy bỏ
+                self.analysis_completed.emit(results) # Gửi kết quả phân tích
                 
-        except Exception as e:
-            self.error_occurred.emit(str(e))
+        except Exception as e: # Nếu có lỗi xảy ra
+            self.error_occurred.emit(str(e)) # Gửi thông báo lỗi
     
     def run_recmd_analysis(self, hive_file):
         """
@@ -292,11 +274,9 @@ class RegistryAnalysisThread(QThread):
             Exception: Khi RECmd thất bại hoặc không thể đọc kết quả
         """
         try:
-            # Chuẩn bị tên file output
-            hive_name = os.path.splitext(os.path.basename(hive_file))[0]
-            output_csv = os.path.join(self.output_dir, f"{hive_name}_analysis.csv")
+            hive_name = os.path.splitext(os.path.basename(hive_file))[0] # Chuẩn bị tên file output
+            output_csv = os.path.join(self.output_dir, f"{hive_name}_analysis.csv") # Tạo đường dẫn file CSV output
             
-            # Xây dựng lệnh RECmd
             cmd = [
                 self.recmd_path,
                 "-f", hive_file,                    # File hive input
@@ -306,8 +286,7 @@ class RegistryAnalysisThread(QThread):
                 "--nl"                              # Cho phép transaction logs không tồn tại
             ]
             
-            # Chạy lệnh subprocess
-            process = subprocess.Popen(
+            process = subprocess.Popen(# Chạy lệnh subprocess
                 cmd,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
@@ -317,14 +296,13 @@ class RegistryAnalysisThread(QThread):
             
             stdout, stderr = process.communicate()
             
-            # Kiểm tra kết quả
-            if process.returncode == 0 and os.path.exists(output_csv):
-                return self.parse_csv_results(output_csv)
+            if process.returncode == 0 and os.path.exists(output_csv): # Kiểm tra kết quả
+                return self.parse_csv_results(output_csv) # Phân tích kết quả CSV
             else:
-                raise Exception(f"RECmd thất bại: {stderr}")
+                raise Exception(f"RECmd thất bại: {stderr}") # Gửi thông báo lỗi nếu RECmd thất bại
                 
-        except Exception as e:
-            raise Exception(f"Lỗi phân tích {os.path.basename(hive_file)}: {str(e)}")
+        except Exception as e: # Nếu có lỗi xảy ra
+            raise Exception(f"Lỗi phân tích {os.path.basename(hive_file)}: {str(e)}") # Gửi thông báo lỗi
     
     def parse_csv_results(self, csv_file):
         """
@@ -388,8 +366,7 @@ class BatchFileManager:
                         'info': info,
                         'size': os.path.getsize(file_path)
                     }
-                except Exception as e:
-                    # Nếu parse thất bại, vẫn bao gồm file với thông tin cơ bản
+                except Exception as e: # Nếu parse thất bại, vẫn bao gồm file với thông tin cơ bản
                     batch_files[file] = {
                         'path': file_path,
                         'info': {'Description': file, 'Category': 'Unknown', 'Error': str(e)},
@@ -400,8 +377,7 @@ class BatchFileManager:
     
     def parse_batch_file_info(self, batch_file):
         """
-        Phân tích header của batch file để trích xuất metadata
-        Đọc các dòng comment đầu file để lấy thông tin mô tả
+        Phân tích header của batch file để trích xuất metadata, đọc các dòng comment đầu file để lấy thông tin mô tả
         Args:
             batch_file (str): Đường dẫn đến batch file
         Returns:
@@ -418,8 +394,7 @@ class BatchFileManager:
             with open(batch_file, 'r', encoding='utf-8', errors='ignore') as f:
                 lines = f.readlines()[:20]  # Chỉ đọc 20 dòng đầu cho header
                 
-            # Phân tích các dòng header
-            for line in lines:
+            for line in lines: # Đọc từng dòng
                 line = line.strip()
                 if line.startswith('Description:'):
                     info['Description'] = line.replace('Description:', '').strip()
@@ -430,8 +405,7 @@ class BatchFileManager:
                 elif line.startswith('Category:'):
                     info['Category'] = line.replace('Category:', '').strip()
                     
-            # Phân loại tự động dựa trên tên file nếu không có Category
-            if info['Category'] == 'General':
+            if info['Category'] == 'General': # Phân loại tự động dựa trên tên file nếu không có Category
                 filename = os.path.basename(batch_file).lower()
                 if 'system' in filename:
                     info['Category'] = 'System Analysis'
@@ -448,8 +422,8 @@ class BatchFileManager:
                 elif 'basic' in filename:
                     info['Category'] = 'Basic System Info'
                 
-        except Exception as e:
-            info['Error'] = str(e)
+        except Exception as e: # Nếu có lỗi xảy ra
+            info['Error'] = str(e) # Gửi thông báo lỗi
             
         return info
     
@@ -473,8 +447,7 @@ class BatchFileManager:
         if hive_type and hive_type.upper() in recommendations:
             return recommendations[hive_type.upper()]
         
-        # Mặc định sử dụng phân tích toàn diện
-        return ['DFIRBatch.reb']
+        return ['DFIRBatch.reb'] # Mặc định sử dụng phân tích toàn diện
 
 # ====================================================
 # 🔎 5. RegistryHiveDetector  ➜  NHẬN DIỆN FILE HIVE
@@ -498,7 +471,6 @@ class RegistryHiveDetector:
         """
         filename = os.path.basename(file_path).upper()
         
-        # Kiểm tra các tên hive phổ biến
         if filename in ['SYSTEM', 'SYSTEM.LOG', 'SYSTEM.LOG1', 'SYSTEM.LOG2']:
             return 'SYSTEM'
         elif filename in ['SOFTWARE', 'SOFTWARE.LOG', 'SOFTWARE.LOG1', 'SOFTWARE.LOG2']:
@@ -513,10 +485,8 @@ class RegistryHiveDetector:
             return 'USRCLASS'
         elif 'DEFAULT' in filename:
             return 'DEFAULT'
-        
-        # Thử phát hiện dựa trên cấu trúc file (kiểm tra header)
         try:
-            with open(file_path, 'rb') as f:
+            with open(file_path, 'rb') as f: # Thử phát hiện dựa trên cấu trúc file (kiểm tra header)
                 header = f.read(4)
                 if header == b'regf':
                     return 'UNKNOWN_HIVE'
@@ -594,19 +564,16 @@ class RegistryTreeParser:
             return None
         
         try:
-            # Tạo item cho key này
-            key_name = key.name() if key.name() else os.path.basename(registry.hive_name())
+            key_name = key.name() if key.name() else os.path.basename(registry.hive_name())# Tạo item cho key này
             key_item = QStandardItem(key_name)
             
-            # Đặt icon dựa trên độ sâu và loại
-            if icons:
+            if icons:# Đặt icon dựa trên độ sâu và loại
                 if current_depth == 0:
                     key_item.setIcon(icons.get('folder', QIcon()))
                 else:
                     key_item.setIcon(icons.get('key', QIcon()))
             
-            # Lưu metadata trong item để sử dụng sau
-            key_data = {
+            key_data = { # Lưu metadata trong item để sử dụng sau
                 'type': 'key',
                 'path': key.path(),
                 'timestamp': key.timestamp(),
@@ -615,14 +582,12 @@ class RegistryTreeParser:
             }
             key_item.setData(key_data, Qt.UserRole)
             
-            # Thêm vào parent hoặc model root
-            if parent_item:
+            if parent_item:# Thêm vào parent hoặc model root
                 parent_item.appendRow(key_item)
             else:
                 model.appendRow(key_item)
             
-            # Thêm các subkey một cách đệ quy
-            try:
+            try: # Thêm các subkey một cách đệ quy
                 for subkey in key.subkeys():
                     self.build_registry_tree(model, key_item, registry, subkey, 
                                            max_depth, current_depth + 1, icons)
@@ -631,8 +596,7 @@ class RegistryTreeParser:
                 
             return key_item
         
-        except Exception as e:
-            # Tạo error item để hiển thị lỗi
+        except Exception as e: # Nếu có lỗi xảy ra
             error_item = QStandardItem(f"Lỗi: {str(e)}")
             if icons:
                 error_item.setIcon(icons.get('error', QIcon()))
@@ -664,8 +628,7 @@ class RegistryTreeParser:
                     'raw_data': value.raw_data()
                 }
                 values.append(value_data)
-        except Exception as e:
-            # Thêm entry lỗi nếu không thể đọc values
+        except Exception as e: # Thêm entry lỗi nếu không thể đọc values
             values.append({
                 'name': '(Lỗi đọc values)',
                 'value': str(e),
@@ -688,30 +651,26 @@ class RegistryTreeParser:
         try:
             raw_value = value.value()
             
-            # Xử lý các loại dữ liệu khác nhau
-            if isinstance(raw_value, str):
-                # Làm sạch string, loại bỏ ký tự null
+            if isinstance(raw_value, str): # Xử lý các loại dữ liệu khác nhau
                 return raw_value.replace('\x00', '').strip()
             elif isinstance(raw_value, (int, float)):
                 return str(raw_value)
             elif isinstance(raw_value, bytes):
-                # Thử decode bytes thành string
                 try:
                     return raw_value.decode('utf-8', errors='ignore').replace('\x00', '').strip()
                 except:
                     return f"<binary data: {len(raw_value)} bytes>"
             elif isinstance(raw_value, list):
-                # Multi-string values
                 return '; '.join(str(item) for item in raw_value)
             else:
                 return str(raw_value)
                 
         except Registry.RegistryValueNotFoundException:
-            return "(giá trị không tìm thấy)"
+            return "(giá trị không tìm thấy)" # Gửi thông báo lỗi nếu không tìm thấy giá trị
         except Registry.RegistryParse.ParseException:
-            return "(lỗi phân tích dữ liệu)"
-        except Exception as e:
-            return f"(lỗi: {str(e)})"
+            return "(lỗi phân tích dữ liệu)" # Gửi thông báo lỗi nếu có lỗi phân tích dữ liệu
+        except Exception as e: # Nếu có lỗi xảy ra
+            return f"(lỗi: {str(e)})" # Gửi thông báo lỗi
 
 # ====================================================
 # 🖥️ 7. RegistryAnalysis  ➜  GIAO DIỆN PHÂN TÍCH CHÍNH
@@ -731,25 +690,20 @@ class RegistryAnalysis(QWidget):
         """
         super().__init__(parent)
         
-        # Thiết lập UI từ file thiết kế
-        self.ui = Ui_RegistryAnalysisWidget()
+        self.ui = Ui_RegistryAnalysisWidget() # Thiết lập UI từ file thiết kế
         self.ui.setupUi(self)
         
-        # Khởi tạo các đường dẫn công cụ
         self.tools_dir = os.path.join(os.path.dirname(__file__), '..', '..', 'tools')
         self.recmd_path = os.path.join(self.tools_dir, 'RECmd', 'RECmd.exe')
         self.batch_dir = os.path.join(self.tools_dir, 'RECmd', 'BatchExamples')
         self.output_dir = os.path.join(os.path.dirname(__file__), '..', '..', 'temp', 'registry_analysis')
         
-        # Tạo thư mục output nếu chưa tồn tại
-        os.makedirs(self.output_dir, exist_ok=True)
+        os.makedirs(self.output_dir, exist_ok=True) # Tạo thư mục output nếu chưa tồn tại
         
-        # Khởi tạo các manager component
         self.batch_manager = BatchFileManager(self.batch_dir)
         self.hive_detector = RegistryHiveDetector()
         self.registry_parser = RegistryTreeParser()
         
-        # Tải icons cho UI elements
         self.icons = {
             'folder': QIcon(":/icons/folder.ico") if QIcon.hasThemeIcon("folder") else QIcon.fromTheme("folder"),
             'key': QIcon(":/icons/key.ico") if QIcon.hasThemeIcon("dialog-password") else QIcon.fromTheme("dialog-password"),

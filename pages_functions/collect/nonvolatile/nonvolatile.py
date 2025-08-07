@@ -139,7 +139,7 @@ class KapeDataLoader(QtCore.QObject):
                 # Tìm tất cả các file có đuôi .mkape
                 module_files = glob.glob(os.path.join(kape_modules_path, "**", "*.mkape"), recursive=True)
                 # Giới hạn số lượng file xử lý để cải thiện hiệu năng
-                for module_file in module_files[:50]:
+                for module_file in module_files:
                     try:
                         with open(module_file, 'r', encoding='utf-8') as f:
                             content = f.read()
