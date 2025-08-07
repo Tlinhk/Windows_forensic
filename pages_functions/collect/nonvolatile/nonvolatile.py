@@ -139,7 +139,7 @@ class KapeDataLoader(QtCore.QObject):
                 # Tìm tất cả các file có đuôi .mkape
                 module_files = glob.glob(os.path.join(kape_modules_path, "**", "*.mkape"), recursive=True)
                 # Giới hạn số lượng file xử lý để cải thiện hiệu năng
-                for module_file in module_files[:50]:
+                for module_file in module_files:
                     try:
                         with open(module_file, 'r', encoding='utf-8') as f:
                             content = f.read()
@@ -371,6 +371,30 @@ class NonVolatilePage(QtWidgets.QWidget, Ui_CollectNonvolatileForm):
         # Thiết lập giao diện người dùng đã được định nghĩa trong Ui_CollectNonvolatileForm
         self.setupUi(self)
         
+        # Thiết lập kích thước và chính sách size cho widget
+        self.setMinimumSize(1200, 850)
+        self.resize(1200, 850)
+        self.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+        
+        # Tạo status label để hiển thị warnings
+        self.status_label = QtWidgets.QLabel()
+        self.status_label.setStyleSheet("""
+            QLabel {
+                background-color: #fff3cd;
+                color: #856404;
+                border: 1px solid #ffeaa7;
+                border-radius: 4px;
+                padding: 8px;
+                font-weight: bold;
+            }
+        """)
+        self.status_label.setWordWrap(True)
+        self.status_label.hide()
+        
+        # Thêm status label vào layout chính
+        if hasattr(self, 'mainLayout'):
+            self.mainLayout.insertWidget(0, self.status_label)
+        
         # --- Nhóm 2 radio vào cùng 1 ButtonGroup ---
         self.strategy_group = QtWidgets.QButtonGroup(self)
         self.strategy_group.addButton(self.radioButton_triage)
@@ -487,6 +511,120 @@ class NonVolatilePage(QtWidgets.QWidget, Ui_CollectNonvolatileForm):
         self.checkBox_md5.setChecked(True)
         self.checkBox_sha1.setChecked(True)
         self.checkBox_sha256.setChecked(True)
+        
+        # Khởi tạo triangle indicators cho warnings
+        self.setup_triangle_indicators()
+        
+        # Khởi tạo dictionary cho target và module variables
+        self.target_variables = {}  # Dict để lưu key:value pairs cho --tvars
+        self.module_variables = {}  # Dict để lưu key:value pairs cho --mvars
+
+    def setup_triangle_indicators(self):
+        """Thiết lập các biểu tượng triangle cảnh báo cho UI."""
+        # Dictionary để theo dõi trạng thái cảnh báo
+        self.warning_states = {
+            'admin_required': False,
+            'disk_space': False,
+            'encryption_detected': False,
+            'system_disk': False,
+            'invalid_config': False
+        }
+        
+        # Tạo các triangle indicators nếu cần
+        self.create_triangle_indicators()
+    
+    def create_triangle_indicators(self):
+        """Tạo các triangle warning indicators trên UI."""
+        # Ẩn tất cả triangle indicators ban đầu - chúng sẽ được hiển thị khi cần
+        # Không tạo ra các widget riêng lẻ vì có thể gây ra vấn đề hiển thị
+        
+        # Chúng ta sẽ sử dụng status bar hoặc tooltip thay vì các widget riêng
+        # để tránh vấn đề hiển thị ở góc màn hình
+        pass
+    
+    def show_triangle_warning(self, warning_type, message="", position=None):
+        """Hiển thị triangle warning với loại và thông điệp cụ thể."""
+        self.warning_states[warning_type] = True
+        self.update_status_display()
+    
+    def hide_triangle_warning(self, warning_type):
+        """Ẩn triangle warning cụ thể."""
+        self.warning_states[warning_type] = False
+        self.update_status_display()
+    
+    def update_status_display(self):
+        """Cập nhật hiển thị status với tất cả warnings hiện tại."""
+        if not hasattr(self, 'status_label'):
+            return
+            
+        active_warnings = []
+        warning_messages = {
+            'admin_required': '⚠️ Cần quyền Administrator để thực hiện thu thập',
+            'disk_space': '💾 Không đủ dung lượng đĩa',
+            'encryption_detected': '🔒 Phát hiện mã hóa trên ổ đĩa',
+            'system_disk': '🖥️ Đây là ổ đĩa hệ thống - cần thận trọng',
+            'invalid_config': '⚙️ Cấu hình không hợp lệ'
+        }
+        
+        for warning_type, is_active in self.warning_states.items():
+            if is_active:
+                active_warnings.append(warning_messages.get(warning_type, f"⚠️ {warning_type}"))
+        
+        if active_warnings:
+            self.status_label.setText(" | ".join(active_warnings))
+            self.status_label.show()
+        else:
+            self.status_label.hide()
+    
+    def update_triangle_indicators(self):
+        """Cập nhật tất cả triangle indicators dựa trên trạng thái hiện tại."""
+        # Kiểm tra quyền admin
+        if not is_admin():
+            self.show_triangle_warning('admin_required', 
+                "Cần quyền Administrator để thực hiện thu thập forensic")
+        else:
+            self.hide_triangle_warning('admin_required')
+        
+        # Kiểm tra thiết bị được chọn
+        current_row = self.tableWidget_devices.currentRow()
+        if current_row >= 0:
+            # Kiểm tra xem có phải ổ hệ thống không
+            partition_text = self.tableWidget_devices.item(current_row, 3).text()
+            if "C:" in partition_text:
+                self.show_triangle_warning('system_disk', 
+                    "Ổ đĩa hệ thống Windows - cần cẩn thận khi thu thập")
+            else:
+                self.hide_triangle_warning('system_disk')
+            
+            # Kiểm tra mã hóa
+            encryption_status = self.tableWidget_devices.item(current_row, 4).text()
+            if encryption_status and encryption_status not in ["Không", "Unknown", "EDD không tìm thấy"]:
+                self.show_triangle_warning('encryption_detected', 
+                    f"Phát hiện mã hóa: {encryption_status}")
+            else:
+                self.hide_triangle_warning('encryption_detected')
+    
+    def validate_configuration_with_triangles(self):
+        """Validate cấu hình và hiển thị triangle warnings tương ứng."""
+        is_valid = True
+        
+        # Kiểm tra dung lượng đĩa cho imaging
+        if self.radioButton_full_image.isChecked():
+            dest_folder = self.lineEdit_destination_folder.text()
+            if dest_folder:
+                source_size = self.get_device_size()
+                if source_size > 0:
+                    free_space = self.get_free_space(dest_folder)
+                    required_space = source_size * 1.1  # Add 10% buffer
+                    
+                    if free_space < required_space:
+                        self.show_triangle_warning('disk_space', 
+                            f"Không đủ dung lượng. Cần: {self.format_size(required_space)}, Có: {self.format_size(free_space)}")
+                        is_valid = False
+                    else:
+                        self.hide_triangle_warning('disk_space')
+        
+        return is_valid
 
     def connect_signals(self):
         """Kết nối tất cả các tín hiệu (signals) từ các widget trên UI tới các khe cắm (slots) xử lý tương ứng."""
@@ -517,10 +655,38 @@ class NonVolatilePage(QtWidgets.QWidget, Ui_CollectNonvolatileForm):
         self.toolButton_target_destination.clicked.connect(self.browse_target_destination)
         self.pushButton_browse_folder.clicked.connect(self.browse_image_destination)
         
+        # Tùy chọn module source/destination
+        if hasattr(self, 'toolButton_module_source'):
+            self.toolButton_module_source.clicked.connect(lambda: self.browse_folder(self.lineEdit_module_source))
+        if hasattr(self, 'toolButton_module_destination'):
+            self.toolButton_module_destination.clicked.connect(lambda: self.browse_folder(self.lineEdit_module_destination))
+        
+        # SHA-1 exclusions
+        if hasattr(self, 'toolButton_sha1_exclusions'):
+            self.toolButton_sha1_exclusions.clicked.connect(self.browse_sha1_exclusions)
+        
         # Các nút chọn nhanh bộ Target định sẵn
         self.toolButton_sans.clicked.connect(lambda: self.select_predefined_targets("!SANS_Triage"))
         self.toolButton_quick.clicked.connect(lambda: self.select_predefined_targets("Quick_System_Info"))
         self.toolButton_browser.clicked.connect(lambda: self.select_predefined_targets("Browser_and_Email"))
+        if hasattr(self, 'toolButton_registry'):
+            self.toolButton_registry.clicked.connect(lambda: self.select_predefined_targets("Registry_All"))
+        if hasattr(self, 'toolButton_logs'):
+            self.toolButton_logs.clicked.connect(lambda: self.select_predefined_targets("EventLogs"))
+        if hasattr(self, 'toolButton_memory'):
+            self.toolButton_memory.clicked.connect(lambda: self.select_predefined_targets("Memory_Artefacts"))
+        if hasattr(self, 'toolButton_persistence'):
+            self.toolButton_persistence.clicked.connect(lambda: self.select_predefined_targets("Persistence"))
+        
+        # Target table controls
+        if hasattr(self, 'pushButton_select_all_targets'):
+            self.pushButton_select_all_targets.clicked.connect(self.select_all_targets)
+        if hasattr(self, 'pushButton_clear_all_targets'):
+            self.pushButton_clear_all_targets.clicked.connect(self.clear_all_targets)
+        
+        # Variable controls
+        if hasattr(self, 'pushButton_add_variable'):
+            self.pushButton_add_variable.clicked.connect(self.add_target_variable)
         
         # Chức năng tìm kiếm trong bảng
         self.lineEdit_targets_search.textChanged.connect(self.filter_targets) # Gõ vào ô tìm kiếm Target -> hàm filter_targets
@@ -542,6 +708,129 @@ class NonVolatilePage(QtWidgets.QWidget, Ui_CollectNonvolatileForm):
         # Thay đổi đường dẫn đích cho file ảnh
         self.lineEdit_destination_folder.textChanged.connect(self.update_image_path)
         self.lineEdit_image_filename.textChanged.connect(self.update_image_path)
+        
+        # Auto-update triangle indicators khi có thay đổi
+        self.lineEdit_destination_folder.textChanged.connect(self.auto_update_triangles)
+        self.checkBox_accept_risk.toggled.connect(self.auto_update_triangles)
+        
+        # Debug và export command line
+        if hasattr(self, 'lineEdit_command_line'):
+            self.lineEdit_command_line.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+            self.lineEdit_command_line.customContextMenuRequested.connect(self.show_command_context_menu)
+    
+    def auto_update_triangles(self):
+        """Tự động cập nhật triangle indicators khi có thay đổi cấu hình."""
+        self.update_triangle_indicators()
+        self.validate_configuration_with_triangles()
+    
+    def get_triangle_status_summary(self):
+        """Trả về summary của tất cả triangle warnings hiện tại."""
+        if not hasattr(self, 'warning_states'):
+            return "✅ Không có cảnh báo"
+            
+        active_warnings = []
+        for warning_type, is_active in self.warning_states.items():
+            if is_active:
+                warning_messages = {
+                    'admin_required': 'Cần quyền Administrator',
+                    'disk_space': 'Không đủ dung lượng đĩa',
+                    'encryption_detected': 'Phát hiện mã hóa',
+                    'system_disk': 'Ổ đĩa hệ thống',
+                    'invalid_config': 'Cấu hình không hợp lệ'
+                }
+                active_warnings.append(warning_messages.get(warning_type, warning_type))
+        
+        if active_warnings:
+            return f"⚠️ Cảnh báo: {', '.join(active_warnings)}"
+        return "✅ Không có cảnh báo"
+    
+    def show_command_context_menu(self, position):
+        """Hiển thị context menu cho command line field."""
+        menu = QtWidgets.QMenu()
+        
+        copy_action = menu.addAction("📋 Copy Command")
+        save_action = menu.addAction("💾 Save Command to File")
+        validate_action = menu.addAction("✅ Validate Command")
+        
+        action = menu.exec_(self.lineEdit_command_line.mapToGlobal(position))
+        
+        if action == copy_action:
+            self.copy_command_to_clipboard()
+        elif action == save_action:
+            self.save_command_to_file()
+        elif action == validate_action:
+            self.validate_command()
+    
+    def copy_command_to_clipboard(self):
+        """Copy command line to clipboard."""
+        command = self.lineEdit_command_line.text()
+        if command:
+            QtWidgets.QApplication.clipboard().setText(command)
+            QtWidgets.QMessageBox.information(self, "Thành công", "Đã copy command line vào clipboard!")
+    
+    def save_command_to_file(self):
+        """Save command line to a batch file."""
+        command = self.lineEdit_command_line.text()
+        if not command:
+            QtWidgets.QMessageBox.warning(self, "Lỗi", "Không có command line để lưu!")
+            return
+        
+        filename, _ = QtWidgets.QFileDialog.getSaveFileName(
+            self, "Lưu Command Line", 
+            f"kape_command_{datetime.now().strftime('%Y%m%d_%H%M%S')}.bat",
+            "Batch Files (*.bat);;Text Files (*.txt);;All Files (*)"
+        )
+        
+        if filename:
+            try:
+                with open(filename, 'w', encoding='utf-8') as f:
+                    f.write("@echo off\n")
+                    f.write("REM KAPE Command generated by Windows Forensic Tool\n")
+                    f.write(f"REM Generated on: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
+                    f.write(f"REM Case ID: {self.lineEdit_case_id.text()}\n")
+                    f.write("\n")
+                    f.write("REM Change to KAPE directory\n")
+                    f.write(f'cd /d "{os.path.dirname(self.kape_exe)}"\n')
+                    f.write("\n")
+                    f.write("REM Execute KAPE command\n")
+                    f.write(command + "\n")
+                    f.write("\n")
+                    f.write("pause\n")
+                
+                QtWidgets.QMessageBox.information(self, "Thành công", f"Đã lưu command vào: {filename}")
+            except Exception as e:
+                QtWidgets.QMessageBox.warning(self, "Lỗi", f"Không thể lưu file: {str(e)}")
+    
+    def validate_command(self):
+        """Validate the current command line."""
+        command = self.lineEdit_command_line.text()
+        if not command:
+            QtWidgets.QMessageBox.warning(self, "Lỗi", "Không có command line để validate!")
+            return
+        
+        issues = []
+        
+        # Check if KAPE exe exists
+        if not os.path.exists(self.kape_exe):
+            issues.append(f"KAPE executable không tìm thấy: {self.kape_exe}")
+        
+        # Check basic required parameters
+        if "--tsource" not in command and "--msource" not in command:
+            issues.append("Thiếu source (--tsource hoặc --msource)")
+        
+        if "--tdest" not in command and "--mdest" not in command:
+            issues.append("Thiếu destination (--tdest hoặc --mdest)")
+        
+        # Check if target or module is specified
+        if "--target" not in command and "--module" not in command:
+            issues.append("Cần chỉ định ít nhất một --target hoặc --module")
+        
+        if issues:
+            QtWidgets.QMessageBox.warning(self, "Validation Issues", 
+                "Phát hiện các vấn đề:\n\n" + "\n".join(issues))
+        else:
+            QtWidgets.QMessageBox.information(self, "Validation Success", 
+                "✅ Command line hợp lệ!\n\nSẵn sàng để thực thi.")
 
     # -----------------------------------------------------
     # 2. LOGIC ĐIỀU HƯỚNG CÁC BƯỚC (WIZARD NAVIGATION)
@@ -639,18 +928,31 @@ class NonVolatilePage(QtWidgets.QWidget, Ui_CollectNonvolatileForm):
         # Lấy trạng thái hiện tại
         is_triage = self.radioButton_triage.isChecked()
 
-        # Bật/Tắt các group box liên quan đến Triage
-        self.groupBox_target_options.setEnabled(is_triage)
-        self.groupBox_targets.setEnabled(is_triage)
+        # Bật/Tắt các frame và group box liên quan đến Triage
+        if hasattr(self, 'frame_targets'):
+            self.frame_targets.setEnabled(is_triage)
+        if hasattr(self, 'frame_modules'):
+            self.frame_modules.setEnabled(is_triage)
         if hasattr(self, 'groupBox_modules'):
             self.groupBox_modules.setEnabled(is_triage)
+        if hasattr(self, 'groupBox_module_options'):
+            self.groupBox_module_options.setEnabled(is_triage)
+        if hasattr(self, 'groupBox_export_options'):
+            self.groupBox_export_options.setEnabled(is_triage)
 
         # Bật/Tắt các group box và widget liên quan đến Imaging
         if hasattr(self, 'groupBox_image_format'):
             self.groupBox_image_format.setEnabled(not is_triage)
-        
-        if hasattr(self, 'groupBox_hash_options'):
-            self.groupBox_hash_options.setEnabled(not is_triage)
+        if hasattr(self, 'groupBox_image_settings'):
+            self.groupBox_image_settings.setEnabled(not is_triage)
+        if hasattr(self, 'groupBox_verification'):
+            self.groupBox_verification.setEnabled(not is_triage)
+        if hasattr(self, 'groupBox_hashing'):
+            self.groupBox_hashing.setEnabled(not is_triage)
+        if hasattr(self, 'groupBox_image_source'):
+            self.groupBox_image_source.setEnabled(not is_triage)
+        if hasattr(self, 'groupBox_image_destination'):
+            self.groupBox_image_destination.setEnabled(not is_triage)
         
         # Kiểm tra các thành phần UI khác trước khi truy cập
         for attr_name in ['lineEdit_destination_folder', 'lineEdit_image_filename', 'pushButton_browse_folder']:
@@ -665,6 +967,9 @@ class NonVolatilePage(QtWidgets.QWidget, Ui_CollectNonvolatileForm):
         Kiểm tra xem người dùng đã nhập đủ thông tin bắt buộc cho bước hiện tại chưa.
         Trả về True nếu hợp lệ, False nếu không.
         """
+        # Cập nhật triangle indicators trước khi validate
+        self.update_triangle_indicators()
+        
         if self.current_step == 0:  # Bước 1: Cài đặt & Chọn Nguồn
             if not self.lineEdit_case_id.text().strip():
                 QtWidgets.QMessageBox.warning(self, "Thiếu thông tin", "Vui lòng nhập Mã vụ việc!")
@@ -672,11 +977,23 @@ class NonVolatilePage(QtWidgets.QWidget, Ui_CollectNonvolatileForm):
             if self.tableWidget_devices.currentRow() < 0:
                 QtWidgets.QMessageBox.warning(self, "Thiếu thiết bị", "Vui lòng chọn một thiết bị nguồn!")
                 return False
+            
+            # Kiểm tra quyền admin với triangle warning
+            if not is_admin():
+                self.show_triangle_warning('admin_required', 
+                    "Cần quyền Administrator để thực hiện thu thập forensic")
+                QtWidgets.QMessageBox.warning(self, "Cảnh báo quyền", 
+                            "Để thực hiện thu thập forensic một cách an toàn, ứng dụng cần quyền Administrator.\n"
+                            "Vui lòng khởi động lại ứng dụng với quyền Administrator.")
+                return False
+            
             # Nếu chọn ổ C:, phải tick vào ô chấp nhận rủi ro
             current_row = self.tableWidget_devices.currentRow()
             if current_row >= 0:
                 partition_text = self.tableWidget_devices.item(current_row, 3).text()
                 if "C:" in partition_text and not self.checkBox_accept_risk.isChecked():
+                    self.show_triangle_warning('system_disk', 
+                        "Ổ đĩa hệ thống Windows - cần chấp nhận rủi ro")
                     QtWidgets.QMessageBox.warning(self, "Cảnh báo rủi ro", 
                                 "Bạn đang chọn ổ hệ thống Windows. Vui lòng chấp nhận rủi ro trước khi tiếp tục!")
                     return False
@@ -694,12 +1011,33 @@ class NonVolatilePage(QtWidgets.QWidget, Ui_CollectNonvolatileForm):
                 if not (self.checkBox_use_targets.isChecked() or self.checkBox_use_modules.isChecked()):
                     QtWidgets.QMessageBox.warning(self, "Thiếu lựa chọn", "Vui lòng chọn ít nhất một loại thu thập (Targets hoặc Modules)!")
                     return False
+                
+                # Kiểm tra xem có targets/modules nào được chọn không
+                if self.checkBox_use_targets.isChecked():
+                    selected_targets = [row for row in range(self.tableWidget_targets.rowCount()) 
+                                      if self.tableWidget_targets.item(row, 0).checkState() == QtCore.Qt.Checked]
+                    if not selected_targets:
+                        QtWidgets.QMessageBox.warning(self, "Thiếu lựa chọn", "Vui lòng chọn ít nhất một Target!")
+                        return False
+                
+                if self.checkBox_use_modules.isChecked():
+                    selected_modules = [row for row in range(self.tableWidget_modules.rowCount()) 
+                                      if self.tableWidget_modules.item(row, 0).checkState() == QtCore.Qt.Checked]
+                    if not selected_modules:
+                        QtWidgets.QMessageBox.warning(self, "Thiếu lựa chọn", "Vui lòng chọn ít nhất một Module!")
+                        return False
+                        
             else: # Nếu là Imaging
                 if not self.lineEdit_destination_folder.text():
                     QtWidgets.QMessageBox.warning(self, "Thiếu thông tin", "Vui lòng chọn thư mục đích cho file ảnh!")
                     return False
                 if not self.lineEdit_image_filename.text():
                     QtWidgets.QMessageBox.warning(self, "Thiếu thông tin", "Vui lòng nhập tên file ảnh!")
+                    return False
+                
+                # Validate configuration với triangle warnings
+                if not self.validate_configuration_with_triangles():
+                    # Triangle warning đã được hiển thị trong validate_configuration_with_triangles
                     return False
         
         return True # Nếu tất cả kiểm tra đều qua, trả về True
@@ -874,14 +1212,33 @@ class NonVolatilePage(QtWidgets.QWidget, Ui_CollectNonvolatileForm):
                         
         self.device_thread.quit() # Dừng luồng sau khi hoàn thành
     
+    def get_startup_info(self):
+        """Tạo startup info để ẩn cửa sổ console trên Windows."""
+        if os.name == 'nt':  # Windows
+            startupinfo = subprocess.STARTUPINFO()
+            startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+            startupinfo.wShowWindow = subprocess.SW_HIDE
+            return startupinfo
+        return None
+
     def check_encryption_status(self, drive_index):
+        """Kiểm tra trạng thái mã hóa của ổ đĩa sử dụng EDD."""
         if not os.path.exists(self.edd_exe):
             return "EDD không tìm thấy"
 
         try:
+            # Trích xuất số drive từ device_id nếu cần
+            if isinstance(drive_index, str):
+                match = re.search(r'(\d+)$', drive_index)
+                if match:
+                    drive_index = match.group(1)
+                else:
+                    return "Không xác định device ID"
+
             cmd = [self.edd_exe, "/batch", f"\\\\.\\PhysicalDrive{drive_index}"]
             process = subprocess.run(
-                cmd, capture_output=True, text=True, timeout=60, startupinfo=self.get_startup_info()
+                cmd, capture_output=True, text=True, timeout=60, 
+                startupinfo=self.get_startup_info()
             )
             output = process.stdout.lower() + process.stderr.lower()
 
@@ -889,12 +1246,20 @@ class NonVolatilePage(QtWidgets.QWidget, Ui_CollectNonvolatileForm):
             if "no truecrypt" in output and "bitlocker" in output and "veracrypt" in output and "found" in output:
                 return "Không"  # Không phát hiện mã hóa trên ổ đĩa này
 
+            # Kiểm tra các loại mã hóa cụ thể
+            if "bitlocker" in output and "detected" in output:
+                return "BitLocker phát hiện"
+            if "truecrypt" in output and "detected" in output:
+                return "TrueCrypt phát hiện"
+            if "veracrypt" in output and "detected" in output:
+                return "VeraCrypt phát hiện"
+
             # Nếu không rõ, trả về "Không xác định"
             return "Không xác định"
         except subprocess.TimeoutExpired:
-            return "EDD timeout: Quá trình kiểm tra ổ đĩa quá lâu, hãy thử tăng timeout hoặc kiểm tra lại trạng thái ổ đĩa."
+            return "EDD timeout"
         except Exception as e:
-            return f"Lỗi EDD: {e}"
+            return f"Lỗi EDD: {str(e)[:50]}..."
 
     # -----------------------------------------------------
     # 5. XỬ LÝ LOAD VÀ HIỂN THỊ TARGETS/MODULES (KAPE)
@@ -1000,17 +1365,33 @@ class NonVolatilePage(QtWidgets.QWidget, Ui_CollectNonvolatileForm):
 
     def toggle_target_options(self, enabled):
         """Bật hoặc tắt các vùng giao diện liên quan đến Targets."""
-        self.groupBox_target_options.setEnabled(enabled)
-        self.groupBox_targets.setEnabled(enabled)
+        # Enable/disable the targets frame and related components
+        if hasattr(self, 'frame_targets'):
+            # Enable/disable specific sections within the frame
+            if hasattr(self, 'gridLayout_target_options'):
+                # Enable/disable individual widgets in the target options layout
+                for i in range(self.gridLayout_target_options.count()):
+                    widget = self.gridLayout_target_options.itemAt(i).widget()
+                    if widget:
+                        widget.setEnabled(enabled)
+            
+            if hasattr(self, 'tableWidget_targets'):
+                self.tableWidget_targets.setEnabled(enabled)
+            if hasattr(self, 'lineEdit_targets_search'):
+                self.lineEdit_targets_search.setEnabled(enabled)
     
     def toggle_module_options(self, enabled):
         """Bật hoặc tắt các vùng giao diện liên quan đến Modules."""
         # Các groupbox này có thể không tồn tại trên UI, cần kiểm tra trước
         if hasattr(self, 'groupBox_module_options'):
             self.groupBox_module_options.setEnabled(enabled)
-        self.groupBox_modules.setEnabled(enabled)
+        if hasattr(self, 'groupBox_modules'):
+            self.groupBox_modules.setEnabled(enabled)
         if hasattr(self, 'groupBox_export_options'):
             self.groupBox_export_options.setEnabled(enabled)
+        if hasattr(self, 'frame_modules'):
+            # Also enable/disable the entire modules frame if needed
+            pass  # The frame is handled separately
     
     def browse_folder(self, line_edit):
         """Mở hộp thoại cho phép người dùng chọn một thư mục."""
@@ -1035,7 +1416,15 @@ class NonVolatilePage(QtWidgets.QWidget, Ui_CollectNonvolatileForm):
         elif target_name == "Quick_System_Info":
             target_names = ["RegistryHives", "WindowsEventLogs", "Prefetch"]
         elif target_name == "Browser_and_Email":
-            target_names = ["BrowserHistory"]
+            target_names = ["BrowserHistory", "Chrome", "Firefox", "Edge"]
+        elif target_name == "Registry_All":
+            target_names = ["RegistryHives", "RegistryBackups", "AmCache", "Syscache"]
+        elif target_name == "EventLogs":
+            target_names = ["WindowsEventLogs", "Application Event Logs", "Security Logs"]
+        elif target_name == "Memory_Artefacts":
+            target_names = ["Memory", "Hibernation", "PageFile"]
+        elif target_name == "Persistence":
+            target_names = ["AutoStart", "Services", "Scheduled Tasks", "Registry Persistence"]
         else:
             target_names = []
         
@@ -1047,6 +1436,68 @@ class NonVolatilePage(QtWidgets.QWidget, Ui_CollectNonvolatileForm):
                 checkbox = self.tableWidget_targets.item(row, 0)
                 if checkbox:
                     checkbox.setCheckState(QtCore.Qt.Checked) # Tick vào ô
+    
+    def select_all_targets(self):
+        """Chọn tất cả các targets trong bảng."""
+        for row in range(self.tableWidget_targets.rowCount()):
+            checkbox = self.tableWidget_targets.item(row, 0)
+            if checkbox:
+                checkbox.setCheckState(QtCore.Qt.Checked)
+    
+    def clear_all_targets(self):
+        """Bỏ chọn tất cả các targets trong bảng."""
+        for row in range(self.tableWidget_targets.rowCount()):
+            checkbox = self.tableWidget_targets.item(row, 0)
+            if checkbox:
+                checkbox.setCheckState(QtCore.Qt.Unchecked)
+    
+    def browse_sha1_exclusions(self):
+        """Mở hộp thoại để chọn file chứa SHA-1 hash exclusions."""
+        filename, _ = QtWidgets.QFileDialog.getOpenFileName(
+            self, "Chọn file SHA-1 exclusions",
+            "", "Text Files (*.txt);;All Files (*)"
+        )
+        if filename:
+            self.lineEdit_sha1_exclusions.setText(filename)
+    
+    def add_target_variable(self):
+        """Thêm biến target vào danh sách để sử dụng với --tvars."""
+        key = self.lineEdit_variable_key.text().strip()
+        value = self.lineEdit_variable_value.text().strip()
+        
+        if not key or not value:
+            QtWidgets.QMessageBox.warning(self, "Lỗi", "Vui lòng nhập cả key và value!")
+            return
+        
+        # Validate key format (should not contain special characters used by KAPE)
+        if ':' in key or '^' in key:
+            QtWidgets.QMessageBox.warning(self, "Lỗi", "Key không được chứa ký tự ':' hoặc '^'!")
+            return
+        
+        # Lưu vào dictionary
+        self.target_variables[key] = value
+        
+        # Hiển thị thông báo thành công với danh sách hiện tại
+        var_list = [f"{k}:{v}" for k, v in self.target_variables.items()]
+        QtWidgets.QMessageBox.information(self, "Thành công", 
+            f"Đã thêm biến: {key} = {value}\n\n"
+            f"Danh sách biến hiện tại:\n" + "\n".join(var_list))
+        
+        # Xóa nội dung sau khi thêm
+        self.lineEdit_variable_key.clear()
+        self.lineEdit_variable_value.clear()
+    
+    def clear_target_variables(self):
+        """Xóa tất cả target variables."""
+        self.target_variables.clear()
+        QtWidgets.QMessageBox.information(self, "Thành công", "Đã xóa tất cả biến target!")
+    
+    def get_variables_string(self, variables_dict):
+        """Chuyển đổi dictionary thành string format cho KAPE --tvars/--mvars."""
+        if not variables_dict:
+            return ""
+        # Format: key1:value1^key2:value2^key3:value3
+        return "^".join([f"{k}:{v}" for k, v in variables_dict.items()])
     
     def filter_targets(self, text):
         """Lọc bảng Targets dựa trên nội dung người dùng nhập vào ô tìm kiếm."""
@@ -1096,6 +1547,11 @@ class NonVolatilePage(QtWidgets.QWidget, Ui_CollectNonvolatileForm):
     def generate_configuration_summary(self):
         """Tạo một chuỗi HTML để tóm tắt tất cả các lựa chọn của người dùng."""
         html = "<h3>📋 Tóm tắt Cấu hình</h3>"
+        
+        # --- Trạng thái Triangle Warnings ---
+        triangle_status = self.get_triangle_status_summary()
+        html += f"<h4>🔺 Trạng thái Hệ thống</h4>"
+        html += f"<b>Cảnh báo:</b> {triangle_status}<br><br>"
         
         # --- Thông tin Vụ việc ---
         html += "<h4>🏷️ Thông tin Vụ việc</h4>"
@@ -1156,6 +1612,20 @@ class NonVolatilePage(QtWidgets.QWidget, Ui_CollectNonvolatileForm):
             hashes = [cb.text() for cb in [self.checkBox_md5, self.checkBox_sha1, self.checkBox_sha256] if cb.isChecked()]
             html += f"<b>Hash:</b> {', '.join(hashes) if hashes else 'Không'}<br>"
         
+        # --- Target Variables (nếu có) ---
+        if hasattr(self, 'target_variables') and self.target_variables:
+            html += "<h4>🔧 Target Variables</h4>"
+            for key, value in self.target_variables.items():
+                html += f"<b>%{key}%:</b> {value}<br>"
+            html += "<br>"
+        
+        # --- Module Variables (nếu có) ---
+        if hasattr(self, 'module_variables') and self.module_variables:
+            html += "<h4>⚙️ Module Variables</h4>"
+            for key, value in self.module_variables.items():
+                html += f"<b>%{key}%:</b> {value}<br>"
+            html += "<br>"
+        
         return html
     
     def build_command_line(self):
@@ -1164,60 +1634,163 @@ class NonVolatilePage(QtWidgets.QWidget, Ui_CollectNonvolatileForm):
         Nó sẽ gọi các hàm con tương ứng với phương pháp Triage hoặc Imaging.
         """
         if self.radioButton_triage.isChecked():
-            # --- Xây dựng lệnh cho KAPE (Triage) ---
-            cmd = [self.kape_exe] # Lệnh bắt đầu bằng đường dẫn đến kape.exe
-            
-            # Nguồn (--tsource)
-            current_row = self.tableWidget_devices.currentRow()
-            if current_row >= 0:
-                source = self.tableWidget_devices.item(current_row, 3).text().split(',')[0] # Lấy ổ đĩa đầu tiên
-                cmd.extend(["--tsource", source])
-            
-            # Đích (--tdest)
-            target_dest = self.lineEdit_target_destination.text()
-            cmd.extend(["--tdest", target_dest])
-            
-            # Targets (--target)
-            if self.checkBox_use_targets.isChecked():
-                selected = [self.tableWidget_targets.item(row, 1).text() 
-                            for row in range(self.tableWidget_targets.rowCount()) 
-                            if self.tableWidget_targets.item(row, 0).checkState() == QtCore.Qt.Checked]
-                if selected:
-                    cmd.extend(["--target", ",".join(selected)])
-            
-            # Modules (--module) và đích cho module (--mdest)
-            if self.checkBox_use_modules.isChecked():
-                selected = [self.tableWidget_modules.item(row, 1).text() 
-                            for row in range(self.tableWidget_modules.rowCount()) 
-                            if self.tableWidget_modules.item(row, 0).checkState() == QtCore.Qt.Checked]
-                if selected:
-                    module_dest = os.path.join(target_dest, "ModuleOutput")
-                    cmd.extend(["--module", ",".join(selected)])
-                    cmd.extend(["--mdest", module_dest])
-            
-            # Thêm các tham số khác cho KAPE
-            cmd.extend(["--vss"])     # Xử lý Volume Shadow Copies
-            cmd.extend(["--zip"])     # Nén kết quả đầu ra
-            cmd.extend(["--debug"])   # Bật chế độ debug để có log chi tiết
-            
-            return cmd
+            return self.build_kape_command()
         else:
-            # --- Xây dựng lệnh cho Imaging ---
-            current_row = self.tableWidget_devices.currentRow()
-            if current_row < 0: return ["echo", "Chưa chọn thiết bị"]
-            
-            # Lấy ID của thiết bị vật lý từ cột 0, ví dụ \\.\PHYSICALDRIVE0
-            model_text = self.tableWidget_devices.item(current_row, 0).text()
-            # Sử dụng regex để tìm device_id, vì WMI và fallback trả về định dạng khác nhau
-            match = re.search(r'(\\\\\.\\[A-Za-z0-9]+)', model_text)
-            device_id = match.group(1) if match else self.tableWidget_devices.item(current_row, 3).text().split(',')[0]
+            return self.build_imaging_command()
+    
+    def build_kape_command(self):
+        """Xây dựng lệnh KAPE chi tiết với tất cả các tùy chọn từ UI theo đúng syntax KAPE."""
+        cmd = [self.kape_exe]
+        
+        # === TARGET OPTIONS ===
+        current_row = self.tableWidget_devices.currentRow()
+        if current_row >= 0:
+            # --tsource: Target source drive (C:, D:, F:\ etc)
+            source = self.lineEdit_target_source.text() or self.tableWidget_devices.item(current_row, 3).text().split(',')[0]
+            if not source.endswith(':') and not source.endswith('\\'):
+                source = source + ':'  # Ensure proper drive format
+            cmd.extend(["--tsource", source])
+        
+        # --tdest: Destination directory với biến %d (date) và %m (machine) nếu cần
+        target_dest = self.lineEdit_target_destination.text()
+        if hasattr(self, 'checkBox_add_date') and self.checkBox_add_date.isChecked():
+            target_dest = target_dest + "_%d"  # %d = timestamp (yyyyMMddTHHmmss)
+        if hasattr(self, 'checkBox_add_machine') and self.checkBox_add_machine.isChecked():
+            target_dest = target_dest + "_%m"  # %m = machine name
+        cmd.extend(["--tdest", target_dest])
+        
+        # --target: Target configurations
+        if self.checkBox_use_targets.isChecked():
+            selected = [self.tableWidget_targets.item(row, 1).text() 
+                        for row in range(self.tableWidget_targets.rowCount()) 
+                        if self.tableWidget_targets.item(row, 0).checkState() == QtCore.Qt.Checked]
+            if selected:
+                cmd.extend(["--target", ",".join(selected)])
+        
+        # --tflush: Delete all files in tdest prior to collection
+        if hasattr(self, 'checkBox_flush') and self.checkBox_flush.isChecked():
+            cmd.append("--tflush")
+        
+        # --tdd: Deduplicate files based on SHA-1 (default is TRUE, so only add if unchecked)
+        if hasattr(self, 'checkBox_deduplicate') and not self.checkBox_deduplicate.isChecked():
+            # KAPE default is TRUE for deduplication, so we don't need to add --tdd unless we want to disable it
+            # But KAPE doesn't have a disable option, so we skip this
+            pass
+        
+        # --vss: Process Volume Shadow Copies
+        if hasattr(self, 'checkBox_process_vscs') and self.checkBox_process_vscs.isChecked():
+            cmd.append("--vss")
+        
+        # === MODULE OPTIONS ===
+        if self.checkBox_use_modules.isChecked():
+            selected_modules = [self.tableWidget_modules.item(row, 1).text() 
+                              for row in range(self.tableWidget_modules.rowCount()) 
+                              if self.tableWidget_modules.item(row, 0).checkState() == QtCore.Qt.Checked]
+            if selected_modules:
+                # --msource: Auto-set to --tdest if not specified
+                module_source = self.lineEdit_module_source.text() if hasattr(self, 'lineEdit_module_source') else ""
+                if module_source:
+                    cmd.extend(["--msource", module_source])
+                # If not specified, KAPE will auto-set to --tdest
+                
+                # --module: Module configurations
+                cmd.extend(["--module", ",".join(selected_modules)])
+                
+                # --mdest: Module output destination
+                module_dest = self.lineEdit_module_destination.text() if hasattr(self, 'lineEdit_module_destination') else ""
+                if not module_dest:
+                    module_dest = os.path.join(target_dest, "ModuleOutput")
+                cmd.extend(["--mdest", module_dest])
+                
+                # --mef: Export format for modules
+                if hasattr(self, 'radioButton_export_csv') and self.radioButton_export_csv.isChecked():
+                    cmd.extend(["--mef", "csv"])
+                elif hasattr(self, 'radioButton_export_json') and self.radioButton_export_json.isChecked():
+                    cmd.extend(["--mef", "json"])
+                elif hasattr(self, 'radioButton_export_html') and self.radioButton_export_html.isChecked():
+                    cmd.extend(["--mef", "html"])
+        
+        # === CONTAINER OPTIONS ===
+        base_name = ""
+        if hasattr(self, 'lineEdit_base_name'):
+            base_name = self.lineEdit_base_name.text() or f"KAPE_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+        
+        if hasattr(self, 'radioButton_vhdx') and self.radioButton_vhdx.isChecked():
+            cmd.extend(["--vhdx", base_name])
+        elif hasattr(self, 'radioButton_vhd') and self.radioButton_vhd.isChecked():
+            cmd.extend(["--vhd", base_name])
+        elif hasattr(self, 'radioButton_zip') and self.radioButton_zip.isChecked():
+            cmd.extend(["--zip", base_name])
+        
+        # --zv: Zip the VHD(X) container after creation (default TRUE)
+        if hasattr(self, 'checkBox_zip_container') and not self.checkBox_zip_container.isChecked():
+            # KAPE default is TRUE, but we can't disable it with a flag
+            # This checkbox probably should control whether we use containers at all
+            pass
+        
+        # === ADVANCED OPTIONS ===
+        # --hex: SHA-1 exclusion file
+        if hasattr(self, 'lineEdit_sha1_exclusions') and self.lineEdit_sha1_exclusions.text():
+            cmd.extend(["--hex", self.lineEdit_sha1_exclusions.text()])
+        
+        # --tvars: Target variables (key:value pairs separated by ^)
+        tvars_string = self.get_variables_string(self.target_variables)
+        if tvars_string:
+            cmd.extend(["--tvars", tvars_string])
+        
+        # --mvars: Module variables (key:value pairs separated by ^) 
+        mvars_string = self.get_variables_string(self.module_variables)
+        if mvars_string:
+            cmd.extend(["--mvars", mvars_string])
+        
+        # === DEBUG OPTIONS ===
+        cmd.append("--debug")  # Show debug information during processing
+        
+        return cmd
+    
+    def build_imaging_command(self):
+        """Xây dựng lệnh imaging với kiểm tra thiết bị cải thiện."""
+        current_row = self.tableWidget_devices.currentRow()
+        if current_row < 0: 
+            return ["echo", "Chưa chọn thiết bị"]
+        
+        # Lấy device ID một cách thông minh hơn
+        device_id = None
+        model_text = self.tableWidget_devices.item(current_row, 0).text()
+        
+        # Tìm physical drive pattern
+        match = re.search(r'(\\\\\.\\PHYSICALDRIVE\d+)', model_text, re.IGNORECASE)
+        if match:
+            device_id = match.group(1)
+        else:
+            # Fallback: sử dụng partition từ cột 3
+            partitions = self.tableWidget_devices.item(current_row, 3).text()
+            if partitions and ':' in partitions:
+                # Convert drive letter to physical drive
+                device_id = self.get_physical_drive_from_letter(partitions.split(',')[0])
+        
+        if not device_id:
+            return ["echo", "Không thể xác định device ID"]
 
-            # Gọi hàm xây dựng lệnh phù hợp với định dạng ảnh đã chọn
-            if self.radioButton_raw.isChecked():
-                return self.build_dd_command(device_id)
-            else:
-                format_type = "encase6" if self.radioButton_e01.isChecked() else "aff"
-                return self.build_ewf_command(device_id, format_type)
+        # Gọi hàm xây dựng lệnh phù hợp với định dạng ảnh đã chọn
+        if self.radioButton_raw.isChecked():
+            return self.build_dd_command(device_id)
+        else:
+            format_type = "encase6" if self.radioButton_e01.isChecked() else "aff"
+            return self.build_ewf_command(device_id, format_type)
+    
+    def get_physical_drive_from_letter(self, drive_letter):
+        """Chuyển đổi drive letter (C:) thành physical drive (\\.\PHYSICALDRIVE0)."""
+        try:
+            if WMI_AVAILABLE:
+                c = wmi.WMI()
+                for logical_disk in c.Win32_LogicalDisk(DeviceID=drive_letter):
+                    for partition in logical_disk.associators("Win32_LogicalDiskToPartition"):
+                        for disk in partition.associators("Win32_DiskDriveToDiskPartition"):
+                            return disk.DeviceID
+            return f"\\\\.\\PHYSICALDRIVE0"  # Default fallback
+        except:
+            return f"\\\\.\\PHYSICALDRIVE0"
 
     def get_drive_letter(self, physical_drive):
         r"""Chuyển đổi đường dẫn ổ đĩa vật lý (ví dụ: \\.\PHYSICALDRIVE0) sang ký tự ổ đĩa (C:)."""
@@ -1905,6 +2478,12 @@ class NonVolatilePage(QtWidgets.QWidget, Ui_CollectNonvolatileForm):
                 safe_model_name = re.sub(r'[<>:"/\\|?*]', '_', model_text.split('(')[0].strip())
                 timestamp = datetime.now().strftime('%Y%m%d-%H%M')
                 self.lineEdit_image_filename.setText(f"{safe_model_name}_{timestamp}")
+            
+            # Cập nhật triangle indicators dựa trên thiết bị được chọn
+            self.update_triangle_indicators()
+            
+            # Validate configuration với triangle warnings
+            self.validate_configuration_with_triangles()
 
     def browse_target_destination(self):
         """Mở hộp thoại để chọn thư mục đích cho việc thu thập Triage."""

@@ -124,7 +124,7 @@
    <item>
     <widget class="QStackedWidget" name="stackedWidget">
      <property name="currentIndex">
-      <number>0</number>
+      <number>2</number>
      </property>
      <widget class="QWidget" name="page_step1_setup">
       <layout class="QVBoxLayout" name="verticalLayout_step1">
@@ -364,12 +364,24 @@
        <item>
         <widget class="QStackedWidget" name="stackedWidget_config">
          <property name="currentIndex">
-          <number>1</number>
+          <number>0</number>
          </property>
          <widget class="QWidget" name="page_triage_config">
           <layout class="QHBoxLayout" name="horizontalLayout_triage_page">
            <item>
             <widget class="QFrame" name="frame_targets">
+             <property name="minimumSize">
+              <size>
+               <width>600</width>
+               <height>0</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>800</width>
+               <height>16777215</height>
+              </size>
+             </property>
              <property name="frameShape">
               <enum>QFrame::StyledPanel</enum>
              </property>
@@ -388,142 +400,463 @@
                </widget>
               </item>
               <item>
-               <widget class="QGroupBox" name="groupBox_target_options">
-                <property name="title">
-                 <string>Tùy chọn Mục tiêu</string>
+               <layout class="QGridLayout" name="gridLayout_target_options">
+                <item row="0" column="0">
+                 <widget class="QLabel" name="label_target_source">
+                  <property name="text">
+                   <string>Target source</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="1">
+                 <widget class="QLineEdit" name="lineEdit_target_source">
+                  <property name="placeholderText">
+                   <string>Required</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="2">
+                 <widget class="QToolButton" name="toolButton_target_source">
+                  <property name="text">
+                   <string>...</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="0">
+                 <widget class="QLabel" name="label_target_destination">
+                  <property name="text">
+                   <string>Target destination</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="1">
+                 <widget class="QLineEdit" name="lineEdit_target_destination">
+                  <property name="placeholderText">
+                   <string>Required</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="2">
+                 <widget class="QToolButton" name="toolButton_target_destination">
+                  <property name="text">
+                   <string>...</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="3">
+                 <widget class="QCheckBox" name="checkBox_flush">
+                  <property name="toolTip">
+                   <string>Xóa toàn bộ nội dung thư mục đích trước khi chạy</string>
+                  </property>
+                  <property name="text">
+                   <string>Flush</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="4">
+                 <widget class="QCheckBox" name="checkBox_add_date">
+                  <property name="toolTip">
+                   <string>Tự động thêm ngày (YYYYMMDD) vào thư mục đích</string>
+                  </property>
+                  <property name="text">
+                   <string>Add %d</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="5">
+                 <widget class="QCheckBox" name="checkBox_add_machine">
+                  <property name="toolTip">
+                   <string>Thêm tên máy (hostname) vào thư mục đích</string>
+                  </property>
+                  <property name="text">
+                   <string>Add %m</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+              <item>
+               <widget class="QLabel" name="label_targets_title">
+                <property name="styleSheet">
+                 <string notr="true">color: red; font-weight: bold;</string>
                 </property>
-                <layout class="QGridLayout" name="gridLayout_target_options">
-                 <item row="0" column="0">
-                  <widget class="QLabel" name="label_target_source">
-                   <property name="text">
-                    <string>Nguồn mục tiêu:</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="0" column="1">
-                  <widget class="QLineEdit" name="lineEdit_target_source"/>
-                 </item>
-                 <item row="0" column="2">
-                  <widget class="QToolButton" name="toolButton_target_source">
-                   <property name="text">
-                    <string>...</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="1" column="0">
-                  <widget class="QLabel" name="label_target_destination">
-                   <property name="text">
-                    <string>Đích mục tiêu:</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="1" column="1">
-                  <widget class="QLineEdit" name="lineEdit_target_destination">
-                   <property name="placeholderText">
-                    <string>Thư mục để lưu kết quả</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="1" column="2">
-                  <widget class="QToolButton" name="toolButton_target_destination">
-                   <property name="text">
-                    <string>...</string>
-                   </property>
-                  </widget>
-                 </item>
-                </layout>
+                <property name="text">
+                 <string>Targets (Double-click to edit a target)</string>
+                </property>
                </widget>
               </item>
               <item>
-               <widget class="QGroupBox" name="groupBox_targets">
-                <property name="title">
-                 <string>Mục tiêu (Targets)</string>
-                </property>
-                <layout class="QVBoxLayout" name="verticalLayout_targets_group">
-                 <item>
-                  <layout class="QHBoxLayout" name="horizontalLayout_triage_predefined">
-                   <item>
-                    <widget class="QLabel" name="label_predefined">
-                     <property name="text">
-                      <string>Gói định sẵn:</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item>
-                    <widget class="QToolButton" name="toolButton_sans">
-                     <property name="text">
-                      <string>!SANS_Triage</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item>
-                    <widget class="QToolButton" name="toolButton_quick">
-                     <property name="text">
-                      <string>Quick_System_Info</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item>
-                    <widget class="QToolButton" name="toolButton_browser">
-                     <property name="text">
-                      <string>Browser_and_Email</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item>
-                    <spacer name="horizontalSpacer_predefined">
-                     <property name="orientation">
-                      <enum>Qt::Horizontal</enum>
-                     </property>
-                     <property name="sizeHint" stdset="0">
-                      <size>
-                       <width>40</width>
-                       <height>20</height>
-                      </size>
-                     </property>
-                    </spacer>
-                   </item>
-                  </layout>
-                 </item>
-                 <item>
-                  <widget class="QLineEdit" name="lineEdit_targets_search">
-                   <property name="placeholderText">
-                    <string>🔍 Tìm kiếm mục tiêu...</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QTableWidget" name="tableWidget_targets">
-                   <column>
-                    <property name="text">
-                     <string>Chọn</string>
-                    </property>
-                   </column>
-                   <column>
-                    <property name="text">
-                     <string>Tên</string>
-                    </property>
-                   </column>
-                   <column>
-                    <property name="text">
-                     <string>Thư mục</string>
-                    </property>
-                   </column>
-                   <column>
-                    <property name="text">
-                     <string>Mô tả</string>
-                    </property>
-                   </column>
-                  </widget>
-                 </item>
-                </layout>
+               <layout class="QHBoxLayout" name="horizontalLayout_search_and_controls">
+                <item>
+                 <widget class="QLineEdit" name="lineEdit_targets_search">
+                  <property name="placeholderText">
+                   <string>🔍 Tìm kiếm mục tiêu...</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="pushButton_select_all_targets">
+                  <property name="maximumSize">
+                   <size>
+                    <width>80</width>
+                    <height>16777215</height>
+                   </size>
+                  </property>
+                  <property name="text">
+                   <string>Select All</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="pushButton_clear_all_targets">
+                  <property name="maximumSize">
+                   <size>
+                    <width>80</width>
+                    <height>16777215</height>
+                   </size>
+                  </property>
+                  <property name="text">
+                   <string>Clear All</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+              <item>
+               <widget class="QTableWidget" name="tableWidget_targets">
+                <column>
+                 <property name="text">
+                  <string>Chọn</string>
+                 </property>
+                </column>
+                <column>
+                 <property name="text">
+                  <string>Tên</string>
+                 </property>
+                </column>
+                <column>
+                 <property name="text">
+                  <string>Thư mục</string>
+                 </property>
+                </column>
+                <column>
+                 <property name="text">
+                  <string>Mô tả</string>
+                 </property>
+                </column>
                </widget>
+              </item>
+              <item>
+               <layout class="QHBoxLayout" name="horizontalLayout_triage_predefined">
+                <item>
+                 <widget class="QLabel" name="label_predefined">
+                  <property name="text">
+                   <string>Gói định sẵn:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QToolButton" name="toolButton_sans">
+                  <property name="toolTip">
+                   <string>Gói thu thập SANS Triage - bao gồm các artifact cơ bản nhất</string>
+                  </property>
+                  <property name="styleSheet">
+                   <string notr="true">QToolButton { background-color: #E3F2FD; border: 1px solid #2196F3; padding: 5px; }</string>
+                  </property>
+                  <property name="text">
+                   <string>!SANS_Triage</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QToolButton" name="toolButton_quick">
+                  <property name="toolTip">
+                   <string>Thu thập thông tin hệ thống cơ bản nhanh chóng</string>
+                  </property>
+                  <property name="styleSheet">
+                   <string notr="true">QToolButton { background-color: #E8F5E8; border: 1px solid #4CAF50; padding: 5px; }</string>
+                  </property>
+                  <property name="text">
+                   <string>Quick_System_Info</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QToolButton" name="toolButton_browser">
+                  <property name="toolTip">
+                   <string>Thu thập dữ liệu từ trình duyệt web và email client</string>
+                  </property>
+                  <property name="styleSheet">
+                   <string notr="true">QToolButton { background-color: #FFF3E0; border: 1px solid #FF9800; padding: 5px; }</string>
+                  </property>
+                  <property name="text">
+                   <string>Browser_and_Email</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QToolButton" name="toolButton_registry">
+                  <property name="toolTip">
+                   <string>Thu thập tất cả các registry hives quan trọng</string>
+                  </property>
+                  <property name="styleSheet">
+                   <string notr="true">QToolButton { background-color: #FCE4EC; border: 1px solid #E91E63; padding: 5px; }</string>
+                  </property>
+                  <property name="text">
+                   <string>Registry_All</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QToolButton" name="toolButton_logs">
+                  <property name="toolTip">
+                   <string>Thu thập Windows Event Logs và Application logs</string>
+                  </property>
+                  <property name="styleSheet">
+                   <string notr="true">QToolButton { background-color: #F3E5F5; border: 1px solid #9C27B0; padding: 5px; }</string>
+                  </property>
+                  <property name="text">
+                   <string>EventLogs</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QToolButton" name="toolButton_memory">
+                  <property name="toolTip">
+                   <string>Thu thập các artifact liên quan đến memory analysis</string>
+                  </property>
+                  <property name="styleSheet">
+                   <string notr="true">QToolButton { background-color: #E0F2F1; border: 1px solid #009688; padding: 5px; }</string>
+                  </property>
+                  <property name="text">
+                   <string>Memory_Artefacts</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QToolButton" name="toolButton_persistence">
+                  <property name="toolTip">
+                   <string>Thu thập các artifact liên quan đến persistence mechanisms</string>
+                  </property>
+                  <property name="styleSheet">
+                   <string notr="true">QToolButton { background-color: #FFEBEE; border: 1px solid #F44336; padding: 5px; }</string>
+                  </property>
+                  <property name="text">
+                   <string>Persistence</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <spacer name="horizontalSpacer_predefined">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>40</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+               </layout>
+              </item>
+              <item>
+               <layout class="QHBoxLayout" name="horizontalLayout_basic_options">
+                <item>
+                 <widget class="QCheckBox" name="checkBox_process_vscs">
+                  <property name="toolTip">
+                   <string>Tự động mount và áp dụng lại Targets trên Volume Shadow Copies</string>
+                  </property>
+                  <property name="text">
+                   <string>Process VSCs</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QCheckBox" name="checkBox_deduplicate">
+                  <property name="toolTip">
+                   <string>Sử dụng SHA-1 để tránh sao chép file trùng</string>
+                  </property>
+                  <property name="text">
+                   <string>Deduplicate</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <spacer name="horizontalSpacer_basic_options">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>40</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+               </layout>
+              </item>
+              <item>
+               <layout class="QHBoxLayout" name="horizontalLayout_container_options">
+                <item>
+                 <widget class="QLabel" name="label_container">
+                  <property name="text">
+                   <string>Container</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QRadioButton" name="radioButton_none">
+                  <property name="text">
+                   <string>None</string>
+                  </property>
+                  <property name="checked">
+                   <bool>true</bool>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QRadioButton" name="radioButton_vhdx">
+                  <property name="text">
+                   <string>VHDX</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QRadioButton" name="radioButton_vhd">
+                  <property name="text">
+                   <string>VHD</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QRadioButton" name="radioButton_zip">
+                  <property name="text">
+                   <string>Zip</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLabel" name="label_base_name">
+                  <property name="text">
+                   <string>Base name</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLineEdit" name="lineEdit_base_name">
+                  <property name="maximumSize">
+                   <size>
+                    <width>200</width>
+                    <height>16777215</height>
+                   </size>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QCheckBox" name="checkBox_zip_container">
+                  <property name="text">
+                   <string>Zip container</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QCheckBox" name="checkBox_transfer">
+                  <property name="text">
+                   <string>Transfer</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+              <item>
+               <layout class="QHBoxLayout" name="horizontalLayout_sha1_exclusions">
+                <item>
+                 <widget class="QLabel" name="label_sha1_exclusions">
+                  <property name="text">
+                   <string>SHA-1 exclusions</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLineEdit" name="lineEdit_sha1_exclusions">
+                  <property name="placeholderText">
+                   <string>File containing SHA-1 hashes to exclude (optional)</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QToolButton" name="toolButton_sha1_exclusions">
+                  <property name="text">
+                   <string>...</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+              <item>
+               <layout class="QHBoxLayout" name="horizontalLayout_target_variables">
+                <item>
+                 <widget class="QLabel" name="label_target_variables">
+                  <property name="text">
+                   <string>Target variables</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLineEdit" name="lineEdit_variable_key">
+                  <property name="maximumSize">
+                   <size>
+                    <width>100</width>
+                    <height>16777215</height>
+                   </size>
+                  </property>
+                  <property name="placeholderText">
+                   <string>Key</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLineEdit" name="lineEdit_variable_value">
+                  <property name="placeholderText">
+                   <string>Value</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="pushButton_add_variable">
+                  <property name="maximumSize">
+                   <size>
+                    <width>60</width>
+                    <height>16777215</height>
+                   </size>
+                  </property>
+                  <property name="text">
+                   <string>Add</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
               </item>
              </layout>
             </widget>
            </item>
            <item>
             <widget class="QFrame" name="frame_modules">
+             <property name="minimumSize">
+              <size>
+               <width>400</width>
+               <height>0</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>600</width>
+               <height>16777215</height>
+              </size>
+             </property>
              <property name="frameShape">
               <enum>QFrame::StyledPanel</enum>
              </property>

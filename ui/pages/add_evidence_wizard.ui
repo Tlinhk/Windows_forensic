@@ -1,0 +1,933 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>AddEvidenceWizard</class>
+ <widget class="QWidget" name="AddEvidenceWizard">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>600</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Add Evidence - Windows Forensic System</string>
+  </property>
+  <layout class="QHBoxLayout" name="horizontalLayout">
+   <property name="spacing">
+    <number>0</number>
+   </property>
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
+   <item>
+    <widget class="QFrame" name="stepsFrame">
+     <property name="minimumSize">
+      <size>
+       <width>200</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>200</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">QFrame {
+    background-color: #f8f9fa;
+    border-right: 1px solid #dee2e6;
+}</string>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::StyledPanel</enum>
+     </property>
+     <layout class="QVBoxLayout" name="stepsLayout">
+      <property name="spacing">
+       <number>10</number>
+      </property>
+      <property name="leftMargin">
+       <number>20</number>
+      </property>
+      <property name="topMargin">
+       <number>30</number>
+      </property>
+      <property name="rightMargin">
+       <number>20</number>
+      </property>
+      <property name="bottomMargin">
+       <number>30</number>
+      </property>
+      <item>
+       <widget class="QLabel" name="stepsHeaderLabel">
+        <property name="styleSheet">
+         <string notr="true">font-size: 16px;
+font-weight: bold;
+color: #2d3748;
+margin-bottom: 10px;</string>
+        </property>
+        <property name="text">
+         <string>Steps</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="step1Label">
+        <property name="styleSheet">
+         <string notr="true">QLabel {
+    font-size: 12px;
+    color: #4a5568;
+    padding: 8px;
+    border-radius: 4px;
+    margin: 2px 0;
+}</string>
+        </property>
+        <property name="text">
+         <string>1. Select Mode Add Evidence</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="step2Label">
+        <property name="styleSheet">
+         <string notr="true">QLabel {
+    font-size: 12px;
+    color: #4a5568;
+    padding: 8px;
+    border-radius: 4px;
+    margin: 2px 0;
+}</string>
+        </property>
+        <property name="text">
+         <string>2. Select Evidence Type</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="step3Label">
+        <property name="styleSheet">
+         <string notr="true">QLabel {
+    font-size: 12px;
+    color: #4a5568;
+    padding: 8px;
+    border-radius: 4px;
+    margin: 2px 0;
+}</string>
+        </property>
+        <property name="text">
+         <string>3. Select Evidence Source</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="step4Label">
+        <property name="styleSheet">
+         <string notr="true">QLabel {
+    font-size: 12px;
+    color: #4a5568;
+    padding: 8px;
+    border-radius: 4px;
+    margin: 2px 0;
+}</string>
+        </property>
+        <property name="text">
+         <string>4. Add Evidence Source</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="verticalSpacer">
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>20</width>
+          <height>40</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QFrame" name="contentFrame">
+     <property name="styleSheet">
+      <string notr="true">QFrame { background-color: white; }</string>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::StyledPanel</enum>
+     </property>
+     <layout class="QVBoxLayout" name="contentLayout">
+      <property name="spacing">
+       <number>20</number>
+      </property>
+      <property name="leftMargin">
+       <number>30</number>
+      </property>
+      <property name="topMargin">
+       <number>30</number>
+      </property>
+      <property name="rightMargin">
+       <number>30</number>
+      </property>
+      <property name="bottomMargin">
+       <number>20</number>
+      </property>
+      <item>
+       <widget class="QFrame" name="headerFrame">
+        <property name="frameShape">
+         <enum>QFrame::StyledPanel</enum>
+        </property>
+        <layout class="QVBoxLayout" name="headerLayout">
+         <property name="spacing">
+          <number>5</number>
+         </property>
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QLabel" name="titleLabel">
+           <property name="styleSheet">
+            <string notr="true">font-size: 18px;
+font-weight: bold;
+color: #2d3748;</string>
+           </property>
+           <property name="text">
+            <string>Select Mode Add Evidence</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="descriptionLabel">
+           <property name="styleSheet">
+            <string notr="true">font-size: 12px;
+color: #718096;</string>
+           </property>
+           <property name="text">
+            <string>Choose how you want to add evidence to the case.</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
+       <widget class="QStackedWidget" name="stackedWidget">
+        <property name="currentIndex">
+         <number>0</number>
+        </property>
+        <!-- Step 1: Select Mode -->
+        <widget class="QWidget" name="step1Widget">
+         <layout class="QVBoxLayout" name="step1Layout">
+          <property name="spacing">
+           <number>15</number>
+          </property>
+          <item>
+           <widget class="QRadioButton" name="importModeRadio">
+            <property name="styleSheet">
+             <string notr="true">font-size: 14px; padding: 10px;</string>
+            </property>
+            <property name="text">
+             <string>Import existing evidence files</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QRadioButton" name="collectModeRadio">
+            <property name="styleSheet">
+             <string notr="true">font-size: 14px; padding: 10px;</string>
+            </property>
+            <property name="text">
+             <string>Collect evidence from system</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="verticalSpacer_2">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>40</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </widget>
+        
+        <!-- Step 2: Evidence Type -->
+        <widget class="QWidget" name="step2Widget">
+         <layout class="QVBoxLayout" name="step2Layout">
+          <property name="spacing">
+           <number>15</number>
+          </property>
+          <item>
+           <widget class="QRadioButton" name="volatileTypeRadio">
+            <property name="styleSheet">
+             <string notr="true">font-size: 14px; padding: 10px;</string>
+            </property>
+            <property name="text">
+             <string>Volatile Data (Memory, Network, Processes, ...)</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QRadioButton" name="nonvolatileTypeRadio">
+            <property name="styleSheet">
+             <string notr="true">font-size: 14px; padding: 10px;</string>
+            </property>
+            <property name="text">
+             <string>Non-volatile Data (Disk, Files, Registry, ...)</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="verticalSpacer_3">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>40</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </widget>
+        
+        <!-- Step 3: Evidence Source -->
+        <widget class="QWidget" name="step3Widget">
+         <layout class="QVBoxLayout" name="step3Layout">
+          <property name="spacing">
+           <number>15</number>
+          </property>
+          <item>
+           <widget class="QFrame" name="importSourceFrame">
+            <property name="frameShape">
+             <enum>QFrame::StyledPanel</enum>
+            </property>
+            <layout class="QVBoxLayout" name="importSourceLayout">
+             <item>
+              <widget class="QLabel" name="label">
+               <property name="text">
+                <string>Selected Evidence Files:</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="label_2">
+               <property name="styleSheet">
+                <string notr="true">color: #666; font-size: 11px; font-style: italic; margin-bottom: 5px;</string>
+               </property>
+               <property name="text">
+                <string>💡 Tip: Double-click on the 'Name' column to edit individual evidence names</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QTableWidget" name="fileListWidget">
+               <property name="minimumSize">
+                <size>
+                 <width>0</width>
+                 <height>200</height>
+                </size>
+               </property>
+               <property name="styleSheet">
+                <string notr="true">QTableWidget {
+    border: 2px solid #dee2e6;
+    border-radius: 4px;
+    background-color: white;
+    font-size: 12px;
+    gridline-color: #e9ecef;
+}
+QTableWidget::item {
+    padding: 8px;
+    border-bottom: 1px solid #f1f3f4;
+    color: black;
+}
+QTableWidget::item:selected {
+    background-color: #e3f2fd;
+    color: black;
+}
+QTableWidget::item:focus {
+    background-color: #fff3cd;
+    border: 1px solid #ffc107;
+    border-radius: 2px;
+    color: black;
+}
+QHeaderView::section {
+    background-color: #f8f9fa;
+    padding: 8px;
+    border: none;
+    border-bottom: 2px solid #dee2e6;
+    font-weight: bold;
+    color: #495057;
+}
+QTableWidget QLineEdit {
+    padding: 6px 10px;
+    border: 1px solid #007bff;
+    border-radius: 3px;
+    background-color: white;
+    font-size: 13px;
+    margin: 2px;
+    color: black;
+}</string>
+               </property>
+               <property name="editTriggers">
+                <set>QAbstractItemView::DoubleClicked|QAbstractItemView::EditKeyPressed</set>
+               </property>
+               <column>
+                <property name="text">
+                 <string>Type</string>
+                </property>
+               </column>
+               <column>
+                <property name="text">
+                 <string>Name</string>
+                </property>
+               </column>
+               <column>
+                <property name="text">
+                 <string>Path</string>
+                </property>
+               </column>
+              </widget>
+             </item>
+             <item>
+              <widget class="QFrame" name="fileButtonFrame">
+               <property name="frameShape">
+                <enum>QFrame::StyledPanel</enum>
+               </property>
+               <layout class="QHBoxLayout" name="fileButtonLayout">
+                <property name="leftMargin">
+                 <number>0</number>
+                </property>
+                <property name="topMargin">
+                 <number>10</number>
+                </property>
+                <property name="rightMargin">
+                 <number>0</number>
+                </property>
+                <property name="bottomMargin">
+                 <number>0</number>
+                </property>
+                <item>
+                 <widget class="QPushButton" name="addFilesBtn">
+                  <property name="text">
+                   <string>Add Files</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="addFoldersBtn">
+                  <property name="text">
+                   <string>Add Folders</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                                  <widget class="QPushButton" name="removeFileBtn">
+                  <property name="text">
+                   <string>Remove Selected</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="clearAllBtn">
+                  <property name="text">
+                   <string>Clear All</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <spacer name="horizontalSpacer_2">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>40</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+               </layout>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item>
+           <widget class="QFrame" name="collectSourceFrame">
+            <property name="frameShape">
+             <enum>QFrame::StyledPanel</enum>
+            </property>
+            <property name="visible">
+             <bool>false</bool>
+            </property>
+            <layout class="QVBoxLayout" name="collectSourceLayout">
+             <item>
+              <widget class="QLabel" name="volatileInfoLabel">
+               <property name="styleSheet">
+                <string notr="true">QLabel {
+    font-size: 14px;
+    color: #2d3748;
+    background-color: #f8f9fa;
+    border: 2px solid #dee2e6;
+    border-radius: 8px;
+    padding: 20px;
+    line-height: 1.5;
+}</string>
+               </property>
+               <property name="text">
+                <string>Volatile data collection will gather:
+
+- Memory dump
+- Running processes
+- Network connections
+- System information
+- System time &amp; uptime
+
+Click 'Start Volatile Collection' to begin data collection.
+This will open the volatile collection interface.</string>
+               </property>
+               <property name="wordWrap">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="startVolatileBtn">
+               <property name="styleSheet">
+                <string notr="true">QPushButton {
+    background-color: #3182ce;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 15px 30px;
+    font-size: 16px;
+    font-weight: bold;
+}
+QPushButton:hover {
+    background-color: #2c5aa0;
+}
+QPushButton:disabled {
+    background-color: #e2e8f0;
+    color: #a0aec0;
+}</string>
+               </property>
+               <property name="text">
+                <string>Start Volatile Collection</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <spacer name="verticalSpacer_4">
+               <property name="orientation">
+                <enum>Qt::Vertical</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>20</width>
+                 <height>40</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item>
+           <spacer name="verticalSpacer_5">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>40</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </widget>
+        
+        <!-- Step 4: Configure Evidence -->
+        <widget class="QWidget" name="step4Widget">
+         <layout class="QVBoxLayout" name="step4Layout">
+          <property name="spacing">
+           <number>15</number>
+          </property>
+          <item>
+           <widget class="QFrame" name="importConfigFrame">
+            <property name="frameShape">
+             <enum>QFrame::StyledPanel</enum>
+            </property>
+            <layout class="QVBoxLayout" name="importConfigLayout">
+             <item>
+              <widget class="QGroupBox" name="processingGroup">
+               <property name="title">
+                <string>Processing Options</string>
+               </property>
+               <layout class="QVBoxLayout" name="processingGroupLayout">
+                <item>
+                 <widget class="QCheckBox" name="calculateHashCheck">
+                  <property name="styleSheet">
+                   <string notr="true">font-size: 12px; padding: 5px;</string>
+                  </property>
+                  <property name="text">
+                   <string>Calculate file hashes (SHA-256)</string>
+                  </property>
+                  <property name="checked">
+                   <bool>true</bool>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QCheckBox" name="verifyIntegrityCheck">
+                  <property name="styleSheet">
+                   <string notr="true">font-size: 12px; padding: 5px;</string>
+                  </property>
+                  <property name="text">
+                   <string>Verify file integrity</string>
+                  </property>
+                  <property name="checked">
+                   <bool>true</bool>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QCheckBox" name="createBackupCheck">
+                  <property name="styleSheet">
+                   <string notr="true">font-size: 12px; padding: 5px;</string>
+                  </property>
+                  <property name="text">
+                   <string>Create backup copies</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </widget>
+             </item>
+             <item>
+              <spacer name="verticalSpacer_6">
+               <property name="orientation">
+                <enum>Qt::Vertical</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>20</width>
+                 <height>40</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item>
+           <widget class="QFrame" name="collectConfigFrame">
+            <property name="frameShape">
+             <enum>QFrame::StyledPanel</enum>
+            </property>
+            <property name="visible">
+             <bool>false</bool>
+            </property>
+            <layout class="QVBoxLayout" name="collectConfigLayout">
+             <item>
+              <widget class="QLabel" name="nonvolatileInfoLabel">
+               <property name="styleSheet">
+                <string notr="true">QLabel {
+    font-size: 14px;
+    color: #2d3748;
+    background-color: #f8f9fa;
+    border: 2px solid #dee2e6;
+    border-radius: 8px;
+    padding: 20px;
+    line-height: 1.5;
+}</string>
+               </property>
+               <property name="text">
+                <string>Non-volatile data collection will gather:
+
+- Disk images
+- File system artifacts
+- Registry hives
+- Event logs
+- Browser artifacts
+- System logs
+
+Click 'Start Non-volatile Collection' to begin data collection.
+This will open the non-volatile collection interface.</string>
+               </property>
+               <property name="wordWrap">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="startNonvolatileBtn">
+               <property name="styleSheet">
+                <string notr="true">QPushButton {
+    background-color: #3182ce;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 15px 30px;
+    font-size: 16px;
+    font-weight: bold;
+}
+QPushButton:hover {
+    background-color: #2c5aa0;
+}
+QPushButton:disabled {
+    background-color: #e2e8f0;
+    color: #a0aec0;
+}</string>
+               </property>
+               <property name="text">
+                <string>Start Non-volatile Collection</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <spacer name="verticalSpacer_7">
+               <property name="orientation">
+                <enum>Qt::Vertical</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>20</width>
+                 <height>40</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item>
+           <spacer name="verticalSpacer_8">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>40</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </widget>
+       </widget>
+      </item>
+      <item>
+       <widget class="QFrame" name="buttonFrame">
+        <property name="styleSheet">
+         <string notr="true">QFrame {
+    border-top: 1px solid #dee2e6;
+    background-color: #f8f9fa;
+}</string>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::StyledPanel</enum>
+        </property>
+        <layout class="QHBoxLayout" name="buttonLayout">
+         <property name="leftMargin">
+          <number>30</number>
+         </property>
+         <property name="topMargin">
+          <number>15</number>
+         </property>
+         <property name="rightMargin">
+          <number>30</number>
+         </property>
+         <property name="bottomMargin">
+          <number>15</number>
+         </property>
+         <item>
+          <widget class="QPushButton" name="backBtn">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>80</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QPushButton {
+    background-color: #4299e1;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 8px 20px;
+    font-weight: bold;
+    min-width: 80px;
+}
+QPushButton:hover {
+    background-color: #3182ce;
+}
+QPushButton:disabled {
+    background-color: #e2e8f0;
+    color: #a0aec0;
+}</string>
+           </property>
+           <property name="text">
+            <string>&lt; Back</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QPushButton" name="nextBtn">
+           <property name="minimumSize">
+            <size>
+             <width>80</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QPushButton {
+    background-color: #4299e1;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 8px 20px;
+    font-weight: bold;
+    min-width: 80px;
+}
+QPushButton:hover {
+    background-color: #3182ce;
+}
+QPushButton:disabled {
+    background-color: #e2e8f0;
+    color: #a0aec0;
+}</string>
+           </property>
+           <property name="text">
+            <string>Next &gt;</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="finishBtn">
+           <property name="minimumSize">
+            <size>
+             <width>80</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QPushButton {
+    background-color: #4299e1;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 8px 20px;
+    font-weight: bold;
+    min-width: 80px;
+}
+QPushButton:hover {
+    background-color: #3182ce;
+}
+QPushButton:disabled {
+    background-color: #e2e8f0;
+    color: #a0aec0;
+}</string>
+           </property>
+           <property name="text">
+            <string>Finish</string>
+           </property>
+           <property name="visible">
+            <bool>false</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="cancelBtn">
+           <property name="minimumSize">
+            <size>
+             <width>80</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QPushButton {
+    background-color: #e2e8f0;
+    color: #4a5568;
+    border: none;
+    border-radius: 4px;
+    padding: 8px 20px;
+    font-weight: bold;
+    min-width: 80px;
+}
+QPushButton:hover {
+    background-color: #cbd5e0;
+}</string>
+           </property>
+           <property name="text">
+            <string>Cancel</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
