@@ -3,32 +3,15 @@ PyQt5==5.15.9
 PyQt5-Qt5==5.15.2
 PyQt5-sip==12.12.1
 
-# Database
-sqlite3
+# OS/Windows integration
+psutil==5.9.5
+wmi==1.5.1
+pywin32>=305
 
-# Forensics Analysis Libraries
+# Forensic analysis libraries
 pytsk3==20230918
 pyewf==20231231
-Pillow==10.0.1
-PyPDF2==3.0.1
-python-docx==0.8.11
-
-# Additional Analysis Tools
+python-registry==1.3.1
+volatility3>=2.4.1
+yara-python>=4.2.0
 pefile==2023.2.7
-yara-python==4.3.1
-python-magic==0.4.27
-
-# Data Processing
-pandas==2.0.3
-numpy==1.24.3
-
-# Utilities
-psutil==5.9.5
-requests==2.31.0
-python-dateutil==2.8.2
-
-# Optional: For advanced image analysis
-opencv-python==4.8.1.78
-
-# Optional: For network analysis
-scapy==2.5.0
