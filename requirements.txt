@@ -10,7 +10,6 @@ pywin32>=305
 
 # Forensic analysis libraries
 pytsk3==20230918
-pyewf==20231231
 python-registry==1.3.1
 volatility3>=2.4.1
 yara-python>=4.2.0

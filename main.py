@@ -3,6 +3,7 @@ from PyQt5.QtCore import pyqtSignal, QTimer, Qt
 from datetime import datetime
 from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import QSizePolicy
+import os
 
 
 from login_window import LoginWindow
@@ -288,6 +289,37 @@ class MyWindow(QMainWindow):
 
         # Delay để đảm bảo tab đã được tạo
         QTimer.singleShot(100, set_case_data)
+
+    def switch_to_file_analysis_tab(self, case_id=None, evidence_path=None):
+        """Chuyển sang tab File Analysis và nạp file chứng cứ nếu cung cấp."""
+        # Đặt current_case_id để vượt qua kiểm tra yêu cầu case
+        if case_id:
+            self.current_case_id = case_id
+
+        # Chuyển sang tab File Analysis
+        self.file_btn.click()
+
+        def set_data():
+            # Tìm FileAnalysis widget trong tab hiện tại và nạp dữ liệu
+            current_tab_index = self.ui.tabWidget.currentIndex()
+            if current_tab_index >= 0:
+                current_widget = self.ui.tabWidget.widget(current_tab_index)
+                if current_widget and isinstance(current_widget, FileAnalysis):
+                    # Set case info nếu có
+                    if case_id and hasattr(current_widget, "load_case_data"):
+                        try:
+                            current_widget.load_case_data(case_id)
+                        except Exception:
+                            pass
+                    # Nạp file chứng cứ nếu tồn tại
+                    if evidence_path and os.path.exists(evidence_path):
+                        try:
+                            current_widget.load_evidence_file(evidence_path)
+                        except Exception:
+                            pass
+
+        # Delay để đảm bảo tab đã được tạo
+        QTimer.singleShot(150, set_data)
 
     def show_case_management_window(self):
         """

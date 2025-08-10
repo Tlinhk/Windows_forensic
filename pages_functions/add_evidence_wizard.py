@@ -1160,6 +1160,23 @@ class AddEvidenceWizard(QDialog):
             for record in evidence_records:
                 self.evidence_added.emit(record)
 
+            # Nếu là import và có file ảnh đĩa, tự động chuyển đến File Analysis và nạp tệp
+            if wizard_data.get("mode") == "import":
+                image_file_path = self.find_first_disk_image_file(wizard_data.get("files", []))
+                if image_file_path:
+                    main_window = self.get_main_window()
+                    if main_window and hasattr(main_window, "switch_to_file_analysis_tab"):
+                        try:
+                            from PyQt5.QtCore import QTimer
+                            QTimer.singleShot(
+                                100,
+                                lambda: main_window.switch_to_file_analysis_tab(
+                                    case_id=self.case_id, evidence_path=image_file_path
+                                ),
+                            )
+                        except Exception:
+                            pass
+
             # Đóng dialog
             self.accept()
         else:
@@ -1256,3 +1273,21 @@ class AddEvidenceWizard(QDialog):
         # Fallback về mimetypes library
         mime_type, _ = mimetypes.guess_type(file_path)
         return mime_type or "application/octet-stream"
+
+    def find_first_disk_image_file(self, paths):
+        """Tìm file ảnh đĩa đầu tiên trong danh sách theo đuôi mở rộng quen thuộc."""
+        try:
+            if not paths:
+                return None
+            supported_exts = {".dd", ".img", ".raw", ".e01", ".001", ".E01"}
+            for file_path in paths:
+                try:
+                    if os.path.isfile(file_path):
+                        _, ext = os.path.splitext(file_path)
+                        if ext.lower() in {e.lower() for e in supported_exts}:
+                            return file_path
+                except Exception:
+                    continue
+            return None
+        except Exception:
+            return None
