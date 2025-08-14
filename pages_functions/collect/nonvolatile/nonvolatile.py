@@ -1461,10 +1461,7 @@ class NonVolatilePage(QtWidgets.QWidget, Ui_CollectNonvolatileForm):
         """Tạo một chuỗi HTML để tóm tắt tất cả các lựa chọn của người dùng."""
         html = "<h3>📋 Tóm tắt Cấu hình</h3>"
         
-        # --- Trạng thái Triangle Warnings ---
-        triangle_status = self.get_triangle_status_summary()
-        html += f"<h4>🔺 Trạng thái Hệ thống</h4>"
-        html += f"<b>Cảnh báo:</b> {triangle_status}<br><br>"
+        # Triangle warnings removed
         
         # --- Thông tin Vụ việc ---
         html += "<h4>🏷️ Thông tin Vụ việc</h4>"
