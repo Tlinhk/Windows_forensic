@@ -395,7 +395,14 @@ class MyWindow(QMainWindow):
             if is_open:
                 self.ui.tabWidget.setCurrentIndex(index)
             else:
-                widget = self.get_or_create_window(title, factory)
+                # Truyền main_window vào NonVolatile/Volatile khi khởi tạo để trang tự lấy case
+                if sender_btn in {self.nonvolatile_btn, self.volatile_btn}:
+                    try:
+                        widget = self.get_or_create_window(title, lambda: factory().__class__(main_window=self))
+                    except Exception:
+                        widget = self.get_or_create_window(title, factory)
+                else:
+                    widget = self.get_or_create_window(title, factory)
                 curIndex = self.ui.tabWidget.addTab(widget, title)
                 self.ui.tabWidget.setCurrentIndex(curIndex)
                 self.ui.tabWidget.setVisible(True)

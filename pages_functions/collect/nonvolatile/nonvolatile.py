@@ -119,12 +119,7 @@ class KapeDataLoader(QtCore.QObject):
                         continue
             except:
                 # Bỏ qua nếu có lỗi chung khi tìm kiếm file
-                pass
-                
-        # Nếu không tìm thấy target nào (hoặc có ít), thêm một vài target mẫu
-        if len(targets) < 10:
-            targets.extend(self.get_dummy_targets())
-            
+                pass            
         return targets
         
     def load_modules(self):
@@ -150,12 +145,7 @@ class KapeDataLoader(QtCore.QObject):
                     except:
                         continue
             except:
-                pass
-                
-        # Nếu không tìm thấy module nào, thêm một vài module mẫu
-        if len(modules) < 10:
-            modules.extend(self.get_dummy_modules())
-            
+                pass            
         return modules
         
     def extract_description(self, content):
@@ -168,32 +158,7 @@ class KapeDataLoader(QtCore.QObject):
                 return line.split(':', 1)[1].strip()
         # Nếu không tìm thấy dòng mô tả, trả về chuỗi mặc định
         return "No description"
-        
-    def get_dummy_targets(self):
-        """
-        Trả về một danh sách các target mẫu.
-        Hữu ích khi không thể đọc được thư mục KAPE thực tế.
-        """
-        return [
-            ("!SANS_Triage", "Compound", "SANS Digital Forensics and Incident Response Triage Collection"),
-            ("Chrome", "Apps", "Chrome browser artifacts"),
-            ("WindowsEventLogs", "EventLogs", "Windows Event Log files"),
-            ("Prefetch", "Execution", "Windows Prefetch files"),
-            ("MFT", "FileSystem", "Master File Table"),
-        ]
-        
-    def get_dummy_modules(self):
-        """
-        Trả về một danh sách các module mẫu.
-        Hữu ích khi không thể đọc được thư mục KAPE thực tế.
-        """
-        return [
-            ("ChromiumParser", "Browsers", "Parse Chromium-based browser artifacts"),
-            ("EvtxECmd", "EventLogs", "Parse Windows Event Log files"),
-            ("PECmd", "Execution", "Parse Windows Prefetch files"),
-            ("MFTECmd", "FileSystem", "Parse Master File Table"),
-            ("RegistryParser", "Registry", "Parse registry hives"),
-        ]
+    
 
 class DeviceScanner(QtCore.QObject):
     """
@@ -205,6 +170,10 @@ class DeviceScanner(QtCore.QObject):
     # Tín hiệu này sẽ được phát ra khi quá trình quét hoàn tất,
     # mang theo một danh sách (list) các thiết bị đã tìm thấy.
     devicesFound = QtCore.pyqtSignal(list)
+
+    def __init__(self, tools_dir: str = None, parent: QtCore.QObject = None):
+        super().__init__(parent)
+        self.tools_dir = tools_dir
     
     def scan(self):
         """
@@ -269,11 +238,11 @@ class DeviceScanner(QtCore.QObject):
                         'id': disk_id,
                         'model': disk_info['model'],
                         'serial': disk_info['serial'].strip(), # Loại bỏ khoảng trắng thừa
-                        'size': self.format_size(disk_info['size']),
+                        'size': self.format_size_gb(disk_info['size']),
                         'filesystem': ", ".join(sorted(list(filesystems))),
                         'partitions': ", ".join(sorted(drive_letters)),
                         'is_windows': is_windows,
-                        'encryption': self.check_encryption(disk_id) # Kiểm tra mã hóa
+                        'encryption': "Unknown"  # Kiểm tra bất đồng bộ sau
                     }
                     devices.append(device)
             except Exception as e:
@@ -283,11 +252,13 @@ class DeviceScanner(QtCore.QObject):
         else:
             # Nếu WMI không khả dụng, sử dụng ngay phương pháp dự phòng
             devices = self.scan_fallback()
+
+        # Không còn kiểm tra mã hóa bất đồng bộ
             
         # Phát tín hiệu 'devicesFound' cùng với danh sách thiết bị đã thu thập được
         self.devicesFound.emit(devices)
         
-    def format_size(self, size_bytes):
+    def format_size_gb(self, size_bytes):
         """Định dạng kích thước từ bytes sang GB cho dễ đọc."""
         try:
             # Chuyển đổi từ bytes sang gigabytes
@@ -298,13 +269,38 @@ class DeviceScanner(QtCore.QObject):
             # Nếu có lỗi, trả về "Unknown"
             return "Unknown"
             
-    def check_encryption(self, drive_id):
-        """
-        Kiểm tra trạng thái mã hóa của ổ đĩa (phiên bản đơn giản).
-        Trong code này, việc kiểm tra thực tế được thực hiện theo yêu cầu để tăng hiệu năng,
-        vì vậy hàm này chỉ trả về giá trị mặc định.
-        """
+    def get_startup_info(self):
+        """Tạo startup info để ẩn console trên Windows."""
+        if os.name == 'nt':
+            startupinfo = subprocess.STARTUPINFO()
+            startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+            startupinfo.wShowWindow = subprocess.SW_HIDE
+            return startupinfo
+        return None
+
+    def get_physical_drive_from_letter(self, drive_letter: str) -> str:
+        """Chuyển C: → \\.\PHYSICALDRIVE0 nếu có thể (WMI)."""
+        try:
+            if WMI_AVAILABLE:
+                c = wmi.WMI()
+                for logical_disk in c.Win32_LogicalDisk(DeviceID=drive_letter):
+                    for partition in logical_disk.associators("Win32_LogicalDiskToPartition"):
+                        for disk in partition.associators("Win32_DiskDriveToDiskPartition"):
+                            return disk.DeviceID
+        except Exception:
+            pass
+        return None
+
+    def check_encryption(self, drive_id: str) -> str:
+        """ĐÃ LOẠI BỎ kiểm tra mã hóa. Trả về 'Unknown'."""
         return "Unknown"
+
+    def _check_encryption_async(self, devices: list):
+        """ĐÃ LOẠI BỎ: không còn kiểm tra mã hóa, giữ nguyên 'Unknown'."""
+        try:
+                self.devicesFound.emit(devices)
+        except Exception:
+            pass
         
     def scan_fallback(self):
         """
@@ -336,7 +332,7 @@ class DeviceScanner(QtCore.QObject):
                             'id': device_id,
                             'model': f"{volume_name} ({device_id})" if volume_name else device_id,
                             'serial': "Unknown", # wmic không cung cấp serial cho ổ logic
-                            'size': self.format_size(size_bytes),
+                            'size': self.format_size_gb(size_bytes),
                             'filesystem': filesystem,
                             'partitions': device_id,
                             'is_windows': device_id == "C:",
@@ -364,36 +360,23 @@ class NonVolatilePage(QtWidgets.QWidget, Ui_CollectNonvolatileForm):
     # 1. KHỞI TẠO, SETUP BAN ĐẦU, KẾT NỐI TÍN HIỆU UI
     # -----------------------------------------------------
     
-    def __init__(self):
+    def __init__(self, main_window=None):
         """Hàm khởi tạo (constructor) của lớp."""
         # Gọi hàm khởi tạo của các lớp cha
         super().__init__()
         # Thiết lập giao diện người dùng đã được định nghĩa trong Ui_CollectNonvolatileForm
         self.setupUi(self)
+        # Context case hiện tại (được truyền từ main/wizard)
+        self.case_data = None
+        # Tham chiếu main window (nếu có) để tự lấy case_id như FileAnalysis
+        self.main_window = main_window
         
         # Thiết lập kích thước và chính sách size cho widget
         self.setMinimumSize(1200, 850)
         self.resize(1200, 850)
         self.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         
-        # Tạo status label để hiển thị warnings
-        self.status_label = QtWidgets.QLabel()
-        self.status_label.setStyleSheet("""
-            QLabel {
-                background-color: #fff3cd;
-                color: #856404;
-                border: 1px solid #ffeaa7;
-                border-radius: 4px;
-                padding: 8px;
-                font-weight: bold;
-            }
-        """)
-        self.status_label.setWordWrap(True)
-        self.status_label.hide()
-        
-        # Thêm status label vào layout chính
-        if hasattr(self, 'mainLayout'):
-            self.mainLayout.insertWidget(0, self.status_label)
+        # Bỏ status label cảnh báo để giao diện gọn hơn
         
         # --- Nhóm 2 radio vào cùng 1 ButtonGroup ---
         self.strategy_group = QtWidgets.QButtonGroup(self)
@@ -402,7 +385,7 @@ class NonVolatilePage(QtWidgets.QWidget, Ui_CollectNonvolatileForm):
 
         # --- Đường dẫn đến thư mục chứa các công cụ pháp lý ---
         self.tools_dir = r"E:\DoAn\Windows_forensic\tools"
-        self.edd_exe = os.path.join(self.tools_dir, "EDDv300.exe") # Công cụ kiểm tra mã hóa
+        # EDD không còn được sử dụng
         self.kape_exe = os.path.join(self.tools_dir, "KAPE", "kape.exe") # Công cụ triage
         self.dc3dd_exe = os.path.join(self.tools_dir, "dc3dd", "dc3dd.exe") # Công cụ tạo ảnh RAW
 
@@ -448,6 +431,77 @@ class NonVolatilePage(QtWidgets.QWidget, Ui_CollectNonvolatileForm):
         # QtCore.QTimer.singleShot(100, ...) sẽ gọi hàm load_data_async sau 100ms
         # để không làm chậm việc hiển thị giao diện ban đầu.
         QtCore.QTimer.singleShot(100, self.load_data_async)
+
+        # Nếu được truyền main_window và đã có case hiện tại, tự nạp case
+        try:
+            if self.main_window and getattr(self.main_window, "current_case_id", None):
+                self.set_case_id(self.main_window.current_case_id)
+        except Exception:
+            pass
+
+    def set_case_data(self, case_data: dict):
+        """Nhận thông tin case và tự động điền thư mục đích Triage/Imaging theo archive_path."""
+        try:
+            self.case_data = case_data or {}
+            # Điền thông tin cơ bản nếu có
+            try:
+                if hasattr(self, "lineEdit_case_id") and self.case_data.get("case_id"):
+                    self.lineEdit_case_id.setText(str(self.case_data["case_id"]))
+                if hasattr(self, "lineEdit_investigator") and self.case_data.get("investigator"):
+                    self.lineEdit_investigator.setText(self.case_data["investigator"])
+            except Exception:
+                pass
+            # Tự đảm bảo đường dẫn đích
+            self.ensure_default_paths()
+        except Exception:
+            pass
+
+    def set_case_id(self, case_id: int):
+        """Fallback: nhận case_id và truy vấn DB lấy archive_path rồi gọi set_case_data."""
+        try:
+            from database.db_manager import DatabaseManager
+            db = DatabaseManager()
+            case = None
+            if db.connect():
+                case = db.get_case_with_investigator(case_id)
+            if case:
+                self.set_case_data({
+                    "case_id": case_id,
+                    "case_name": case.get("title", f"CASE-{case_id}"),
+                    "investigator": case.get("full_name", "Unknown"),
+                    "created_date": case.get("created_at", ""),
+                    "archive_path": case.get("archive_path", ""),
+                    "database_case_id": case_id,
+                })
+        except Exception:
+            pass
+
+    def ensure_default_paths(self):
+        """Auto điền và tạo thư mục đích dựa trên archive_path của case."""
+        try:
+            archive_path = (self.case_data or {}).get("archive_path") or ""
+            if not archive_path:
+                return
+            triage_dir = os.path.join(archive_path, "nonvolatile", "triage")
+            imaging_dir = os.path.join(archive_path, "nonvolatile", "imaging")
+            os.makedirs(triage_dir, exist_ok=True)
+            os.makedirs(imaging_dir, exist_ok=True)
+
+            if hasattr(self, "lineEdit_target_destination") and not self.lineEdit_target_destination.text().strip():
+                self.lineEdit_target_destination.setText(triage_dir)
+            if hasattr(self, "lineEdit_module_destination") and (
+                not getattr(self, "lineEdit_module_destination", None)
+                or not self.lineEdit_module_destination.text().strip()
+            ):
+                if hasattr(self, "lineEdit_module_destination"):
+                    self.lineEdit_module_destination.setText(os.path.join(triage_dir, "ModuleOutput"))
+            if hasattr(self, "lineEdit_destination_folder") and not self.lineEdit_destination_folder.text().strip():
+                self.lineEdit_destination_folder.setText(imaging_dir)
+
+            if hasattr(self, "update_image_path"):
+                self.update_image_path()
+        except Exception:
+            pass
         
     def setup_initial_state(self):
         """Hàm này thiết lập các giá trị và trạng thái mặc định cho giao diện khi khởi động."""
@@ -472,13 +526,12 @@ class NonVolatilePage(QtWidgets.QWidget, Ui_CollectNonvolatileForm):
         self.label_time_elapsed_val.setText("00:00:00")
         self.label_eta_val.setText("00:00:00")
         
-        # Tạo label hiển thị dung lượng thiết bị nguồn nếu chưa có
-        if not hasattr(self, 'label_source_size'):
-            self.label_source_size = QtWidgets.QLabel(self)
-            self.label_source_size.setText("Unknown")
-            # Thêm label này vào layout thông tin thiết bị
-            if hasattr(self, 'gridLayout_device_info'):
+        # Tạo label hiển thị dung lượng thiết bị nguồn nếu layout tồn tại
+        if hasattr(self, 'gridLayout_device_info'):
+            if not hasattr(self, 'label_source_size'):
+                self.label_source_size = QtWidgets.QLabel()
                 self.gridLayout_device_info.addWidget(self.label_source_size, 2, 1)
+            self.label_source_size.setText("Unknown")
 
         # Tạo label hiển thị đường dẫn xem trước nếu chưa có
         if not hasattr(self, 'label_preview_path'):
@@ -512,119 +565,13 @@ class NonVolatilePage(QtWidgets.QWidget, Ui_CollectNonvolatileForm):
         self.checkBox_sha1.setChecked(True)
         self.checkBox_sha256.setChecked(True)
         
-        # Khởi tạo triangle indicators cho warnings
-        self.setup_triangle_indicators()
+        # Bỏ hệ thống triangle warnings
         
         # Khởi tạo dictionary cho target và module variables
         self.target_variables = {}  # Dict để lưu key:value pairs cho --tvars
         self.module_variables = {}  # Dict để lưu key:value pairs cho --mvars
 
-    def setup_triangle_indicators(self):
-        """Thiết lập các biểu tượng triangle cảnh báo cho UI."""
-        # Dictionary để theo dõi trạng thái cảnh báo
-        self.warning_states = {
-            'admin_required': False,
-            'disk_space': False,
-            'encryption_detected': False,
-            'system_disk': False,
-            'invalid_config': False
-        }
-        
-        # Tạo các triangle indicators nếu cần
-        self.create_triangle_indicators()
-    
-    def create_triangle_indicators(self):
-        """Tạo các triangle warning indicators trên UI."""
-        # Ẩn tất cả triangle indicators ban đầu - chúng sẽ được hiển thị khi cần
-        # Không tạo ra các widget riêng lẻ vì có thể gây ra vấn đề hiển thị
-        
-        # Chúng ta sẽ sử dụng status bar hoặc tooltip thay vì các widget riêng
-        # để tránh vấn đề hiển thị ở góc màn hình
-        pass
-    
-    def show_triangle_warning(self, warning_type, message="", position=None):
-        """Hiển thị triangle warning với loại và thông điệp cụ thể."""
-        self.warning_states[warning_type] = True
-        self.update_status_display()
-    
-    def hide_triangle_warning(self, warning_type):
-        """Ẩn triangle warning cụ thể."""
-        self.warning_states[warning_type] = False
-        self.update_status_display()
-    
-    def update_status_display(self):
-        """Cập nhật hiển thị status với tất cả warnings hiện tại."""
-        if not hasattr(self, 'status_label'):
-            return
-            
-        active_warnings = []
-        warning_messages = {
-            'admin_required': '⚠️ Cần quyền Administrator để thực hiện thu thập',
-            'disk_space': '💾 Không đủ dung lượng đĩa',
-            'encryption_detected': '🔒 Phát hiện mã hóa trên ổ đĩa',
-            'system_disk': '🖥️ Đây là ổ đĩa hệ thống - cần thận trọng',
-            'invalid_config': '⚙️ Cấu hình không hợp lệ'
-        }
-        
-        for warning_type, is_active in self.warning_states.items():
-            if is_active:
-                active_warnings.append(warning_messages.get(warning_type, f"⚠️ {warning_type}"))
-        
-        if active_warnings:
-            self.status_label.setText(" | ".join(active_warnings))
-            self.status_label.show()
-        else:
-            self.status_label.hide()
-    
-    def update_triangle_indicators(self):
-        """Cập nhật tất cả triangle indicators dựa trên trạng thái hiện tại."""
-        # Kiểm tra quyền admin
-        if not is_admin():
-            self.show_triangle_warning('admin_required', 
-                "Cần quyền Administrator để thực hiện thu thập forensic")
-        else:
-            self.hide_triangle_warning('admin_required')
-        
-        # Kiểm tra thiết bị được chọn
-        current_row = self.tableWidget_devices.currentRow()
-        if current_row >= 0:
-            # Kiểm tra xem có phải ổ hệ thống không
-            partition_text = self.tableWidget_devices.item(current_row, 3).text()
-            if "C:" in partition_text:
-                self.show_triangle_warning('system_disk', 
-                    "Ổ đĩa hệ thống Windows - cần cẩn thận khi thu thập")
-            else:
-                self.hide_triangle_warning('system_disk')
-            
-            # Kiểm tra mã hóa
-            encryption_status = self.tableWidget_devices.item(current_row, 4).text()
-            if encryption_status and encryption_status not in ["Không", "Unknown", "EDD không tìm thấy"]:
-                self.show_triangle_warning('encryption_detected', 
-                    f"Phát hiện mã hóa: {encryption_status}")
-            else:
-                self.hide_triangle_warning('encryption_detected')
-    
-    def validate_configuration_with_triangles(self):
-        """Validate cấu hình và hiển thị triangle warnings tương ứng."""
-        is_valid = True
-        
-        # Kiểm tra dung lượng đĩa cho imaging
-        if self.radioButton_full_image.isChecked():
-            dest_folder = self.lineEdit_destination_folder.text()
-            if dest_folder:
-                source_size = self.get_device_size()
-                if source_size > 0:
-                    free_space = self.get_free_space(dest_folder)
-                    required_space = source_size * 1.1  # Add 10% buffer
-                    
-                    if free_space < required_space:
-                        self.show_triangle_warning('disk_space', 
-                            f"Không đủ dung lượng. Cần: {self.format_size(required_space)}, Có: {self.format_size(free_space)}")
-                        is_valid = False
-                    else:
-                        self.hide_triangle_warning('disk_space')
-        
-        return is_valid
+    # Gỡ toàn bộ cơ chế triangle warnings và status label
 
     def connect_signals(self):
         """Kết nối tất cả các tín hiệu (signals) từ các widget trên UI tới các khe cắm (slots) xử lý tương ứng."""
@@ -709,40 +656,12 @@ class NonVolatilePage(QtWidgets.QWidget, Ui_CollectNonvolatileForm):
         self.lineEdit_destination_folder.textChanged.connect(self.update_image_path)
         self.lineEdit_image_filename.textChanged.connect(self.update_image_path)
         
-        # Auto-update triangle indicators khi có thay đổi
-        self.lineEdit_destination_folder.textChanged.connect(self.auto_update_triangles)
-        self.checkBox_accept_risk.toggled.connect(self.auto_update_triangles)
+        # Bỏ auto-update triangle indicators
         
         # Debug và export command line
         if hasattr(self, 'lineEdit_command_line'):
             self.lineEdit_command_line.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
             self.lineEdit_command_line.customContextMenuRequested.connect(self.show_command_context_menu)
-    
-    def auto_update_triangles(self):
-        """Tự động cập nhật triangle indicators khi có thay đổi cấu hình."""
-        self.update_triangle_indicators()
-        self.validate_configuration_with_triangles()
-    
-    def get_triangle_status_summary(self):
-        """Trả về summary của tất cả triangle warnings hiện tại."""
-        if not hasattr(self, 'warning_states'):
-            return "✅ Không có cảnh báo"
-            
-        active_warnings = []
-        for warning_type, is_active in self.warning_states.items():
-            if is_active:
-                warning_messages = {
-                    'admin_required': 'Cần quyền Administrator',
-                    'disk_space': 'Không đủ dung lượng đĩa',
-                    'encryption_detected': 'Phát hiện mã hóa',
-                    'system_disk': 'Ổ đĩa hệ thống',
-                    'invalid_config': 'Cấu hình không hợp lệ'
-                }
-                active_warnings.append(warning_messages.get(warning_type, warning_type))
-        
-        if active_warnings:
-            return f"⚠️ Cảnh báo: {', '.join(active_warnings)}"
-        return "✅ Không có cảnh báo"
     
     def show_command_context_menu(self, position):
         """Hiển thị context menu cho command line field."""
@@ -958,6 +877,12 @@ class NonVolatilePage(QtWidgets.QWidget, Ui_CollectNonvolatileForm):
         for attr_name in ['lineEdit_destination_folder', 'lineEdit_image_filename', 'pushButton_browse_folder']:
             if hasattr(self, attr_name):
                 getattr(self, attr_name).setEnabled(not is_triage)
+        # Cố gắng tự điền lại đường dẫn theo case nếu có
+        try:
+            if self.case_data:
+                self.set_case_data(self.case_data)
+        except Exception:
+            pass
 
     # -----------------------------------------------------
     # 3. KIỂM TRA, VALIDATE DỮ LIỆU Ở MỖI BƯỚC
@@ -967,8 +892,14 @@ class NonVolatilePage(QtWidgets.QWidget, Ui_CollectNonvolatileForm):
         Kiểm tra xem người dùng đã nhập đủ thông tin bắt buộc cho bước hiện tại chưa.
         Trả về True nếu hợp lệ, False nếu không.
         """
-        # Cập nhật triangle indicators trước khi validate
-        self.update_triangle_indicators()
+        # Bổ sung: nếu chưa có case_data mà main_window đang có case, tự nạp
+        try:
+            if (not self.case_data) and getattr(self, 'main_window', None) and getattr(self.main_window, 'current_case_id', None):
+                self.set_case_id(self.main_window.current_case_id)
+        except Exception:
+            pass
+
+        # Bỏ cập nhật triangle indicators
         
         if self.current_step == 0:  # Bước 1: Cài đặt & Chọn Nguồn
             if not self.lineEdit_case_id.text().strip():
@@ -980,8 +911,6 @@ class NonVolatilePage(QtWidgets.QWidget, Ui_CollectNonvolatileForm):
             
             # Kiểm tra quyền admin với triangle warning
             if not is_admin():
-                self.show_triangle_warning('admin_required', 
-                    "Cần quyền Administrator để thực hiện thu thập forensic")
                 QtWidgets.QMessageBox.warning(self, "Cảnh báo quyền", 
                             "Để thực hiện thu thập forensic một cách an toàn, ứng dụng cần quyền Administrator.\n"
                             "Vui lòng khởi động lại ứng dụng với quyền Administrator.")
@@ -992,8 +921,6 @@ class NonVolatilePage(QtWidgets.QWidget, Ui_CollectNonvolatileForm):
             if current_row >= 0:
                 partition_text = self.tableWidget_devices.item(current_row, 3).text()
                 if "C:" in partition_text and not self.checkBox_accept_risk.isChecked():
-                    self.show_triangle_warning('system_disk', 
-                        "Ổ đĩa hệ thống Windows - cần chấp nhận rủi ro")
                     QtWidgets.QMessageBox.warning(self, "Cảnh báo rủi ro", 
                                 "Bạn đang chọn ổ hệ thống Windows. Vui lòng chấp nhận rủi ro trước khi tiếp tục!")
                     return False
@@ -1005,6 +932,12 @@ class NonVolatilePage(QtWidgets.QWidget, Ui_CollectNonvolatileForm):
         
         elif self.current_step == 2:  # Bước 3: Cấu hình chi tiết
             if self.radioButton_triage.isChecked(): # Nếu là Triage
+                # Auto điền nếu có case và còn trống
+                try:
+                    if self.case_data and hasattr(self, 'lineEdit_target_destination') and not self.lineEdit_target_destination.text().strip():
+                        self.set_case_data(self.case_data)
+                except Exception:
+                    pass
                 if not self.lineEdit_target_destination.text():
                     QtWidgets.QMessageBox.warning(self, "Thiếu thông tin", "Vui lòng chọn thư mục đích cho Triage!")
                     return False
@@ -1028,6 +961,12 @@ class NonVolatilePage(QtWidgets.QWidget, Ui_CollectNonvolatileForm):
                         return False
                         
             else: # Nếu là Imaging
+                # Auto điền nếu có case và còn trống
+                try:
+                    if self.case_data and hasattr(self, 'lineEdit_destination_folder') and not self.lineEdit_destination_folder.text().strip():
+                        self.set_case_data(self.case_data)
+                except Exception:
+                    pass
                 if not self.lineEdit_destination_folder.text():
                     QtWidgets.QMessageBox.warning(self, "Thiếu thông tin", "Vui lòng chọn thư mục đích cho file ảnh!")
                     return False
@@ -1035,9 +974,8 @@ class NonVolatilePage(QtWidgets.QWidget, Ui_CollectNonvolatileForm):
                     QtWidgets.QMessageBox.warning(self, "Thiếu thông tin", "Vui lòng nhập tên file ảnh!")
                     return False
                 
-                # Validate configuration với triangle warnings
-                if not self.validate_configuration_with_triangles():
-                    # Triangle warning đã được hiển thị trong validate_configuration_with_triangles
+                # Kiểm tra dung lượng bằng QMessageBox thay vì triangle
+                if not self.check_disk_space(self.lineEdit_destination_folder.text(), self.get_device_size()):
                     return False
         
         return True # Nếu tất cả kiểm tra đều qua, trả về True
@@ -1113,10 +1051,8 @@ class NonVolatilePage(QtWidgets.QWidget, Ui_CollectNonvolatileForm):
                     # Cột 3: Các phân vùng
                     partition_display = ", ".join(sorted(partitions)) if partitions else "Không có"
                     self.tableWidget_devices.setItem(row, 3, QtWidgets.QTableWidgetItem(partition_display))
-                    # Cột 4: Trạng thái mã hóa
-                    self.tableWidget_devices.setItem(row, 4, QtWidgets.QTableWidgetItem(
-                        self.check_encryption_status(device_id)
-                    ))
+                    # Cột 4: Trạng thái mã hóa (đã loại bỏ kiểm tra)
+                    self.tableWidget_devices.setItem(row, 4, QtWidgets.QTableWidgetItem("Unknown"))
                     
                     # Tô màu vàng cho hàng chứa ổ đĩa Windows để cảnh báo
                     if is_windows:
@@ -1169,7 +1105,8 @@ class NonVolatilePage(QtWidgets.QWidget, Ui_CollectNonvolatileForm):
                         self.tableWidget_devices.setItem(row, 1, QtWidgets.QTableWidgetItem(filesystem))
                         self.tableWidget_devices.setItem(row, 2, QtWidgets.QTableWidgetItem(size))
                         self.tableWidget_devices.setItem(row, 3, QtWidgets.QTableWidgetItem(device_id))
-                        self.tableWidget_devices.setItem(row, 4, QtWidgets.QTableWidgetItem("Unknown")) # Không kiểm tra mã hóa ở chế độ fallback
+                        # Cột 4: Trạng thái mã hóa (đã loại bỏ kiểm tra)
+                        self.tableWidget_devices.setItem(row, 4, QtWidgets.QTableWidgetItem("Unknown"))
                         
                         # Tô màu cho ổ C:
                         if device_id == "C:":
@@ -1222,44 +1159,8 @@ class NonVolatilePage(QtWidgets.QWidget, Ui_CollectNonvolatileForm):
         return None
 
     def check_encryption_status(self, drive_index):
-        """Kiểm tra trạng thái mã hóa của ổ đĩa sử dụng EDD."""
-        if not os.path.exists(self.edd_exe):
-            return "EDD không tìm thấy"
-
-        try:
-            # Trích xuất số drive từ device_id nếu cần
-            if isinstance(drive_index, str):
-                match = re.search(r'(\d+)$', drive_index)
-                if match:
-                    drive_index = match.group(1)
-                else:
-                    return "Không xác định device ID"
-
-            cmd = [self.edd_exe, "/batch", f"\\\\.\\PhysicalDrive{drive_index}"]
-            process = subprocess.run(
-                cmd, capture_output=True, text=True, timeout=60, 
-                startupinfo=self.get_startup_info()
-            )
-            output = process.stdout.lower() + process.stderr.lower()
-
-            # Kiểm tra thông báo không phát hiện mã hóa (dòng có "no ... found")
-            if "no truecrypt" in output and "bitlocker" in output and "veracrypt" in output and "found" in output:
-                return "Không"  # Không phát hiện mã hóa trên ổ đĩa này
-
-            # Kiểm tra các loại mã hóa cụ thể
-            if "bitlocker" in output and "detected" in output:
-                return "BitLocker phát hiện"
-            if "truecrypt" in output and "detected" in output:
-                return "TrueCrypt phát hiện"
-            if "veracrypt" in output and "detected" in output:
-                return "VeraCrypt phát hiện"
-
-            # Nếu không rõ, trả về "Không xác định"
-            return "Không xác định"
-        except subprocess.TimeoutExpired:
-            return "EDD timeout"
-        except Exception as e:
-            return f"Lỗi EDD: {str(e)[:50]}..."
+        """ĐÃ LOẠI BỎ: luôn trả về 'Unknown'."""
+        return "Unknown"
 
     # -----------------------------------------------------
     # 5. XỬ LÝ LOAD VÀ HIỂN THỊ TARGETS/MODULES (KAPE)
@@ -1287,7 +1188,12 @@ class NonVolatilePage(QtWidgets.QWidget, Ui_CollectNonvolatileForm):
         
         # --- Làm mới danh sách thiết bị trong một luồng nền (tương tự như trên) ---
         self.device_thread = QtCore.QThread()
-        self.device_worker = DeviceScanner()
+        # Khởi tạo worker quét thiết bị với tools_dir để kiểm tra mã hóa bằng EDD
+        try:
+            self.device_worker = DeviceScanner(self.tools_dir)
+        except TypeError:
+            # Fallback nếu chữ ký hàm không hỗ trợ đối số tên
+            self.device_worker = DeviceScanner(self.tools_dir)
         self.device_worker.moveToThread(self.device_thread)
         # Khi worker quét xong, tín hiệu 'devicesFound' sẽ gọi hàm 'update_device_list'
         self.device_worker.devicesFound.connect(self.update_device_list)
@@ -1487,11 +1393,6 @@ class NonVolatilePage(QtWidgets.QWidget, Ui_CollectNonvolatileForm):
         self.lineEdit_variable_key.clear()
         self.lineEdit_variable_value.clear()
     
-    def clear_target_variables(self):
-        """Xóa tất cả target variables."""
-        self.target_variables.clear()
-        QtWidgets.QMessageBox.information(self, "Thành công", "Đã xóa tất cả biến target!")
-    
     def get_variables_string(self, variables_dict):
         """Chuyển đổi dictionary thành string format cho KAPE --tvars/--mvars."""
         if not variables_dict:
@@ -1652,6 +1553,9 @@ class NonVolatilePage(QtWidgets.QWidget, Ui_CollectNonvolatileForm):
             cmd.extend(["--tsource", source])
         
         # --tdest: Destination directory với biến %d (date) và %m (machine) nếu cần
+        tdest = self.lineEdit_target_destination.text().strip() if hasattr(self, "lineEdit_target_destination") else ""
+        if tdest:
+            os.makedirs(tdest, exist_ok=True)
         target_dest = self.lineEdit_target_destination.text()
         if hasattr(self, 'checkBox_add_date') and self.checkBox_add_date.isChecked():
             target_dest = target_dest + "_%d"  # %d = timestamp (yyyyMMddTHHmmss)
@@ -1791,22 +1695,6 @@ class NonVolatilePage(QtWidgets.QWidget, Ui_CollectNonvolatileForm):
             return f"\\\\.\\PHYSICALDRIVE0"  # Default fallback
         except:
             return f"\\\\.\\PHYSICALDRIVE0"
-
-    def get_drive_letter(self, physical_drive):
-        r"""Chuyển đổi đường dẫn ổ đĩa vật lý (ví dụ: \\.\PHYSICALDRIVE0) sang ký tự ổ đĩa (C:)."""
-        try:
-            if WMI_AVAILABLE:
-                c = wmi.WMI()
-                # Tìm ổ đĩa vật lý tương ứng
-                for disk in c.Win32_DiskDrive(DeviceID=physical_drive):
-                    # Tìm phân vùng và ổ đĩa logic liên kết với nó
-                    for partition in disk.associators("Win32_DiskDriveToDiskPartition"):
-                        for logical_disk in partition.associators("Win32_LogicalDiskToPartition"):
-                            return logical_disk.DeviceID # Trả về ký tự ổ đĩa đầu tiên tìm thấy
-            return "C:" # Mặc định trả về C: nếu không tìm thấy
-        except Exception as e:
-            print(f"Error converting physical drive to letter: {e}")
-            return "C:"
 
     def build_ewf_command(self, device_id, format_type):
         """Xây dựng dòng lệnh cho công cụ ewfacquire.exe để tạo ảnh E01 hoặc AFF."""
@@ -2155,6 +2043,14 @@ class NonVolatilePage(QtWidgets.QWidget, Ui_CollectNonvolatileForm):
             self.textBrowser_log.clear()
             self.textBrowser_log.append("<b>🚀 Bắt đầu thu thập KAPE...</b>")
             self.textBrowser_log.append(f"<b>Lệnh:</b> {' '.join(cmd)}")
+            # Đảm bảo thư mục tdest tồn tại trước khi chạy
+            try:
+                if hasattr(self, 'lineEdit_target_destination'):
+                    tdest = self.lineEdit_target_destination.text().strip()
+                    if tdest:
+                        os.makedirs(tdest, exist_ok=True)
+            except Exception:
+                pass
             
             # Thiết lập và chạy QProcess cho KAPE
             self.kape_process = QtCore.QProcess(self)
@@ -2232,6 +2128,36 @@ class NonVolatilePage(QtWidgets.QWidget, Ui_CollectNonvolatileForm):
         self.pushButton_previous.setEnabled(True)
         self.pushButton_pause.setEnabled(False)
         self.pushButton_stop.setEnabled(False)
+        # Thông báo wizard (nếu đang chạy workflow) để auto ghi artifact vào DB
+        try:
+            if hasattr(self, 'wizard_reference'):
+                tdest = ''
+                try:
+                    tdest = self.lineEdit_target_destination.text().strip()
+                except Exception:
+                    pass
+                self.wizard_reference.wizard_collection_finished(
+                    "nonvolatile",
+                    exit_code == 0,
+                    "KAPE triage completed" if exit_code == 0 else f"KAPE triage failed: {exit_code}",
+                    tdest or None,
+                )
+        except Exception:
+            pass
+
+        # Thông báo wizard (nếu có) với đường dẫn triage
+        if hasattr(self, "wizard_reference"):
+            tdest = ""
+            try:
+                tdest = self.lineEdit_target_destination.text().strip()
+            except Exception:
+                pass
+            self.wizard_reference.wizard_collection_finished(
+                "nonvolatile",
+                exit_code == 0,
+                "KAPE triage completed" if exit_code == 0 else f"KAPE triage failed: {exit_code}",
+                tdest or None
+            )
 
     def update_progress_stats(self):
         """Cập nhật các thông số về thời gian và ETA mỗi giây."""
@@ -2263,6 +2189,20 @@ class NonVolatilePage(QtWidgets.QWidget, Ui_CollectNonvolatileForm):
         self.pushButton_previous.setEnabled(True)
         self.pushButton_pause.setEnabled(False)
         self.pushButton_stop.setEnabled(False)
+
+        # Thông báo wizard (nếu có) với thư mục lưu ảnh
+        if hasattr(self, "wizard_reference"):
+            out_dir = ""
+            try:
+                out_dir = self.lineEdit_destination_folder.text().strip()
+            except Exception:
+                pass
+            self.wizard_reference.wizard_collection_finished(
+                "nonvolatile",
+                exit_code == 0,
+                "Imaging completed" if exit_code == 0 else f"Imaging failed: {exit_code}",
+                out_dir or None
+            )
 
     def handle_imaging_stdout(self):
         """Xử lý output chuẩn (stdout) từ ewfacquire hoặc dc3dd."""
@@ -2303,16 +2243,6 @@ class NonVolatilePage(QtWidgets.QWidget, Ui_CollectNonvolatileForm):
             
             # dc3dd có thể xuất thông tin tiến độ hoặc lỗi ra stderr
             if self.radioButton_raw.isChecked():
-                # dc3dd xuất thông tin dạng:
-                # dc3dd 7.2.641 started at 2024-01-20 10:30:00 +0700
-                # input results for device `/dev/sda':
-                #   8323072 sectors in
-                #   4100 MB in
-                # output results for file `output.dd':
-                #   8323072 sectors out
-                #   4100 MB out
-                # dc3dd completed at 2024-01-20 10:35:00 +0700
-                
                 # Tìm sectors đã copy
                 match_in = re.search(r'(\d+)\s+sectors in', error_output)
                 match_mb = re.search(r'(\d+)\s+MB in', error_output)
@@ -2478,12 +2408,6 @@ class NonVolatilePage(QtWidgets.QWidget, Ui_CollectNonvolatileForm):
                 safe_model_name = re.sub(r'[<>:"/\\|?*]', '_', model_text.split('(')[0].strip())
                 timestamp = datetime.now().strftime('%Y%m%d-%H%M')
                 self.lineEdit_image_filename.setText(f"{safe_model_name}_{timestamp}")
-            
-            # Cập nhật triangle indicators dựa trên thiết bị được chọn
-            self.update_triangle_indicators()
-            
-            # Validate configuration với triangle warnings
-            self.validate_configuration_with_triangles()
 
     def browse_target_destination(self):
         """Mở hộp thoại để chọn thư mục đích cho việc thu thập Triage."""
@@ -2503,17 +2427,6 @@ class NonVolatilePage(QtWidgets.QWidget, Ui_CollectNonvolatileForm):
         )
         if folder:
             self.lineEdit_destination_folder.setText(folder)
-
-    def format_size(self, size_bytes):
-        """Hàm tiện ích để định dạng kích thước từ bytes sang đơn vị lớn hơn (KB, MB, GB...)."""
-        if size_bytes == 0:
-            return "0 B"
-        # Danh sách các đơn vị kích thước
-        units = ['B', 'KB', 'MB', 'GB', 'TB', 'PB']
-        # Tính toán chỉ số của đơn vị phù hợp
-        i = int(math.floor(math.log(size_bytes, 1024)))
-        # Định dạng và trả về chuỗi
-        return f"{round(size_bytes / (1024**i), 2)} {units[i]}"
 
     def update_image_path(self):
         """

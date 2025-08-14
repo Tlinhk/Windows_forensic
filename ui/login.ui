@@ -1,0 +1,434 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>LoginWindow</class>
+ <widget class="QMainWindow" name="LoginWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>550</width>
+    <height>750</height>
+   </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>550</width>
+    <height>750</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>550</width>
+    <height>750</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>Hệ thống điều tra Windows - Đăng nhập</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">QMainWindow {
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #2E86AB, stop:1 #A23B72);
+}
+QWidget#centralwidget {
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #2E86AB, stop:1 #A23B72);
+}</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <property name="leftMargin">
+     <number>50</number>
+    </property>
+    <property name="topMargin">
+     <number>40</number>
+    </property>
+    <property name="rightMargin">
+     <number>50</number>
+    </property>
+    <property name="bottomMargin">
+     <number>40</number>
+    </property>
+    <property name="spacing">
+     <number>30</number>
+    </property>
+    <item>
+     <widget class="QFrame" name="logo_frame">
+      <property name="styleSheet">
+       <string notr="true">QFrame {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 15px;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+}</string>
+      </property>
+      <property name="frameShape">
+       <enum>QFrame::StyledPanel</enum>
+      </property>
+      <layout class="QVBoxLayout" name="logo_layout">
+       <property name="leftMargin">
+        <number>20</number>
+       </property>
+       <property name="topMargin">
+        <number>20</number>
+       </property>
+       <property name="rightMargin">
+        <number>20</number>
+       </property>
+       <property name="bottomMargin">
+        <number>20</number>
+       </property>
+       <item>
+        <widget class="QLabel" name="title_label">
+         <property name="styleSheet">
+          <string notr="true">QLabel {
+    color: white;
+    font-size: 22px;
+    font-weight: bold;
+    background: transparent;
+    border: none;
+    padding: 10px;
+}</string>
+         </property>
+         <property name="text">
+          <string>🔒 HỆ THỐNG ĐIỀU TRA MÁY TÍNH</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="subtitle_label">
+         <property name="styleSheet">
+          <string notr="true">QLabel {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 16px;
+    background: transparent;
+    border: none;
+    padding: 5px;
+}</string>
+         </property>
+         <property name="text">
+          <string>Nền tảng điều tra số</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item>
+     <widget class="QFrame" name="login_frame">
+      <property name="styleSheet">
+       <string notr="true">QFrame {
+    background-color: rgba(255, 255, 255, 0.95);
+    border-radius: 15px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+}</string>
+      </property>
+      <property name="frameShape">
+       <enum>QFrame::StyledPanel</enum>
+      </property>
+      <layout class="QVBoxLayout" name="form_layout">
+       <property name="leftMargin">
+        <number>40</number>
+       </property>
+       <property name="topMargin">
+        <number>35</number>
+       </property>
+       <property name="rightMargin">
+        <number>40</number>
+       </property>
+       <property name="bottomMargin">
+        <number>35</number>
+       </property>
+       <property name="spacing">
+        <number>18</number>
+       </property>
+       <item>
+        <widget class="QLabel" name="username_label">
+         <property name="styleSheet">
+          <string notr="true">QLabel {
+    color: #333;
+    font-size: 14px;
+    font-weight: bold;
+}</string>
+         </property>
+         <property name="text">
+          <string>TÊN ĐĂNG NHẬP:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="username_input">
+         <property name="placeholderText">
+          <string>Nhập tên đăng nhập</string>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">QLineEdit {
+    padding: 15px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    font-size: 16px;
+    background-color: white;
+    min-height: 20px;
+}
+QLineEdit:focus {
+    border-color: #2E86AB;
+}
+QLineEdit::placeholder {
+    color: #999;
+    font-style: italic;
+}</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="password_label">
+         <property name="styleSheet">
+          <string notr="true">QLabel {
+    color: #333;
+    font-size: 14px;
+    font-weight: bold;
+}</string>
+         </property>
+         <property name="text">
+          <string>MẬT KHẨU:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QFrame" name="password_container">
+         <property name="styleSheet">
+          <string notr="true">QFrame { border: none; background: transparent; }</string>
+         </property>
+         <layout class="QHBoxLayout" name="password_layout">
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
+          <property name="spacing">
+           <number>0</number>
+          </property>
+          <item>
+           <widget class="QLineEdit" name="password_input">
+            <property name="placeholderText">
+             <string>Nhập mật khẩu</string>
+            </property>
+            <property name="echoMode">
+             <enum>QLineEdit::Password</enum>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">QLineEdit {
+    padding: 15px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    font-size: 16px;
+    background-color: white;
+    min-height: 20px;
+}
+QLineEdit:focus {
+    border-color: #2E86AB;
+}
+QLineEdit::placeholder {
+    color: #999;
+    font-style: italic;
+}</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="show_password_btn">
+            <property name="minimumSize">
+             <size>
+              <width>45</width>
+              <height>54</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>45</width>
+              <height>54</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>🔒</string>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">QPushButton {
+    border: 2px solid #ddd;
+    border-left: none;
+    border-radius: 0px 8px 8px 0px;
+    background-color: #f8f9fa;
+    font-size: 14px;
+    color: #666;
+    margin-left: -2px;
+    font-weight: bold;
+}
+QPushButton:hover {
+    background-color: #e9ecef;
+    color: #2E86AB;
+}
+QPushButton:pressed {
+    background-color: #dee2e6;
+}</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QFrame" name="forgot_password_container">
+         <property name="styleSheet">
+          <string notr="true">QFrame { background: transparent; border: none; }</string>
+         </property>
+         <layout class="QHBoxLayout" name="forgot_layout">
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
+          <property name="topMargin">
+           <number>15</number>
+          </property>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
+           <number>15</number>
+          </property>
+          <item>
+           <spacer name="left_spacer">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="QLabel" name="forgot_password_label">
+            <property name="styleSheet">
+             <string notr="true">QLabel {
+    color: #2E86AB;
+    font-size: 15px;
+    font-weight: 600;
+    text-decoration: underline;
+    background: transparent;
+    border: none;
+    padding: 10px;
+    min-height: 25px;
+}
+QLabel:hover {
+    color: #1E5F7A;
+    font-weight: bold;
+}</string>
+            </property>
+            <property name="text">
+             <string>Quên mật khẩu?</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="right_spacer">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="login_button">
+         <property name="styleSheet">
+          <string notr="true">QPushButton {
+    padding: 18px;
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #2E86AB, stop:1 #A23B72);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 18px;
+    font-weight: bold;
+    min-height: 25px;
+}
+QPushButton:hover {
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #1E5F7A, stop:1 #7A2B52);
+}
+QPushButton:pressed {
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #1A4D63, stop:1 #5A1E3A);
+}</string>
+         </property>
+         <property name="text">
+          <string>ĐĂNG NHẬP</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="error_label">
+         <property name="styleSheet">
+          <string notr="true">QLabel {
+    color: #e74c3c;
+    font-size: 14px;
+    background: transparent;
+    border: none;
+    padding: 10px;
+    font-weight: bold;
+}</string>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+         <property name="wordWrap">
+          <bool>true</bool>
+         </property>
+         <property name="visible">
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item>
+     <spacer name="verticalSpacer">
+      <property name="orientation">
+       <enum>Qt::Vertical</enum>
+      </property>
+      <property name="sizeHint" stdset="0">
+       <size>
+        <width>20</width>
+        <height>40</height>
+       </size>
+      </property>
+     </spacer>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+ </widget>
+ <resources/>
+ <connections/>
+}</ui>
+
+
