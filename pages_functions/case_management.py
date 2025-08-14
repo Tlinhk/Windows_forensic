@@ -935,6 +935,7 @@ class Case(QWidget):
             cases_header.setSectionResizeMode(QHeaderView.ResizeToContents)
         self.ui.casesTable.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.ui.casesTable.setSelectionMode(QAbstractItemView.SingleSelection)
+        self.ui.casesTable.setEditTriggers(QAbstractItemView.NoEditTriggers)
 
         # Bỏ grid lines và cải thiện appearance
         self.ui.casesTable.setShowGrid(False)
@@ -951,6 +952,7 @@ class Case(QWidget):
             evidence_header.setSectionResizeMode(QHeaderView.ResizeToContents)
         self.ui.evidenceTable.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.ui.evidenceTable.setSelectionMode(QAbstractItemView.SingleSelection)
+        self.ui.evidenceTable.setEditTriggers(QAbstractItemView.NoEditTriggers)
 
         # Bỏ grid lines và cải thiện appearance
         self.ui.evidenceTable.setShowGrid(False)

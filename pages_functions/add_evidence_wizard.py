@@ -10,6 +10,7 @@ from PyQt5.QtWidgets import (
     QButtonGroup,
 )
 from PyQt5.QtCore import QThread, pyqtSignal, Qt
+from PyQt5 import QtWidgets
 from ui.pages.add_evidence_wizard_ui import Ui_AddEvidenceWizard
 from database.db_manager import DatabaseManager
 
@@ -133,11 +134,8 @@ class AddEvidenceWizard(QDialog):
         self.ui.fileListWidget.setColumnWidth(1, 250)  # Cột Name
         # Cột Path sẽ tự động stretch
         
-        # Chỉ cho phép edit cột Name
-        self.ui.fileListWidget.setEditTriggers(
-            self.ui.fileListWidget.DoubleClicked | 
-            self.ui.fileListWidget.EditKeyPressed
-        )
+        # Không cho phép sửa trực tiếp (chỉ chọn)
+        self.ui.fileListWidget.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
 
     def setup_connections(self):
         """Thiết lập signal connections"""

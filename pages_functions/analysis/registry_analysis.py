@@ -570,12 +570,14 @@ class RegistryAnalysis(QWidget):
         self.ui.registryValuesTable.setAlternatingRowColors(True)
         self.ui.registryValuesTable.setSortingEnabled(True)
         self.ui.registryValuesTable.horizontalHeader().setStretchLastSection(True)
+        self.ui.registryValuesTable.setEditTriggers(QAbstractItemView.NoEditTriggers)
         
         # Cấu hình tree view cho registry structure
         self.ui.registryTreeView.setAlternatingRowColors(True)
         self.ui.registryTreeView.setHeaderHidden(False)
         self.ui.registryTreeView.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.ui.registryTreeView.setUniformRowHeights(True)
+        self.ui.registryTreeView.setEditTriggers(QAbstractItemView.NoEditTriggers)
         
         # Tạo model rỗng ban đầu cho tree view
         tree_model = QStandardItemModel()

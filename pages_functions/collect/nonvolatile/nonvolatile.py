@@ -366,6 +366,18 @@ class NonVolatilePage(QtWidgets.QWidget, Ui_CollectNonvolatileForm):
         super().__init__()
         # Thiết lập giao diện người dùng đã được định nghĩa trong Ui_CollectNonvolatileForm
         self.setupUi(self)
+        # Chỉ cho phép chọn, không cho sửa ở các bảng chính
+        try:
+            for table in [
+                getattr(self, 'tableWidget_devices', None),
+                getattr(self, 'tableWidget_targets', None),
+                getattr(self, 'tableWidget_modules', None),
+            ]:
+                if table:
+                    table.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
+                    table.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
+        except Exception:
+            pass
         # Context case hiện tại (được truyền từ main/wizard)
         self.case_data = None
         # Tham chiếu main window (nếu có) để tự lấy case_id như FileAnalysis

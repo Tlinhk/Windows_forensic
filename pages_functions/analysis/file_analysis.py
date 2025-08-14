@@ -72,27 +72,37 @@ class FileAnalysis(QWidget):
             table_files.horizontalHeader().setSectionResizeMode(1, QHeaderView.ResizeToContents)  # Size
             table_files.horizontalHeader().setSectionResizeMode(6, QHeaderView.ResizeToContents)  # Type
             table_files.setSortingEnabled(True)
+            table_files.setEditTriggers(QAbstractItemView.NoEditTriggers)
         
         # Timeline table
         table_timeline = self.get_ui_component('tableTimeline')
         if table_timeline:
             table_timeline.horizontalHeader().setSectionResizeMode(3, QHeaderView.Stretch)  # Description
             table_timeline.setSortingEnabled(True)
+            table_timeline.setEditTriggers(QAbstractItemView.NoEditTriggers)
         
         # Search results table
         table_search = self.get_ui_component('tableSearchResults')
         if table_search:
             table_search.horizontalHeader().setSectionResizeMode(1, QHeaderView.Stretch)  # Path
             table_search.setSortingEnabled(True)
+            table_search.setEditTriggers(QAbstractItemView.NoEditTriggers)
         
         # Metadata and properties tables
         table_metadata = self.get_ui_component('tableMetadata')
         if table_metadata:
             table_metadata.horizontalHeader().setSectionResizeMode(1, QHeaderView.Stretch)
+            table_metadata.setEditTriggers(QAbstractItemView.NoEditTriggers)
         
         table_properties = self.get_ui_component('tableProperties')
         if table_properties:
             table_properties.horizontalHeader().setSectionResizeMode(1, QHeaderView.Stretch)
+            table_properties.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        
+        # Tree
+        tree = self.get_ui_component('treeInvestigation')
+        if tree:
+            tree.setEditTriggers(QAbstractItemView.NoEditTriggers)
     
     def setup_connections(self):
         """Kết nối các tín hiệu (signal) của UI với các slot xử lý tương ứng."""
