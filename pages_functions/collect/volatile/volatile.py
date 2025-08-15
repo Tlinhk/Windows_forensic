@@ -812,6 +812,9 @@ Tool: Windows Forensic System - Volatile Collection Module
 
     def package_evidence(self):
         """Package all evidence files and calculate hash"""
+        zipf = None
+        package_file = None
+
         try:
             timestamp = self.start_time.strftime("%Y%m%d_%H%M%S")
             case_id = self.case_info.get("case_id", "UNKNOWN")
@@ -829,69 +832,74 @@ Tool: Windows Forensic System - Volatile Collection Module
                 self.log_message.emit(
                     f"⚠️ Warning: {len(missing_files)} files not found and will be skipped"
                 )
-                for missing_file in missing_files[:5]:  # Show first 5 missing files
-                    self.log_message.emit(f"   - {os.path.basename(missing_file)}")
-                if len(missing_files) > 5:
-                    self.log_message.emit(f"   ... and {len(missing_files) - 5} more")
 
             self.log_message.emit(f"📁 Tổng số file sẽ đóng gói: {len(existing_files)}")
 
-            with zipfile.ZipFile(
+            # Tạo zip file với context manager an toàn
+            zipf = zipfile.ZipFile(
                 package_path, "w", zipfile.ZIP_DEFLATED, allowZip64=True
-            ) as zipf:
-                # Add all evidence files
-                for i, file_path in enumerate(existing_files):
-                    if not self.running:
-                        self.log_message.emit("❌ Quá trình bị hủy bởi người dùng")
-                        return None
+            )
 
-                    try:
-                        arcname = os.path.relpath(file_path, self.output_path)
-                        zipf.write(file_path, arcname)
-                        if i % 5 == 0:  # Log every 5 files
-                            self.log_message.emit(
-                                f"📦 Đang đóng gói file {i+1}/{len(existing_files)}: {os.path.basename(file_path)}"
-                            )
-                    except Exception as file_error:
-                        self.log_message.emit(
-                            f"⚠️ Warning: Could not add file {file_path}: {str(file_error)}"
-                        )
-                        continue
-
-                # Create collection summary
-                self.log_message.emit("📋 Đang tạo collection summary...")
-                summary = {
-                    "case_id": case_id,
-                    "collection_type": "VOLATILE",
-                    "investigator": self.case_info.get("investigator", "N/A"),
-                    "collection_start": self.start_time.isoformat(),
-                    "collection_end": datetime.now().isoformat(),
-                    "evidence_files": [os.path.basename(f) for f in existing_files],
-                    "missing_files": (
-                        [os.path.basename(f) for f in missing_files]
-                        if missing_files
-                        else []
-                    ),
-                    "collection_options": self.collection_options,
-                    "tool_version": "Windows Forensic System v1.0",
-                }
+            # Add all evidence files
+            for i, file_path in enumerate(existing_files):
+                if not self.running:
+                    self.log_message.emit("❌ Quá trình bị hủy bởi người dùng")
+                    return None
 
                 try:
-                    zipf.writestr(
-                        "COLLECTION_SUMMARY.json",
-                        json.dumps(summary, indent=2, ensure_ascii=False).encode(
-                            "utf-8"
-                        ),
-                    )
-                    self.log_message.emit("✅ Collection summary created")
-                except Exception as summary_error:
+                    arcname = os.path.relpath(file_path, self.output_path)
+                    zipf.write(file_path, arcname)
+                    if i % 5 == 0:
+                        self.log_message.emit(
+                            f"📦 Đang đóng gói file {i+1}/{len(existing_files)}: {os.path.basename(file_path)}"
+                        )
+                except Exception as file_error:
                     self.log_message.emit(
-                        f"⚠️ Warning: Could not create summary: {str(summary_error)}"
+                        f"⚠️ Warning: Could not add file {file_path}: {str(file_error)}"
                     )
+                    continue
 
-            # Calculate SHA-256 hash
+            # Create collection summary
+            self.log_message.emit("📋 Đang tạo collection summary...")
+            summary = {
+                "case_id": case_id,
+                "collection_type": "VOLATILE",
+                "investigator": self.case_info.get("investigator", "N/A"),
+                "collection_start": self.start_time.isoformat(),
+                "collection_end": datetime.now().isoformat(),
+                "evidence_files": [os.path.basename(f) for f in existing_files],
+                "missing_files": (
+                    [os.path.basename(f) for f in missing_files]
+                    if missing_files
+                    else []
+                ),
+                "collection_options": self.collection_options,
+                "tool_version": "Windows Forensic System v1.0",
+            }
+
+            try:
+                zipf.writestr(
+                    "COLLECTION_SUMMARY.json",
+                    json.dumps(summary, indent=2, ensure_ascii=False).encode("utf-8"),
+                )
+                self.log_message.emit("✅ Collection summary created")
+            except Exception as summary_error:
+                self.log_message.emit(
+                    f"⚠️ Warning: Could not create summary: {str(summary_error)}"
+                )
+
+            # Đóng zip file trước khi tính hash
+            zipf.close()
+            zipf = None
+
+            # Calculate SHA-256 hash với xử lý dừng an toàn
+            if not self.running:
+                self.log_message.emit("❌ Quá trình bị hủy bởi người dùng")
+                return None
+
             self.log_message.emit("🔐 Đang tính SHA-256 hash...")
             sha256_hash = hashlib.sha256()
+
             try:
                 with open(package_path, "rb") as f:
                     chunk_count = 0
@@ -905,7 +913,7 @@ Tool: Windows Forensic System - Volatile Collection Module
                             break
                         sha256_hash.update(chunk)
                         chunk_count += 1
-                        if chunk_count % 1000 == 0:  # Log every 1000 chunks
+                        if chunk_count % 1000 == 0:
                             self.log_message.emit(
                                 f"🔐 Đang tính hash... ({chunk_count} chunks processed)"
                             )
@@ -942,6 +950,14 @@ Tool: Windows Forensic System - Volatile Collection Module
         except Exception as e:
             self.log_message.emit(f"❌ Packaging error: {str(e)}")
             return None
+
+        finally:
+            # Đảm bảo đóng zip file nếu có lỗi
+            if zipf:
+                try:
+                    zipf.close()
+                except:
+                    pass
 
     def stop(self):
         """Stop the collection process"""
@@ -1168,9 +1184,21 @@ Current Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"""
 
     def stop_collection(self):
         """Stop forensic data collection"""
-        if self.collection_worker:
-            self.collection_worker.stop()
-        self.collection_stopped()
+        # Hiển thị dialog xác nhận
+        reply = QMessageBox.question(
+            self,
+            "Xác nhận dừng thu thập",
+            "Bạn có chắc muốn dừng quá trình thu thập?\n\n"
+            "⚠️ Dữ liệu đã thu thập sẽ được giữ lại.\n"
+            "⚠️ Quá trình thu thập có thể mất vài giây để dừng an toàn.",
+            QMessageBox.Yes | QMessageBox.No,
+            QMessageBox.No,
+        )
+
+        if reply == QMessageBox.Yes:
+            if self.collection_worker:
+                self.collection_worker.stop()
+            self.collection_stopped()
 
     def update_progress(self, overall_progress, task_name, task_progress):
         """Update progress bars and labels"""
@@ -1239,10 +1267,28 @@ Current Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"""
         self.ui.startCollectionBtn.setEnabled(True)
         self.ui.stopCollectionBtn.setEnabled(False)
 
+        # Sử dụng QTimer để tránh blocking UI
         if self.collection_thread and self.collection_thread.isRunning():
+            # Gửi signal để dừng thread an toàn
             self.collection_thread.quit()
-            self.collection_thread.wait()
 
+            # Tạo timer để kiểm tra thread đã dừng chưa
+            cleanup_timer = QTimer()
+            cleanup_timer.timeout.connect(lambda: self._cleanup_thread(cleanup_timer))
+            cleanup_timer.start(100)  # Kiểm tra mỗi 100ms
+        else:
+            self._final_cleanup()
+
+    def _cleanup_thread(self, timer):
+        """Cleanup thread an toàn"""
+        if self.collection_thread and not self.collection_thread.isRunning():
+            timer.stop()
+            self._final_cleanup()
+
+    def _final_cleanup(self):
+        """Final cleanup sau khi thread đã dừng"""
+        if self.collection_thread:
+            self.collection_thread.wait(1000)  # Timeout 1 giây
         self.collection_worker = None
         self.collection_thread = None
 

@@ -1,0 +1,39 @@
+==================================================
+Domain/Host       : .google.com
+Path              : /
+Name              : AEC
+Value             : AVh_V2hni0ERJE9SaRekcDk3hQcOig-GLebM_mlP2bvpngIgLeqJ1YpqbSk
+Expiration Date   : 28/01/2026 1:41:06 PM
+Secure            : Yes
+Domain Access     : 
+Line/ID           : 17
+Last Accessed     : 01/08/2025 1:41:06 PM
+Created Time      : 01/08/2025 1:41:06 PM
+==================================================
+
+==================================================
+Domain/Host       : .google.com
+Path              : /verify
+Name              : SNID
+Value             : ABablndP-qs6Q0eAw3QzeN-zPTjYyWeV-_qiHMx76EAbKSwG95yGBaGwo1Uh4sRnExUF8DXln7LXCNNZYU-eaKkVSCGEZDtUKQ
+Expiration Date   : 31/01/2026 1:41:06 PM
+Secure            : Yes
+Domain Access     : 
+Line/ID           : 19
+Last Accessed     : 01/08/2025 1:41:06 PM
+Created Time      : 01/08/2025 1:41:06 PM
+==================================================
+
+==================================================
+Domain/Host       : .google.com
+Path              : /
+Name              : NID
+Value             : 525=QNxJkyApIb3fzQtyFYzSsx5cnOH7du3VZ-22-M2rMKGJJiMu24oMeV0xlWunIzkbwDl6DPd4SDXnt-vXakHAleAwApoSG_6UkjrLmWVhW2RRKkaOiFvbyKwQ0HTWdcI5mnZuSzvkIE__kTS07Eg2Qk3BoUZh47eOJpWuu7Q7qukvomk_dJt8WNmIhJwVz9x-6GRqkblV6J7VFaXx6d7DgRCDOQ3gwd_9h2K93CLlqTy6sy51cMC3jB97bLw
+Expiration Date   : 31/01/2026 1:41:06 PM
+Secure            : Yes
+Domain Access     : 
+Line/ID           : 21
+Last Accessed     : 01/08/2025 1:41:07 PM
+Created Time      : 01/08/2025 1:41:06 PM
+==================================================
+

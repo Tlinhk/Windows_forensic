@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1400</width>
-    <height>893</height>
+    <width>1622</width>
+    <height>934</height>
    </rect>
   </property>
   <property name="font">
@@ -19,7 +19,7 @@
    <string>Thu thập dữ liệu khả biến - Forensic Live Collection</string>
   </property>
   <property name="styleSheet">
-   <string>QWidget {
+   <string notr="true">QWidget {
     background-color: #f8f9fa;
 }
 
@@ -37,27 +37,6 @@ QGroupBox::title {
     left: 10px;
     padding: 0 8px 0 8px;
     color: #495057;
-}
-
-QPushButton {
-    background-color: #007bff;
-    color: white;
-    border: none;
-    padding: 8px 16px;
-    border-radius: 4px;
-    font-weight: bold;
-}
-
-QPushButton:hover {
-    background-color: #0056b3;
-}
-
-QPushButton:pressed {
-    background-color: #004085;
-}
-
-QPushButton:disabled {
-    background-color: #6c757d;
 }
 
 QProgressBar {
@@ -96,218 +75,400 @@ QCheckBox {
     spacing: 8px;
 }</string>
   </property>
-  <layout class="QVBoxLayout" name="mainLayout">
-   <property name="spacing">
-    <number>10</number>
-   </property>
-   <property name="leftMargin">
-    <number>15</number>
-   </property>
-   <property name="topMargin">
-    <number>15</number>
-   </property>
-   <property name="rightMargin">
-    <number>15</number>
-   </property>
-   <property name="bottomMargin">
-    <number>15</number>
-   </property>
-   <item>
-    <layout class="QHBoxLayout" name="mainHorizontalLayout">
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="0" column="0">
+    <layout class="QVBoxLayout" name="verticalLayout">
      <property name="spacing">
+      <number>10</number>
+     </property>
+     <property name="leftMargin">
+      <number>10</number>
+     </property>
+     <property name="topMargin">
       <number>15</number>
      </property>
+     <property name="rightMargin">
+      <number>10</number>
+     </property>
+     <property name="bottomMargin">
+      <number>10</number>
+     </property>
      <item>
-      <layout class="QVBoxLayout" name="leftColumnLayout">
-       <property name="spacing">
-        <number>10</number>
+      <widget class="QGroupBox" name="acquisitionConfigGroup">
+       <property name="minimumSize">
+        <size>
+         <width>450</width>
+         <height>120</height>
+        </size>
        </property>
-       <property name="leftMargin">
-        <number>10</number>
+       <property name="font">
+        <font>
+         <pointsize>10</pointsize>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
        </property>
-       <property name="topMargin">
-        <number>15</number>
+       <property name="title">
+        <string>Cấu hình Thu thập</string>
        </property>
-       <property name="rightMargin">
-        <number>10</number>
-       </property>
-       <property name="bottomMargin">
-        <number>10</number>
-       </property>
-       <item>
-        <widget class="QGroupBox" name="acquisitionConfigGroup">
-         <property name="minimumSize">
-          <size>
-           <width>450</width>
-           <height>0</height>
-          </size>
-         </property>
-         <property name="font">
-          <font>
-           <pointsize>10</pointsize>
-           <weight>75</weight>
-           <bold>true</bold>
-          </font>
-         </property>
-         <property name="title">
-          <string>Cấu hình Thu thập</string>
-         </property>
-         <layout class="QVBoxLayout" name="configLayout">
-          <property name="spacing">
-           <number>15</number>
-          </property>
-          <property name="leftMargin">
-           <number>15</number>
-          </property>
+       <layout class="QVBoxLayout" name="configLayout">
+        <property name="spacing">
+         <number>15</number>
+        </property>
+        <property name="leftMargin">
+         <number>15</number>
+        </property>
+        <property name="topMargin">
+         <number>20</number>
+        </property>
+        <property name="bottomMargin">
+         <number>20</number>
+        </property>
+        <item>
+         <layout class="QHBoxLayout" name="caseInfoLayout">
           <item>
-           <layout class="QHBoxLayout" name="targetSystemLayout"/>
+           <widget class="QLabel" name="caseIdLabel">
+            <property name="font">
+             <font>
+              <pointsize>10</pointsize>
+             </font>
+            </property>
+            <property name="text">
+             <string>  Case name:</string>
+            </property>
+           </widget>
           </item>
           <item>
-           <layout class="QHBoxLayout" name="caseInfoLayout">
-            <item>
-             <widget class="QLabel" name="caseIdLabel">
-              <property name="font">
-               <font>
-                <pointsize>10</pointsize>
-               </font>
-              </property>
-              <property name="text">
-               <string>  Case name:</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLineEdit" name="caseIdEdit">
-              <property name="enabled">
-               <bool>false</bool>
-              </property>
-              <property name="font">
-               <font>
-                <pointsize>10</pointsize>
-               </font>
-              </property>
-              <property name="placeholderText">
-               <string>VD: Điều tra máy tính A</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-          <item>
-           <layout class="QHBoxLayout" name="outputDeviceLayout">
-            <item>
-             <widget class="QLabel" name="outputDeviceLabel">
-              <property name="font">
-               <font>
-                <pointsize>10</pointsize>
-                <weight>50</weight>
-                <bold>false</bold>
-               </font>
-              </property>
-              <property name="text">
-               <string>  Thiết bị lưu trữ:</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLineEdit" name="outputPathEdit">
-              <property name="enabled">
-               <bool>false</bool>
-              </property>
-              <property name="font">
-               <font>
-                <pointsize>10</pointsize>
-               </font>
-              </property>
-              <property name="text">
-               <string>E:\ForensicCollection</string>
-              </property>
-              <property name="placeholderText">
-               <string>Chọn thiết bị ngoài (USB/External HDD)</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QPushButton" name="browseOutputBtn">
-              <property name="minimumSize">
-               <size>
-                <width>40</width>
-                <height>30</height>
-               </size>
-              </property>
-              <property name="maximumSize">
-               <size>
-                <width>40</width>
-                <height>30</height>
-               </size>
-              </property>
-              <property name="font">
-               <font>
-                <pointsize>9</pointsize>
-                <weight>75</weight>
-                <bold>true</bold>
-               </font>
-              </property>
-              <property name="styleSheet">
-               <string notr="true">background-color: rgb(255, 255, 255);
-border-color: rgb(194, 199, 200);</string>
-              </property>
-              <property name="text">
-               <string/>
-              </property>
-              <property name="icon">
-               <iconset resource="../../../static/resource.qrc">
-                <normaloff>:/icons/icons/icons8-folder-50.png</normaloff>:/icons/icons/icons8-folder-50.png</iconset>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-          <item>
-           <layout class="QHBoxLayout" name="investigatorLayout"/>
+           <widget class="QLineEdit" name="caseIdEdit">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="font">
+             <font>
+              <pointsize>10</pointsize>
+             </font>
+            </property>
+            <property name="placeholderText">
+             <string>VD: Điều tra máy tính A</string>
+            </property>
+           </widget>
           </item>
          </layout>
-        </widget>
-       </item>
-       <item>
-        <widget class="QGroupBox" name="orderOfVolatilityGroup">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>16777215</width>
-           <height>1677215</height>
-          </size>
-         </property>
-         <property name="font">
-          <font>
-           <pointsize>10</pointsize>
-           <weight>75</weight>
-           <bold>true</bold>
-          </font>
-         </property>
-         <property name="title">
-          <string>Order of Volatility - Thứ tự thu thập</string>
-         </property>
-         <layout class="QVBoxLayout" name="volatilityLayout">
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="outputDeviceLayout">
+          <item>
+           <widget class="QLabel" name="outputDeviceLabel">
+            <property name="font">
+             <font>
+              <pointsize>10</pointsize>
+              <weight>50</weight>
+              <bold>false</bold>
+             </font>
+            </property>
+            <property name="text">
+             <string>  Thiết bị lưu trữ:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="outputPathEdit">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="font">
+             <font>
+              <pointsize>10</pointsize>
+             </font>
+            </property>
+            <property name="text">
+             <string>E:\ForensicCollection</string>
+            </property>
+            <property name="placeholderText">
+             <string>Chọn thiết bị ngoài (USB/External HDD)</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="browseOutputBtn">
+            <property name="minimumSize">
+             <size>
+              <width>40</width>
+              <height>30</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>40</width>
+              <height>30</height>
+             </size>
+            </property>
+            <property name="font">
+             <font>
+              <pointsize>9</pointsize>
+              <weight>75</weight>
+              <bold>true</bold>
+             </font>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">background-color: rgb(255, 255, 255);
+border-color: rgb(194, 199, 200);</string>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+            <property name="icon">
+             <iconset resource="../../../static/resource.qrc">
+              <normaloff>:/icons/icons/icons8-folder-50.png</normaloff>:/icons/icons/icons8-folder-50.png</iconset>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </widget>
+     </item>
+     <item>
+      <widget class="QGroupBox" name="orderOfVolatilityGroup">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>16777215</width>
+         <height>1677215</height>
+        </size>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>10</pointsize>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="title">
+        <string>Order of Volatility - Thứ tự thu thập</string>
+       </property>
+       <layout class="QVBoxLayout" name="volatilityLayout">
+        <property name="spacing">
+         <number>20</number>
+        </property>
+        <property name="leftMargin">
+         <number>50</number>
+        </property>
+        <property name="topMargin">
+         <number>30</number>
+        </property>
+        <property name="rightMargin">
+         <number>50</number>
+        </property>
+        <property name="bottomMargin">
+         <number>15</number>
+        </property>
+        <item>
+         <widget class="QCheckBox" name="ramAcquisitionCheck">
+          <property name="font">
+           <font>
+            <pointsize>10</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
+          </property>
+          <property name="styleSheet">
+           <string>color: #dc3545; font-weight: bold;</string>
+          </property>
+          <property name="text">
+           <string>1. RAM Acquisition (Ưu tiên cao nhất)</string>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="systemTimeCheck">
+          <property name="font">
+           <font>
+            <pointsize>10</pointsize>
+           </font>
+          </property>
+          <property name="text">
+           <string>2. System Time &amp; Uptime</string>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="networkStateCheck">
+          <property name="font">
+           <font>
+            <pointsize>10</pointsize>
+           </font>
+          </property>
+          <property name="text">
+           <string>3. Network State</string>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="processInfoCheck">
+          <property name="font">
+           <font>
+            <pointsize>10</pointsize>
+           </font>
+          </property>
+          <property name="text">
+           <string>4. Process Information </string>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="userSessionsCheck">
+          <property name="font">
+           <font>
+            <pointsize>10</pointsize>
+           </font>
+          </property>
+          <property name="text">
+           <string>5. Logged-On Users</string>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="clipboardCheck">
+          <property name="font">
+           <font>
+            <pointsize>10</pointsize>
+           </font>
+          </property>
+          <property name="text">
+           <string>6. Clipboard Content</string>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="commandHistoryCheck">
+          <property name="font">
+           <font>
+            <pointsize>10</pointsize>
+           </font>
+          </property>
+          <property name="text">
+           <string>7. Command History</string>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="servicesDriversCheck">
+          <property name="font">
+           <font>
+            <pointsize>10</pointsize>
+           </font>
+          </property>
+          <property name="text">
+           <string>8. Services &amp; Drivers</string>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="environmentVarsCheck">
+          <property name="font">
+           <font>
+            <pointsize>10</pointsize>
+           </font>
+          </property>
+          <property name="text">
+           <string>9. Environment Variables</string>
+          </property>
+          <property name="checked">
+           <bool>false</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="sharedResourcesCheck">
+          <property name="font">
+           <font>
+            <pointsize>10</pointsize>
+           </font>
+          </property>
+          <property name="text">
+           <string>10. Shared Resources (Locally Shared Folders)</string>
+          </property>
+          <property name="checked">
+           <bool>false</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="volatilityVerticalSpacer">
+          <property name="font">
+           <font>
+            <pointsize>10</pointsize>
+           </font>
+          </property>
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeType">
+           <enum>QSizePolicy::Expanding</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="volatilityButtonsLayout">
           <property name="spacing">
-           <number>20</number>
-          </property>
-          <property name="leftMargin">
-           <number>15</number>
-          </property>
-          <property name="topMargin">
-           <number>30</number>
-          </property>
-          <property name="bottomMargin">
-           <number>10</number>
+           <number>100</number>
           </property>
           <item>
-           <widget class="QCheckBox" name="ramAcquisitionCheck">
+           <widget class="QPushButton" name="selectAllBtn">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>16777215</height>
+             </size>
+            </property>
             <property name="font">
              <font>
               <pointsize>10</pointsize>
@@ -316,330 +477,253 @@ border-color: rgb(194, 199, 200);</string>
              </font>
             </property>
             <property name="styleSheet">
-             <string>color: #dc3545; font-weight: bold;</string>
+             <string notr="true">/* QPushButton */
+QPushButton {
+    background-color: #4a90e2;
+    border: none;
+    border-radius: 4px;
+    padding: 6px 12px;
+    color: #fff;
+}
+QPushButton:hover {
+    background-color: #5aa0f2;
+}
+QPushButton:pressed {
+    background-color: #3a7fcc;
+}</string>
             </property>
             <property name="text">
-             <string>1. RAM Acquisition (Ưu tiên cao nhất)</string>
-            </property>
-            <property name="checked">
-             <bool>true</bool>
+             <string>✅ Chọn tất cả</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QCheckBox" name="systemTimeCheck">
+           <widget class="QPushButton" name="clearAllBtn">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>16777215</height>
+             </size>
+            </property>
+            <property name="font">
+             <font>
+              <pointsize>10</pointsize>
+              <weight>75</weight>
+              <bold>true</bold>
+             </font>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">/* QPushButton */
+QPushButton {
+    background-color: #4a90e2;
+    border: none;
+    border-radius: 4px;
+    padding: 6px 12px;
+    color: #fff;
+}
+QPushButton:hover {
+    background-color: #5aa0f2;
+}
+QPushButton:pressed {
+    background-color: #3a7fcc;
+}</string>
+            </property>
+            <property name="text">
+             <string>❌ Bỏ chọn tất cả</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </widget>
+     </item>
+     <item>
+      <widget class="QGroupBox" name="ramConfigGroup">
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>200</height>
+        </size>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>9</pointsize>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="title">
+        <string>Cấu hình RAM Acquisition</string>
+       </property>
+       <layout class="QVBoxLayout" name="ramConfigLayout">
+        <property name="spacing">
+         <number>15</number>
+        </property>
+        <property name="leftMargin">
+         <number>15</number>
+        </property>
+        <item>
+         <layout class="QHBoxLayout" name="ramFormatLayout">
+          <item>
+           <widget class="QLabel" name="ramFormatLabel">
             <property name="font">
              <font>
               <pointsize>10</pointsize>
              </font>
             </property>
             <property name="text">
-             <string>2. System Time &amp; Uptime</string>
-            </property>
-            <property name="checked">
-             <bool>true</bool>
+             <string>📄 Định dạng:</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QCheckBox" name="networkStateCheck">
+           <widget class="QComboBox" name="ramFormatCombo">
             <property name="font">
              <font>
               <pointsize>10</pointsize>
              </font>
             </property>
-            <property name="text">
-             <string>3. Network State</string>
+            <property name="currentIndex">
+             <number>1</number>
             </property>
-            <property name="checked">
-             <bool>true</bool>
-            </property>
+            <item>
+             <property name="text">
+              <string>RAW (.mem) - Tiêu chuẩn</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>RAW (.raw) - Tương thích rộng</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>AFF4 (.aff4) - Nén &amp; Metadata</string>
+             </property>
+            </item>
            </widget>
           </item>
+         </layout>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="calculateHashCheck">
+          <property name="font">
+           <font>
+            <pointsize>10</pointsize>
+           </font>
+          </property>
+          <property name="text">
+           <string>Tính toán Hash SHA-256 trong quá trình thu thập</string>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="compressRamCheck">
+          <property name="font">
+           <font>
+            <pointsize>10</pointsize>
+           </font>
+          </property>
+          <property name="text">
+           <string>Nén RAM dump (tiết kiệm không gian)</string>
+          </property>
+          <property name="checked">
+           <bool>false</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout">
           <item>
-           <widget class="QCheckBox" name="processInfoCheck">
-            <property name="font">
-             <font>
-              <pointsize>10</pointsize>
-             </font>
-            </property>
-            <property name="text">
-             <string>4. Process Information </string>
-            </property>
-            <property name="checked">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QCheckBox" name="userSessionsCheck">
-            <property name="font">
-             <font>
-              <pointsize>10</pointsize>
-             </font>
-            </property>
-            <property name="text">
-             <string>5. Logged-On Users</string>
-            </property>
-            <property name="checked">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QCheckBox" name="clipboardCheck">
-            <property name="font">
-             <font>
-              <pointsize>10</pointsize>
-             </font>
-            </property>
-            <property name="text">
-             <string>6. Clipboard Content</string>
-            </property>
-            <property name="checked">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QCheckBox" name="commandHistoryCheck">
-            <property name="font">
-             <font>
-              <pointsize>10</pointsize>
-             </font>
-            </property>
-            <property name="text">
-             <string>7. Command History</string>
-            </property>
-            <property name="checked">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QCheckBox" name="servicesDriversCheck">
-            <property name="font">
-             <font>
-              <pointsize>10</pointsize>
-             </font>
-            </property>
-            <property name="text">
-             <string>8. Services &amp; Drivers</string>
-            </property>
-            <property name="checked">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QCheckBox" name="environmentVarsCheck">
-            <property name="font">
-             <font>
-              <pointsize>10</pointsize>
-             </font>
-            </property>
-            <property name="text">
-             <string>9. Environment Variables</string>
-            </property>
-            <property name="checked">
-             <bool>false</bool>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QCheckBox" name="sharedResourcesCheck">
-            <property name="font">
-             <font>
-              <pointsize>10</pointsize>
-             </font>
-            </property>
-            <property name="text">
-             <string>10. Shared Resources (Locally Shared Folders)</string>
-            </property>
-            <property name="checked">
-             <bool>false</bool>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <spacer name="volatilityVerticalSpacer">
-            <property name="font">
-             <font>
-              <pointsize>10</pointsize>
-             </font>
-            </property>
+           <spacer name="horizontalSpacer_2">
             <property name="orientation">
-             <enum>Qt::Vertical</enum>
-            </property>
-            <property name="sizeType">
-             <enum>QSizePolicy::Expanding</enum>
+             <enum>Qt::Horizontal</enum>
             </property>
             <property name="sizeHint" stdset="0">
              <size>
-              <width>20</width>
+              <width>262</width>
               <height>20</height>
              </size>
             </property>
            </spacer>
           </item>
           <item>
-           <layout class="QHBoxLayout" name="volatilityButtonsLayout">
-            <item>
-             <widget class="QPushButton" name="selectAllBtn">
-              <property name="font">
-               <font>
-                <pointsize>10</pointsize>
-                <weight>75</weight>
-                <bold>true</bold>
-               </font>
-              </property>
-              <property name="text">
-               <string>✅ Chọn tất cả</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QPushButton" name="clearAllBtn">
-              <property name="font">
-               <font>
-                <pointsize>10</pointsize>
-                <weight>75</weight>
-                <bold>true</bold>
-               </font>
-              </property>
-              <property name="text">
-               <string>❌ Bỏ chọn tất cả</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-         </layout>
-        </widget>
-       </item>
-       <item>
-        <widget class="QGroupBox" name="ramConfigGroup">
-         <property name="font">
-          <font>
-           <pointsize>9</pointsize>
-           <weight>75</weight>
-           <bold>true</bold>
-          </font>
-         </property>
-         <property name="title">
-          <string>Cấu hình RAM Acquisition</string>
-         </property>
-         <layout class="QVBoxLayout" name="ramConfigLayout">
-          <property name="leftMargin">
-           <number>15</number>
-          </property>
-          <item>
-           <layout class="QHBoxLayout" name="ramFormatLayout">
-            <item>
-             <widget class="QLabel" name="ramFormatLabel">
-              <property name="font">
-               <font>
-                <pointsize>10</pointsize>
-               </font>
-              </property>
-              <property name="text">
-               <string>📄 Định dạng:</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QComboBox" name="ramFormatCombo">
-              <property name="font">
-               <font>
-                <pointsize>10</pointsize>
-               </font>
-              </property>
-              <property name="currentIndex">
-               <number>1</number>
-              </property>
-              <item>
-               <property name="text">
-                <string>RAW (.mem) - Tiêu chuẩn</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>RAW (.raw) - Tương thích rộng</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>AFF4 (.aff4) - Nén &amp; Metadata</string>
-               </property>
-              </item>
-             </widget>
-            </item>
-           </layout>
-          </item>
-          <item>
-           <widget class="QCheckBox" name="calculateHashCheck">
+           <widget class="QPushButton" name="startCollectionBtn">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>250</width>
+              <height>0</height>
+             </size>
+            </property>
             <property name="font">
              <font>
               <pointsize>10</pointsize>
+              <weight>75</weight>
+              <bold>true</bold>
              </font>
             </property>
-            <property name="text">
-             <string>Tính toán Hash SHA-256 trong quá trình thu thập</string>
+            <property name="layoutDirection">
+             <enum>Qt::LeftToRight</enum>
             </property>
-            <property name="checked">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QCheckBox" name="compressRamCheck">
-            <property name="font">
-             <font>
-              <pointsize>10</pointsize>
-             </font>
-            </property>
-            <property name="text">
-             <string>Nén RAM dump (tiết kiệm không gian)</string>
-            </property>
-            <property name="checked">
-             <bool>false</bool>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="startCollectionBtn">
-         <property name="font">
-          <font>
-           <pointsize>-1</pointsize>
-           <weight>75</weight>
-           <bold>true</bold>
-          </font>
-         </property>
-         <property name="styleSheet">
-          <string notr="true">QPushButton {
-    background-color: #dc3545;
-    font-size: 17px;
-    border: 2px solid #bd2130;
+            <property name="styleSheet">
+             <string notr="true">/* QPushButton */
+QPushButton {
+    background-color: #4a90e2;
+    border: none;
+    border-radius: 4px;
+    padding: 6px 12px;
+    color: #fff;
 }
-
 QPushButton:hover {
-    background-color: #c82333;
+    background-color: #5aa0f2;
 }
-
 QPushButton:pressed {
-    background-color: #bd2130;
+    background-color: #3a7fcc;
 }</string>
-         </property>
-         <property name="text">
-          <string>BẮT ĐẦU THU THẬP</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
+            </property>
+            <property name="text">
+             <string>BẮT ĐẦU THU THẬP</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>261</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </widget>
      </item>
+    </layout>
+   </item>
+   <item row="0" column="1">
+    <layout class="QVBoxLayout" name="verticalLayout_2">
      <item>
       <layout class="QVBoxLayout" name="rightColumnLayout">
        <property name="spacing">
@@ -885,12 +969,34 @@ QPushButton:pressed {
            <layout class="QHBoxLayout" name="evidenceControlLayout">
             <item>
              <widget class="QPushButton" name="clearLogBtn">
+              <property name="minimumSize">
+               <size>
+                <width>120</width>
+                <height>0</height>
+               </size>
+              </property>
               <property name="font">
                <font>
                 <pointsize>10</pointsize>
                 <weight>75</weight>
                 <bold>true</bold>
                </font>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">/* QPushButton */
+QPushButton {
+    background-color: #4a90e2;
+    border: none;
+    border-radius: 4px;
+    padding: 6px 12px;
+    color: #fff;
+}
+QPushButton:hover {
+    background-color: #5aa0f2;
+}
+QPushButton:pressed {
+    background-color: #3a7fcc;
+}</string>
               </property>
               <property name="text">
                <string>🗑️ Xóa log</string>
@@ -899,12 +1005,34 @@ QPushButton:pressed {
             </item>
             <item>
              <widget class="QPushButton" name="saveLogBtn">
+              <property name="minimumSize">
+               <size>
+                <width>120</width>
+                <height>0</height>
+               </size>
+              </property>
               <property name="font">
                <font>
                 <pointsize>10</pointsize>
                 <weight>75</weight>
                 <bold>true</bold>
                </font>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">/* QPushButton */
+QPushButton {
+    background-color: #4a90e2;
+    border: none;
+    border-radius: 4px;
+    padding: 6px 12px;
+    color: #fff;
+}
+QPushButton:hover {
+    background-color: #5aa0f2;
+}
+QPushButton:pressed {
+    background-color: #3a7fcc;
+}</string>
               </property>
               <property name="text">
                <string>💾 Lưu log</string>
@@ -942,17 +1070,19 @@ QPushButton:pressed {
                </font>
               </property>
               <property name="styleSheet">
-               <string>QPushButton {
-    background-color: #dc3545;
-    font-weight: bold;
+               <string notr="true">/* QPushButton */
+QPushButton {
+    background-color: #4a90e2;
+    border: none;
+    border-radius: 4px;
+    padding: 6px 12px;
+    color: #fff;
 }
-
 QPushButton:hover {
-    background-color: #c82333;
+    background-color: #5aa0f2;
 }
-
 QPushButton:pressed {
-    background-color: #bd2130;
+    background-color: #3a7fcc;
 }</string>
               </property>
               <property name="text">
