@@ -5,35 +5,35 @@ import mimetypes
 import struct
 from datetime import datetime
 from pathlib import Path
-from PyQt5.QtWidgets import *
-from PyQt5.QtCore import *
-from PyQt5.QtGui import *
+from PyQt5.QtWidgets import *  # Các widget Qt (QTreeWidget, QTableWidget, QMessageBox, ...)
+from PyQt5.QtCore import *  # Core Qt (Qt, QTimer, QModel...)
+from PyQt5.QtGui import *  # Đồ họa (QColor, QPixmap, ...)
+import pytsk3  # Thư viện forensics: Python binding của The Sleuth Kit (đọc ảnh đĩa/hệ thống tệp)
 
 # Import UI class
 from ui.pages.analysis_ui.file_analysis_ui import Ui_EvidenceAnalysisWidget
 
-# Try to import forensics libraries
-try:
-    import pytsk3
-    PYTSK3_AVAILABLE = True
-except ImportError:
-    PYTSK3_AVAILABLE = False
-
 class FileAnalysis(QWidget):
+    """Widget phân tích tệp trong vụ án.
+
+    - Kết nối với `Ui_EvidenceAnalysisWidget` để hiển thị giao diện.
+    - Quản lý trạng thái vụ án, đường dẫn chứng cứ và cấu trúc hệ thống tệp (pytsk3).
+    - Cung cấp duyệt cây, xem chi tiết, tìm kiếm/lọc, timeline và phục hồi tệp đã xóa.
+    """
     def __init__(self, main_window=None):
         super().__init__()
         
-        self.main_window = main_window
-        self.current_case_id = None
-        self.current_evidence_path = None
+        self.main_window = main_window  # Cửa sổ chính (để lấy case_id, cập nhật tiêu đề, ...)
+        self.current_case_id = None  # ID vụ án hiện tại (nếu có)
+        self.current_evidence_path = None  # Đường dẫn ảnh đĩa (chứng cứ) đang làm việc
         
         # Data containers
-        self.file_list = []
-        self.timeline_data = []
-        self.search_results = []
-        self.img_info = None
-        self.volume_info = None
-        self.fs_info = None
+        self.file_list = []  # Danh sách tệp hiển thị (mỗi phần tử là dict thông tin tệp)
+        self.timeline_data = []  # Dữ liệu timeline sinh từ self.file_list
+        self.search_results = []  # Kết quả tìm kiếm hiện tại
+        self.img_info = None  # pytsk3.Img_Info: đối tượng ảnh đĩa đang mở
+        self.volume_info = None  # pytsk3.Volume_Info: thông tin phân vùng (nếu có)
+        self.fs_info = None  # pytsk3.FS_Info: hệ thống tệp đang được duyệt
         
         # Setup UI
         self.setup_ui()
@@ -45,7 +45,7 @@ class FileAnalysis(QWidget):
             self.load_case_data(main_window.current_case_id)
     
     def setup_ui(self):
-        """Setup UI from converted file"""
+        """Cài đặt giao diện từ file UI đã chuyển đổi (Qt Designer -> PyQt5)."""
         self.ui = Ui_EvidenceAnalysisWidget()
         self.ui.setupUi(self)
         
@@ -53,7 +53,7 @@ class FileAnalysis(QWidget):
         self.setup_table_properties()
         
     def get_ui_component(self, component_name):
-        """Get UI component from self or self.ui"""
+        """Lấy thành phần UI theo tên từ `self` hoặc từ `self.ui` nếu có."""
         if hasattr(self, component_name):
             return getattr(self, component_name)
         elif hasattr(self.ui, component_name):
@@ -62,138 +62,149 @@ class FileAnalysis(QWidget):
             return None
     
     def setup_table_properties(self):
-        """Setup table properties for better display"""
+        """Thiết lập thuộc tính các bảng để hiển thị đẹp, dễ đọc và có sắp xếp."""
         
         # File table
         table_files = self.get_ui_component('tableFiles')
         if table_files:
+            # Cột 0 (Name) giãn ra chiếm phần trống, các cột khác tự điều chỉnh
             table_files.horizontalHeader().setSectionResizeMode(0, QHeaderView.Stretch)  # Name
             table_files.horizontalHeader().setSectionResizeMode(1, QHeaderView.ResizeToContents)  # Size
             table_files.horizontalHeader().setSectionResizeMode(6, QHeaderView.ResizeToContents)  # Type
             table_files.setSortingEnabled(True)
+            table_files.setEditTriggers(QAbstractItemView.NoEditTriggers)
         
         # Timeline table
         table_timeline = self.get_ui_component('tableTimeline')
         if table_timeline:
             table_timeline.horizontalHeader().setSectionResizeMode(3, QHeaderView.Stretch)  # Description
             table_timeline.setSortingEnabled(True)
+            table_timeline.setEditTriggers(QAbstractItemView.NoEditTriggers)
         
         # Search results table
         table_search = self.get_ui_component('tableSearchResults')
         if table_search:
             table_search.horizontalHeader().setSectionResizeMode(1, QHeaderView.Stretch)  # Path
             table_search.setSortingEnabled(True)
+            table_search.setEditTriggers(QAbstractItemView.NoEditTriggers)
         
         # Metadata and properties tables
         table_metadata = self.get_ui_component('tableMetadata')
         if table_metadata:
             table_metadata.horizontalHeader().setSectionResizeMode(1, QHeaderView.Stretch)
+            table_metadata.setEditTriggers(QAbstractItemView.NoEditTriggers)
         
         table_properties = self.get_ui_component('tableProperties')
         if table_properties:
             table_properties.horizontalHeader().setSectionResizeMode(1, QHeaderView.Stretch)
-    
-    def setup_connections(self):
-        """Setup signal connections"""
-        try:
-            # Load evidence button
-            btn_load = self.get_ui_component('btnLoadEvidence')
-            if btn_load:
-                btn_load.clicked.connect(self.load_evidence_dialog)
-            
-            # Tree widget
-            tree = self.get_ui_component('treeInvestigation')
-            if tree:
-                tree.itemClicked.connect(self.on_tree_item_clicked)
-                tree.itemExpanded.connect(self.on_tree_item_expanded)
-            
-            # File table
-            table_files = self.get_ui_component('tableFiles')
-            if table_files:
-                table_files.itemSelectionChanged.connect(self.on_file_selected)
-            
-            # Search controls
-            btn_search = self.get_ui_component('btnSearch')
-            if btn_search:
-                btn_search.clicked.connect(self.perform_search)
-            
-            line_search = self.get_ui_component('lineEditSearch')
-            if line_search:
-                line_search.returnPressed.connect(self.perform_search)
-            
-            # Timeline table
-            table_timeline = self.get_ui_component('tableTimeline')
-            if table_timeline:
-                table_timeline.itemSelectionChanged.connect(self.on_timeline_selected)
-                
-        except Exception as e:
-            pass
-    
-    def initialize_empty_state(self):
-        """Initialize empty state - Clear pre-populated tree"""
+            table_properties.setEditTriggers(QAbstractItemView.NoEditTriggers)
         
-        # Clear the pre-populated tree completely
+        # Tree
         tree = self.get_ui_component('treeInvestigation')
         if tree:
-            tree.clear()
-            tree.setHeaderLabel("Data Sources")
+            tree.setEditTriggers(QAbstractItemView.NoEditTriggers)
+    
+    def setup_connections(self):
+        """Kết nối các tín hiệu (signal) của UI với các slot xử lý tương ứng."""
+        try:
+            # Load evidence button
+            btn_load = self.get_ui_component('btnLoadEvidence')  # Nút "Load Evidence"
+            if btn_load:
+                btn_load.clicked.connect(self.load_evidence_dialog)  # Nhấn để mở hộp thoại chọn ảnh đĩa
+            
+            # Tree widget
+            tree = self.get_ui_component('treeInvestigation')  # Cây duyệt dữ liệu (ảnh đĩa/phân vùng/FS/thư mục)
+            if tree:
+                tree.itemClicked.connect(self.on_tree_item_clicked)  # Click vào node -> xử lý theo loại node
+                tree.itemExpanded.connect(self.on_tree_item_expanded)  # Mở rộng node -> lazy load nội dung
+            
+            # File table
+            table_files = self.get_ui_component('tableFiles')  # Bảng liệt kê tệp ở thư mục đang xem
+            if table_files:
+                table_files.itemSelectionChanged.connect(self.on_file_selected)  # Chọn dòng -> hiển thị chi tiết
+            
+            # Search controls
+            btn_search = self.get_ui_component('btnSearch')  # Nút tìm kiếm theo từ khóa
+            if btn_search:
+                btn_search.clicked.connect(self.perform_search)  # Bấm để tìm
+            
+            line_search = self.get_ui_component('lineEditSearch')  # Ô nhập từ khóa tìm kiếm
+            if line_search:
+                line_search.returnPressed.connect(self.perform_search)  # Nhấn Enter để tìm
+            
+            # Timeline table
+            table_timeline = self.get_ui_component('tableTimeline')  # Bảng hiển thị timeline sự kiện
+            if table_timeline:
+                table_timeline.itemSelectionChanged.connect(self.on_timeline_selected)  # Chọn -> xem chi tiết sự kiện
+                
+        except Exception as e:
+            pass  # Bỏ qua lỗi kết nối tín hiệu để tránh làm chết UI khi thiếu thành phần
+    
+    def initialize_empty_state(self):
+        """Khởi tạo trạng thái rỗng: dọn cây dữ liệu, bảng và các vùng hiển thị nội dung."""
+        
+        # Clear the pre-populated tree completely
+        tree = self.get_ui_component('treeInvestigation')  # Cây dữ liệu
+        if tree:
+            tree.clear()  # Xóa toàn bộ node cũ
+            tree.setHeaderLabel("Data Sources")  # Tiêu đề cột cây
         
         # Clear all tables
-        table_files = self.get_ui_component('tableFiles')
+        table_files = self.get_ui_component('tableFiles')  # Bảng tệp
         if table_files:
-            table_files.setRowCount(0)
+            table_files.setRowCount(0)  # Xóa nội dung bảng
         
-        table_timeline = self.get_ui_component('tableTimeline')
+        table_timeline = self.get_ui_component('tableTimeline')  # Bảng timeline
         if table_timeline:
-            table_timeline.setRowCount(0)
+            table_timeline.setRowCount(0)  # Xóa nội dung
         
-        table_search = self.get_ui_component('tableSearchResults')
+        table_search = self.get_ui_component('tableSearchResults')  # Bảng kết quả tìm kiếm
         if table_search:
-            table_search.setRowCount(0)
+            table_search.setRowCount(0)  # Xóa nội dung
         
-        table_metadata = self.get_ui_component('tableMetadata')
+        table_metadata = self.get_ui_component('tableMetadata')  # Bảng metadata tệp
         if table_metadata:
             table_metadata.setRowCount(0)
         
-        table_properties = self.get_ui_component('tableProperties')
+        table_properties = self.get_ui_component('tableProperties')  # Bảng thuộc tính tệp
         if table_properties:
             table_properties.setRowCount(0)
         
         # Clear text views
-        text_hex = self.get_ui_component('textHexView')
+        text_hex = self.get_ui_component('textHexView')  # Ô xem hex
         if text_hex:
             text_hex.clear()
         
-        text_content = self.get_ui_component('textContentView')
+        text_content = self.get_ui_component('textContentView')  # Ô xem nội dung văn bản
         if text_content:
             text_content.clear()
         
-        text_analysis = self.get_ui_component('textAnalysisResults')
+        text_analysis = self.get_ui_component('textAnalysisResults')  # Ô hiển thị kết quả phân tích khác
         if text_analysis:
             text_analysis.clear()
         
-        label_picture = self.get_ui_component('labelPicture')
+        label_picture = self.get_ui_component('labelPicture')  # Ảnh xem trước (nếu là hình)
         if label_picture:
             label_picture.clear()
         
         # Update case info to show no evidence loaded
-        label_case = self.get_ui_component('labelCaseInfo')
+        label_case = self.get_ui_component('labelCaseInfo')  # Nhãn tiêu đề trạng thái
         if label_case:
-            label_case.setText("File Analysis - No evidence loaded")
+            label_case.setText("File Analysis - No evidence loaded")  # Chưa nạp chứng cứ
     
     def load_case_data(self, case_id):
-        """Load case data"""
+        """Nạp thông tin vụ án từ cơ sở dữ liệu để hiển thị lên thanh tiêu đề."""
         self.current_case_id = case_id
         
         try:
             from database.db_manager import DatabaseManager
-            db = DatabaseManager()
-            db.connect()
+            db = DatabaseManager()  # Quản lý kết nối CSDL
+            db.connect()  # Mở kết nối
             
-            case_info = db.get_case_with_investigator(case_id)
+            case_info = db.get_case_with_investigator(case_id)  # Lấy thông tin vụ án + điều tra viên
             if case_info:
                 text = f"File Analysis - Case: {case_info['title']} (ID: {case_id})"
-                label_case = self.get_ui_component('labelCaseInfo')
+                label_case = self.get_ui_component('labelCaseInfo')  # Cập nhật tiêu đề
                 if label_case:
                     label_case.setText(text)
                     
@@ -201,45 +212,44 @@ class FileAnalysis(QWidget):
             pass
     
     def load_evidence_dialog(self):
-        """Show load evidence dialog"""
+        """Hiển thị hộp thoại chọn tệp chứng cứ (ảnh đĩa) để phân tích."""
         
-        file_dialog = QFileDialog()
+        file_dialog = QFileDialog()  # Hộp thoại chọn tệp
         file_path, _ = file_dialog.getOpenFileName(
             self, 
             "Select Evidence File", 
             "", 
-            "Disk Images (*.dd *.img *.raw *.E01 *.001);;All Files (*)"
+            "Disk Images (*.dd *.img *.raw *.E01 *.001);;All Files (*)"  # Bộ lọc tệp
         )
         
-        if file_path and os.path.exists(file_path):
+        if file_path and os.path.exists(file_path):  # Người dùng đã chọn và tệp tồn tại
             self.load_evidence_file(file_path)
     
     def load_evidence_file(self, file_path):
-        """Load and analyze evidence file"""
-        
-        if not PYTSK3_AVAILABLE:
-            QMessageBox.critical(
-                self, 
-                "Missing Library", 
-                "pytsk3 library is required for disk image analysis.\n\n"
-                "Please install it with:\npip install pytsk3"
-            )
-            return
+        """Nạp và phân tích tệp chứng cứ.
+
+        - Mở ảnh đĩa bằng `pytsk3.Img_Info` và phát hiện phân vùng (`Volume_Info`).
+        - Dựng cây dữ liệu (các phân vùng/hệ thống tệp) để duyệt.
+        - Nạp danh sách tệp ban đầu ở thư mục gốc.
+        """
         
         try:
             # Show progress
+            # Hộp thoại tiến trình để tránh treo UI khi thao tác nặng
             progress = QProgressDialog("Loading evidence file...", "Cancel", 0, 100, self)
-            progress.setWindowModality(Qt.WindowModal)
+            progress.setWindowModality(Qt.WindowModal)  # Khóa tương tác cửa sổ cho tới khi xong
             progress.show()
             
+            # Lưu đường dẫn chứng cứ và tên tệp hiển thị
             self.current_evidence_path = file_path
             file_name = os.path.basename(file_path)
             
             # Clear previous data
+            # Xóa sạch dữ liệu hiện có trên UI trước khi nạp ảnh mới
             self.initialize_empty_state()
             
             # Update UI to show loading
-            label_case = self.get_ui_component('labelCaseInfo')
+            label_case = self.get_ui_component('labelCaseInfo')  # Cập nhật tiêu đề có tên chứng cứ
             if label_case:
                 current_text = label_case.text()
                 if "Case:" in current_text:
@@ -251,40 +261,40 @@ class FileAnalysis(QWidget):
             QApplication.processEvents()
             
             # Step 1: Open image with pytsk3
-            self.img_info = pytsk3.Img_Info(file_path)
-            image_size = self.img_info.get_size()
+            self.img_info = pytsk3.Img_Info(file_path)  # Mở ảnh đĩa chế độ chỉ-đọc
+            image_size = self.img_info.get_size()  # Lấy kích thước ảnh (để hiển thị)
             
             progress.setValue(40)
             QApplication.processEvents()
             
             # Step 2: Get volume/partition info
-            partitions = []
+            partitions = []  # Danh sách phân vùng (nếu có)
             try:
-                self.volume_info = pytsk3.Volume_Info(self.img_info)
+                self.volume_info = pytsk3.Volume_Info(self.img_info)  # Đọc bảng phân vùng
                 partitions = list(self.volume_info)
             except:
-                partitions = [None]  # Single filesystem
+                partitions = [None]  # Không có bảng phân vùng -> 1 hệ thống tệp duy nhất
             
             progress.setValue(60)
             QApplication.processEvents()
             
             # Step 3: Build evidence tree
-            self.build_evidence_tree(file_name, partitions)
+            self.build_evidence_tree(file_name, partitions)  # Dựng cây dữ liệu cho UI
             
             progress.setValue(80)
             QApplication.processEvents()
             
             # Step 4: Load initial file list
             if partitions and partitions[0] is not None:
-                self.load_partition_root(partitions[0])
+                self.load_partition_root(partitions[0])  # Nạp danh sách từ thư mục gốc của phân vùng đầu tiên
             else:
-                self.load_single_filesystem_root()
+                self.load_single_filesystem_root()  # Ảnh có 1 hệ thống tệp
             
             progress.setValue(100)
             progress.close()
             
             # Show success message
-            deleted_count = len([f for f in self.file_list if f.get('deleted', False)])
+            deleted_count = len([f for f in self.file_list if f.get('deleted', False)])  # Đếm số tệp đã xóa
             QMessageBox.information(
                 self, 
                 "Evidence Loaded Successfully", 
@@ -299,13 +309,13 @@ class FileAnalysis(QWidget):
             
         except Exception as e:
             if 'progress' in locals():
-                progress.close()
+                progress.close()  # Đảm bảo đóng tiến trình nếu xảy ra lỗi
             
             error_msg = f"Failed to load evidence file:\n\n{str(e)}"
             QMessageBox.critical(self, "Error Loading Evidence", error_msg)
     
     def build_evidence_tree(self, evidence_name, partitions):
-        """Build evidence tree structure like Autopsy"""
+        """Xây dựng cây dữ liệu chứng cứ (giống Autopsy) gồm ảnh đĩa, phân vùng và hệ thống tệp."""
         
         tree = self.get_ui_component('treeInvestigation')
         if not tree:
@@ -315,7 +325,7 @@ class FileAnalysis(QWidget):
         tree.clear()
         tree.setHeaderLabel("Data Sources")
         
-        # Root item - Evidence file
+        # Node gốc - tên tệp chứng cứ
         root_item = QTreeWidgetItem(tree, [evidence_name])
         root_item.setData(0, Qt.UserRole, {'type': 'evidence', 'path': self.current_evidence_path})
         root_item.setExpanded(True)
@@ -326,13 +336,13 @@ class FileAnalysis(QWidget):
             for i, partition in enumerate(partitions):
                 try:
                     # Get partition info
-                    part_desc = f"Partition {i+1}"
+                    part_desc = f"Partition {i+1}"  # Nhãn cơ bản cho phân vùng
                     if hasattr(partition, 'desc') and partition.desc:
-                        desc_str = partition.desc.decode('utf-8', errors='ignore').strip()
+                        desc_str = partition.desc.decode('utf-8', errors='ignore').strip()  # Mô tả phân vùng (nếu có)
                         if desc_str:
                             part_desc += f" ({desc_str})"
                     
-                    part_size = partition.len * 512 if hasattr(partition, 'len') else 0
+                    part_size = partition.len * 512 if hasattr(partition, 'len') else 0  # Quy đổi sector (512B) -> bytes
                     part_desc += f" - {self.format_file_size(part_size)}"
                     
                     part_item = QTreeWidgetItem(root_item, [part_desc])
@@ -344,43 +354,43 @@ class FileAnalysis(QWidget):
                     
                     # Try to get filesystem info
                     try:
-                        offset = partition.start * 512 if hasattr(partition, 'start') else 0
-                        fs_info = pytsk3.FS_Info(self.img_info, offset=offset)
+                        offset = partition.start * 512 if hasattr(partition, 'start') else 0  # Tính offset byte bắt đầu phân vùng
+                        fs_info = pytsk3.FS_Info(self.img_info, offset=offset)  # Mở hệ thống tệp tại offset
                         
                         fs_type = fs_info.info.ftype_str if hasattr(fs_info.info, 'ftype_str') else "Unknown"
-                        fs_item = QTreeWidgetItem(part_item, [f"File System ({fs_type})"])
+                        fs_item = QTreeWidgetItem(part_item, [f"File System ({fs_type})"])  # Node hệ thống tệp
                         fs_item.setData(0, Qt.UserRole, {
                             'type': 'filesystem',
                             'fs_info': fs_info,
                             'partition': partition
                         })
                         
-                        # Add navigation folders
+                        # Thêm các thư mục điều hướng cho FS này
                         self.add_navigation_folders(fs_item, fs_info)
                         
                     except Exception as fs_error:
-                        pass
+                        pass  # Không mở được FS tại phân vùng này (có thể phân vùng trống/không hỗ trợ)
                         
                 except Exception as part_error:
-                    pass
+                    pass  # Bỏ qua phân vùng lỗi để tiếp tục dựng cây các phân vùng còn lại
         else:
             # Single filesystem
             try:
                 fs_info = pytsk3.FS_Info(self.img_info)
                 fs_type = fs_info.info.ftype_str if hasattr(fs_info.info, 'ftype_str') else "Unknown"
                 
-                fs_item = QTreeWidgetItem(root_item, [f"File System ({fs_type})"])
+                fs_item = QTreeWidgetItem(root_item, [f"File System ({fs_type})"])  # Node hệ thống tệp đơn
                 fs_item.setData(0, Qt.UserRole, {
                     'type': 'filesystem',
                     'fs_info': fs_info,
                     'partition': None
                 })
                 
-                # Add navigation folders
+                # Thêm thư mục điều hướng cho FS đơn
                 self.add_navigation_folders(fs_item, fs_info)
                 
             except Exception as fs_error:
-                pass
+                pass  # Không mở được hệ thống tệp đơn từ ảnh -> bỏ qua
         
         # Add Views section (like Autopsy)
         views_item = QTreeWidgetItem(tree, ["Views"])
@@ -457,7 +467,7 @@ class FileAnalysis(QWidget):
         deleted_item.setIcon(0, self.style().standardIcon(QStyle.SP_TrashIcon))
     
     def add_navigation_folders(self, parent_item, fs_info):
-        """Add navigation folders to filesystem"""
+        """Thêm các thư mục điều hướng vào node hệ thống tệp và nạp nhanh một phần nội dung."""
         
         try:
             # Add root directory and scan its contents
@@ -467,7 +477,10 @@ class FileAnalysis(QWidget):
             pass
     
     def populate_directory_tree(self, parent_item, fs_info, path="/", depth=0, max_depth=2):
-        """Recursively populate directory tree with file counts"""
+        """Đệ quy điền cây thư mục kèm số lượng thư mục con/tệp để hiển thị.
+
+        Giới hạn độ sâu (`max_depth`) và số lượng mục để tránh treo UI.
+        """
         
         if depth > max_depth:
             return
@@ -477,7 +490,7 @@ class FileAnalysis(QWidget):
             try:
                 directory = fs_info.open_dir(path=path)
             except:
-                return
+                return  # Không mở được thư mục (có thể do quyền/FS không hỗ trợ)
             
             # Count files and subdirectories
             subdirs = []
@@ -509,7 +522,7 @@ class FileAnalysis(QWidget):
                             total_size += entry.info.meta.size
                     
                 except:
-                    continue
+                    continue  # Bỏ qua entry lỗi để tiếp tục quét
             
             # Create tree item for current directory
             if path == "/":
@@ -559,12 +572,12 @@ class FileAnalysis(QWidget):
                 more_item.setForeground(0, QColor(128, 128, 128))
             
         except Exception as e:
-            pass
+            pass  # An toàn: không chặn UI khi có lỗi lẻ tẻ
     
     def on_tree_item_expanded(self, item):
-        """Handle tree item expansion for lazy loading"""
+        """Xử lý khi người dùng mở rộng node trong cây (lazy load các thư mục con)."""
         
-        data = item.data(0, Qt.UserRole)
+        data = item.data(0, Qt.UserRole)  # Metadata gắn với node
         if not data:
             return
         
@@ -632,10 +645,10 @@ class FileAnalysis(QWidget):
                     item.setData(0, Qt.UserRole, data)
                     
                 except Exception as e:
-                    pass
+                    pass  # Không thể liệt kê thư mục con; giữ nguyên node hiện tại
     
     def on_tree_item_clicked(self, item, column):
-        """Handle tree item clicks"""
+        """Xử lý click trên cây: nạp thư mục, phân vùng, tệp đã xóa hoặc lọc theo loại tệp."""
         
         data = item.data(0, Qt.UserRole)
         if not data:
@@ -645,30 +658,30 @@ class FileAnalysis(QWidget):
         item_text = item.text(0)
         
         try:
-            if item_type == 'filesystem':
+            if item_type == 'filesystem':  # Click vào hệ thống tệp -> nạp thư mục gốc
                 fs_info = data.get('fs_info')
                 if fs_info:
                     self.load_filesystem_root(fs_info)
                     
-            elif item_type == 'directory':
+            elif item_type == 'directory':  # Click vào thư mục -> nạp danh sách tệp trong thư mục đó
                 fs_info = data.get('fs_info')
                 path = data.get('path', '/')
                 if fs_info:
                     self.load_directory_files(fs_info, path)
                     
-            elif item_type == 'deleted_files':
+            elif item_type == 'deleted_files':  # Chế độ xem tệp đã xóa -> quét toàn FS
                 # Find the filesystem from the tree structure
                 fs_info = self.find_filesystem_info()
                 if fs_info:
                     self.load_deleted_files(fs_info)
                     
-            elif item_type == 'file_type_filter':
+            elif item_type == 'file_type_filter':  # Lọc theo loại tệp -> duyệt và nạp theo phần mở rộng
                 file_type = data.get('file_type')
                 fs_info = self.find_filesystem_info()
                 if fs_info and file_type:
                     self.load_files_by_type(fs_info, file_type)
                     
-            elif item_type == 'partition':
+            elif item_type == 'partition':  # Click vào phân vùng -> nạp thư mục gốc của phân vùng
                 partition = data.get('partition')
                 if partition:
                     self.load_partition_root(partition)
@@ -677,23 +690,23 @@ class FileAnalysis(QWidget):
             QMessageBox.warning(self, "Error", f"Error loading data: {str(e)}")
     
     def find_filesystem_info(self):
-        """Find the first available filesystem info from tree"""
+        """Tìm đối tượng `pytsk3.FS_Info` đầu tiên khả dụng từ cây dữ liệu."""
         try:
-            tree = self.get_ui_component('treeInvestigation')
+            tree = self.get_ui_component('treeInvestigation')  # Cây dữ liệu
             if not tree:
                 return None
                 
-            root = tree.topLevelItem(0)  # Evidence item
+            root = tree.topLevelItem(0)  # Node tệp chứng cứ (cấp trên cùng)
             if root:
                 for i in range(root.childCount()):
-                    child = root.child(i)
+                    child = root.child(i)  # Có thể là phân vùng hoặc FS
                     data = child.data(0, Qt.UserRole)
                     if data and data.get('type') == 'filesystem':
-                        return data.get('fs_info')
+                        return data.get('fs_info')  # Trả về FS đầu tiên tìm được
                     
                     # Check partition children
                     for j in range(child.childCount()):
-                        grandchild = child.child(j)
+                        grandchild = child.child(j)  # Nếu child là phân vùng, grandchild là FS
                         data = grandchild.data(0, Qt.UserRole)
                         if data and data.get('type') == 'filesystem':
                             return data.get('fs_info')
@@ -702,28 +715,28 @@ class FileAnalysis(QWidget):
             return None
     
     def load_filesystem_root(self, fs_info):
-        """Load root directory of filesystem"""
+        """Nạp thư mục gốc của hệ thống tệp."""
         self.load_directory_files(fs_info, "/")
     
     def load_partition_root(self, partition):
-        """Load root directory of partition"""
+        """Nạp thư mục gốc của một phân vùng dựa trên `start` offset."""
         try:
             offset = partition.start * 512 if hasattr(partition, 'start') else 0
             fs_info = pytsk3.FS_Info(self.img_info, offset=offset)
             self.load_directory_files(fs_info, "/")
         except Exception as e:
-            pass
+            pass  # Không mở được FS tại offset phân vùng
     
     def load_single_filesystem_root(self):
-        """Load root of single filesystem"""
+        """Nạp thư mục gốc khi ảnh đĩa chỉ có một hệ thống tệp."""
         try:
             fs_info = pytsk3.FS_Info(self.img_info)
             self.load_directory_files(fs_info, "/")
         except Exception as e:
-            pass
+            pass  # Không mở được FS đơn từ ảnh
     
     def load_directory_files(self, fs_info, path="/"):
-        """Load files from specific directory including deleted files"""
+        """Nạp danh sách tệp trong thư mục chỉ định, kèm phát hiện tệp đã xóa (tại gốc)."""
         
         try:
             self.file_list = []
@@ -738,57 +751,57 @@ class FileAnalysis(QWidget):
                 for entry in directory:
                     try:
                         # Skip . and ..
-                        if entry.info.name.name in [b'.', b'..']:
+                        if entry.info.name.name in [b'.', b'..']:  # Bỏ qua 2 entry đặc biệt
                             continue
                         
-                        file_info = self.extract_file_info_safe(entry, fs_info, path)
+                        file_info = self.extract_file_info_safe(entry, fs_info, path)  # Trích xuất thông tin tệp
                         if file_info:
                             self.file_list.append(file_info)
                             
                     except Exception as e:
                         continue
             except Exception as e:
-                pass
+                pass  # Không mở được thư mục tại đường dẫn chỉ định
             
             # Method 2: Scan for deleted files in current directory using inode walking
-            if path == "/":  # Only scan unallocated at root level to avoid duplicates
+            if path == "/":  # Chỉ quét inode UNALLOC ở gốc để tránh trùng lặp
                 try:
                     self.scan_unallocated_inodes(fs_info)
                 except Exception as e:
                     pass
             
             # Sort files: directories first, then by name
-            self.file_list.sort(key=lambda x: (x['type'] != 'Directory', x['name'].lower()))
+            self.file_list.sort(key=lambda x: (x['type'] != 'Directory', x['name'].lower()))  # Thư mục trước, rồi theo tên
             
-            self.update_file_table()
-            self.generate_timeline()
+            self.update_file_table()  # Đổ vào bảng
+            self.generate_timeline()  # Sinh timeline từ danh sách tệp
             
         except Exception as e:
             QMessageBox.warning(self, "Error", f"Error loading directory: {str(e)}")
     
     def load_deleted_files(self, fs_info):
-        """Load all deleted files from filesystem using inode scanning"""
+        """Nạp toàn bộ tệp đã xóa bằng cách quét inode và duyệt hệ thống tệp (có thanh tiến trình)."""
         
         try:
             self.file_list = []
             self.fs_info = fs_info
             
             # Show progress dialog
-            progress = QProgressDialog("Scanning for deleted files...", "Cancel", 0, 100, self)
+            progress = QProgressDialog("Scanning for deleted files...", "Cancel", 0, 100, self)  # Tiến trình quét
             progress.setWindowModality(Qt.WindowModal)
             progress.show()
             
             # Method 1: Scan unallocated inodes
-            self.scan_unallocated_inodes(fs_info, show_progress=progress)
+            self.scan_unallocated_inodes(fs_info, show_progress=progress)  # Quét inode UNALLOC
             
             # Method 2: Walk filesystem looking for unallocated entries
             progress.setLabelText("Walking filesystem for deleted entries...")
-            self.walk_deleted_entries(fs_info, progress)
+            self.walk_deleted_entries(fs_info, progress)  # Duyệt thư mục tìm entry UNALLOC
             
             progress.close()
             
             # Remove duplicates based on inode
-            unique_files = {}
+            unique_files = {}  # Khử trùng lặp theo khóa (inode + tên)
             for file in self.file_list:
                 key = f"{file['inode']}_{file['name']}"
                 if key not in unique_files:
@@ -812,11 +825,11 @@ class FileAnalysis(QWidget):
             
         except Exception as e:
             if 'progress' in locals():
-                progress.close()
+                progress.close()  # Đảm bảo đóng tiến trình khi lỗi
             QMessageBox.warning(self, "Error", f"Error loading deleted files: {str(e)}")
     
     def load_files_by_type(self, fs_info, file_type):
-        """Load files by type"""
+        """Lọc và nạp tệp theo loại (map đuôi mở rộng -> nhóm như ảnh, video, tài liệu, thực thi...)."""
         
         try:
             self.file_list = []
@@ -848,40 +861,40 @@ class FileAnalysis(QWidget):
             target_extensions = type_extensions.get(file_type, [])
             
             # Walk through filesystem
-            def find_files_by_type(directory, current_path="/", depth=0):
+            def find_files_by_type(directory, current_path="/", depth=0):  # Đệ quy duyệt theo loại tệp
                 if depth > 10:  # Limit recursion depth
                     return
                     
                 try:
                     for entry in directory:
                         try:
-                            if entry.info.name.name in [b'.', b'..']:
+                            if entry.info.name.name in [b'.', b'..']:  # Bỏ qua 2 entry đặc biệt
                                 continue
                             
                             # Safe check for meta
                             if not hasattr(entry.info, 'meta') or entry.info.meta is None:
                                 continue
                             
-                            name = entry.info.name.name.decode('utf-8', errors='ignore')
+                            name = entry.info.name.name.decode('utf-8', errors='ignore')  # Tên tệp/thư mục
                             
                             if file_type == 'other':
                                 # For "other", include files that don't match any specific category
                                 ext = os.path.splitext(name)[1].lower()
-                                all_extensions = []
+                                all_extensions = []  # Tập hợp tất cả đuôi thuộc các nhóm đã biết
                                 for exts in type_extensions.values():
                                     all_extensions.extend(exts)
                                 
                                 if (ext not in all_extensions and 
                                     hasattr(entry.info.meta, 'type') and
                                     entry.info.meta.type != pytsk3.TSK_FS_META_TYPE_DIR):
-                                    file_info = self.extract_file_info_safe(entry, fs_info, current_path)
+                                    file_info = self.extract_file_info_safe(entry, fs_info, current_path)  # Tệp thuộc nhóm khác
                                     if file_info:
                                         self.file_list.append(file_info)
                             else:
                                 # Check file extension
                                 ext = os.path.splitext(name)[1].lower()
                                 if ext in target_extensions:
-                                    file_info = self.extract_file_info_safe(entry, fs_info, current_path)
+                                    file_info = self.extract_file_info_safe(entry, fs_info, current_path)  # Tệp thuộc nhóm mục tiêu
                                     if file_info:
                                         self.file_list.append(file_info)
                             
@@ -890,8 +903,8 @@ class FileAnalysis(QWidget):
                                 entry.info.meta.type == pytsk3.TSK_FS_META_TYPE_DIR):
                                 try:
                                     if name and name not in ['.', '..']:
-                                        sub_path = f"{current_path.rstrip('/')}/{name}"
-                                        sub_dir = fs_info.open_dir(inode=entry.info.meta.addr)
+                                        sub_path = f"{current_path.rstrip('/')}/{name}"  # Cập nhật đường dẫn con
+                                        sub_dir = fs_info.open_dir(inode=entry.info.meta.addr)  # Mở thư mục con theo inode
                                         find_files_by_type(sub_dir, sub_path, depth + 1)
                                 except:
                                     pass
@@ -912,7 +925,7 @@ class FileAnalysis(QWidget):
             QMessageBox.warning(self, "Error", f"Error loading files by type: {str(e)}")
     
     def extract_file_info_safe(self, entry, fs_info, current_path):
-        """Safely extract file information from TSK entry"""
+        """Trích xuất an toàn thông tin tệp từ entry của TSK (tên, kích thước, loại, thời gian, inode...)."""
         
         try:
             # Safe check for meta
@@ -970,7 +983,7 @@ class FileAnalysis(QWidget):
             return None
     
     def extract_timestamps_safe(self, entry):
-        """Safely extract timestamps from file entry"""
+        """Trích xuất an toàn các mốc thời gian (created/modified/accessed/changed) từ entry."""
         
         timestamps = {
             'created': 'Unknown',
@@ -1014,7 +1027,7 @@ class FileAnalysis(QWidget):
         return timestamps
     
     def determine_file_type(self, filename):
-        """Determine file type from filename"""
+        """Xác định loại tệp sơ bộ dựa trên đuôi mở rộng (fallback: Unknown)."""
         
         if not filename:
             return "Unknown"
@@ -1053,7 +1066,7 @@ class FileAnalysis(QWidget):
         return type_map.get(ext, 'Unknown File')
     
     def update_file_table(self):
-        """Update file table with current file list"""
+        """Đổ dữ liệu danh sách tệp hiện có lên bảng (tô màu hàng nếu là tệp đã xóa)."""
         
         table_files = self.get_ui_component('tableFiles')
         if not table_files:
@@ -1081,7 +1094,7 @@ class FileAnalysis(QWidget):
                         item.setToolTip("🗑️ Deleted file")
     
     def generate_timeline(self):
-        """Generate timeline from current file list"""
+        """Tạo danh sách sự kiện Timeline từ các mốc thời gian của từng tệp và sắp xếp theo thời gian."""
         
         self.timeline_data = []
         
@@ -1111,7 +1124,7 @@ class FileAnalysis(QWidget):
         self.update_timeline_table()
     
     def update_timeline_table(self):
-        """Update timeline table"""
+        """Cập nhật bảng Timeline từ dữ liệu đã tạo."""
         
         table_timeline = self.get_ui_component('tableTimeline')
         if not table_timeline:
@@ -1127,7 +1140,7 @@ class FileAnalysis(QWidget):
             table_timeline.setItem(row, 4, QTableWidgetItem(event['artifact']))
     
     def on_file_selected(self):
-        """Handle file selection in table"""
+        """Xử lý khi người dùng chọn một dòng trong bảng tệp để hiển thị chi tiết."""
         
         table_files = self.get_ui_component('tableFiles')
         if not table_files:
@@ -1139,7 +1152,7 @@ class FileAnalysis(QWidget):
             self.show_file_details(file_info)
     
     def show_file_details(self, file_info):
-        """Show file details in detail tabs"""
+        """Hiển thị chi tiết tệp ở các tab: Thuộc tính, Metadata, Nội dung/Hex/Ảnh xem trước."""
         
         # Update File Properties
         self.update_file_properties(file_info)
@@ -1151,7 +1164,7 @@ class FileAnalysis(QWidget):
         self.update_file_content(file_info)
     
     def update_file_properties(self, file_info):
-        """Update file properties table"""
+        """Cập nhật bảng Thuộc tính (Properties) của tệp đang chọn."""
         
         table_properties = self.get_ui_component('tableProperties')
         if not table_properties:
@@ -1177,7 +1190,7 @@ class FileAnalysis(QWidget):
             table_properties.setItem(row, 1, QTableWidgetItem(str(value)))
     
     def update_file_metadata(self, file_info):
-        """Update file metadata table"""
+        """Cập nhật bảng Siêu dữ liệu (Metadata) của tệp đang chọn."""
         
         table_metadata = self.get_ui_component('tableMetadata')
         if not table_metadata:
@@ -1200,7 +1213,7 @@ class FileAnalysis(QWidget):
             table_metadata.setItem(row, 1, QTableWidgetItem(str(value)))
     
     def update_file_content(self, file_info):
-        """Update file content views"""
+        """Cập nhật vùng hiển thị nội dung: văn bản, hex, và ảnh xem trước (nếu là ảnh)."""
         
         # Clear previous content
         text_hex = self.get_ui_component('textHexView')
@@ -1270,7 +1283,7 @@ class FileAnalysis(QWidget):
                     label_picture.setText(f"📄 {file_info['type']}\n\nNot an image file")
     
     def extract_file_content_safe(self, file_info):
-        """Safely extract file content using pytsk3 - Enhanced for NTFS"""
+        """Đọc nội dung tệp một cách an toàn bằng pytsk3 (ưu tiên NTFS, thử nhiều phương pháp đọc)."""
         
         try:
             entry = file_info.get('entry')
@@ -1294,7 +1307,7 @@ class FileAnalysis(QWidget):
                     size_to_read = min(file_info['size'], 50000) if file_info['size'] > 0 else 50000
                     file_data = entry.read_random(0, size_to_read)
             except Exception as e:
-                pass
+                pass  # Không đọc được trực tiếp (không hỗ trợ read_random)
             
             # Method 2: Try attribute-based reading for NTFS
             if not file_data:
@@ -1310,7 +1323,7 @@ class FileAnalysis(QWidget):
                                     if file_data:
                                         break
                 except Exception as e:
-                    pass
+                    pass  # Đọc thuộc tính thất bại (không phải NTFS/không có $DATA)
             
             # Method 3: Try filesystem-level reading
             if not file_data and hasattr(entry.info, 'meta') and hasattr(entry.info.meta, 'addr'):
@@ -1322,7 +1335,7 @@ class FileAnalysis(QWidget):
                             size_to_read = min(file_info['size'], 50000) if file_info['size'] > 0 else 50000
                             file_data = file_obj.read_random(0, size_to_read)
                 except Exception as e:
-                    pass
+                    pass  # Không mở lại theo inode được (inode không tồn tại/không đọc được)
             
             if file_data:
                 # Try to decode as text
@@ -1343,7 +1356,7 @@ class FileAnalysis(QWidget):
             return f"Content extraction error: {str(e)}"
     
     def generate_hex_view(self, content):
-        """Generate hex view of content"""
+        """Sinh chuỗi hiển thị nội dung dạng hex kèm cột ASCII để quan sát nhanh."""
         
         if isinstance(content, str):
             content = content.encode('utf-8', errors='ignore')
@@ -1367,7 +1380,7 @@ class FileAnalysis(QWidget):
         return '\n'.join(hex_lines)
     
     def generate_hex_preview(self, content):
-        """Generate a short hex preview for binary content"""
+        """Sinh phần xem trước dạng hex ngắn gọn cho dữ liệu nhị phân."""
         if isinstance(content, str):
             content = content.encode('utf-8', errors='ignore')
         
@@ -1388,12 +1401,12 @@ class FileAnalysis(QWidget):
         return '\n'.join(hex_lines)
     
     def get_mime_type(self, filename):
-        """Get MIME type of file"""
+        """Suy đoán kiểu MIME của tệp dựa trên tên/đuôi mở rộng (mimetypes)."""
         mime_type, _ = mimetypes.guess_type(filename)
         return mime_type or "application/octet-stream"
     
     def perform_search(self):
-        """Perform search in current file list"""
+        """Tìm kiếm theo từ khóa trong danh sách tệp hiện tại (tên và đường dẫn)."""
         
         line_search = self.get_ui_component('lineEditSearch')
         if not line_search:
@@ -1439,7 +1452,7 @@ class FileAnalysis(QWidget):
         )
     
     def update_search_results(self):
-        """Update search results table"""
+        """Cập nhật bảng kết quả tìm kiếm (tô màu nếu là tệp đã xóa)."""
         
         table_search = self.get_ui_component('tableSearchResults')
         if not table_search:
@@ -1463,7 +1476,7 @@ class FileAnalysis(QWidget):
                         item.setBackground(QColor(255, 200, 200))
     
     def on_timeline_selected(self):
-        """Handle timeline selection"""
+        """Xử lý khi chọn một dòng trong Timeline và hiển thị hộp thoại chi tiết sự kiện."""
         
         table_timeline = self.get_ui_component('tableTimeline')
         if not table_timeline:
@@ -1484,7 +1497,7 @@ class FileAnalysis(QWidget):
             QMessageBox.information(self, "Timeline Event", details)
     
     def format_file_size(self, size_bytes):
-        """Format file size for display"""
+        """Định dạng kích thước (B, KB, MB, GB, TB) để hiển thị thân thiện."""
         
         if size_bytes == 0:
             return "0 B"
@@ -1500,7 +1513,7 @@ class FileAnalysis(QWidget):
         return f"{size:.1f} {units[unit_index]}"
     
     def get_current_fs_info(self):
-        """Get current filesystem info from stored reference"""
+        """Lấy đối tượng `FS_Info` đang dùng từ danh sách tệp, biến lưu trữ hoặc tìm lại trong cây."""
         # Try to get from current file list
         if self.file_list and len(self.file_list) > 0:
             first_file = self.file_list[0]
@@ -1515,7 +1528,7 @@ class FileAnalysis(QWidget):
         return self.find_filesystem_info()
     
     def extract_raw_file_content(self, file_info):
-        """Extract raw binary content for files like images"""
+        """Trích xuất dữ liệu nhị phân thô của tệp (ví dụ ảnh) để hiển thị/xuất ra tệp."""
         try:
             entry = file_info.get('entry')
             if not entry:
@@ -1539,7 +1552,7 @@ class FileAnalysis(QWidget):
                     if file_data:
                         return file_data
             except:
-                pass
+                pass  # Không đọc trực tiếp được
             
             # Method 2: Attribute-based reading
             try:
@@ -1551,7 +1564,7 @@ class FileAnalysis(QWidget):
                             if file_data:
                                 return file_data
             except:
-                pass
+                pass  # Không đọc theo thuộc tính (không phải NTFS/không có $DATA)
             
             # Method 3: Filesystem-level reading
             if hasattr(entry.info, 'meta') and hasattr(entry.info.meta, 'addr'):
@@ -1564,14 +1577,18 @@ class FileAnalysis(QWidget):
                             if file_data:
                                 return file_data
                 except:
-                    pass
+                    pass  # Không thể mở lại theo inode
             
             return None
         except Exception as e:
             return None
     
     def scan_unallocated_inodes(self, fs_info, show_progress=None):
-        """Scan filesystem for unallocated inodes (deleted files)"""
+        """Quét các inode không còn cấp phát (tệp đã xóa) và tạo bản ghi tạm cho mỗi tệp tìm thấy.
+
+        - Duyệt theo lô (chunk) để tránh tốn bộ nhớ.
+        - Cố gắng khôi phục tên tệp đã xóa, nếu không sẽ đặt tên $OrphanFile_<inode>.
+        """
         try:
             # Get filesystem info
             fs_type = fs_info.info.ftype if hasattr(fs_info.info, 'ftype') else 0
@@ -1579,24 +1596,24 @@ class FileAnalysis(QWidget):
             first_inum = fs_info.info.first_inum if hasattr(fs_info.info, 'first_inum') else 0
             
             if last_inum == 0:
-                last_inum = 100000  # Default for testing
+                last_inum = 100000  # Giá trị mặc định khi FS không cung cấp last_inum
             
             deleted_count = 0
             checked_count = 0
             
             # Scan inodes in chunks to avoid memory issues
-            chunk_size = 1000
+            chunk_size = 1000  # Quét theo lô để tiết kiệm bộ nhớ
             for start_inode in range(first_inum, min(last_inum, 50000), chunk_size):
                 end_inode = min(start_inode + chunk_size, last_inum)
                 
-                if show_progress:
+                if show_progress:  # Cập nhật tiến trình nếu có hộp thoại
                     progress_pct = int((start_inode / min(last_inum, 50000)) * 100)
                     show_progress.setValue(progress_pct)
                     show_progress.setLabelText(f"Scanning inodes {start_inode} - {end_inode}...")
                     QApplication.processEvents()
                     
                     if show_progress.wasCanceled():
-                        break
+                        break  # Người dùng hủy quét
                 
                 for inode_num in range(start_inode, end_inode):
                     try:
@@ -1675,14 +1692,14 @@ class FileAnalysis(QWidget):
                         checked_count += 1
                         
                     except Exception:
-                        # Inode doesn't exist or can't be read
+                        # Inode không tồn tại hoặc không thể đọc -> bỏ qua
                         pass
             
         except Exception as e:
-            pass
+            pass  # Lỗi không xác định khi quét inode -> bỏ qua
     
     def walk_deleted_entries(self, fs_info, progress=None):
-        """Walk filesystem directories looking for deleted entries"""
+        """Duyệt cây thư mục, tìm các entry có cờ UNALLOC (đã xóa) và thêm vào danh sách."""
         try:
             def scan_directory(directory, current_path="/", depth=0):
                 if depth > 5:  # Limit depth
@@ -1714,7 +1731,7 @@ class FileAnalysis(QWidget):
                                     sub_dir = fs_info.open_dir(inode=entry.info.meta.addr)
                                     scan_directory(sub_dir, new_path, depth + 1)
                                 except:
-                                    pass
+                                    pass  # Mở thư mục con thất bại -> bỏ qua nhánh này
                                     
                         except:
                             continue
@@ -1727,10 +1744,10 @@ class FileAnalysis(QWidget):
             scan_directory(root_dir)
             
         except Exception as e:
-            pass
+            pass  # Lỗi khi walk hệ thống tệp -> bỏ qua (đã có phương pháp quét inode phụ trợ)
     
     def get_file_type_from_meta(self, meta):
-        """Determine file type from metadata"""
+        """Suy ra loại tệp từ metadata (DIR/REG/LNK), dùng khi tên tệp không đáng tin cậy."""
         if hasattr(meta, 'type'):
             if meta.type == pytsk3.TSK_FS_META_TYPE_DIR:
                 return "Directory"
@@ -1741,7 +1758,7 @@ class FileAnalysis(QWidget):
         return "Unknown"
     
     def format_timestamp(self, timestamp):
-        """Format Unix timestamp to string"""
+        """Định dạng Unix timestamp thành chuỗi thời gian; trả về 'Unknown' nếu không hợp lệ."""
         try:
             if timestamp and timestamp > 0:
                 return datetime.fromtimestamp(timestamp).strftime('%Y-%m-%d %H:%M:%S')
@@ -1750,7 +1767,7 @@ class FileAnalysis(QWidget):
         return "Unknown"
     
     def find_deleted_filename(self, fs_info, inode_num):
-        """Try to find the actual filename of a deleted file from directory entries"""
+        """Cố gắng tìm lại tên gốc của tệp đã xóa thông qua entry thư mục trỏ tới inode tương ứng."""
         try:
             # Enhanced search for deleted file names
             found_names = []
@@ -1827,7 +1844,7 @@ class FileAnalysis(QWidget):
             return None
     
     def guess_file_extension(self, file_obj):
-        """Try to guess file extension from file content (magic bytes)"""
+        """Phỏng đoán đuôi tệp dựa trên chữ ký đầu tệp (magic bytes) hoặc tính chất văn bản."""
         try:
             # Read first 512 bytes for signature detection
             content = b''
@@ -1889,10 +1906,10 @@ class FileAnalysis(QWidget):
             return ""
             
         except:
-            return ""
+            return ""  # Không giải mã được chữ ký -> trả về rỗng
     
     def count_files_by_type(self, partitions):
-        """Count files by type for Views display"""
+        """Thống kê số lượng tệp theo loại để hiển thị ở mục `Views` (ảnh, video, audio, tài liệu, thực thi...)."""
         counts = {
             # Main categories
             'images': 0,
@@ -2025,7 +2042,7 @@ class FileAnalysis(QWidget):
         return counts
     
     def recover_file(self, file_info):
-        """Recover a deleted file"""
+        """Khôi phục tệp đã xóa (nếu còn dữ liệu), cho phép người dùng chọn nơi lưu ra đĩa."""
         try:
             if not file_info.get('deleted'):
                 QMessageBox.warning(self, "Recovery", "This file is not deleted.")

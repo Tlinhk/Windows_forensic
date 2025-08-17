@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# ====================================================
-# 📚 1. NHẬP THƯ VIỆN & NẠP UI
-# ====================================================
+# 1) Imports & UI
 
 import os
 import sys
@@ -63,19 +61,11 @@ from PyQt5.QtGui import (
 # Import UI đã được thiết kế
 from ui.pages.analysis_ui.registry_analysis_ui import Ui_RegistryAnalysisWidget
 
-# ====================================================
-# 🧰 2. HÀM TIỆN ÍCH CHUNG
-# ====================================================
+# 2) Tiện ích chung
 
 
 def format_as_hex(data):
-    """
-    Định dạng dữ liệu dưới dạng hex view với cả hex và ASCII
-    Args:
-        data: Dữ liệu cần định dạng (bytes hoặc str)
-    Returns:
-        str: Dữ liệu đã định dạng theo kiểu hex dump
-    """
+    """Trả về hex dump (hex + ASCII) từ bytes/str."""
     if not data:
         return "Không có dữ liệu"
 
@@ -97,14 +87,7 @@ def format_as_hex(data):
 
 
 def decode_registry_data(data, format_type):
-    """
-    Decode dữ liệu registry dựa trên định dạng được chỉ định
-    Args:
-        data: Dữ liệu cần decode
-        format_type (str): Loại định dạng ("Auto-detect", "UTF-8 String", "DWORD", etc.)
-    Returns:
-        str: Dữ liệu đã được decode
-    """
+    """Decode dữ liệu registry theo định dạng đã chọn."""
     if not data:
         return "Không có dữ liệu để decode"
 
@@ -132,14 +115,7 @@ def decode_registry_data(data, format_type):
 
 
 def auto_decode_data(data):
-    """
-    Tự động phát hiện và decode định dạng dữ liệu
-    Thử nhiều phương pháp decode khác nhau để tìm định dạng phù hợp
-    Args:
-        data: Dữ liệu cần phân tích
-    Returns:
-        str: Dữ liệu đã được decode với thông tin định dạng
-    """
+    """Tự phát hiện định dạng và decode dữ liệu."""
     if not data:
         return "Không có dữ liệu"
 
@@ -172,13 +148,8 @@ def auto_decode_data(data):
 
 
 def decode_dword(data):
-    """
-    Decode giá trị DWORD (32-bit integer)
-    Args:
-        data: Dữ liệu DWORD
-    Returns:
-        str: Giá trị DWORD với các biểu diễn khác nhau
-    """
+    """Giải mã DWORD (32-bit) và hiển thị thập phân/hex/binary."""
+
     try:
         if isinstance(data, str) and data.isdigit():
             value = int(data)
@@ -192,13 +163,7 @@ def decode_dword(data):
 
 
 def decode_qword(data):
-    """
-    Decode giá trị QWORD (64-bit integer)
-    Args:
-        data: Dữ liệu QWORD
-    Returns:
-        str: Giá trị QWORD với các biểu diễn khác nhau
-    """
+    """Giải mã QWORD (64-bit) và hiển thị thập phân/hex/binary."""
     try:
         if isinstance(data, str) and data.isdigit():
             value = int(data)
@@ -212,14 +177,7 @@ def decode_qword(data):
 
 
 def decode_filetime(data):
-    """
-    Decode Windows FILETIME (64-bit timestamp)
-    FILETIME là số 100-nanosecond intervals kể từ 1/1/1601
-    Args:
-        data: Dữ liệu FILETIME
-    Returns:
-        str: Timestamp đã được chuyển đổi
-    """
+    """Giải mã FILETIME (Windows) sang thời gian người đọc được."""
     try:
         if isinstance(data, bytes) and len(data) == 8:
             filetime = int.from_bytes(
@@ -248,16 +206,11 @@ def decode_filetime(data):
         )
 
 
-# ====================================================
-# 🧵 3. RegistryAnalysisThread  ➜  LUỒNG PHÂN TÍCH RECmd
-# ====================================================
+# 3) RegistryAnalysisThread (chạy RECmd trong nền)
 
 
 class RegistryAnalysisThread(QThread):
-    """
-    Thread để chạy phân tích registry mà không làm đóng băng UI
-    Chạy RECmd với các batch file để phân tích registry hive
-    """
+    """Thread chạy phân tích registry bằng RECmd mà không chặn UI."""
 
     # Các signal để giao tiếp với UI chính
     progress_updated = pyqtSignal(int)  # Cập nhật tiến độ (0-100)
@@ -266,14 +219,8 @@ class RegistryAnalysisThread(QThread):
     error_occurred = pyqtSignal(str)  # Có lỗi xảy ra với thông điệp lỗi
 
     def __init__(self, recmd_path, batch_file, hive_files, output_dir):
-        """
-        Khởi tạo thread phân tích registry
-        Args:
-            recmd_path (str): Đường dẫn đến RECmd.exe
-            batch_file (str): Đường dẫn đến batch file (.reb)
-            hive_files (list): Danh sách đường dẫn các file hive cần phân tích
-            f (str): Thư mục để lưu kết quả phân tích
-        """
+        """Khởi tạo thread.
+        recmd_path: đường dẫn RECmd.exe; batch_file: file .reb; hive_files: các hive; output_dir: thư mục xuất."""
         super().__init__()
         self.recmd_path = recmd_path
         self.batch_file = batch_file
@@ -282,15 +229,11 @@ class RegistryAnalysisThread(QThread):
         self.is_cancelled = False
 
     def cancel(self):
-        """
-        Hủy bỏ quá trình phân tích đang chạy, đặt flag để dừng vòng lặp phân tích
-        """
+        """Đánh dấu hủy quá trình phân tích đang chạy."""
         self.is_cancelled = True
 
     def run(self):
-        """
-        Phương thức chính của thread - chạy phân tích cho tất cả hive files, phân tích từng file một và báo cáo tiến độ
-        """
+        """Chạy phân tích lần lượt các hive và báo cáo tiến độ."""
         try:
             total_hives = len(self.hive_files)
             results = {}
@@ -318,15 +261,7 @@ class RegistryAnalysisThread(QThread):
             self.error_occurred.emit(str(e))  # Gửi thông báo lỗi
 
     def run_recmd_analysis(self, hive_file):
-        """
-        Chạy phân tích RECmd trên một file hive cụ thể
-        Args:
-            hive_file (str): Đường dẫn đến file hive cần phân tích
-        Returns:
-            list: Danh sách kết quả phân tích từ CSV, None nếu thất bại
-        Raises:
-            Exception: Khi RECmd thất bại hoặc không thể đọc kết quả
-        """
+        """Chạy RECmd cho một hive; trả về list record đọc từ CSV."""
         try:
             hive_name = os.path.splitext(os.path.basename(hive_file))[
                 0
@@ -373,15 +308,7 @@ class RegistryAnalysisThread(QThread):
             )  # Gửi thông báo lỗi
 
     def parse_csv_results(self, csv_file):
-        """
-        Phân tích kết quả CSV từ RECmd và chuyển thành list dictionaries
-        Args:
-            csv_file (str): Đường dẫn đến file CSV kết quả
-        Returns:
-            list: Danh sách các record từ CSV, mỗi record là một dictionary
-        Raises:
-            Exception: Khi không thể đọc hoặc phân tích CSV
-        """
+        """Đọc CSV kết quả từ RECmd thành list[dict]."""
         results = []
         try:
             with open(csv_file, "r", encoding="utf-8", errors="ignore") as f:
@@ -392,35 +319,21 @@ class RegistryAnalysisThread(QThread):
         except Exception as e:
             raise Exception(f"Lỗi đọc CSV {csv_file}: {str(e)}")
 
+# 4) BatchFileManager (quản lý .reb)
 
-# ====================================================
-# 📂 4. BatchFileManager  ➜  QUẢN LÝ FILE .reb
-# ====================================================
 
 
 class BatchFileManager:
-    """
-    Quản lý các file batch của RECmd (.reb files)
-    Phát hiện, phân loại và cung cấp thông tin về các batch file có sẵn
-    """
+    """Quản lý, phát hiện và mô tả các RECmd batch (.reb)."""
+    
 
     def __init__(self, batch_dir):
-        """
-        Khởi tạo manager với thư mục chứa batch files
-        Args:
-            batch_dir (str): Đường dẫn thư mục chứa các file .reb
-        """
+        """batch_dir: thư mục chứa các .reb."""
         self.batch_dir = batch_dir
         self.batch_files = self.discover_batch_files()
 
     def discover_batch_files(self):
-        """
-        Tìm kiếm và khám phá tất cả các file batch có sẵn
-        Quét thư mục batch và phân tích thông tin từ mỗi file
-        Returns:
-            dict: Dictionary với key là tên file, value là thông tin file
-                  Format: {filename: {'path': str, 'info': dict, 'size': int}}
-        """
+        """Quét batch_dir, trả về {filename: {'path','info','size'}}."""
         batch_files = {}
 
         if not os.path.exists(self.batch_dir):
@@ -452,13 +365,7 @@ class BatchFileManager:
         return batch_files
 
     def parse_batch_file_info(self, batch_file):
-        """
-        Phân tích header của batch file để trích xuất metadata, đọc các dòng comment đầu file để lấy thông tin mô tả
-        Args:
-            batch_file (str): Đường dẫn đến batch file
-        Returns:
-            dict: Thông tin batch file bao gồm Description, Author, Version, Category
-        """
+        """Đọc header .reb để lấy Description/Author/Version/Category."""
         info = {
             "Description": "Unknown",
             "Author": "Unknown",
@@ -528,27 +435,16 @@ class BatchFileManager:
         return ["DFIRBatch.reb"]  # Mặc định sử dụng phân tích toàn diện
 
 
-# ====================================================
-# 🔎 5. RegistryHiveDetector  ➜  NHẬN DIỆN FILE HIVE
-# ====================================================
+# 5) RegistryHiveDetector (nhận diện hive)
 
 
 class RegistryHiveDetector:
-    """
-    Phát hiện và phân loại các file registry hive
-    Xác định loại hive dựa trên tên file và cấu trúc header
-    """
+    """Nhận diện/kiểm tra tính hợp lệ của registry hive."""
+    
 
     @staticmethod
     def detect_hive_type(file_path):
-        """
-        Phát hiện loại registry hive dựa trên tên file và cấu trúc
-        Sử dụng tên file để xác định loại hive Windows
-        Args:
-            file_path (str): Đường dẫn đến file hive
-        Returns:
-            str: Loại hive (SYSTEM, SOFTWARE, SAM, SECURITY, NTUSER, USRCLASS, DEFAULT, UNKNOWN)
-        """
+        """Suy đoán loại hive (SYSTEM/SOFTWARE/...) từ tên và header."""
         filename = os.path.basename(file_path).upper()
 
         if filename in ["SYSTEM", "SYSTEM.LOG", "SYSTEM.LOG1", "SYSTEM.LOG2"]:
@@ -579,14 +475,7 @@ class RegistryHiveDetector:
 
     @staticmethod
     def is_registry_hive(file_path):
-        """
-        Kiểm tra xem file có phải là registry hive hợp lệ không
-        Kiểm tra magic header 'regf' ở đầu file
-        Args:
-            file_path (str): Đường dẫn đến file cần kiểm tra
-        Returns:
-            bool: True nếu file là registry hive hợp lệ, False nếu không
-        """
+        """Kiểm tra magic header 'regf' để xác thực hive."""
         try:
             with open(file_path, "rb") as f:
                 header = f.read(4)
@@ -594,67 +483,30 @@ class RegistryHiveDetector:
         except Exception:
             return False
 
+# 6) RegistryTreeParser (xây dựng cây registry)
 
-# ====================================================
-# 🌲 6. RegistryTreeParser  ➜  XÂY DỰNG CÂY REGISTRY
-# ====================================================
 
 
 class RegistryTreeParser:
-    """
-    Phân tích registry hive và xây dựng cấu trúc cây
-    Sử dụng thư viện python-registry để đọc và phân tích cấu trúc
-    """
+    """Trích xuất cấu trúc cây keys/values từ hive (python-registry)."""
+    
 
     def __init__(self):
-        """
-        Khởi tạo parser với dictionary để lưu trữ các registry object
-        """
+        """Khởi tạo bộ nhớ đệm registry theo đường dẫn file."""
         self.registry_objects = {}  # Lưu trữ registry objects theo đường dẫn file
 
     def parse_registry_file(self, file_path):
-        """
-        Phân tích file registry hive và trả về registry object
-        Args:
-            file_path (str): Đường dẫn đến file registry hive
-        Returns:
-            Registry.Registry: Object registry đã được phân tích
-        Raises:
-            Exception: Khi không thể phân tích file (file corrupt, không hợp lệ)
-        """
+        """Mở hive và trả về Registry.Registry; lưu vào bộ nhớ đệm."""
         try:
             registry = Registry.Registry(file_path)
             self.registry_objects[file_path] = registry
             return registry
         except Exception as e:
-            raise Exception(
-                f"Không thể phân tích file registry {os.path.basename(file_path)}: {e}"
-            )
+            raise Exception(f"Không thể phân tích file registry {os.path.basename(file_path)}: {e}")
+    
+    def build_registry_tree(self, model, parent_item, registry, key, max_depth=100, current_depth=0, icons=None):
+        """Đệ quy dựng cây keys vào model (giới hạn max_depth)."""
 
-    def build_registry_tree(
-        self,
-        model,
-        parent_item,
-        registry,
-        key,
-        max_depth=100,
-        current_depth=0,
-        icons=None,
-    ):
-        """
-        Xây dựng cây hiển thị registry key một cách đệ quy
-        Tạo QStandardItem cho mỗi key và thêm vào model
-        Args:
-            model (QStandardItemModel): Model của tree view
-            parent_item (QStandardItem): Item cha trong cây, None cho root
-            registry (Registry.Registry): Object registry
-            key (Registry.RegistryKey): Registry key hiện tại
-            max_depth (int): Độ sâu tối đa để tránh vòng lặp vô hạn
-            current_depth (int): Độ sâu hiện tại trong đệ quy
-            icons (dict): Dictionary chứa các icon cho key types
-        Returns:
-            QStandardItem: Item đã được tạo cho key này
-        """
         if current_depth >= max_depth:
             return None
 
@@ -711,15 +563,8 @@ class RegistryTreeParser:
             return error_item
 
     def get_values_for_key(self, key):
-        """
-        Lấy tất cả các value cho một registry key
-        Trích xuất name, value, type và raw data cho mỗi value
-        Args:
-            key (Registry.RegistryKey): Registry key object
-        Returns:
-            list: Danh sách các value với thông tin chi tiết
-                  Format: [{'name': str, 'value': any, 'type': str, 'type_id': int, 'raw_data': bytes}]
-        """
+        """Trả về list value của key kèm name/value/type/type_id/raw_data."""
+
         values = []
 
         try:
@@ -746,14 +591,7 @@ class RegistryTreeParser:
         return values
 
     def _format_value_data(self, value):
-        """
-        Định dạng dữ liệu registry value để hiển thị an toàn
-        Xử lý các trường hợp lỗi và exception khi đọc value
-        Args:
-            value (Registry.RegistryValue): Registry value object
-        Returns:
-            str: Dữ liệu đã được định dạng và làm sạch
-        """
+        """Chuẩn hóa dữ liệu value để hiển thị an toàn."""
         try:
             raw_value = value.value()
 
@@ -783,23 +621,15 @@ class RegistryTreeParser:
             return f"(lỗi: {str(e)})"  # Gửi thông báo lỗi
 
 
-# ====================================================
-# 🖥️ 7. RegistryAnalysis  ➜  GIAO DIỆN PHÂN TÍCH CHÍNH
-# ====================================================
+# 7) RegistryAnalysis (UI chính)
 
 
 class RegistryAnalysis(QWidget):
-    """
-    Widget chính cho công cụ phân tích Registry
-    Giao diện chính để tải, phân tích và hiển thị dữ liệu registry
-    """
+    """Widget chính: tải, phân tích và hiển thị dữ liệu registry."""
+    
 
     def __init__(self, parent=None):
-        """
-        Khởi tạo widget phân tích Registry với tất cả thành phần cần thiết
-        Args:
-            parent: Widget cha (có thể là None)
-        """
+        """Khởi tạo widget và cấu hình thành phần UI."""
         super().__init__(parent)
 
         self.ui = Ui_RegistryAnalysisWidget()  # Thiết lập UI từ file thiết kế
@@ -847,11 +677,12 @@ class RegistryAnalysis(QWidget):
                 else QIcon.fromTheme("dialog-error")
             ),
         }
-
-        # Khởi tạo biến lưu trữ dữ liệu
-        self.loaded_hives = {}  # Dictionary các hive đã tải
-        self.analysis_results = {}  # Kết quả phân tích từ RECmd
-        self.current_analysis_thread = None  # Thread phân tích hiện tại
+        
+        # Trạng thái
+        self.loaded_hives = {}
+        self.analysis_results = {}
+        self.current_analysis_thread = None
+        
 
         # Thiết lập UI và kết nối
         self.setup_ui()
@@ -859,15 +690,11 @@ class RegistryAnalysis(QWidget):
         self.populate_batch_files()
         self.setup_forensic_bookmarks()
 
-    # ====================================================
-    # 7.1 Khởi tạo & cấu hình UI
-    # ====================================================
+    # 7.1 Cấu hình UI
+        
 
     def setup_ui(self):
-        """
-        Thiết lập các thành phần UI bổ sung và cấu hình giao diện
-        Cấu hình các thuộc tính cho table, tree view và các control
-        """
+        """Thiết lập thành phần UI và tùy chọn hiển thị."""
         # Đặt thuộc tính cửa sổ
         self.setWindowTitle("Công cụ Phân tích Registry - Digital Forensics")
 
@@ -877,12 +704,16 @@ class RegistryAnalysis(QWidget):
         self.ui.registryValuesTable.setAlternatingRowColors(True)
         self.ui.registryValuesTable.setSortingEnabled(True)
         self.ui.registryValuesTable.horizontalHeader().setStretchLastSection(True)
+        self.ui.registryValuesTable.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        
 
         # Cấu hình tree view cho registry structure
         self.ui.registryTreeView.setAlternatingRowColors(True)
         self.ui.registryTreeView.setHeaderHidden(False)
         self.ui.registryTreeView.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.ui.registryTreeView.setUniformRowHeights(True)
+        self.ui.registryTreeView.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        
 
         # Tạo model rỗng ban đầu cho tree view
         tree_model = QStandardItemModel()
@@ -891,9 +722,10 @@ class RegistryAnalysis(QWidget):
 
         # Đặt tỷ lệ splitter cho layout
         self.ui.horizontalSplitter.setSizes([300, 700])  # Tree : Detail = 3:7
-        self.ui.verticalSplitter.setSizes([500, 200])  # Main : Bottom = 5:2
+        self.ui.verticalSplitter.setSizes([500, 200])    # Main : Bottom = 5:2
+        
+        # Thiết lập combo boxes
 
-        # Thiết lập combo boxes với options
         self.ui.cmbHiveSelector.clear()
         self.ui.cmbHiveSelector.addItems(
             ["Tất cả Hive", "SYSTEM", "SOFTWARE", "NTUSER", "SAM", "SECURITY"]
@@ -907,26 +739,17 @@ class RegistryAnalysis(QWidget):
         # Thiết lập data format combo
         if hasattr(self.ui, "cmbDataFormat"):
             self.ui.cmbDataFormat.clear()
-            self.ui.cmbDataFormat.addItems(
-                [
-                    "Auto-detect",
-                    "UTF-8 String",
-                    "UTF-16 String",
-                    "DWORD",
-                    "QWORD",
-                    "Windows Timestamp",
-                    "Binary",
-                ]
-            )
-
-        # Thiết lập trạng thái ban đầu
-        self.update_status("Sẵn sàng - Tải registry hive để bắt đầu phân tích")
+            self.ui.cmbDataFormat.addItems([
+                "Auto-detect", "UTF-8 String", "UTF-16 String", 
+                "DWORD", "QWORD", "Windows Timestamp", "Binary"
+            ])
+        
+        # Trạng thái ban đầu
+        self.update_status("Sẵn sàng - Tải hive để bắt đầu phân tích")
+        
 
     def setup_connections(self):
-        """
-        Thiết lập tất cả các kết nối signal-slot cho giao diện
-        Kết nối các button clicks, selection changes và các event khác
-        """
+        """Kết nối signal-slot cho các thành phần UI."""
         # Kết nối các nút toolbar chính
         self.ui.btnLoadHive.clicked.connect(self.load_registry_hives)
         self.ui.btnExportReport.clicked.connect(self.export_analysis_report)
@@ -960,12 +783,7 @@ class RegistryAnalysis(QWidget):
             self.ui.cmbDataFormat.currentTextChanged.connect(self.update_decoded_view)
 
     def update_status(self, message):
-        """
-        Cập nhật thông báo trạng thái cho người dùng
-        Hiển thị trạng thái hiện tại của quá trình phân tích
-        Args:
-            message (str): Thông điệp trạng thái cần hiển thị
-        """
+        """Cập nhật trạng thái hiển thị và tiêu đề cửa sổ."""
         # Hiển thị trong console để debug
         print(f"Registry Analysis Status: {message}")
 
@@ -996,15 +814,10 @@ class RegistryAnalysis(QWidget):
                 f"  - {batch_name}: {batch_info.get('Description', 'Không có mô tả')}"
             )
 
-    # ====================================================
     # 7.2 Bookmarks & thao tác cây
-    # ====================================================
 
     def setup_forensic_bookmarks(self):
-        """
-        Thiết lập các bookmark forensic được định nghĩa trước
-        Thêm các registry location quan trọng cho digital forensics
-        """
+        """Thêm các registry location quan trọng vào danh sách bookmark."""
         bookmarks = [
             (
                 "🏃 Run Keys",
@@ -1058,12 +871,7 @@ class RegistryAnalysis(QWidget):
             self.ui.bookmarksList.addItem(item)
 
     def show_tree_context_menu(self, position):
-        """
-        Hiển thị context menu cho registry tree view
-        Cung cấp các action như copy path, bookmark, expand/collapse
-        Args:
-            position (QPoint): Vị trí chuột khi click chuột phải
-        """
+        """Hiển thị context menu của tree (copy path, bookmark, expand/collapse)."""
         # Lấy index item dưới con trỏ chuột
         index = self.ui.registryTreeView.indexAt(position)
         if not index.isValid():
@@ -1122,24 +930,16 @@ class RegistryAnalysis(QWidget):
         menu.exec_(self.ui.registryTreeView.viewport().mapToGlobal(position))
 
     def copy_text_to_clipboard(self, text):
-        """
-        Sao chép text vào clipboard hệ thống
-        Args:
-            text (str): Text cần sao chép
-        """
+        """Sao chép text vào clipboard hệ thống."""
         clipboard = QApplication.clipboard()
         clipboard.setText(text)
         self.update_status(f"Đã sao chép: {text}")
 
     def add_key_to_bookmarks(self, key, key_data):
-        """
-        Thêm registry key vào danh sách bookmarks
-        Args:
-            key: Registry key object
-            key_data (dict): Dữ liệu metadata của key
-        """
-        key_path = key_data.get("path", "")
-        key_name = key.name() if key.name() else "(Root)"
+        """Thêm registry key vào danh sách bookmarks."""
+        key_path = key_data.get('path', '')
+        key_name = key.name() if key.name() else '(Root)'
+        
 
         # Tạo bookmark item với icon
         item = QListWidgetItem(f"🔖 {key_name} - {key_path}")
@@ -1154,9 +954,7 @@ class RegistryAnalysis(QWidget):
         self.update_status(f"Đã thêm bookmark: {key_path}")
 
     def add_current_to_bookmarks(self):
-        """
-        Thêm vị trí hiện tại được chọn trong tree vào bookmarks
-        """
+        """Thêm vị trí đang chọn trong tree vào bookmarks."""
         # Lấy item hiện tại được chọn
         index = self.ui.registryTreeView.currentIndex()
         if not index.isValid():
@@ -1189,9 +987,7 @@ class RegistryAnalysis(QWidget):
         self.add_key_to_bookmarks(item_data.get("key_object"), item_data)
 
     def remove_selected_bookmark(self):
-        """
-        Xóa bookmark được chọn khỏi danh sách
-        """
+        """Xóa bookmark đang chọn khỏi danh sách."""
         current_item = self.ui.bookmarksList.currentItem()
         if not current_item:
             QMessageBox.warning(
@@ -1213,11 +1009,7 @@ class RegistryAnalysis(QWidget):
             self.update_status("Đã xóa bookmark")
 
     def navigate_to_bookmark(self, item):
-        """
-        Điều hướng đến vị trí bookmark trong registry tree
-        Args:
-            item (QListWidgetItem): Bookmark item được double-click
-        """
+        """Điều hướng đến key của bookmark trong tree."""
         bookmark_data = item.data(Qt.UserRole)
         if not bookmark_data:
             return
@@ -1251,20 +1043,12 @@ class RegistryAnalysis(QWidget):
             )
 
     def expand_subtree(self, index):
-        """
-        Mở rộng tất cả các node con của index được chỉ định
-        Args:
-            index (QModelIndex): Index của node cần mở rộng
-        """
+        """Mở rộng tất cả node con của index."""
         self.ui.registryTreeView.expandRecursively(index)
         self.update_status("Đã mở rộng tất cả node con")
 
     def collapse_subtree(self, index):
-        """
-        Thu gọn tất cả các node con của index được chỉ định
-        Args:
-            index (QModelIndex): Index của node cần thu gọn
-        """
+        """Thu gọn node và toàn bộ node con."""
         self.ui.registryTreeView.collapse(index)
 
         # Thu gọn các child nodes
@@ -1277,11 +1061,7 @@ class RegistryAnalysis(QWidget):
         self.update_status("Đã thu gọn tất cả node con")
 
     def export_key_data(self, key):
-        """
-        Export dữ liệu của registry key ra file JSON
-        Args:
-            key: Registry key object cần export
-        """
+        """Export dữ liệu key ra JSON (key info, values, subkeys)."""
         try:
             # Lấy đường dẫn key
             key_path = key.path()
@@ -1364,10 +1144,7 @@ class RegistryAnalysis(QWidget):
     # ====================================================
 
     def load_registry_hives(self):
-        """
-        Mở dialog để tải các file registry hive
-        Cho phép người dùng chọn nhiều file hive cùng lúc
-        """
+        """Mở dialog chọn nhiều registry hive để tải."""
         file_dialog = QFileDialog()
         file_dialog.setFileMode(QFileDialog.ExistingFiles)
         file_dialog.setNameFilter("Registry Hives (*);;All Files (*)")
@@ -1379,13 +1156,8 @@ class RegistryAnalysis(QWidget):
                 self.process_hive_files(files)
 
     def process_hive_files(self, file_paths):
-        """
-        Xử lý và kiểm tra tính hợp lệ của các file hive đã chọn
-        Phân loại hive và tạo metadata cho mỗi file
+        """Kiểm tra hợp lệ, phân loại và lưu metadata cho các hive đã chọn."""
 
-        Args:
-            file_paths (list): Danh sách đường dẫn file được chọn
-        """
         valid_hives = []
         invalid_files = []
 
@@ -1434,10 +1206,7 @@ class RegistryAnalysis(QWidget):
             )
 
     def build_registry_tree_view(self):
-        """
-        Xây dựng tree view hiển thị cấu trúc registry keys từ các hive đã tải
-        Tạo cây phân cấp cho tất cả hive trong một model duy nhất
-        """
+        """Dựng tree view keys cho toàn bộ hive đã tải (một model)."""
         # Tạo model mới cho tree view
         model = QStandardItemModel()
         model.setHorizontalHeaderLabels(["Registry Keys"])
@@ -1526,10 +1295,7 @@ class RegistryAnalysis(QWidget):
             self.ui.valueStatus.setText("Không có dữ liệu")
 
     def start_comprehensive_analysis(self):
-        """
-        Bắt đầu quá trình phân tích toàn diện các hive đã tải
-        Sử dụng RECmd với batch file phù hợp để phân tích
-        """
+        """Chạy phân tích RECmd toàn diện cho các hive đã tải."""
         if not self.loaded_hives:
             QMessageBox.warning(
                 self,
@@ -1581,13 +1347,8 @@ class RegistryAnalysis(QWidget):
         progress_dialog.exec_()
 
     def select_optimal_batch_file(self):
-        """
-        Chọn batch file tối ưu dựa trên các hive đã tải
-        Ưu tiên DFIRBatch.reb cho phân tích toàn diện
+        """Chọn batch .reb phù hợp (ưu tiên DFIRBatch.reb)."""
 
-        Returns:
-            str: Đường dẫn đến batch file được chọn, None nếu không tìm thấy
-        """
         # Kiểm tra DFIRBatch.reb trước (toàn diện nhất)
         dfir_batch = os.path.join(self.batch_dir, "DFIRBatch.reb")
         if os.path.exists(dfir_batch):
@@ -1621,14 +1382,8 @@ class RegistryAnalysis(QWidget):
     # ====================================================
 
     def on_analysis_completed(self, results):
-        """
-        Xử lý khi quá trình phân tích RECmd hoàn thành
-        Hiển thị kết quả và cập nhật UI
+        """Nhận kết quả phân tích, hiển thị bảng và cập nhật trạng thái."""
 
-        Args:
-            results (dict): Dictionary kết quả phân tích từ thread
-                          Format: {hive_path: [list_of_records]}
-        """
         self.analysis_results = results
 
         # Đếm tổng số records
@@ -1658,12 +1413,8 @@ class RegistryAnalysis(QWidget):
         )
 
     def on_analysis_error(self, error_message):
-        """
-        Xử lý khi có lỗi trong quá trình phân tích
+        """Hiển thị lỗi phân tích và gợi ý kiểm tra."""
 
-        Args:
-            error_message (str): Thông điệp lỗi từ analysis thread
-        """
         self.update_status(f"Phân tích thất bại: {error_message}")
 
         # Hiển thị dialog lỗi chi tiết
@@ -1680,10 +1431,7 @@ class RegistryAnalysis(QWidget):
         )
 
     def populate_results_table(self):
-        """
-        Đưa dữ liệu kết quả phân tích vào bảng hiển thị
-        Kết hợp kết quả từ tất cả hive và tạo model cho table view
-        """
+        """Hợp nhất kết quả các hive và hiển thị vào bảng."""
         if not self.analysis_results:
             return
 
@@ -1762,14 +1510,8 @@ class RegistryAnalysis(QWidget):
     # ====================================================
 
     def on_selection_changed(self, selected, deselected):
-        """
-        Xử lý khi người dùng thay đổi lựa chọn trong bảng kết quả
-        Cập nhật các panel chi tiết với dữ liệu được chọn
+        """Khi chọn một hàng kết quả: cập nhật panel chi tiết."""
 
-        Args:
-            selected (QItemSelection): Items được chọn
-            deselected (QItemSelection): Items bỏ chọn
-        """
         selected_indexes = selected.indexes()
         if not selected_indexes:
             return
@@ -1788,13 +1530,8 @@ class RegistryAnalysis(QWidget):
             self.update_detail_panels(data)
 
     def on_tree_selection_changed(self, index):
-        """
-        Xử lý khi người dùng thay đổi lựa chọn trong registry tree view
-        Hiển thị values của key được chọn
+        """Khi chọn item trong tree: hiển thị values và meta key/hive."""
 
-        Args:
-            index (QModelIndex): Index của item được chọn trong tree
-        """
         # Lấy model và dữ liệu
         model = self.ui.registryTreeView.model()
         if not model:
@@ -1849,12 +1586,8 @@ class RegistryAnalysis(QWidget):
                 )
 
     def populate_values_table(self, values):
-        """
-        Đưa danh sách registry values vào bảng hiển thị
+        """Đưa list values của key vào bảng hiển thị."""
 
-        Args:
-            values (list): Danh sách values từ registry key
-        """
         # Tạo model cho bảng values
         model = QStandardItemModel(len(values), 3)
         model.setHorizontalHeaderLabels(["Tên Value", "Loại", "Dữ liệu"])
@@ -1892,14 +1625,8 @@ class RegistryAnalysis(QWidget):
         self.update_status(f"Hiển thị {len(values)} values cho registry key")
 
     def on_value_selection_changed(self, selected, deselected):
-        """
-        Xử lý khi người dùng chọn value trong bảng values
-        Cập nhật hex editor và decoded view
+        """Khi chọn value: cập nhật hex editor, decoded view, và info."""
 
-        Args:
-            selected (QItemSelection): Values được chọn
-            deselected (QItemSelection): Values bỏ chọn
-        """
         selected_indexes = selected.indexes()
         if not selected_indexes:
             return
@@ -1939,12 +1666,8 @@ class RegistryAnalysis(QWidget):
         self.update_detail_panels(value_info)
 
     def update_detail_panels(self, data):
-        """
-        Cập nhật các panel chi tiết với dữ liệu được chọn
+        """Cập nhật panel chi tiết (selection, hex, decoded, plugin)."""
 
-        Args:
-            data (dict): Dictionary chứa thông tin cần hiển thị
-        """
         # Cập nhật thông tin selection
         if "KeyPath" in data:
             self.ui.lblCurrentSelection.setText(
@@ -1972,15 +1695,10 @@ class RegistryAnalysis(QWidget):
         # Cập nhật plugin results nếu có
         self.update_plugin_results(data)
 
-    # ====================================================
-    # 7.6 Decode & hiển thị dữ liệu value
-    # ====================================================
+    # 7.6 Decode & hiển thị dữ liệu value    
 
     def update_decoded_view(self):
-        """
-        Cập nhật decoded data view dựa trên định dạng được chọn
-        Lấy dữ liệu từ selection hiện tại và decode theo format
-        """
+        """Decode dữ liệu từ selection hiện tại theo format đã chọn."""
         # Lấy các index được chọn trong bảng
         selected_indexes = self.ui.registryValuesTable.selectionModel().selectedRows()
         if not selected_indexes:
@@ -2013,34 +1731,18 @@ class RegistryAnalysis(QWidget):
         self.ui.txtDecodedData.setPlainText(decoded_text)
 
     def update_decoded_view_with_value(self, value_data):
-        """
-        Cập nhật decoded data view với dữ liệu value cụ thể
-        Sử dụng khi có value_data trực tiếp từ registry parser
+        """Decode và hiển thị từ value_data (khi có dữ liệu trực tiếp)."""
+        format_type = self.ui.cmbDataFormat.currentText() if hasattr(self.ui, 'cmbDataFormat') else "Auto-detect"
+        raw_data = value_data.get('raw_data', b'')
 
-        Args:
-            value_data (dict): Dictionary chứa thông tin value
-        """
-        format_type = (
-            self.ui.cmbDataFormat.currentText()
-            if hasattr(self.ui, "cmbDataFormat")
-            else "Auto-detect"
-        )
-        raw_data = value_data.get("raw_data", b"")
         decoded_text = decode_registry_data(raw_data, format_type)
         self.ui.txtDecodedData.setPlainText(decoded_text)
 
-    # ====================================================
     # 7.7 Plugin & hiển thị bổ sung
-    # ====================================================
-
+    
     def update_plugin_results(self, registry_data):
-        """
-        Cập nhật tab kết quả plugin với thông tin bổ sung
-        Hiển thị kết quả phân tích từ các plugin RECmd
+        """Cập nhật tab plugin (nếu có dữ liệu plugin liên quan)."""
 
-        Args:
-            registry_data (dict): Dữ liệu registry được chọn
-        """
         # Xóa kết quả cũ
         if hasattr(self.ui, "pluginResultsTable"):
             self.ui.pluginResultsTable.setRowCount(0)
@@ -2064,15 +1766,8 @@ class RegistryAnalysis(QWidget):
                 self.ui.lblPluginInfo.setText("Không có kết quả plugin cho item này")
 
     def parse_plugin_data(self, plugin_info):
-        """
-        Phân tích dữ liệu plugin từ RECmd
+        """Parse plugin_info (JSON hoặc text) thành list kết quả."""
 
-        Args:
-            plugin_info (str): Thông tin plugin raw
-
-        Returns:
-            list: Danh sách kết quả đã phân tích
-        """
         results = []
 
         try:
@@ -2097,13 +1792,9 @@ class RegistryAnalysis(QWidget):
         return results
 
     def display_plugin_results(self, results):
-        """
-        Hiển thị kết quả plugin trong bảng
+        """Hiển thị list kết quả plugin trong bảng 2 cột."""
+        if not hasattr(self.ui, 'pluginResultsTable') or not results:
 
-        Args:
-            results (list): Danh sách kết quả plugin
-        """
-        if not hasattr(self.ui, "pluginResultsTable") or not results:
             return
 
         # Cấu hình bảng
@@ -2127,15 +1818,10 @@ class RegistryAnalysis(QWidget):
         # Resize cột
         table.resizeColumnsToContents()
 
-    # ====================================================
-    # 7.8 Tìm kiếm & điều hướng
-    # ====================================================
+    # 7.8 Tìm kiếm & điều hướng    
 
     def perform_global_search(self):
-        """
-        Thực hiện tìm kiếm toàn cục trong tất cả dữ liệu registry
-        Tìm kiếm trong cả key names, value names và value data
-        """
+        """Tìm kiếm toàn cục (key/value name/data) theo chuỗi nhập."""
         search_term = self.ui.txtGlobalSearch.text().strip()
         if not search_term:
             # Nếu không có search term, hiển thị lại tất cả kết quả
@@ -2146,13 +1832,8 @@ class RegistryAnalysis(QWidget):
         self.search_registry_tree(search_term)
 
     def search_registry_tree(self, search_term):
-        """
-        Tìm kiếm keys và values trong registry tree
-        Sử dụng tìm kiếm đệ quy qua tất cả hive đã tải
+        """Tìm kiếm đệ quy trong toàn bộ hive đã tải."""
 
-        Args:
-            search_term (str): Từ khóa tìm kiếm
-        """
         model = self.ui.registryTreeView.model()
         if not model:
             self.update_status("Không có dữ liệu registry để tìm kiếm")
@@ -2187,20 +1868,10 @@ class RegistryAnalysis(QWidget):
                 "Kết Quả Tìm Kiếm",
                 f"Không tìm thấy kết quả nào cho '{search_term}'",
             )
+    
+    def search_key_recursive(self, key, search_term, results, max_depth=20, current_depth=0):
+        """Đệ quy tìm theo tên key, tên value, và dữ liệu value (string)."""
 
-    def search_key_recursive(
-        self, key, search_term, results, max_depth=20, current_depth=0
-    ):
-        """
-        Tìm kiếm đệ quy trong registry keys và values
-
-        Args:
-            key: Registry key object hiện tại
-            search_term (str): Từ khóa tìm kiếm
-            results (list): Danh sách kết quả (pass by reference)
-            max_depth (int): Độ sâu tối đa để tránh vô hạn
-            current_depth (int): Độ sâu hiện tại
-        """
         if current_depth >= max_depth:
             return
 
@@ -2266,13 +1937,8 @@ class RegistryAnalysis(QWidget):
             pass
 
     def display_search_results(self, results, search_term):
-        """
-        Hiển thị kết quả tìm kiếm registry trong bảng
+        """Hiển thị kết quả tìm kiếm và cho phép điều hướng tới key."""
 
-        Args:
-            results (list): Danh sách kết quả tìm kiếm
-            search_term (str): Từ khóa đã tìm
-        """
         # Tạo model với các cột phù hợp
         from PyQt5.QtGui import QStandardItemModel, QStandardItem
 
@@ -2322,12 +1988,8 @@ class RegistryAnalysis(QWidget):
         self.update_status(f"Tìm kiếm hoàn thành: {len(results)} kết quả")
 
     def navigate_to_search_result(self, row):
-        """
-        Điều hướng đến kết quả tìm kiếm được chọn
+        """Điều hướng tới key tương ứng của hàng tìm kiếm được chọn."""
 
-        Args:
-            row (int): Số hàng của kết quả trong bảng
-        """
         # Lấy dữ liệu kết quả
         model = self.ui.registryValuesTable.model()
         if not model:
@@ -2345,12 +2007,8 @@ class RegistryAnalysis(QWidget):
         self.find_key_in_tree(result["key"])
 
     def find_key_in_tree(self, key):
-        """
-        Tìm một key cụ thể trong registry tree view và điều hướng tới
+        """Tìm key trong tree và cuộn/đánh dấu để hiển thị."""
 
-        Args:
-            key: Registry key object cần tìm
-        """
         model = self.ui.registryTreeView.model()
         if not model:
             self.update_status("Registry tree model không khả dụng")
@@ -2388,16 +2046,8 @@ class RegistryAnalysis(QWidget):
             )
 
     def find_item_by_path(self, model, path):
-        """
-        Helper function để tìm item trong tree model theo đường dẫn
+        """Tìm QModelIndex trong tree theo đường dẫn registry."""
 
-        Args:
-            model: QStandardItemModel của tree
-            path (str): Đường dẫn registry cần tìm
-
-        Returns:
-            QModelIndex: Index của item, hoặc invalid index nếu không tìm thấy
-        """
         if not path:
             return model.index(0, 0)  # Trả về root nếu path rỗng
 
@@ -2422,15 +2072,10 @@ class RegistryAnalysis(QWidget):
 
         return current_index
 
-    # ====================================================
-    # 7.9 Lọc và tùy chọn xem
-    # ====================================================
+    # 7.9 Lọc và tùy chọn xem    
 
     def filter_by_hive(self):
-        """
-        Lọc kết quả theo loại hive được chọn
-        Áp dụng filter cho bảng results dựa trên hive type
-        """
+        """Lọc kết quả theo loại hive đã chọn."""
         selected_hive = self.ui.cmbHiveSelector.currentText()
         self.update_status(f"Đang lọc theo hive: {selected_hive}")
 
@@ -2442,10 +2087,7 @@ class RegistryAnalysis(QWidget):
             self.filter_results_by_hive_type(selected_hive)
 
     def filter_by_view_type(self):
-        """
-        Lọc kết quả theo loại view được chọn
-        Lọc theo key only, value only, hoặc suspicious items
-        """
+        """Lọc theo Key-only, Value-only, hoặc Suspicious."""
         selected_view = self.ui.cmbViewType.currentText()
         self.update_status(f"Đang lọc theo view: {selected_view}")
 
@@ -2459,12 +2101,8 @@ class RegistryAnalysis(QWidget):
             self.filter_suspicious_items()
 
     def filter_results_by_hive_type(self, hive_type):
-        """
-        Lọc kết quả phân tích theo loại hive
+        """Chỉ giữ kết quả có hive type trùng khớp."""
 
-        Args:
-            hive_type (str): Loại hive cần lọc
-        """
         if not self.analysis_results:
             return
 
@@ -2482,12 +2120,8 @@ class RegistryAnalysis(QWidget):
         self.display_filtered_results(filtered_results, f"Hive: {hive_type}")
 
     def filter_results_by_type(self, item_type):
-        """
-        Lọc kết quả theo loại item (key hoặc value)
+        """Lọc kết quả theo loại item ('key' hoặc 'value')."""
 
-        Args:
-            item_type (str): 'key' hoặc 'value'
-        """
         # Implementation tùy thuộc vào cấu trúc dữ liệu
         # Ở đây ta giả sử có trường 'ItemType' trong results
         if not self.analysis_results:
@@ -2508,10 +2142,7 @@ class RegistryAnalysis(QWidget):
         self.display_filtered_results(filtered_results, f"Loại: {item_type}")
 
     def filter_suspicious_items(self):
-        """
-        Lọc các item đáng nghi trong registry
-        Tìm các pattern thường gặp trong malware/intrusion
-        """
+        """Lọc item đáng nghi dựa trên các pattern phổ biến."""
         if not self.analysis_results:
             return
 
@@ -2547,13 +2178,8 @@ class RegistryAnalysis(QWidget):
         self.display_filtered_results(suspicious_results, "Items đáng nghi")
 
     def display_filtered_results(self, results, filter_description):
-        """
-        Hiển thị kết quả đã được lọc
+        """Hiển thị bảng kết quả đã lọc cùng mô tả bộ lọc."""
 
-        Args:
-            results (list): Danh sách kết quả đã lọc
-            filter_description (str): Mô tả bộ lọc
-        """
         if not results:
             self.ui.lblCurrentPath.setText(
                 f"Lọc ({filter_description}): Không có kết quả"
@@ -2611,15 +2237,10 @@ class RegistryAnalysis(QWidget):
             "Vui lòng sử dụng tìm kiếm cơ bản và các bộ lọc có sẵn.",
         )
 
-    # ====================================================
-    # 7.10 Xuất báo cáo & làm mới
-    # ====================================================
+    # 7.10 Xuất báo cáo & làm mới    
 
     def export_analysis_report(self):
-        """
-        Xuất báo cáo phân tích ra các định dạng khác nhau
-        Hỗ trợ CSV, JSON, HTML và XML
-        """
+        """Xuất báo cáo (CSV/JSON/HTML/XML) từ kết quả phân tích."""
         if not self.analysis_results:
             QMessageBox.warning(
                 self,
@@ -2671,12 +2292,8 @@ class RegistryAnalysis(QWidget):
                 self.update_status(f"Lỗi xuất báo cáo: {str(e)}")
 
     def export_results_to_file(self, file_path):
-        """
-        Xuất kết quả ra file với định dạng được chỉ định
+        """Gộp kết quả và ghi ra file theo phần mở rộng."""
 
-        Args:
-            file_path (str): Đường dẫn file output
-        """
         # Kết hợp tất cả kết quả từ các hive
         all_results = []
         for hive_path, results in self.analysis_results.items():
@@ -2828,10 +2445,7 @@ class RegistryAnalysis(QWidget):
             f.write(xml_content)
 
     def refresh_analysis(self):
-        """
-        Làm mới phân tích hiện tại
-        Chạy lại phân tích với các hive đã tải
-        """
+        """Làm mới: xóa kết quả cũ và chạy lại phân tích các hive đã tải."""
         if self.loaded_hives:
             reply = QMessageBox.question(
                 self,
@@ -2856,10 +2470,7 @@ class RegistryAnalysis(QWidget):
             )
 
     def add_selected_to_report(self):
-        """
-        Thêm item được chọn vào báo cáo điều tra
-        Tạo danh sách các item quan trọng để phân tích chi tiết
-        """
+        """Đánh dấu item được chọn để đưa vào báo cáo điều tra."""
         # Kiểm tra có selection model không
         selection_model = self.ui.registryValuesTable.selectionModel()
         if not selection_model:
@@ -2915,15 +2526,10 @@ class RegistryAnalysis(QWidget):
                 f"Đã thêm {len(selected_items)} item vào báo cáo điều tra"
             )
 
-    # ====================================================
     # 7.11 Ghi chú
-    # ====================================================
-
+    
     def save_investigation_notes(self):
-        """
-        Lưu ghi chú điều tra của analyst
-        Ghi chú sẽ được lưu cùng với session analysis
-        """
+        """Lưu ghi chú điều tra (kèm metadata phiên làm việc)."""
         notes = self.ui.txtNotes.toPlainText().strip()
 
         if not notes:
@@ -3005,34 +2611,21 @@ Investigation Notes:
             # - Refresh UI if needed
 
 
-# ====================================================
-# ⚙️ 8. RegistryAnalysisSettingsDialog  ➜  HỘP THOẠI CÀI ĐẶT
-# ====================================================
+# 8) RegistryAnalysisSettingsDialog (hộp thoại cài đặt)
 
 
 class RegistryAnalysisSettingsDialog(QDialog):
-    """
-    Dialog cài đặt cho công cụ phân tích registry
-    Cho phép cấu hình batch files, tùy chọn phân tích và các thông số khác
-    """
-
+    """Dialog cài đặt: chọn batch, tùy chọn phân tích và xuất kết quả."""
+    
     def __init__(self, parent, batch_manager):
-        """
-        Khởi tạo dialog settings
+        """parent: RegistryAnalysis; batch_manager: quản lý batch files."""
 
-        Args:
-            parent: Widget cha (RegistryAnalysis)
-            batch_manager: BatchFileManager instance để quản lý batch files
-        """
         super().__init__(parent)
         self.batch_manager = batch_manager
         self.setup_ui()
 
     def setup_ui(self):
-        """
-        Thiết lập giao diện người dùng cho dialog settings
-        Tạo các tab và control để cấu hình các tùy chọn
-        """
+        """Tạo các tab: Batch Files, Tùy chọn phân tích, Cài đặt xuất."""
         self.setWindowTitle("Cài Đặt Phân Tích Registry")
         self.setModal(True)
         self.resize(700, 500)
@@ -3068,12 +2661,8 @@ class RegistryAnalysisSettingsDialog(QDialog):
         layout.addWidget(button_box)
 
     def create_batch_selection_tab(self):
-        """
-        Tạo tab cho việc chọn và cấu hình batch files
+        """Tab chọn/cấu hình batch files."""
 
-        Returns:
-            QWidget: Tab widget cho batch file selection
-        """
         tab = QWidget()
         layout = QVBoxLayout(tab)
 
@@ -3121,12 +2710,8 @@ class RegistryAnalysisSettingsDialog(QDialog):
         return tab
 
     def create_analysis_options_tab(self):
-        """
-        Tạo tab cho các tùy chọn phân tích
+        """Tab tùy chọn phân tích và hiệu suất."""
 
-        Returns:
-            QWidget: Tab widget cho analysis options
-        """
         tab = QWidget()
         layout = QVBoxLayout(tab)
 
@@ -3186,12 +2771,8 @@ class RegistryAnalysisSettingsDialog(QDialog):
         return tab
 
     def create_output_settings_tab(self):
-        """
-        Tạo tab cho cài đặt xuất kết quả
+        """Tab cài đặt xuất: định dạng, đường dẫn, quy tắc đặt tên."""
 
-        Returns:
-            QWidget: Tab widget cho output settings
-        """
         tab = QWidget()
         layout = QVBoxLayout(tab)
 
@@ -3241,9 +2822,7 @@ class RegistryAnalysisSettingsDialog(QDialog):
         return tab
 
     def populate_batch_list(self):
-        """
-        Đưa danh sách batch file vào bảng với checkbox để chọn
-        """
+        """Đưa danh sách batch files vào bảng (checkbox chọn)."""
         batch_files = self.batch_manager.batch_files
         self.batch_list.setRowCount(len(batch_files))
 
@@ -3273,9 +2852,7 @@ class RegistryAnalysisSettingsDialog(QDialog):
         self.batch_list.setAlternatingRowColors(True)
 
     def browse_custom_batch(self):
-        """
-        Mở dialog để chọn custom batch file
-        """
+        """Chọn custom batch file (.reb)."""
         file_path, _ = QFileDialog.getOpenFileName(
             self,
             "Chọn Custom Batch File",
@@ -3287,18 +2864,19 @@ class RegistryAnalysisSettingsDialog(QDialog):
             self.custom_batch_path.setText(file_path)
 
     def browse_output_dir(self):
-        """
-        Mở dialog để chọn thư mục output
-        """
-        dir_path = QFileDialog.getExistingDirectory(self, "Chọn Thư Mục Xuất", "")
+        """Chọn thư mục xuất mặc định."""
+        dir_path = QFileDialog.getExistingDirectory(
+            self,
+            "Chọn Thư Mục Xuất",
+            ""
+        )
+        
 
         if dir_path:
             self.output_dir_edit.setText(dir_path)
 
     def apply_settings(self):
-        """
-        Áp dụng các cài đặt mà không đóng dialog
-        """
+        """Áp dụng cài đặt (không đóng dialog)."""
         try:
             # Validate settings
             self.validate_settings()
@@ -3318,12 +2896,8 @@ class RegistryAnalysisSettingsDialog(QDialog):
             )
 
     def validate_settings(self):
-        """
-        Kiểm tra tính hợp lệ của các cài đặt
+        """Kiểm tra hợp lệ của đường dẫn batch, output và lựa chọn."""
 
-        Raises:
-            ValueError: Khi có cài đặt không hợp lệ
-        """
         # Kiểm tra custom batch file nếu có
         custom_path = self.custom_batch_path.text().strip()
         if custom_path and not os.path.exists(custom_path):
@@ -3342,12 +2916,8 @@ class RegistryAnalysisSettingsDialog(QDialog):
             )
 
     def get_selected_batch_files(self):
-        """
-        Lấy danh sách các batch file được chọn
+        """Trả về danh sách tên batch file đang được chọn."""
 
-        Returns:
-            list: Danh sách tên batch file được chọn
-        """
         selected = []
 
         for row in range(self.batch_list.rowCount()):
@@ -3359,12 +2929,8 @@ class RegistryAnalysisSettingsDialog(QDialog):
         return selected
 
     def get_current_settings(self):
-        """
-        Lấy tất cả cài đặt hiện tại từ dialog
+        """Trả về dict cấu hình hiện tại từ dialog."""
 
-        Returns:
-            dict: Dictionary chứa tất cả cài đặt
-        """
         return {
             "batch_files": {
                 "selected": self.get_selected_batch_files(),

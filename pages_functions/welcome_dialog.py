@@ -39,6 +39,7 @@ class RecentCaseDialog(QDialog):
         self.table.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.table.setSelectionMode(QAbstractItemView.SingleSelection)
         self.table.setAlternatingRowColors(True)
+        self.table.setEditTriggers(QAbstractItemView.NoEditTriggers)
 
         # Configure table headers
         header_view = self.table.horizontalHeader()
