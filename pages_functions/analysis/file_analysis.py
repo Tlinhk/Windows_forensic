@@ -122,6 +122,8 @@ class FileAnalysis(QWidget):
             table_files = self.get_ui_component('tableFiles')  # Bảng liệt kê tệp ở thư mục đang xem
             if table_files:
                 table_files.itemSelectionChanged.connect(self.on_file_selected)  # Chọn dòng -> hiển thị chi tiết
+                # Context menu from UI: connect signal to handler
+                table_files.customContextMenuRequested.connect(self.on_files_table_context_menu)
             
             # Search controls
             btn_search = self.get_ui_component('btnSearch')  # Nút tìm kiếm theo từ khóa
@@ -131,6 +133,11 @@ class FileAnalysis(QWidget):
             line_search = self.get_ui_component('lineEditSearch')  # Ô nhập từ khóa tìm kiếm
             if line_search:
                 line_search.returnPressed.connect(self.perform_search)  # Nhấn Enter để tìm
+            
+            # Search results table context menu
+            table_search = self.get_ui_component('tableSearchResults')
+            if table_search:
+                table_search.customContextMenuRequested.connect(self.on_search_table_context_menu)
             
             # Timeline table
             table_timeline = self.get_ui_component('tableTimeline')  # Bảng hiển thị timeline sự kiện
@@ -1076,7 +1083,9 @@ class FileAnalysis(QWidget):
         
         for row, file_info in enumerate(self.file_list):
             # Columns: Name, Size, Modified, Accessed, Created, MFT Modified, Type, Path
-            table_files.setItem(row, 0, QTableWidgetItem(file_info['name']))
+            name_item = QTableWidgetItem(file_info['name'])
+            name_item.setData(Qt.UserRole, file_info)
+            table_files.setItem(row, 0, name_item)
             table_files.setItem(row, 1, QTableWidgetItem(self.format_file_size(file_info['size'])))
             table_files.setItem(row, 2, QTableWidgetItem(file_info['modified']))
             table_files.setItem(row, 3, QTableWidgetItem(file_info['accessed']))
@@ -1463,7 +1472,9 @@ class FileAnalysis(QWidget):
         for row, result in enumerate(self.search_results):
             file_info = result['file_info']
             
-            table_search.setItem(row, 0, QTableWidgetItem(file_info['name']))
+            name_item = QTableWidgetItem(file_info['name'])
+            name_item.setData(Qt.UserRole, file_info)
+            table_search.setItem(row, 0, name_item)
             table_search.setItem(row, 1, QTableWidgetItem(file_info['path']))
             table_search.setItem(row, 2, QTableWidgetItem(str(result['matches'])))
             table_search.setItem(row, 3, QTableWidgetItem(file_info['modified']))
@@ -2084,3 +2095,105 @@ class FileAnalysis(QWidget):
                 "Recovery Error",
                 f"Error recovering file: {str(e)}"
             )
+            
+    # ==============================
+    # Context menu handlers & utils
+    # ==============================
+    def on_files_table_context_menu(self, position):
+        table = self.get_ui_component('tableFiles')
+        if not table:
+            return
+        index = table.indexAt(position)
+        if not index.isValid():
+            return
+        row = index.row()
+        item = table.item(row, 0)
+        file_info = item.data(Qt.UserRole) if item else None
+        if not file_info and 0 <= row < len(self.file_list):
+            file_info = self.file_list[row]
+        if not file_info:
+            return
+
+        menu = QMenu(self)
+        act_view = QAction("View details", self)
+        act_copy = QAction("Copy full path", self)
+        act_export = QAction("Export raw...", self)
+        act_recover = QAction("Recover (deleted)", self)
+        act_recover.setEnabled(bool(file_info.get('deleted')))
+
+        act_view.triggered.connect(lambda: self.show_file_details(file_info))
+        act_copy.triggered.connect(lambda: self.copy_text_to_clipboard(file_info.get('path', '')))
+        act_export.triggered.connect(lambda: self.export_raw_file(file_info))
+        act_recover.triggered.connect(lambda: self.recover_file(file_info))
+
+        menu.addAction(act_view)
+        menu.addSeparator()
+        menu.addAction(act_copy)
+        menu.addAction(act_export)
+        menu.addSeparator()
+        menu.addAction(act_recover)
+
+        menu.exec_(table.viewport().mapToGlobal(position))
+
+    def on_search_table_context_menu(self, position):
+        table = self.get_ui_component('tableSearchResults')
+        if not table:
+            return
+        index = table.indexAt(position)
+        if not index.isValid():
+            return
+        row = index.row()
+        item = table.item(row, 0)
+        file_info = item.data(Qt.UserRole) if item else None
+        if not file_info and 0 <= row < len(self.search_results):
+            file_info = self.search_results[row].get('file_info')
+        if not file_info:
+            return
+
+        menu = QMenu(self)
+        act_view = QAction("View details", self)
+        act_copy = QAction("Copy full path", self)
+        act_export = QAction("Export raw...", self)
+        act_recover = QAction("Recover (deleted)", self)
+        act_recover.setEnabled(bool(file_info.get('deleted')))
+
+        act_view.triggered.connect(lambda: self.show_file_details(file_info))
+        act_copy.triggered.connect(lambda: self.copy_text_to_clipboard(file_info.get('path', '')))
+        act_export.triggered.connect(lambda: self.export_raw_file(file_info))
+        act_recover.triggered.connect(lambda: self.recover_file(file_info))
+
+        menu.addAction(act_view)
+        menu.addSeparator()
+        menu.addAction(act_copy)
+        menu.addAction(act_export)
+        menu.addSeparator()
+        menu.addAction(act_recover)
+
+        menu.exec_(table.viewport().mapToGlobal(position))
+
+    def copy_text_to_clipboard(self, text):
+        clipboard = QApplication.clipboard()
+        clipboard.setText(text or "")
+
+    def export_raw_file(self, file_info):
+        try:
+            if not file_info:
+                return
+            suggest_name = file_info.get('name') or 'export.bin'
+            save_path, _ = QFileDialog.getSaveFileName(
+                self,
+                "Export Raw Content",
+                suggest_name,
+                "All Files (*.*)"
+            )
+            if not save_path:
+                return
+            content = self.extract_raw_file_content(file_info)
+            if content:
+                with open(save_path, 'wb') as f:
+                    f.write(content)
+                QMessageBox.information(self, "Export", f"Exported raw content to:\n{save_path}\nSize: {len(content)} bytes")
+            else:
+                QMessageBox.warning(self, "Export", "No raw content could be extracted for this file.")
+        except Exception as e:
+            QMessageBox.critical(self, "Export Error", f"Error exporting content: {str(e)}")

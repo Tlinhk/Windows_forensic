@@ -188,6 +188,7 @@ class Ui_EvidenceAnalysisWidget(object):
         self.verticalLayout_browser.setContentsMargins(0, 0, 0, 0)
         self.verticalLayout_browser.setObjectName("verticalLayout_browser")
         self.tableFiles = QtWidgets.QTableWidget(self.tabFileBrowser)
+        self.tableFiles.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.tableFiles.setStyleSheet("QTableWidget {\n"
 "    border: none;\n"
 "    gridline-color: #e0e0e0;\n"
@@ -302,6 +303,7 @@ class Ui_EvidenceAnalysisWidget(object):
         self.horizontalLayout_search.addWidget(self.btnSearch)
         self.verticalLayout_search.addWidget(self.searchControlFrame)
         self.tableSearchResults = QtWidgets.QTableWidget(self.tabSearch)
+        self.tableSearchResults.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.tableSearchResults.setStyleSheet("QTableWidget {\n"
 "    border: none;\n"
 "    gridline-color: #e0e0e0;\n"
