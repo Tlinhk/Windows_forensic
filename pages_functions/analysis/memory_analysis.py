@@ -259,6 +259,26 @@ class MemoryAnalysisWindow(QMainWindow):
         else:
             return pretty
 
+    def format_info_output(self, json_data, title: str = "") -> str:
+        """
+        Chuyển json_data của plugin 'info' thành table text:
+        Variable           Value
+        Kernel Base        0xf8000145e000
+        DTB                0x187000
+        ...
+        """
+        # json_data thường là list of dict
+        rows = json_data if isinstance(json_data, list) else json_data.get("data", [])
+        # Tính độ rộng cột Variable
+        max_var = max((len(item.get("Variable", "")) for item in rows), default=8)
+        header = f"{'Variable'.ljust(max_var)}   Value"
+        lines = [header, "-" * len(header)]
+        for item in rows:
+            var = item.get("Variable", "")
+            val = item.get("Value", "")
+            lines.append(f"{var.ljust(max_var)}   {val}")
+        return "\n".join(lines)
+
     def setup_connections(self):
         # Removed browse button connection - no browse button needed
         self.ui.startAnalysisButton.clicked.connect(self.start_analysis)
@@ -385,6 +405,7 @@ class MemoryAnalysisWindow(QMainWindow):
         table.setRowCount(0)
         default_plugins = {
             # Process plugins
+            "info",
             "pslist",
             "pstree",
             "psscan",
@@ -394,6 +415,12 @@ class MemoryAnalysisWindow(QMainWindow):
             "netscan",
             # File plugins
             "filescan",
+            "cmdline",
+            "hashdump",
+            "cachedump",
+            "lsadump",
+            "consoles",
+            "cmdscan",
         }
         for p in self.all_plugins:
             if (
@@ -575,7 +602,10 @@ class MemoryAnalysisWindow(QMainWindow):
         """
         # 1) Chạy plugin
         json_data = run_volatility3_plugin(memory_path, plugin_name)
-
+        if plugin_name == "info":
+            output = self.format_info_output(json_data)
+            self.ui.infoText.setText(output)
+            return
         # 2) Xác định widget đã được define trong .ui
         cat = self.plugin_types.get(
             plugin_name, "Khác"
@@ -602,6 +632,15 @@ class MemoryAnalysisWindow(QMainWindow):
         else:
             # nếu lỗi, đẩy vào customTabWidget
             tabs = getattr(self.ui, "customTabWidget")
+
+        # Check if tab already exists
+        for i in range(tabs.count()):
+            if tabs.tabText(i) == plugin_name:
+                print(
+                    f"DEBUG: Plugin tab '{plugin_name}' already exists, switching to it"
+                )
+                tabs.setCurrentIndex(i)
+                return
 
         # tạo 1 bảng chung
         tab = QWidget()
@@ -630,6 +669,10 @@ class MemoryAnalysisWindow(QMainWindow):
             with open(path, "r", encoding="utf-8") as f:
                 data = json.load(f)
 
+            if plugin == "info":
+                output = self.format_info_output(data)
+                self.ui.infoText.setText(output)
+                continue
             # điền vào widget có sẵn hoặc tạo tab mới
             filled = False
             for suffix, filler in (
@@ -652,13 +695,24 @@ class MemoryAnalysisWindow(QMainWindow):
                     getattr(self.ui, f"{cat}TabWidget", None) or self.ui.customTabWidget
                 )
 
-                page = QWidget()
-                layout = QVBoxLayout(page)
-                tbl = QTableWidget()
-                layout.addWidget(tbl)
-                self.parse_json_to_table(data, tbl)
-                tabw.addTab(page, plugin)
-                tabw.setCurrentIndex(tabw.count() - 1)
+                # Check if tab already exists
+                for i in range(tabw.count()):
+                    if tabw.tabText(i) == plugin:
+                        print(
+                            f"DEBUG: Plugin tab '{plugin}' already exists, switching to it"
+                        )
+                        tabw.setCurrentIndex(i)
+                        filled = True
+                        break
+
+                if not filled:
+                    page = QWidget()
+                    layout = QVBoxLayout(page)
+                    tbl = QTableWidget()
+                    layout.addWidget(tbl)
+                    self.parse_json_to_table(data, tbl)
+                    tabw.addTab(page, plugin)
+                    tabw.setCurrentIndex(tabw.count() - 1)
         self.ui.progressBar.setValue(100)
 
     def start_analysis(self):
@@ -768,9 +822,9 @@ class MemoryAnalysisWindow(QMainWindow):
 
     def mock_reset_ui(self):
         # Reset all result widgets to default/empty
-        self.ui.osVersionValue.setText("-")
-        self.ui.architectureValue.setText("-")
-        self.ui.timestampValue.setText("-")
+        # self.ui.osVersionValue.setText("-")
+        # self.ui.architectureValue.setText("-")
+        # self.ui.timestampValue.setText("-")
         self.ui.pslistTable.setRowCount(0)
         self.ui.malfindText.clear()
         self.ui.netscanTable.setRowCount(0)
@@ -910,6 +964,16 @@ class MemoryAnalysisWindow(QMainWindow):
         print(f"DEBUG: load_case_data called with case_id: {case_id}")
         try:
             from database.db_manager import DatabaseManager
+
+            # Clear all previous results when switching to a new case
+            self.clear_previous_results()
+
+            # Reset UI state for new case
+            self.ui.filePathEdit.clear()
+            self.ui.statusLabel.setText("Status: Ready")
+            self.ui.progressBar.setValue(0)
+            self.current_results_dir = ""
+            self.curren_evidence_type = ""
 
             self.current_case_id = case_id
             db = DatabaseManager()
@@ -1440,13 +1504,9 @@ class MemoryAnalysisWindow(QMainWindow):
             self.ui.runningCommandEdit.setText("Ready to run CDB commands...")
 
     def clear_previous_results(self):
-
-        print("DEBUG: Clearing UI for new file...")
-
-        # Clear CDB result tabs (chỉ UI, không xóa files)
+        # Clear CDB result tabs
         if hasattr(self, "cdb_results_tabwidget") and self.cdb_results_tabwidget:
             self.cdb_results_tabwidget.clear()
-            print("DEBUG: Cleared CDB result tabs")
 
         # Clear running command display
         self.clear_running_command_display()
@@ -1454,15 +1514,126 @@ class MemoryAnalysisWindow(QMainWindow):
         # Clear custom command input
         if hasattr(self.ui, "customCommandEdit"):
             self.ui.customCommandEdit.clear()
-            print("DEBUG: Cleared custom command input")
 
         # Clear custom commands list
         self.custom_commands = []
 
-        # KHÔNG clear current_results_dir - để giữ reference đến files cũ
-        # self.current_results_dir = None  # BỎ DÒNG NÀY
+        # Clear dynamic plugin tabs
+        self.clear_dynamic_plugin_tabs()
 
-        print("DEBUG: UI cleared successfully (files preserved)")
+        # Clear all fixed result widgets
+        self.clear_fixed_result_widgets()
+
+    def clear_fixed_result_widgets(self):
+        """Clear all fixed result widgets that display analysis results"""
+
+        # Clear info text
+        if hasattr(self.ui, "infoText"):
+            self.ui.infoText.clear()
+
+        # Clear process analysis tables
+        if hasattr(self.ui, "pslistTable"):
+            self.ui.pslistTable.setRowCount(0)
+
+        if hasattr(self.ui, "dlllistTable"):
+            self.ui.dlllistTable.setRowCount(0)
+
+        # Clear network table
+        if hasattr(self.ui, "netscanTable"):
+            self.ui.netscanTable.setRowCount(0)
+
+        # Clear file analysis table
+        if hasattr(self.ui, "filescanTable"):
+            self.ui.filescanTable.setRowCount(0)
+
+        # Clear command history text
+        if hasattr(self.ui, "cmdscanText"):
+            self.ui.cmdscanText.clear()
+
+        # Clear credential tables
+        if hasattr(self.ui, "hashdumpTable"):
+            self.ui.hashdumpTable.setRowCount(0)
+
+        # Clear malfind text
+        if hasattr(self.ui, "malfindText"):
+            self.ui.malfindText.clear()
+
+        # Clear hibernation results
+        if hasattr(self.ui, "hibernationResultsText"):
+            self.ui.hibernationResultsText.clear()
+
+        # Clear hibernation info labels
+        hibernation_labels = [
+            "hibernationTypeValue",
+            "compressedSizeValue",
+            "originalSizeValue",
+        ]
+        for label_name in hibernation_labels:
+            if hasattr(self.ui, label_name):
+                getattr(self.ui, label_name).setText("-")
+
+        # Clear pagefile tree
+        if hasattr(self.ui, "pagefiletreeWidget"):
+            self.ui.pagefiletreeWidget.clear()
+
+        # Clear pagefile strings table
+        if hasattr(self.ui, "tableStrings"):
+            self.ui.tableStrings.setRowCount(0)
+
+        # Clear pagefile yara details
+        if hasattr(self.ui, "txtYaraMatches"):
+            self.ui.txtYaraMatches.clear()
+
+        # Clear pagefile carved files list
+        if hasattr(self.ui, "lstCarved"):
+            self.ui.lstCarved.clear()
+
+        # Clear AI results
+        if hasattr(self.ui, "aiResultsText"):
+            self.ui.aiResultsText.clear()
+
+        # Clear log
+        if hasattr(self.ui, "logTextEdit"):
+            self.ui.logTextEdit.clear()
+
+    def clear_dynamic_plugin_tabs(self):
+        """Clear all dynamically created plugin tabs"""
+
+        # List of tabwidgets that might contain dynamic plugin tabs
+        tabwidget_names = [
+            "processTabWidget",
+            "networkTabWidget",
+            "fileTabWidget",
+            "commandTabWidget",
+            "credentialTabWidget",
+            "otherTabWidget",
+        ]
+
+        for tabwidget_name in tabwidget_names:
+            if hasattr(self.ui, tabwidget_name):
+                tabwidget = getattr(self.ui, tabwidget_name)
+                if isinstance(tabwidget, QTabWidget):
+                    # Remove tabs in reverse order to avoid index issues
+                    for i in range(tabwidget.count() - 1, -1, -1):
+                        tab_title = tabwidget.tabText(i)
+                        # Check if this is a dynamic plugin tab (not a predefined tab)
+                        if self.is_dynamic_plugin_tab(tab_title):
+                            tabwidget.removeTab(i)
+
+    def is_dynamic_plugin_tab(self, tab_title):
+        """Check if a tab is a dynamically created plugin tab"""
+        # List of predefined tab titles (not plugin names)
+        predefined_tabs = [
+            "Process List",
+            "DLL List",
+            "Malfind",
+            "Command History",
+            "File Scan",
+            "Password Hashes",
+        ]
+
+        # If tab title is not in predefined list, it's likely a plugin tab
+        return tab_title not in predefined_tabs
 
     def create_cdb_result_tab(self, command, tab_title):
         """Tạo tab mới để hiển thị kết quả CDB"""

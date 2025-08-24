@@ -14,23 +14,75 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_Form(object):
     def setupUi(self, Form):
         Form.setObjectName("Form")
-        Form.resize(1400, 893)
+        Form.resize(1622, 934)
         font = QtGui.QFont()
         font.setPointSize(10)
         Form.setFont(font)
-        self.mainLayout = QtWidgets.QVBoxLayout(Form)
-        self.mainLayout.setContentsMargins(15, 15, 15, 15)
-        self.mainLayout.setSpacing(10)
-        self.mainLayout.setObjectName("mainLayout")
-        self.mainHorizontalLayout = QtWidgets.QHBoxLayout()
-        self.mainHorizontalLayout.setSpacing(15)
-        self.mainHorizontalLayout.setObjectName("mainHorizontalLayout")
-        self.leftColumnLayout = QtWidgets.QVBoxLayout()
-        self.leftColumnLayout.setContentsMargins(10, 15, 10, 10)
-        self.leftColumnLayout.setSpacing(10)
-        self.leftColumnLayout.setObjectName("leftColumnLayout")
+        Form.setStyleSheet(
+            "QWidget {\n"
+            "    background-color: #f8f9fa;\n"
+            "}\n"
+            "\n"
+            "QGroupBox {\n"
+            "    font-weight: bold;\n"
+            "    border: 2px solid #dee2e6;\n"
+            "    border-radius: 8px;\n"
+            "    margin-top: 1ex;\n"
+            "    padding-top: 10px;\n"
+            "    background-color: white;\n"
+            "}\n"
+            "\n"
+            "QGroupBox::title {\n"
+            "    subcontrol-origin: margin;\n"
+            "    left: 10px;\n"
+            "    padding: 0 8px 0 8px;\n"
+            "    color: #495057;\n"
+            "}\n"
+            "\n"
+            "QProgressBar {\n"
+            "    border: 1px solid #dee2e6;\n"
+            "    border-radius: 4px;\n"
+            "    text-align: center;\n"
+            "    background-color: #e9ecef;\n"
+            "}\n"
+            "\n"
+            "QProgressBar::chunk {\n"
+            "    background-color: #28a745;\n"
+            "    border-radius: 3px;\n"
+            "}\n"
+            "\n"
+            "QTextEdit {\n"
+            "    border: 1px solid #ced4da;\n"
+            "    border-radius: 4px;\n"
+            "    padding: 8px;\n"
+            "    background-color: white;\n"
+            "    font-family: 'Consolas', monospace;\n"
+            "}\n"
+            "\n"
+            "QComboBox {\n"
+            "    border: 1px solid #ced4da;\n"
+            "    border-radius: 4px;\n"
+            "    padding: 4px 8px;\n"
+            "    background-color: white;\n"
+            "}\n"
+            "\n"
+            "QLabel {\n"
+            "    color: #495057;\n"
+            "}\n"
+            "\n"
+            "QCheckBox {\n"
+            "    color: #495057;\n"
+            "    spacing: 8px;\n"
+            "}"
+        )
+        self.gridLayout = QtWidgets.QGridLayout(Form)
+        self.gridLayout.setObjectName("gridLayout")
+        self.verticalLayout = QtWidgets.QVBoxLayout()
+        self.verticalLayout.setContentsMargins(10, 15, 10, 10)
+        self.verticalLayout.setSpacing(10)
+        self.verticalLayout.setObjectName("verticalLayout")
         self.acquisitionConfigGroup = QtWidgets.QGroupBox(Form)
-        self.acquisitionConfigGroup.setMinimumSize(QtCore.QSize(450, 0))
+        self.acquisitionConfigGroup.setMinimumSize(QtCore.QSize(450, 120))
         font = QtGui.QFont()
         font.setPointSize(10)
         font.setBold(True)
@@ -38,12 +90,9 @@ class Ui_Form(object):
         self.acquisitionConfigGroup.setFont(font)
         self.acquisitionConfigGroup.setObjectName("acquisitionConfigGroup")
         self.configLayout = QtWidgets.QVBoxLayout(self.acquisitionConfigGroup)
-        self.configLayout.setContentsMargins(15, -1, -1, -1)
+        self.configLayout.setContentsMargins(15, 20, -1, 20)
         self.configLayout.setSpacing(15)
         self.configLayout.setObjectName("configLayout")
-        self.targetSystemLayout = QtWidgets.QHBoxLayout()
-        self.targetSystemLayout.setObjectName("targetSystemLayout")
-        self.configLayout.addLayout(self.targetSystemLayout)
         self.caseInfoLayout = QtWidgets.QHBoxLayout()
         self.caseInfoLayout.setObjectName("caseInfoLayout")
         self.caseIdLabel = QtWidgets.QLabel(self.acquisitionConfigGroup)
@@ -100,10 +149,7 @@ class Ui_Form(object):
         self.browseOutputBtn.setObjectName("browseOutputBtn")
         self.outputDeviceLayout.addWidget(self.browseOutputBtn)
         self.configLayout.addLayout(self.outputDeviceLayout)
-        self.investigatorLayout = QtWidgets.QHBoxLayout()
-        self.investigatorLayout.setObjectName("investigatorLayout")
-        self.configLayout.addLayout(self.investigatorLayout)
-        self.leftColumnLayout.addWidget(self.acquisitionConfigGroup)
+        self.verticalLayout.addWidget(self.acquisitionConfigGroup)
         self.orderOfVolatilityGroup = QtWidgets.QGroupBox(Form)
         sizePolicy = QtWidgets.QSizePolicy(
             QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Expanding
@@ -122,7 +168,7 @@ class Ui_Form(object):
         self.orderOfVolatilityGroup.setFont(font)
         self.orderOfVolatilityGroup.setObjectName("orderOfVolatilityGroup")
         self.volatilityLayout = QtWidgets.QVBoxLayout(self.orderOfVolatilityGroup)
-        self.volatilityLayout.setContentsMargins(15, 30, -1, 10)
+        self.volatilityLayout.setContentsMargins(50, 30, 50, 15)
         self.volatilityLayout.setSpacing(20)
         self.volatilityLayout.setObjectName("volatilityLayout")
         self.ramAcquisitionCheck = QtWidgets.QCheckBox(self.orderOfVolatilityGroup)
@@ -202,26 +248,77 @@ class Ui_Form(object):
         )
         self.volatilityLayout.addItem(spacerItem)
         self.volatilityButtonsLayout = QtWidgets.QHBoxLayout()
+        self.volatilityButtonsLayout.setSpacing(100)
         self.volatilityButtonsLayout.setObjectName("volatilityButtonsLayout")
         self.selectAllBtn = QtWidgets.QPushButton(self.orderOfVolatilityGroup)
+        sizePolicy = QtWidgets.QSizePolicy(
+            QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed
+        )
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.selectAllBtn.sizePolicy().hasHeightForWidth())
+        self.selectAllBtn.setSizePolicy(sizePolicy)
+        self.selectAllBtn.setMinimumSize(QtCore.QSize(0, 0))
+        self.selectAllBtn.setMaximumSize(QtCore.QSize(16777215, 16777215))
         font = QtGui.QFont()
         font.setPointSize(10)
         font.setBold(True)
         font.setWeight(75)
         self.selectAllBtn.setFont(font)
+        self.selectAllBtn.setStyleSheet(
+            "/* QPushButton */\n"
+            "QPushButton {\n"
+            "    background-color: #4a90e2;\n"
+            "    border: none;\n"
+            "    border-radius: 4px;\n"
+            "    padding: 6px 12px;\n"
+            "    color: #fff;\n"
+            "}\n"
+            "QPushButton:hover {\n"
+            "    background-color: #5aa0f2;\n"
+            "}\n"
+            "QPushButton:pressed {\n"
+            "    background-color: #3a7fcc;\n"
+            "}"
+        )
         self.selectAllBtn.setObjectName("selectAllBtn")
         self.volatilityButtonsLayout.addWidget(self.selectAllBtn)
         self.clearAllBtn = QtWidgets.QPushButton(self.orderOfVolatilityGroup)
+        sizePolicy = QtWidgets.QSizePolicy(
+            QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed
+        )
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.clearAllBtn.sizePolicy().hasHeightForWidth())
+        self.clearAllBtn.setSizePolicy(sizePolicy)
+        self.clearAllBtn.setMaximumSize(QtCore.QSize(16777215, 16777215))
         font = QtGui.QFont()
         font.setPointSize(10)
         font.setBold(True)
         font.setWeight(75)
         self.clearAllBtn.setFont(font)
+        self.clearAllBtn.setStyleSheet(
+            "/* QPushButton */\n"
+            "QPushButton {\n"
+            "    background-color: #4a90e2;\n"
+            "    border: none;\n"
+            "    border-radius: 4px;\n"
+            "    padding: 6px 12px;\n"
+            "    color: #fff;\n"
+            "}\n"
+            "QPushButton:hover {\n"
+            "    background-color: #5aa0f2;\n"
+            "}\n"
+            "QPushButton:pressed {\n"
+            "    background-color: #3a7fcc;\n"
+            "}"
+        )
         self.clearAllBtn.setObjectName("clearAllBtn")
         self.volatilityButtonsLayout.addWidget(self.clearAllBtn)
         self.volatilityLayout.addLayout(self.volatilityButtonsLayout)
-        self.leftColumnLayout.addWidget(self.orderOfVolatilityGroup)
+        self.verticalLayout.addWidget(self.orderOfVolatilityGroup)
         self.ramConfigGroup = QtWidgets.QGroupBox(Form)
+        self.ramConfigGroup.setMinimumSize(QtCore.QSize(0, 200))
         font = QtGui.QFont()
         font.setPointSize(9)
         font.setBold(True)
@@ -230,6 +327,7 @@ class Ui_Form(object):
         self.ramConfigGroup.setObjectName("ramConfigGroup")
         self.ramConfigLayout = QtWidgets.QVBoxLayout(self.ramConfigGroup)
         self.ramConfigLayout.setContentsMargins(15, -1, -1, -1)
+        self.ramConfigLayout.setSpacing(15)
         self.ramConfigLayout.setObjectName("ramConfigLayout")
         self.ramFormatLayout = QtWidgets.QHBoxLayout()
         self.ramFormatLayout.setObjectName("ramFormatLayout")
@@ -263,31 +361,56 @@ class Ui_Form(object):
         self.compressRamCheck.setChecked(False)
         self.compressRamCheck.setObjectName("compressRamCheck")
         self.ramConfigLayout.addWidget(self.compressRamCheck)
-        self.leftColumnLayout.addWidget(self.ramConfigGroup)
-        self.startCollectionBtn = QtWidgets.QPushButton(Form)
+        self.horizontalLayout = QtWidgets.QHBoxLayout()
+        self.horizontalLayout.setObjectName("horizontalLayout")
+        spacerItem1 = QtWidgets.QSpacerItem(
+            262, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum
+        )
+        self.horizontalLayout.addItem(spacerItem1)
+        self.startCollectionBtn = QtWidgets.QPushButton(self.ramConfigGroup)
+        sizePolicy = QtWidgets.QSizePolicy(
+            QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed
+        )
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(
+            self.startCollectionBtn.sizePolicy().hasHeightForWidth()
+        )
+        self.startCollectionBtn.setSizePolicy(sizePolicy)
+        self.startCollectionBtn.setMinimumSize(QtCore.QSize(250, 0))
         font = QtGui.QFont()
-        font.setPointSize(-1)
+        font.setPointSize(10)
         font.setBold(True)
         font.setWeight(75)
         self.startCollectionBtn.setFont(font)
+        self.startCollectionBtn.setLayoutDirection(QtCore.Qt.LeftToRight)
         self.startCollectionBtn.setStyleSheet(
+            "/* QPushButton */\n"
             "QPushButton {\n"
-            "    background-color: #dc3545;\n"
-            "    font-size: 17px;\n"
-            "    border: 2px solid #bd2130;\n"
+            "    background-color: #4a90e2;\n"
+            "    border: none;\n"
+            "    border-radius: 4px;\n"
+            "    padding: 6px 12px;\n"
+            "    color: #fff;\n"
             "}\n"
-            "\n"
             "QPushButton:hover {\n"
-            "    background-color: #c82333;\n"
+            "    background-color: #5aa0f2;\n"
             "}\n"
-            "\n"
             "QPushButton:pressed {\n"
-            "    background-color: #bd2130;\n"
+            "    background-color: #3a7fcc;\n"
             "}"
         )
         self.startCollectionBtn.setObjectName("startCollectionBtn")
-        self.leftColumnLayout.addWidget(self.startCollectionBtn)
-        self.mainHorizontalLayout.addLayout(self.leftColumnLayout)
+        self.horizontalLayout.addWidget(self.startCollectionBtn)
+        spacerItem2 = QtWidgets.QSpacerItem(
+            261, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum
+        )
+        self.horizontalLayout.addItem(spacerItem2)
+        self.ramConfigLayout.addLayout(self.horizontalLayout)
+        self.verticalLayout.addWidget(self.ramConfigGroup)
+        self.gridLayout.addLayout(self.verticalLayout, 0, 0, 1, 1)
+        self.verticalLayout_2 = QtWidgets.QVBoxLayout()
+        self.verticalLayout_2.setObjectName("verticalLayout_2")
         self.rightColumnLayout = QtWidgets.QVBoxLayout()
         self.rightColumnLayout.setContentsMargins(10, 15, 10, 10)
         self.rightColumnLayout.setSpacing(10)
@@ -357,10 +480,10 @@ class Ui_Form(object):
         self.elapsedTimeLabel.setFont(font)
         self.elapsedTimeLabel.setObjectName("elapsedTimeLabel")
         self.timeInfoLayout.addWidget(self.elapsedTimeLabel)
-        spacerItem1 = QtWidgets.QSpacerItem(
+        spacerItem3 = QtWidgets.QSpacerItem(
             40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum
         )
-        self.timeInfoLayout.addItem(spacerItem1)
+        self.timeInfoLayout.addItem(spacerItem3)
         self.etaLabel = QtWidgets.QLabel(self.progressGroup)
         font = QtGui.QFont()
         font.setPointSize(10)
@@ -374,10 +497,10 @@ class Ui_Form(object):
         self.ramSizeLabel.setFont(font)
         self.ramSizeLabel.setObjectName("ramSizeLabel")
         self.progressLayout.addWidget(self.ramSizeLabel)
-        spacerItem2 = QtWidgets.QSpacerItem(
+        spacerItem4 = QtWidgets.QSpacerItem(
             20, 20, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding
         )
-        self.progressLayout.addItem(spacerItem2)
+        self.progressLayout.addItem(spacerItem4)
         self.rightColumnLayout.addWidget(self.progressGroup)
         self.evidenceLogGroup = QtWidgets.QGroupBox(Form)
         font = QtGui.QFont()
@@ -401,25 +524,59 @@ class Ui_Form(object):
         self.evidenceControlLayout = QtWidgets.QHBoxLayout()
         self.evidenceControlLayout.setObjectName("evidenceControlLayout")
         self.clearLogBtn = QtWidgets.QPushButton(self.evidenceLogGroup)
+        self.clearLogBtn.setMinimumSize(QtCore.QSize(120, 0))
         font = QtGui.QFont()
         font.setPointSize(10)
         font.setBold(True)
         font.setWeight(75)
         self.clearLogBtn.setFont(font)
+        self.clearLogBtn.setStyleSheet(
+            "/* QPushButton */\n"
+            "QPushButton {\n"
+            "    background-color: #4a90e2;\n"
+            "    border: none;\n"
+            "    border-radius: 4px;\n"
+            "    padding: 6px 12px;\n"
+            "    color: #fff;\n"
+            "}\n"
+            "QPushButton:hover {\n"
+            "    background-color: #5aa0f2;\n"
+            "}\n"
+            "QPushButton:pressed {\n"
+            "    background-color: #3a7fcc;\n"
+            "}"
+        )
         self.clearLogBtn.setObjectName("clearLogBtn")
         self.evidenceControlLayout.addWidget(self.clearLogBtn)
         self.saveLogBtn = QtWidgets.QPushButton(self.evidenceLogGroup)
+        self.saveLogBtn.setMinimumSize(QtCore.QSize(120, 0))
         font = QtGui.QFont()
         font.setPointSize(10)
         font.setBold(True)
         font.setWeight(75)
         self.saveLogBtn.setFont(font)
+        self.saveLogBtn.setStyleSheet(
+            "/* QPushButton */\n"
+            "QPushButton {\n"
+            "    background-color: #4a90e2;\n"
+            "    border: none;\n"
+            "    border-radius: 4px;\n"
+            "    padding: 6px 12px;\n"
+            "    color: #fff;\n"
+            "}\n"
+            "QPushButton:hover {\n"
+            "    background-color: #5aa0f2;\n"
+            "}\n"
+            "QPushButton:pressed {\n"
+            "    background-color: #3a7fcc;\n"
+            "}"
+        )
         self.saveLogBtn.setObjectName("saveLogBtn")
         self.evidenceControlLayout.addWidget(self.saveLogBtn)
-        spacerItem3 = QtWidgets.QSpacerItem(
+        spacerItem5 = QtWidgets.QSpacerItem(
             40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum
         )
-        self.evidenceControlLayout.addItem(spacerItem3)
+        self.evidenceControlLayout.addItem(spacerItem5)
         self.stopCollectionBtn = QtWidgets.QPushButton(self.evidenceLogGroup)
         self.stopCollectionBtn.setEnabled(False)
         font = QtGui.QFont()
@@ -427,12 +584,28 @@ class Ui_Form(object):
         font.setBold(True)
         font.setWeight(75)
         self.stopCollectionBtn.setFont(font)
+        self.stopCollectionBtn.setStyleSheet(
+            "/* QPushButton */\n"
+            "QPushButton {\n"
+            "    background-color: #4a90e2;\n"
+            "    border: none;\n"
+            "    border-radius: 4px;\n"
+            "    padding: 6px 12px;\n"
+            "    color: #fff;\n"
+            "}\n"
+            "QPushButton:hover {\n"
+            "    background-color: #5aa0f2;\n"
+            "}\n"
+            "QPushButton:pressed {\n"
+            "    background-color: #3a7fcc;\n"
+            "}"
+        )
         self.stopCollectionBtn.setObjectName("stopCollectionBtn")
         self.evidenceControlLayout.addWidget(self.stopCollectionBtn)
         self.evidenceLogLayout.addLayout(self.evidenceControlLayout)
         self.rightColumnLayout.addWidget(self.evidenceLogGroup)
-        self.mainHorizontalLayout.addLayout(self.rightColumnLayout)
-        self.mainLayout.addLayout(self.mainHorizontalLayout)
+        self.verticalLayout_2.addLayout(self.rightColumnLayout)
+        self.gridLayout.addLayout(self.verticalLayout_2, 0, 1, 1, 1)
 
         self.retranslateUi(Form)
         self.ramFormatCombo.setCurrentIndex(1)
@@ -442,87 +615,6 @@ class Ui_Form(object):
         _translate = QtCore.QCoreApplication.translate
         Form.setWindowTitle(
             _translate("Form", "Thu thập dữ liệu khả biến - Forensic Live Collection")
-        )
-        Form.setStyleSheet(
-            _translate(
-                "Form",
-                "QWidget {\n"
-                "    background-color: #f8f9fa;\n"
-                "}\n"
-                "\n"
-                "QGroupBox {\n"
-                "    font-weight: bold;\n"
-                "    border: 2px solid #dee2e6;\n"
-                "    border-radius: 8px;\n"
-                "    margin-top: 1ex;\n"
-                "    padding-top: 10px;\n"
-                "    background-color: white;\n"
-                "}\n"
-                "\n"
-                "QGroupBox::title {\n"
-                "    subcontrol-origin: margin;\n"
-                "    left: 10px;\n"
-                "    padding: 0 8px 0 8px;\n"
-                "    color: #495057;\n"
-                "}\n"
-                "\n"
-                "QPushButton {\n"
-                "    background-color: #007bff;\n"
-                "    color: white;\n"
-                "    border: none;\n"
-                "    padding: 8px 16px;\n"
-                "    border-radius: 4px;\n"
-                "    font-weight: bold;\n"
-                "}\n"
-                "\n"
-                "QPushButton:hover {\n"
-                "    background-color: #0056b3;\n"
-                "}\n"
-                "\n"
-                "QPushButton:pressed {\n"
-                "    background-color: #004085;\n"
-                "}\n"
-                "\n"
-                "QPushButton:disabled {\n"
-                "    background-color: #6c757d;\n"
-                "}\n"
-                "\n"
-                "QProgressBar {\n"
-                "    border: 1px solid #dee2e6;\n"
-                "    border-radius: 4px;\n"
-                "    text-align: center;\n"
-                "    background-color: #e9ecef;\n"
-                "}\n"
-                "\n"
-                "QProgressBar::chunk {\n"
-                "    background-color: #28a745;\n"
-                "    border-radius: 3px;\n"
-                "}\n"
-                "\n"
-                "QTextEdit {\n"
-                "    border: 1px solid #ced4da;\n"
-                "    border-radius: 4px;\n"
-                "    padding: 8px;\n"
-                "    background-color: white;\n"
-                "    font-family: 'Consolas', monospace;\n"
-                "}\n"
-                "\n"
-                "QComboBox {\n"
-                "    border: 1px solid #ced4da;\n"
-                "    border-radius: 4px;\n"
-                "    padding: 4px 8px;\n"
-                "    background-color: white;\n"
-                "}\n"
-                "\n"
-                "QLabel {\n"
-                "    color: #495057;\n"
-                "}\n"
-                "\n"
-                "QCheckBox {\n"
-                "    color: #495057;\n"
-                "    spacing: 8px;\n"
-                "}",
-            )
         )
         self.acquisitionConfigGroup.setTitle(_translate("Form", "Cấu hình Thu thập"))
         self.caseIdLabel.setText(_translate("Form", "  Case name:"))
@@ -600,27 +692,10 @@ class Ui_Form(object):
         )
         self.clearLogBtn.setText(_translate("Form", "🗑️ Xóa log"))
         self.saveLogBtn.setText(_translate("Form", "💾 Lưu log"))
-        self.stopCollectionBtn.setStyleSheet(
-            _translate(
-                "Form",
-                "QPushButton {\n"
-                "    background-color: #dc3545;\n"
-                "    font-weight: bold;\n"
-                "}\n"
-                "\n"
-                "QPushButton:hover {\n"
-                "    background-color: #c82333;\n"
-                "}\n"
-                "\n"
-                "QPushButton:pressed {\n"
-                "    background-color: #bd2130;\n"
-                "}",
-            )
-        )
         self.stopCollectionBtn.setText(_translate("Form", "⏹️ DỪNG THU THẬP"))
 
 
-from static import resource_rc
+from static.resource_rc import *
 
 
 if __name__ == "__main__":

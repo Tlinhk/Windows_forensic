@@ -1,8 +1,8 @@
 
 
 
-ChromeCacheView v2.21
-Copyright (c) 2008 - 2020 Nir Sofer
+ChromeCacheView v2.52
+Copyright (c) 2008 - 2025 Nir Sofer
 Web site: https://www.nirsoft.net
 
 
@@ -34,7 +34,7 @@ System Requirements
 
 
 * This utility works on any version of Windows, starting from Windows
-  2000, and up to Windows 7/8/2008/10.
+  2000, and up to Windows 7/8/2008/10/11.
 
 
 
@@ -65,6 +65,90 @@ press F8).
 Versions History
 ================
 
+
+* Version 2.52:
+  o Updated to read the HTTP headers properly in the latest versions
+    of Chrome (Version 132).
+
+* Version 2.51:
+  o Added 'Record Created Time' column.
+
+* Version 2.50:
+  o Updated to read the modified cache structure in the new versions
+    of Chrome.
+  o Fixed to display missing date/time value as empty instead of
+    01/01/1601 in previous versions.
+
+* Version 2.47:
+  o You can now send the data to stdout by specifying empty string as
+    filename, for example:
+    ChromeCacheView.exe /scomma "" | more
+
+* Version 2.46:
+  o Added /Columns command-line option, which allows you to set the
+    columns to display or the columns to export from command-line, for
+    example:
+    ChromeCacheView.exe /Columns "URL,Content Type,File Size,Last
+    Accessed,Server Time"
+
+* Version 2.45:
+  o Updated to work properly in high DPI mode.
+  o The Properties window is now resizable.
+  o Added 'Sort By' toolbar button
+
+* Version 2.41:
+  o Added 'Brave' button to the 'Select Cache Folder' window, which
+    automatically sets the cache folder of Brave Web browser.
+
+* Version 2.40:
+  o Added 'Filename Mode' to the 'Copy Selected Files To...' option.
+    You can choose one of the following modes: 'Based on URL' (Default),
+    Cache Name, Cache Name + Extension.
+  o If you choose the cache name options, the original cache filename
+    is used (it's the name displayed in the 'Cache Name' column).
+  o Added 'Show Milliseconds In Last Accessed Time' option.
+
+* Version 2.36:
+  o Updated to keep the selection and focus after refresh.
+
+* Version 2.35:
+  o Updated the time filter options, and now you can choose to view
+    the cache files in the last xx seconds/minutes/hours.
+
+* Version 2.31:
+  o Fixed to automatically use the Cache_Data subfolder in the new
+    versions of Chrome.
+  o Fixed to automatically detect the last used profile of Chrome,
+    when there are multiple profiles.
+
+* Version 2.30:
+  o Updated the preview pane to display webp image files.
+
+* Version 2.27:
+  o Updated to work properly with the cache partitioning string on
+    the latest versions of Chrome.
+
+* Version 2.26:
+  o Added option to change the sorting column from the menu (View ->
+    Sort By). Like the column header click sorting, if you click again
+    the same sorting menu item, it'll switch between ascending and
+    descending order. Also, if you hold down the shift key while choosing
+    the sort menu item, you'll get a secondary sorting.
+  o Added 'Copy Clicked Cell' option to the right-click context menu,
+    which copies to the clipboard the text of cell that you right-clicked
+    with the mouse.
+
+* Version 2.25:
+  o Updated to work properly with the new cache partitioning of
+    Chrome. (In previous versions, URL was displayed with _dk_ prefix).
+  o Added 2 new columns to display the information of the new cache
+    partitioning feature: 'Web Site' and 'Frame'. These columns display
+    the Web site and the frame that requested to load the specified cache
+    item.
+
+* Version 2.22:
+  o Added 'Align Numeric Columns To Right' option (For 'File Size'
+    and 'URL Length' columns).
 
 * Version 2.21:
   o Added the 'Copy Selected Cache Files To...' option (F4) to the
@@ -299,6 +383,18 @@ Save the list of all cache files into HTML file (Vertical).
 /sxml <Filename>
 Save the list of all cache files to XML file.
 
+/Columns <Comma Delimited Columns List>
+Allows you to set the columns to display or the columns to export from
+command-line. You have to specify the column names, delimited by comma,
+for example:
+ChromeCacheView.exe /scomma c:\temp\cache-list.csv /Columns "URL,Content
+Type,File Size,Last Accessed,Server Time"
+
+You can also specify the column names without space characters, for
+example:
+ChromeCacheView.exe /Columns
+"URL,ContentType,FileSize,LastAccessed,ServerTime"
+
 -folder <Cache Folder>
 Start ChromeCacheView with the specified cache folder.
 
@@ -308,7 +404,7 @@ parameter. In the <URL> parameter, you can specify the URL of the Web
 site (for example: http://www.nirsoft.net) or empty string ("") if you
 want to copy files from all Web sites. In the <Content Type> parameter,
 you can specify full content type (like image/png), partial content type
-(like 'image') or empry string ("") if you want to copy all types of
+(like 'image') or empty string ("") if you want to copy all types of
 files.
 
 /CopyFilesFolder <Folder>
