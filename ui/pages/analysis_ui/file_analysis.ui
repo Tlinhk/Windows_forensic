@@ -433,6 +433,9 @@ QTabBar::tab:selected {
          </property>
          <item>
           <widget class="QTableWidget" name="tableFiles">
+           <property name="contextMenuPolicy">
+            <enum>Qt::CustomContextMenu</enum>
+           </property>
            <property name="styleSheet">
             <string notr="true">QTableWidget {
     border: none;
@@ -641,6 +644,9 @@ QPushButton:hover {
          </item>
          <item>
           <widget class="QTableWidget" name="tableSearchResults">
+           <property name="contextMenuPolicy">
+            <enum>Qt::CustomContextMenu</enum>
+           </property>
            <property name="styleSheet">
             <string notr="true">QTableWidget {
     border: none;
