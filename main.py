@@ -121,7 +121,7 @@ class MyWindow(QMainWindow):
             self.file_btn: ("File", lambda: FileAnalysis(main_window=self)),
             self.metadata_btn: ("Metadata", lambda: MetadataAnalysis()),
             self.eventlog_btn: ("Event Log", lambda: EventlogAnalysis()),
-            self.report_btn: ("Report", lambda: Report()),
+            self.report_btn: ("Report", lambda: Report(main_window=self)),
         }
         ##Show home window when start app
         self.show_case_management_window()
