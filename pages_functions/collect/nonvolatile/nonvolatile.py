@@ -487,9 +487,9 @@ class NonVolatilePage(QtWidgets.QWidget):
             # Điền thông tin cơ bản nếu có
             try:
                 if hasattr(self, "lineEdit_case_id") and self.case_data.get("case_id"):
-                    self.lineEdit_case_id.setText(str(self.case_data["case_id"]))
+                    self.ui.lineEdit_case_id.setText(str(self.case_data["case_id"]))
                 if hasattr(self, "lineEdit_investigator") and self.case_data.get("investigator"):
-                    self.lineEdit_investigator.setText(self.case_data["investigator"])
+                    self.ui.lineEdit_investigator.setText(self.case_data["investigator"])
             except Exception:
                 pass
             # Tự đảm bảo đường dẫn đích
@@ -528,16 +528,12 @@ class NonVolatilePage(QtWidgets.QWidget):
             os.makedirs(triage_dir, exist_ok=True)
             os.makedirs(imaging_dir, exist_ok=True)
 
-            if hasattr(self, "lineEdit_target_destination") and not self.lineEdit_target_destination.text().strip():
-                self.lineEdit_target_destination.setText(triage_dir)
-            if hasattr(self, "lineEdit_module_destination") and (
-                not getattr(self, "lineEdit_module_destination", None)
-                or not self.lineEdit_module_destination.text().strip()
-            ):
-                if hasattr(self, "lineEdit_module_destination"):
-                    self.lineEdit_module_destination.setText(os.path.join(triage_dir, "ModuleOutput"))
-            if hasattr(self, "lineEdit_destination_folder") and not self.lineEdit_destination_folder.text().strip():
-                self.lineEdit_destination_folder.setText(imaging_dir)
+            if hasattr(self.ui, "lineEdit_target_destination") and not self.ui.lineEdit_target_destination.text().strip():
+                self.ui.lineEdit_target_destination.setText(triage_dir)
+            if hasattr(self.ui, "lineEdit_module_destination") and not self.ui.lineEdit_module_destination.text().strip():
+                self.ui.lineEdit_module_destination.setText(os.path.join(triage_dir, "ModuleOutput"))
+            if hasattr(self.ui, "lineEdit_destination_folder") and not self.ui.lineEdit_destination_folder.text().strip():
+                self.ui.lineEdit_destination_folder.setText(imaging_dir)
 
             if hasattr(self, "update_image_path"):
                 self.update_image_path()
@@ -580,17 +576,17 @@ class NonVolatilePage(QtWidgets.QWidget):
         # Tạo label hiển thị dung lượng thiết bị nguồn nếu layout tồn tại
         if hasattr(self.ui, 'gridLayout_device_info'):
             if not hasattr(self, 'label_source_size'):
-                self.label_source_size = QtWidgets.QLabel()
-                self.ui.gridLayout_device_info.addWidget(self.label_source_size, 2, 1)
-            self.label_source_size.setText("Unknown")
+                self.ui.label_source_size = QtWidgets.QLabel()
+                self.ui.gridLayout_device_info.addWidget(self.ui.label_source_size, 2, 1)
+            self.ui.label_source_size.setText("Unknown")
 
         # Tạo label hiển thị đường dẫn xem trước nếu chưa có
         if not hasattr(self, 'label_preview_path'):
-            self.label_preview_path = QtWidgets.QLabel(self)
-            self.label_preview_path.setText("")
+            self.ui.label_preview_path = QtWidgets.QLabel(self)
+            self.ui.label_preview_path.setText("")
             # Thêm label này vào layout phù hợp
             if hasattr(self.ui, 'verticalLayout_image_config'):
-                self.ui.verticalLayout_image_config.addWidget(self.label_preview_path)
+                self.ui.verticalLayout_image_config.addWidget(self.ui.label_preview_path)
         
         # Đặt các giá trị mặc định cho các ô nhập liệu
         # Tạo mã vụ việc mặc định dựa trên ngày giờ hiện tại
@@ -681,13 +677,13 @@ class NonVolatilePage(QtWidgets.QWidget):
         
         # Tùy chọn module source/destination
         if hasattr(self, 'toolButton_module_source'):
-            self.toolButton_module_source.clicked.connect(lambda: self.browse_folder(self.lineEdit_module_source))
+            self.ui.toolButton_module_source.clicked.connect(lambda: self.browse_folder(self.ui.lineEdit_module_source))
         if hasattr(self, 'toolButton_module_destination'):
-            self.toolButton_module_destination.clicked.connect(lambda: self.browse_folder(self.lineEdit_module_destination))
+            self.ui.toolButton_module_destination.clicked.connect(lambda: self.browse_folder(self.ui.lineEdit_module_destination))
         
         # SHA-1 exclusions
         if hasattr(self, 'toolButton_sha1_exclusions'):
-            self.toolButton_sha1_exclusions.clicked.connect(self.browse_sha1_exclusions)
+            self.ui.toolButton_sha1_exclusions.clicked.connect(self.browse_sha1_exclusions)
         
         # Các nút chọn nhanh bộ Target định sẵn
         if hasattr(self.ui, 'toolButton_sans'):
@@ -753,8 +749,8 @@ class NonVolatilePage(QtWidgets.QWidget):
         
         # Debug và export command line
         if hasattr(self, 'lineEdit_command_line'):
-            self.lineEdit_command_line.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
-            self.lineEdit_command_line.customContextMenuRequested.connect(self.show_command_context_menu)
+            self.ui.lineEdit_command_line.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+            self.ui.lineEdit_command_line.customContextMenuRequested.connect(self.show_command_context_menu)
     
     def show_command_context_menu(self, position):
         """Hiển thị context menu cho command line field."""
@@ -764,7 +760,7 @@ class NonVolatilePage(QtWidgets.QWidget):
         save_action = menu.addAction("💾 Save Command to File")
         validate_action = menu.addAction("✅ Validate Command")
         
-        action = menu.exec_(self.lineEdit_command_line.mapToGlobal(position))
+        action = menu.exec_(self.ui.lineEdit_command_line.mapToGlobal(position))
         
         if action == copy_action:
             self.copy_command_to_clipboard()
@@ -775,14 +771,14 @@ class NonVolatilePage(QtWidgets.QWidget):
     
     def copy_command_to_clipboard(self):
         """Copy command line to clipboard."""
-        command = self.lineEdit_command_line.text()
+        command = self.ui.lineEdit_command_line.text()
         if command:
             QtWidgets.QApplication.clipboard().setText(command)
             QtWidgets.QMessageBox.information(self, "Thành công", "Đã copy command line vào clipboard!")
     
     def save_command_to_file(self):
         """Save command line to a batch file."""
-        command = self.lineEdit_command_line.text()
+        command = self.ui.lineEdit_command_line.text()
         if not command:
             QtWidgets.QMessageBox.warning(self, "Lỗi", "Không có command line để lưu!")
             return
@@ -799,7 +795,7 @@ class NonVolatilePage(QtWidgets.QWidget):
                     f.write("@echo off\n")
                     f.write("REM KAPE Command generated by Windows Forensic Tool\n")
                     f.write(f"REM Generated on: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
-                    f.write(f"REM Case ID: {self.lineEdit_case_id.text()}\n")
+                    f.write(f"REM Case ID: {self.ui.lineEdit_case_id.text()}\n")
                     f.write("\n")
                     f.write("REM Change to KAPE directory\n")
                     f.write(f'cd /d "{os.path.dirname(self.kape_exe)}"\n')
@@ -815,7 +811,7 @@ class NonVolatilePage(QtWidgets.QWidget):
     
     def validate_command(self):
         """Validate the current command line."""
-        command = self.lineEdit_command_line.text()
+        command = self.ui.lineEdit_command_line.text()
         if not command:
             QtWidgets.QMessageBox.warning(self, "Lỗi", "Không có command line để validate!")
             return
@@ -1229,21 +1225,21 @@ class NonVolatilePage(QtWidgets.QWidget):
                             size = "Unknown"
                         
                         # Thêm một hàng mới và điền thông tin
-                        row = self.tableWidget_devices.rowCount()
-                        self.tableWidget_devices.insertRow(row)
+                        row = self.ui.tableWidget_devices.rowCount()
+                        self.ui.tableWidget_devices.insertRow(row)
                         
                         display_name = f"{volume_name} ({device_id})" if volume_name else device_id
-                        self.tableWidget_devices.setItem(row, 0, QtWidgets.QTableWidgetItem(display_name))
-                        self.tableWidget_devices.setItem(row, 1, QtWidgets.QTableWidgetItem(filesystem))
-                        self.tableWidget_devices.setItem(row, 2, QtWidgets.QTableWidgetItem(size))
-                        self.tableWidget_devices.setItem(row, 3, QtWidgets.QTableWidgetItem(device_id))
+                        self.ui.tableWidget_devices.setItem(row, 0, QtWidgets.QTableWidgetItem(display_name))
+                        self.ui.tableWidget_devices.setItem(row, 1, QtWidgets.QTableWidgetItem(filesystem))
+                        self.ui.tableWidget_devices.setItem(row, 2, QtWidgets.QTableWidgetItem(size))
+                        self.ui.tableWidget_devices.setItem(row, 3, QtWidgets.QTableWidgetItem(device_id))
                         # Cột 4: Trạng thái mã hóa (đã loại bỏ kiểm tra)
-                        self.tableWidget_devices.setItem(row, 4, QtWidgets.QTableWidgetItem("Unknown"))
+                        self.ui.tableWidget_devices.setItem(row, 4, QtWidgets.QTableWidgetItem("Unknown"))
                         
                         # Tô màu cho ổ C:
                         if device_id == "C:":
                             for col in range(5):
-                                item = self.tableWidget_devices.item(row, col)
+                                item = self.ui.tableWidget_devices.item(row, col)
                                 if item:
                                     item.setBackground(QtGui.QColor(255, 255, 200))
         except Exception as e:
@@ -1423,9 +1419,9 @@ class NonVolatilePage(QtWidgets.QWidget):
                         widget.setEnabled(enabled)
             
             if hasattr(self, 'tableWidget_targets'):
-                self.tableWidget_targets.setEnabled(enabled)
+                self.ui.tableWidget_targets.setEnabled(enabled)
             if hasattr(self, 'lineEdit_targets_search'):
-                self.lineEdit_targets_search.setEnabled(enabled)
+                self.ui.lineEdit_targets_search.setEnabled(enabled)
     
     def toggle_module_options(self, enabled):
         """Bật hoặc tắt các vùng giao diện liên quan đến Modules."""
@@ -1514,12 +1510,12 @@ class NonVolatilePage(QtWidgets.QWidget):
             "", "Text Files (*.txt);;All Files (*)"
         )
         if filename:
-            self.lineEdit_sha1_exclusions.setText(filename)
+            self.ui.lineEdit_sha1_exclusions.setText(filename)
     
     def add_target_variable(self):
         """Thêm biến target vào danh sách để sử dụng với --tvars."""
-        key = self.lineEdit_variable_key.text().strip()
-        value = self.lineEdit_variable_value.text().strip()
+        key = self.ui.lineEdit_variable_key.text().strip()
+        value = self.ui.lineEdit_variable_value.text().strip()
         
         if not key or not value:
             QtWidgets.QMessageBox.warning(self, "Lỗi", "Vui lòng nhập cả key và value!")
@@ -1540,8 +1536,8 @@ class NonVolatilePage(QtWidgets.QWidget):
             f"Danh sách biến hiện tại:\n" + "\n".join(var_list))
         
         # Xóa nội dung sau khi thêm
-        self.lineEdit_variable_key.clear()
-        self.lineEdit_variable_value.clear()
+        self.ui.lineEdit_variable_key.clear()
+        self.ui.lineEdit_variable_value.clear()
     
     def get_variables_string(self, variables_dict):
         """Chuyển đổi dictionary thành string format cho KAPE --tvars/--mvars."""
@@ -1553,29 +1549,29 @@ class NonVolatilePage(QtWidgets.QWidget):
     def filter_targets(self, text):
         """Lọc bảng Targets dựa trên nội dung người dùng nhập vào ô tìm kiếm."""
         # Duyệt qua từng hàng trong bảng
-        for row in range(self.tableWidget_targets.rowCount()):
+        for row in range(self.ui.tableWidget_targets.rowCount()):
             visible = False # Mặc định là ẩn hàng này đi
             # Duyệt qua các cột có chứa text (bỏ qua cột checkbox)
             for col in range(1, 4):
-                item = self.tableWidget_targets.item(row, col)
+                item = self.ui.tableWidget_targets.item(row, col)
                 # Nếu text tìm kiếm (chuyển về chữ thường) có trong nội dung của ô
                 if item and text.lower() in item.text().lower():
                     visible = True # Đặt cờ là sẽ hiển thị hàng này
                     break # Thoát khỏi vòng lặp cột vì đã tìm thấy
             # Ẩn hoặc hiện hàng dựa trên cờ 'visible'
-            self.tableWidget_targets.setRowHidden(row, not visible)
+            self.ui.tableWidget_targets.setRowHidden(row, not visible)
     
     def filter_modules(self, text):
         """Lọc bảng Modules dựa trên nội dung người dùng nhập vào ô tìm kiếm."""
         # Logic hoàn toàn tương tự như filter_targets
-        for row in range(self.tableWidget_modules.rowCount()):
+        for row in range(self.ui.tableWidget_modules.rowCount()):
             visible = False
             for col in range(1, 4):
-                item = self.tableWidget_modules.item(row, col)
+                item = self.ui.tableWidget_modules.item(row, col)
                 if item and text.lower() in item.text().lower():
                     visible = True
                     break
-            self.tableWidget_modules.setRowHidden(row, not visible)
+            self.ui.tableWidget_modules.setRowHidden(row, not visible)
 
     # -----------------------------------------------------
     # 6. XÂY DỰNG LỆNH THU THẬP/IMAGE (BUILD COMMAND LINE)
@@ -1588,12 +1584,12 @@ class NonVolatilePage(QtWidgets.QWidget):
         # Tạo một bản tóm tắt HTML về cấu hình
         summary = self.generate_configuration_summary()
         # Hiển thị bản tóm tắt này trong textBrowser
-        self.textBrowser_summary.setHtml(summary)
+        self.ui.textBrowser_summary.setHtml(summary)
         
         # Xây dựng dòng lệnh tương ứng với cấu hình
         command = self.build_command_line()
         # Hiển thị dòng lệnh trong ô lineEdit
-        self.lineEdit_command_line.setText(' '.join(command))
+        self.ui.lineEdit_command_line.setText(' '.join(command))
     
     def generate_configuration_summary(self):
         """Tạo một chuỗi HTML để tóm tắt tất cả các lựa chọn của người dùng."""
@@ -1603,20 +1599,24 @@ class NonVolatilePage(QtWidgets.QWidget):
         
         # --- Thông tin Vụ việc ---
         html += "<h4>🏷️ Thông tin Vụ việc</h4>"
-        html += f"<b>Mã vụ việc:</b> {self.lineEdit_case_id.text()}<br>"
-        html += f"<b>Điều tra viên:</b> {self.lineEdit_investigator.text()}<br>"
-        html += f"<b>Mô tả:</b> {self.lineEdit_case_description.text()}<br><br>"
+        if hasattr(self.ui, 'lineEdit_case_id'):
+            html += f"<b>Mã vụ việc:</b> {self.ui.lineEdit_case_id.text()}<br>"
+        if hasattr(self.ui, 'lineEdit_investigator'):
+            html += f"<b>Điều tra viên:</b> {self.ui.lineEdit_investigator.text()}<br>"
+        if hasattr(self.ui, 'lineEdit_case_description'):
+            html += f"<b>Mô tả:</b> {self.ui.lineEdit_case_description.text()}<br><br>"
         
         # --- Thiết bị Nguồn ---
         html += "<h4>💾 Thiết bị Nguồn</h4>"
-        current_row = self.tableWidget_devices.currentRow()
-        if current_row >= 0:
-            model = self.tableWidget_devices.item(current_row, 0).text()
-            partition = self.tableWidget_devices.item(current_row, 3).text()
-            size = self.tableWidget_devices.item(current_row, 2).text()
-            html += f"<b>Thiết bị:</b> {model}<br>"
-            html += f"<b>Phân vùng:</b> {partition}<br>"
-            html += f"<b>Dung lượng:</b> {size}<br><br>"
+        if hasattr(self.ui, 'tableWidget_devices'):
+            current_row = self.ui.tableWidget_devices.currentRow()
+            if current_row >= 0:
+                model = self.ui.tableWidget_devices.item(current_row, 0).text()
+                partition = self.ui.tableWidget_devices.item(current_row, 3).text()
+                size = self.ui.tableWidget_devices.item(current_row, 2).text()
+                html += f"<b>Thiết bị:</b> {model}<br>"
+                html += f"<b>Phân vùng:</b> {partition}<br>"
+                html += f"<b>Dung lượng:</b> {size}<br><br>"
         
         # --- Phương pháp Thu thập ---
         html += "<h4>🎯 Phương pháp Thu thập</h4>"
@@ -1624,10 +1624,11 @@ class NonVolatilePage(QtWidgets.QWidget):
             html += "<b>Loại:</b> Thu thập Triage (Nhanh & có Mục tiêu)<br>"
             
             # Liệt kê các Targets và Modules đã chọn
-            if self.checkBox_use_targets.isChecked():
-                selected_targets = [self.tableWidget_targets.item(row, 1).text() 
-                                    for row in range(self.tableWidget_targets.rowCount()) 
-                                    if self.tableWidget_targets.item(row, 0).checkState() == QtCore.Qt.Checked]
+            if hasattr(self.ui, 'checkBox_use_targets') and self.ui.checkBox_use_targets.isChecked():
+                if hasattr(self.ui, 'tableWidget_targets'):
+                    selected_targets = [self.ui.tableWidget_targets.item(row, 1).text() 
+                                        for row in range(self.ui.tableWidget_targets.rowCount()) 
+                                        if self.ui.tableWidget_targets.item(row, 0).checkState() == QtCore.Qt.Checked]
                 html += f"<b>Targets đã chọn:</b> {len(selected_targets)}<br>"
                 # Hiển thị 5 target đầu tiên để tóm tắt
                 if selected_targets:
@@ -1636,11 +1637,12 @@ class NonVolatilePage(QtWidgets.QWidget):
                         html += f"<li>... và {len(selected_targets) - 5} targets khác</li>"
                     html += "</ul>"
 
-            if self.checkBox_use_modules.isChecked():
-                selected_modules = [self.tableWidget_modules.item(row, 1).text() 
-                                    for row in range(self.tableWidget_modules.rowCount()) 
-                                    if self.tableWidget_modules.item(row, 0).checkState() == QtCore.Qt.Checked]
-                html += f"<b>Modules đã chọn:</b> {len(selected_modules)}<br>"
+            if hasattr(self.ui, 'checkBox_use_modules') and self.ui.checkBox_use_modules.isChecked():
+                if hasattr(self.ui, 'tableWidget_modules'):
+                    selected_modules = [self.ui.tableWidget_modules.item(row, 1).text() 
+                                        for row in range(self.ui.tableWidget_modules.rowCount()) 
+                                        if self.ui.tableWidget_modules.item(row, 0).checkState() == QtCore.Qt.Checked]
+                    html += f"<b>Modules đã chọn:</b> {len(selected_modules)}<br>"
         else: # Nếu là Imaging
             html += "<b>Loại:</b> Tạo ảnh Toàn bộ (Toàn diện & An toàn)<br>"
             
@@ -1649,15 +1651,22 @@ class NonVolatilePage(QtWidgets.QWidget):
             html += f"<b>Định dạng:</b> {format_text}<br>"
             
             # Mức độ nén (chỉ áp dụng cho E01/AFF)
-            if format_text != "Raw":
-                html += f"<b>Mức nén:</b> {self.comboBox_compression.currentText()}<br>"
+            if format_text != "Raw" and hasattr(self.ui, 'comboBox_compression'):
+                html += f"<b>Mức nén:</b> {self.ui.comboBox_compression.currentText()}<br>"
             
             # Phân mảnh
-            frag_size = self.spinBox_fragment_size.value()
-            html += f"<b>Phân mảnh:</b> {'Không' if frag_size == 0 else str(frag_size) + ' MB'}<br>"
+            if hasattr(self.ui, 'spinBox_fragment_size'):
+                frag_size = self.ui.spinBox_fragment_size.value()
+                html += f"<b>Phân mảnh:</b> {'Không' if frag_size == 0 else str(frag_size) + ' MB'}<br>"
 
             # Các thuật toán băm đã chọn
-            hashes = [cb.text() for cb in [self.checkBox_md5, self.checkBox_sha1, self.checkBox_sha256] if cb.isChecked()]
+            hashes = []
+            if hasattr(self.ui, 'checkBox_md5') and self.ui.checkBox_md5.isChecked():
+                hashes.append("MD5")
+            if hasattr(self.ui, 'checkBox_sha1') and self.ui.checkBox_sha1.isChecked():
+                hashes.append("SHA1")
+            if hasattr(self.ui, 'checkBox_sha256') and self.ui.checkBox_sha256.isChecked():
+                hashes.append("SHA256")
             html += f"<b>Hash:</b> {', '.join(hashes) if hashes else 'Không'}<br>"
         
         # --- Target Variables (nếu có) ---
@@ -1691,55 +1700,63 @@ class NonVolatilePage(QtWidgets.QWidget):
         cmd = [self.kape_exe]
         
         # === TARGET OPTIONS ===
-        current_row = self.tableWidget_devices.currentRow()
-        if current_row >= 0:
-            # --tsource: Target source drive (C:, D:, F:\ etc)
-            source = self.lineEdit_target_source.text() or self.tableWidget_devices.item(current_row, 3).text().split(',')[0]
-            if not source.endswith(':') and not source.endswith('\\'):
-                source = source + ':'  # Ensure proper drive format
-            cmd.extend(["--tsource", source])
+        if hasattr(self.ui, 'tableWidget_devices'):
+            current_row = self.ui.tableWidget_devices.currentRow()
+            if current_row >= 0:
+                # --tsource: Target source drive (C:, D:, F:\ etc)
+                if hasattr(self.ui, 'lineEdit_target_source'):
+                    source = self.ui.lineEdit_target_source.text() or self.ui.tableWidget_devices.item(current_row, 3).text().split(',')[0]
+                else:
+                    source = self.ui.tableWidget_devices.item(current_row, 3).text().split(',')[0]
+                if not source.endswith(':') and not source.endswith('\\'):
+                    source = source + ':'  # Ensure proper drive format
+                cmd.extend(["--tsource", source])
         
         # --tdest: Destination directory với biến %d (date) và %m (machine) nếu cần
-        tdest = self.lineEdit_target_destination.text().strip() if hasattr(self, "lineEdit_target_destination") else ""
-        if tdest:
-            os.makedirs(tdest, exist_ok=True)
-        target_dest = self.lineEdit_target_destination.text()
-        if hasattr(self, 'checkBox_add_date') and self.checkBox_add_date.isChecked():
+        if hasattr(self.ui, 'lineEdit_target_destination'):
+            tdest = self.ui.lineEdit_target_destination.text().strip()
+            if tdest:
+                os.makedirs(tdest, exist_ok=True)
+            target_dest = self.ui.lineEdit_target_destination.text()
+        else:
+            target_dest = ""
+        if hasattr(self.ui, 'checkBox_add_date') and self.ui.checkBox_add_date.isChecked():
             target_dest = target_dest + "_%d"  # %d = timestamp (yyyyMMddTHHmmss)
-        if hasattr(self, 'checkBox_add_machine') and self.checkBox_add_machine.isChecked():
+        if hasattr(self.ui, 'checkBox_add_machine') and self.ui.checkBox_add_machine.isChecked():
             target_dest = target_dest + "_%m"  # %m = machine name
         cmd.extend(["--tdest", target_dest])
         
         # --target: Target configurations
-        if self.checkBox_use_targets.isChecked():
-            selected = [self.tableWidget_targets.item(row, 1).text() 
-                        for row in range(self.tableWidget_targets.rowCount()) 
-                        if self.tableWidget_targets.item(row, 0).checkState() == QtCore.Qt.Checked]
-            if selected:
-                cmd.extend(["--target", ",".join(selected)])
+        if hasattr(self.ui, 'checkBox_use_targets') and self.ui.checkBox_use_targets.isChecked():
+            if hasattr(self.ui, 'tableWidget_targets'):
+                selected = [self.ui.tableWidget_targets.item(row, 1).text() 
+                            for row in range(self.ui.tableWidget_targets.rowCount()) 
+                            if self.ui.tableWidget_targets.item(row, 0).checkState() == QtCore.Qt.Checked]
+                if selected:
+                    cmd.extend(["--target", ",".join(selected)])
         
         # --tflush: Delete all files in tdest prior to collection
-        if hasattr(self, 'checkBox_flush') and self.checkBox_flush.isChecked():
+        if hasattr(self.ui, 'checkBox_flush') and self.ui.checkBox_flush.isChecked():
             cmd.append("--tflush")
         
         # --tdd: Deduplicate files based on SHA-1 (default is TRUE, so only add if unchecked)
-        if hasattr(self, 'checkBox_deduplicate') and not self.checkBox_deduplicate.isChecked():
+        if hasattr(self.ui, 'checkBox_deduplicate') and not self.ui.checkBox_deduplicate.isChecked():
             # KAPE default is TRUE for deduplication, so we don't need to add --tdd unless we want to disable it
             # But KAPE doesn't have a disable option, so we skip this
             pass
         
         # --vss: Process Volume Shadow Copies
-        if hasattr(self, 'checkBox_process_vscs') and self.checkBox_process_vscs.isChecked():
+        if hasattr(self, 'checkBox_process_vscs') and self.ui.checkBox_process_vscs.isChecked():
             cmd.append("--vss")
         
         # === MODULE OPTIONS ===
-        if self.checkBox_use_modules.isChecked():
-            selected_modules = [self.tableWidget_modules.item(row, 1).text() 
-                              for row in range(self.tableWidget_modules.rowCount()) 
-                              if self.tableWidget_modules.item(row, 0).checkState() == QtCore.Qt.Checked]
+        if self.ui.checkBox_use_modules.isChecked():
+            selected_modules = [self.ui.tableWidget_modules.item(row, 1).text() 
+                              for row in range(self.ui.tableWidget_modules.rowCount()) 
+                              if self.ui.tableWidget_modules.item(row, 0).checkState() == QtCore.Qt.Checked]
             if selected_modules:
                 # --msource: Auto-set to --tdest if not specified
-                module_source = self.lineEdit_module_source.text() if hasattr(self, 'lineEdit_module_source') else ""
+                module_source = self.ui.lineEdit_module_source.text() if hasattr(self, 'lineEdit_module_source') else ""
                 if module_source:
                     cmd.extend(["--msource", module_source])
                 # If not specified, KAPE will auto-set to --tdest
@@ -1748,7 +1765,7 @@ class NonVolatilePage(QtWidgets.QWidget):
                 cmd.extend(["--module", ",".join(selected_modules)])
                 
                 # --mdest: Module output destination
-                module_dest = self.lineEdit_module_destination.text() if hasattr(self, 'lineEdit_module_destination') else ""
+                module_dest = self.ui.lineEdit_module_destination.text() if hasattr(self, 'lineEdit_module_destination') else ""
                 if not module_dest:
                     module_dest = os.path.join(target_dest, "ModuleOutput")
                 cmd.extend(["--mdest", module_dest])
@@ -1764,7 +1781,7 @@ class NonVolatilePage(QtWidgets.QWidget):
         # === CONTAINER OPTIONS ===
         base_name = ""
         if hasattr(self, 'lineEdit_base_name'):
-            base_name = self.lineEdit_base_name.text() or f"KAPE_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+            base_name = self.ui.lineEdit_base_name.text() or f"KAPE_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
         
         if hasattr(self, 'radioButton_vhdx') and self.ui.radioButton_vhdx.isChecked():
             cmd.extend(["--vhdx", base_name])
@@ -1774,15 +1791,15 @@ class NonVolatilePage(QtWidgets.QWidget):
             cmd.extend(["--zip", base_name])
         
         # --zv: Zip the VHD(X) container after creation (default TRUE)
-        if hasattr(self, 'checkBox_zip_container') and not self.checkBox_zip_container.isChecked():
+        if hasattr(self, 'checkBox_zip_container') and not self.ui.checkBox_zip_container.isChecked():
             # KAPE default is TRUE, but we can't disable it with a flag
             # This checkbox probably should control whether we use containers at all
             pass
         
         # === ADVANCED OPTIONS ===
         # --hex: SHA-1 exclusion file
-        if hasattr(self, 'lineEdit_sha1_exclusions') and self.lineEdit_sha1_exclusions.text():
-            cmd.extend(["--hex", self.lineEdit_sha1_exclusions.text()])
+        if hasattr(self, 'lineEdit_sha1_exclusions') and self.ui.lineEdit_sha1_exclusions.text():
+            cmd.extend(["--hex", self.ui.lineEdit_sha1_exclusions.text()])
         
         # --tvars: Target variables (key:value pairs separated by ^)
         tvars_string = self.get_variables_string(self.target_variables)
@@ -1801,13 +1818,13 @@ class NonVolatilePage(QtWidgets.QWidget):
     
     def build_imaging_command(self):
         """Xây dựng lệnh imaging với kiểm tra thiết bị cải thiện."""
-        current_row = self.tableWidget_devices.currentRow()
+        current_row = self.ui.tableWidget_devices.currentRow()
         if current_row < 0: 
             return ["echo", "Chưa chọn thiết bị"]
         
         # Lấy device ID một cách thông minh hơn
         device_id = None
-        model_text = self.tableWidget_devices.item(current_row, 0).text()
+        model_text = self.ui.tableWidget_devices.item(current_row, 0).text()
         
         # Tìm physical drive pattern
         match = re.search(r'(\\\\\.\\PHYSICALDRIVE\d+)', model_text, re.IGNORECASE)
@@ -1815,7 +1832,7 @@ class NonVolatilePage(QtWidgets.QWidget):
             device_id = match.group(1)
         else:
             # Fallback: sử dụng partition từ cột 3
-            partitions = self.tableWidget_devices.item(current_row, 3).text()
+            partitions = self.ui.tableWidget_devices.item(current_row, 3).text()
             if partitions and ':' in partitions:
                 # Convert drive letter to physical drive
                 device_id = self.get_physical_drive_from_letter(partitions.split(',')[0])
@@ -1848,8 +1865,8 @@ class NonVolatilePage(QtWidgets.QWidget):
         ewf_path = os.path.join(self.tools_dir, "ewftools-x64", "ewfacquire.exe")
         
         # Lấy đường dẫn và tên file từ giao diện
-        output_dir = self.lineEdit_destination_folder.text()
-        filename = self.lineEdit_image_filename.text()
+        output_dir = self.ui.lineEdit_destination_folder.text()
+        filename = self.ui.lineEdit_image_filename.text()
         output_path = os.path.join(output_dir, filename)
         
         # Khởi tạo lệnh cơ bản
@@ -1863,27 +1880,27 @@ class NonVolatilePage(QtWidgets.QWidget):
         ]
 
         # Thêm thông tin vụ việc
-        if self.lineEdit_case_id.text(): cmd.extend(["-C", self.lineEdit_case_id.text()])
-        if self.lineEdit_case_description.text(): cmd.extend(["-D", self.lineEdit_case_description.text()])
-        if self.lineEdit_investigator.text(): cmd.extend(["-e", self.lineEdit_investigator.text()])
+        if self.ui.lineEdit_case_id.text(): cmd.extend(["-C", self.ui.lineEdit_case_id.text()])
+        if self.ui.lineEdit_case_description.text(): cmd.extend(["-D", self.ui.lineEdit_case_description.text()])
+        if self.ui.lineEdit_investigator.text(): cmd.extend(["-e", self.ui.lineEdit_investigator.text()])
 
         # Thêm mức độ nén
         compression_map = {0: "none", 1: "fast", 2: "best"}
-        compression_level = compression_map.get(self.comboBox_compression.currentIndex(), "fast")
+        compression_level = compression_map.get(self.ui.comboBox_compression.currentIndex(), "fast")
         if compression_level != "none":
              cmd.extend(["-c", compression_level])
 
         # Thêm kích thước phân mảnh (segment size)
-        frag_size = self.spinBox_fragment_size.value()
+        frag_size = self.ui.spinBox_fragment_size.value()
         if frag_size > 0:
             segment_bytes = frag_size * 1024 * 1024 # Chuyển từ MB sang bytes
             cmd.extend(["-S", str(segment_bytes)])
 
         # Thêm các tùy chọn băm
         hashes = []
-        if self.checkBox_md5.isChecked(): hashes.append("md5")
-        if self.checkBox_sha1.isChecked(): hashes.append("sha1")
-        if self.checkBox_sha256.isChecked(): hashes.append("sha256")
+        if self.ui.checkBox_md5.isChecked(): hashes.append("md5")
+        if self.ui.checkBox_sha1.isChecked(): hashes.append("sha1")
+        if self.ui.checkBox_sha256.isChecked(): hashes.append("sha256")
         if hashes:
             cmd.extend(["-d", ",".join(hashes)])
 
@@ -1896,14 +1913,14 @@ class NonVolatilePage(QtWidgets.QWidget):
         """Xây dựng dòng lệnh để tạo ảnh RAW bằng công cụ dc3dd."""
         # Đường dẫn file ảnh đầu ra
         output_path = os.path.join(
-            self.lineEdit_destination_folder.text(),
-            self.lineEdit_image_filename.text() + ".dd" # Thêm đuôi .dd cho ảnh RAW
+            self.ui.lineEdit_destination_folder.text(),
+            self.ui.lineEdit_image_filename.text() + ".dd" # Thêm đuôi .dd cho ảnh RAW
         )
         
         # Đường dẫn file log
         log_path = os.path.join(
-            self.lineEdit_destination_folder.text(),
-            self.lineEdit_image_filename.text() + "_dc3dd.log"
+            self.ui.lineEdit_destination_folder.text(),
+            self.ui.lineEdit_image_filename.text() + "_dc3dd.log"
         )
         
         # Xây dựng lệnh dc3dd cơ bản
@@ -1916,18 +1933,18 @@ class NonVolatilePage(QtWidgets.QWidget):
         ]
         
         # Thêm các tùy chọn hash nếu được chọn
-        if self.checkBox_md5.isChecked():
+        if self.ui.checkBox_md5.isChecked():
             cmd.append("hash=md5")
-        if self.checkBox_sha1.isChecked():
+        if self.ui.checkBox_sha1.isChecked():
             cmd.append("hash=sha1")
-        if self.checkBox_sha256.isChecked():
+        if self.ui.checkBox_sha256.isChecked():
             cmd.append("hash=sha256")
             
         # Thêm log file để lưu thông tin
         cmd.append(f"log={log_path}")
         
         # Thêm tùy chọn phân mảnh nếu cần
-        frag_size = self.spinBox_fragment_size.value()
+        frag_size = self.ui.spinBox_fragment_size.value()
         if frag_size > 0:
             # dc3dd sử dụng ofsz= cho output file size khi dùng với ofs=
             # Nhưng với of= đơn lẻ, ta cần split thủ công sau
@@ -1968,15 +1985,15 @@ class NonVolatilePage(QtWidgets.QWidget):
         """Handle image format selection change"""
         # Enable/disable compression options based on format
         use_compression = self.ui.radioButton_e01.isChecked() or self.ui.radioButton_aff.isChecked()
-        self.comboBox_compression.setEnabled(use_compression)
+        self.ui.comboBox_compression.setEnabled(use_compression)
         
         # Update UI based on format
         if self.ui.radioButton_raw.isChecked():
             # Raw format doesn't support compression or encryption
-            self.checkBox_ad_encryption.setEnabled(False)
-            self.checkBox_ad_encryption.setChecked(False)
+            self.ui.checkBox_ad_encryption.setEnabled(False)
+            self.ui.checkBox_ad_encryption.setChecked(False)
         else:
-            self.checkBox_ad_encryption.setEnabled(True)
+            self.ui.checkBox_ad_encryption.setEnabled(True)
         
         # Update overview if we're on that page
         if self.current_step == 3:
@@ -2026,7 +2043,7 @@ class NonVolatilePage(QtWidgets.QWidget):
                     1: 0.7,   # Nén nhanh: Ước tính còn ~70%
                     2: 0.5    # Nén tốt nhất: Ước tính còn ~50%
                 }
-                compression_factor = compression_map.get(self.comboBox_compression.currentIndex(), 1.01)
+                compression_factor = compression_map.get(self.ui.comboBox_compression.currentIndex(), 1.01)
                 required_space = source_size * compression_factor
 
             # Chuyển đổi sang đơn vị GB để hiển thị cho người dùng
@@ -2073,16 +2090,16 @@ class NonVolatilePage(QtWidgets.QWidget):
         Hàm thử nhiều cách để có được thông tin này.
         """
         try:
-            current_row = self.tableWidget_devices.currentRow()
+            current_row = self.ui.tableWidget_devices.currentRow()
             if current_row >= 0:
                 # Cách 1: Thử lấy từ cột "Kích thước" trong bảng (nhanh nhất)
-                size_text = self.tableWidget_devices.item(current_row, 2).text()
+                size_text = self.ui.tableWidget_devices.item(current_row, 2).text()
                 if size_text and "GB" in size_text:
                     size_gb = float(size_text.replace("GB", "").strip())
                     return int(size_gb * 1024 * 1024 * 1024)
                 
                 # Cách 2: Nếu cách 1 thất bại, thử truy vấn lại bằng WMI (chính xác)
-                device_id_wmi = self.tableWidget_devices.item(current_row, 0).text() # Lấy DeviceID từ cột Model
+                device_id_wmi = self.ui.tableWidget_devices.item(current_row, 0).text() # Lấy DeviceID từ cột Model
                 match = re.search(r'(\\\\\.\\[A-Za-z0-9]+)', device_id_wmi)
                 if WMI_AVAILABLE and match:
                     c = wmi.WMI()
@@ -2090,7 +2107,7 @@ class NonVolatilePage(QtWidgets.QWidget):
                         return int(disk.Size) # Trả về kích thước chính xác từ WMI
                 
                 # Cách 3: Dùng win32file để mở thiết bị và lấy kích thước (cấp thấp)
-                device_id_raw = self.tableWidget_devices.item(current_row, 3).text().split(',')[0]
+                device_id_raw = self.ui.tableWidget_devices.item(current_row, 3).text().split(',')[0]
                 if WIN32_AVAILABLE and device_id_raw.startswith("\\\\.\\"):
                     try:
                         hDevice = win32file.CreateFile(device_id_raw, win32file.GENERIC_READ,
@@ -2117,25 +2134,25 @@ class NonVolatilePage(QtWidgets.QWidget):
         Hàm này được gọi khi người dùng chuyển đến trang 5.
         """
         # Bật các nút điều khiển quá trình thu thập
-        self.pushButton_pause.setEnabled(False) # Tạm thời vô hiệu hóa cho đến khi bắt đầu
-        self.pushButton_stop.setEnabled(False)
-        self.pushButton_save_log.setEnabled(True)
+        self.ui.pushButton_pause.setEnabled(False) # Tạm thời vô hiệu hóa cho đến khi bắt đầu
+        self.ui.pushButton_stop.setEnabled(False)
+        self.ui.pushButton_save_log.setEnabled(True)
         
         # Reset lại các hiển thị tiến trình và log
-        self.progressBar.setValue(0)
-        self.label_errors_val.setText("0")
-        self.textBrowser_log.clear()
+        self.ui.progressBar.setValue(0)
+        self.ui.label_errors_val.setText("0")
+        self.ui.textBrowser_log.clear()
         
         # Hiển thị tóm tắt cấu hình trong cửa sổ log để người dùng biết sắp làm gì
         if self.ui.radioButton_triage.isChecked():
-            self.textBrowser_log.append("<b>✅ Sẵn sàng thu thập Triage</b>")
+            self.ui.textBrowser_log.append("<b>✅ Sẵn sàng thu thập Triage</b>")
         else: # Imaging mode
-            self.textBrowser_log.append("<b>✅ Sẵn sàng tạo Image</b>")
+            self.ui.textBrowser_log.append("<b>✅ Sẵn sàng tạo Image</b>")
             
         # Hiển thị dòng lệnh sẽ được thực thi
         command = self.build_command_line()
-        self.textBrowser_log.append(f"<br><b>Lệnh sẽ chạy:</b><pre>{' '.join(command)}</pre>")
-        self.textBrowser_log.append("\nNhấn 'Bắt đầu Thu thập' để thực thi.")
+        self.ui.textBrowser_log.append(f"<br><b>Lệnh sẽ chạy:</b><pre>{' '.join(command)}</pre>")
+        self.ui.textBrowser_log.append("\nNhấn 'Bắt đầu Thu thập' để thực thi.")
 
 
     def start_collection(self):
@@ -2150,13 +2167,13 @@ class NonVolatilePage(QtWidgets.QWidget):
             return
 
         # 2. Kiểm tra các lựa chọn cơ bản
-        current_row = self.tableWidget_devices.currentRow()
+        current_row = self.ui.tableWidget_devices.currentRow()
         if current_row < 0:
             QtWidgets.QMessageBox.warning(self, "Lỗi", "Vui lòng chọn thiết bị nguồn!")
             return
         
         # Reset UI cho quá trình mới
-        self.progressBar.setValue(0)
+        self.ui.progressBar.setValue(0)
         self.start_time = time.time()
         # Khởi tạo và bắt đầu timer cập nhật tiến độ mỗi giây
         self.update_timer = QtCore.QTimer(self)
@@ -2176,7 +2193,7 @@ class NonVolatilePage(QtWidgets.QWidget):
                 return
             
             # Kiểm tra xem ổ đích có đủ dung lượng không
-            if not self.check_disk_space(self.lineEdit_destination_folder.text(), source_size):
+            if not self.check_disk_space(self.ui.lineEdit_destination_folder.text(), source_size):
                 self.update_timer.stop()
                 return # Dừng lại nếu không đủ dung lượng
 
@@ -2187,13 +2204,13 @@ class NonVolatilePage(QtWidgets.QWidget):
         try:
             cmd = self.build_command_line() # Lấy dòng lệnh đã được xây dựng
             
-            self.textBrowser_log.clear()
-            self.textBrowser_log.append("<b>🚀 Bắt đầu thu thập KAPE...</b>")
-            self.textBrowser_log.append(f"<b>Lệnh:</b> {' '.join(cmd)}")
+            self.ui.textBrowser_log.clear()
+            self.ui.textBrowser_log.append("<b>🚀 Bắt đầu thu thập KAPE...</b>")
+            self.ui.textBrowser_log.append(f"<b>Lệnh:</b> {' '.join(cmd)}")
             # Đảm bảo thư mục tdest tồn tại trước khi chạy
             try:
                 if hasattr(self, 'lineEdit_target_destination'):
-                    tdest = self.lineEdit_target_destination.text().strip()
+                    tdest = self.ui.lineEdit_target_destination.text().strip()
                     if tdest:
                         os.makedirs(tdest, exist_ok=True)
             except Exception:
@@ -2212,10 +2229,10 @@ class NonVolatilePage(QtWidgets.QWidget):
             self.kape_process.start(cmd[0], cmd[1:]) # Bắt đầu tiến trình
             
             # Cập nhật trạng thái các nút
-            self.pushButton_start.setEnabled(False)
-            self.pushButton_previous.setEnabled(False)
-            self.pushButton_pause.setEnabled(True)
-            self.pushButton_stop.setEnabled(True)
+            self.ui.pushButton_start.setEnabled(False)
+            self.ui.pushButton_previous.setEnabled(False)
+            self.ui.pushButton_pause.setEnabled(True)
+            self.ui.pushButton_stop.setEnabled(True)
         except Exception as e:
             QtWidgets.QMessageBox.critical(self, "Lỗi", f"Không thể bắt đầu KAPE: {str(e)}")
             self.update_timer.stop()
@@ -2224,12 +2241,12 @@ class NonVolatilePage(QtWidgets.QWidget):
         """Bắt đầu quá trình tạo ảnh đĩa (EWF hoặc RAW)."""
         try:
             cmd = self.build_command_line()
-            output_dir = self.lineEdit_destination_folder.text()
+            output_dir = self.ui.lineEdit_destination_folder.text()
             os.makedirs(output_dir, exist_ok=True) # Tạo thư mục đích nếu chưa có
 
-            self.textBrowser_log.clear()
-            self.textBrowser_log.append("<b>🚀 Bắt đầu tạo ảnh...</b>")
-            self.textBrowser_log.append(f"<b>Lệnh:</b> {' '.join(cmd)}")
+            self.ui.textBrowser_log.clear()
+            self.ui.textBrowser_log.append("<b>🚀 Bắt đầu tạo ảnh...</b>")
+            self.ui.textBrowser_log.append(f"<b>Lệnh:</b> {' '.join(cmd)}")
             
             # Thiết lập và chạy QProcess cho công cụ tạo ảnh
             self.imaging_process = QtCore.QProcess(self)
@@ -2241,10 +2258,10 @@ class NonVolatilePage(QtWidgets.QWidget):
             self.imaging_active = True
 
             # Cập nhật trạng thái các nút
-            self.pushButton_start.setEnabled(False)
-            self.pushButton_previous.setEnabled(False)
-            self.pushButton_pause.setEnabled(True)
-            self.pushButton_stop.setEnabled(True)
+            self.ui.pushButton_start.setEnabled(False)
+            self.ui.pushButton_previous.setEnabled(False)
+            self.ui.pushButton_pause.setEnabled(True)
+            self.ui.pushButton_stop.setEnabled(True)
         except Exception as e:
             QtWidgets.QMessageBox.critical(self, "Lỗi", f"Không thể bắt đầu tạo ảnh: {str(e)}")
             self.update_timer.stop()
@@ -2253,34 +2270,34 @@ class NonVolatilePage(QtWidgets.QWidget):
         """Xử lý output từ tiến trình KAPE đang chạy."""
         if hasattr(self, 'kape_process') and self.kape_process:
             output = self.kape_process.readAllStandardOutput().data().decode('utf-8', errors='ignore')
-            self.textBrowser_log.append(output)
+            self.ui.textBrowser_log.append(output)
             
             # Dùng regex để tìm phần trăm tiến độ trong output của KAPE
             match = re.search(r'Progress:\s*(\d+)%', output)
             if match:
                 progress = int(match.group(1))
-                self.progressBar.setValue(progress)
+                self.ui.progressBar.setValue(progress)
 
     def kape_process_finished(self, exit_code, exit_status):
         """Slot được gọi khi tiến trình KAPE kết thúc."""
         if hasattr(self, 'update_timer'): self.update_timer.stop() # Dừng timer cập nhật
         if exit_code == 0:
-            self.textBrowser_log.append("<b>✅ Thu thập KAPE hoàn tất thành công!</b>")
-            self.progressBar.setValue(100)
+            self.ui.textBrowser_log.append("<b>✅ Thu thập KAPE hoàn tất thành công!</b>")
+            self.ui.progressBar.setValue(100)
         else:
-            self.textBrowser_log.append(f"<b>❌ Thu thập KAPE thất bại với mã lỗi: {exit_code}</b>")
+            self.ui.textBrowser_log.append(f"<b>❌ Thu thập KAPE thất bại với mã lỗi: {exit_code}</b>")
         
         # Reset trạng thái các nút
-        self.pushButton_start.setEnabled(True)
-        self.pushButton_previous.setEnabled(True)
-        self.pushButton_pause.setEnabled(False)
-        self.pushButton_stop.setEnabled(False)
+        self.ui.pushButton_start.setEnabled(True)
+        self.ui.pushButton_previous.setEnabled(True)
+        self.ui.pushButton_pause.setEnabled(False)
+        self.ui.pushButton_stop.setEnabled(False)
         # Thông báo wizard (nếu đang chạy workflow) để auto ghi artifact vào DB
         try:
             if hasattr(self, 'wizard_reference'):
                 tdest = ''
                 try:
-                    tdest = self.lineEdit_target_destination.text().strip()
+                    tdest = self.ui.lineEdit_target_destination.text().strip()
                 except Exception:
                     pass
                 self.wizard_reference.wizard_collection_finished(
@@ -2296,7 +2313,7 @@ class NonVolatilePage(QtWidgets.QWidget):
         if hasattr(self, "wizard_reference"):
             tdest = ""
             try:
-                tdest = self.lineEdit_target_destination.text().strip()
+                tdest = self.ui.lineEdit_target_destination.text().strip()
             except Exception:
                 pass
             self.wizard_reference.wizard_collection_finished(
@@ -2311,37 +2328,37 @@ class NonVolatilePage(QtWidgets.QWidget):
         if self.start_time is None: return
 
         elapsed = time.time() - self.start_time
-        self.label_time_elapsed_val.setText(time.strftime("%H:%M:%S", time.gmtime(elapsed)))
+        self.ui.label_time_elapsed_val.setText(time.strftime("%H:%M:%S", time.gmtime(elapsed)))
         
-        progress = self.progressBar.value()
+        progress = self.ui.progressBar.value()
         # Tính toán thời gian dự kiến hoàn thành (ETA)
         if progress > 0 and elapsed > 1: # Cần có tiến độ và thời gian trôi qua để tính
             total_time_estimated = (elapsed / progress) * 100
             remaining_time = total_time_estimated - elapsed
             if remaining_time > 0:
-                self.label_eta_val.setText(time.strftime("%H:%M:%S", time.gmtime(remaining_time)))
+                self.ui.label_eta_val.setText(time.strftime("%H:%M:%S", time.gmtime(remaining_time)))
 
     def imaging_process_finished(self, exit_code, exit_status):
         """Slot được gọi khi tiến trình tạo ảnh kết thúc."""
         if hasattr(self, 'update_timer'): self.update_timer.stop()
         self.imaging_active = False
         if exit_code == 0:
-            self.textBrowser_log.append("<b>✅ Tạo ảnh hoàn tất thành công!</b>")
-            self.progressBar.setValue(100)
+            self.ui.textBrowser_log.append("<b>✅ Tạo ảnh hoàn tất thành công!</b>")
+            self.ui.progressBar.setValue(100)
         else:
-            self.textBrowser_log.append(f"<b>❌ Tạo ảnh thất bại với mã lỗi: {exit_code}</b>")
+            self.ui.textBrowser_log.append(f"<b>❌ Tạo ảnh thất bại với mã lỗi: {exit_code}</b>")
         
         # Reset trạng thái các nút
-        self.pushButton_start.setEnabled(True)
-        self.pushButton_previous.setEnabled(True)
-        self.pushButton_pause.setEnabled(False)
-        self.pushButton_stop.setEnabled(False)
+        self.ui.pushButton_start.setEnabled(True)
+        self.ui.pushButton_previous.setEnabled(True)
+        self.ui.pushButton_pause.setEnabled(False)
+        self.ui.pushButton_stop.setEnabled(False)
 
         # Thông báo wizard (nếu có) với thư mục lưu ảnh
         if hasattr(self, "wizard_reference"):
             out_dir = ""
             try:
-                out_dir = self.lineEdit_destination_folder.text().strip()
+                out_dir = self.ui.lineEdit_destination_folder.text().strip()
             except Exception:
                 pass
             self.wizard_reference.wizard_collection_finished(
@@ -2368,19 +2385,19 @@ class NonVolatilePage(QtWidgets.QWidget):
                     total_bytes = self.get_device_size()
                     if total_bytes > 0:
                         progress = (bytes_copied / total_bytes) * 100
-                        self.progressBar.setValue(int(progress))
+                        self.ui.progressBar.setValue(int(progress))
                         copied_gb = bytes_copied / (1024**3)
                         total_gb = total_bytes / (1024**3)
-                        self.label_source_progress_val.setText(f"{copied_gb:.1f} GB / {total_gb:.1f} GB")
+                        self.ui.label_source_progress_val.setText(f"{copied_gb:.1f} GB / {total_gb:.1f} GB")
                 
                 # Ghi log output
                 if output.strip():
-                    self.textBrowser_log.append(output.strip())
+                    self.ui.textBrowser_log.append(output.strip())
             else:
                 # ewfacquire xuất log dạng JSON, tìm các key quan trọng
                 if "acquiry_percentage" in output:
                     match = re.search(r'acquiry_percentage:\s*(\d+)', output)
-                    if match: self.progressBar.setValue(int(match.group(1)))
+                    if match: self.ui.progressBar.setValue(int(match.group(1)))
             # Có thể parse thêm các thông tin khác như tốc độ, dung lượng đã đọc...
 
     def handle_imaging_stderr(self):
@@ -2401,20 +2418,20 @@ class NonVolatilePage(QtWidgets.QWidget):
                     total_bytes = self.get_device_size()
                     if total_bytes > 0:
                         progress = (bytes_copied / total_bytes) * 100
-                        self.progressBar.setValue(int(progress))
+                        self.ui.progressBar.setValue(int(progress))
                 elif match_mb:
                     mb_copied = int(match_mb.group(1))
-                    self.label_source_progress_val.setText(f"{mb_copied/1024:.1f} GB copied")
+                    self.ui.label_source_progress_val.setText(f"{mb_copied/1024:.1f} GB copied")
                 
                 # Tìm tốc độ nếu có
                 speed_match = re.search(r'([\d\.]+)\s+MB/s', error_output)
                 if speed_match:
                     speed_mbs = float(speed_match.group(1))
-                    self.label_speed_val.setText(f"{speed_mbs:.1f} MB/s")
+                    self.ui.label_speed_val.setText(f"{speed_mbs:.1f} MB/s")
                     
                 # Ghi log
                 if error_output.strip():
-                    self.textBrowser_log.append(error_output.strip())
+                    self.ui.textBrowser_log.append(error_output.strip())
             else:
                 # Xử lý cho dd thông thường (nếu có)
                 # Dùng regex để phân tích dòng tiến độ của 'dd'
@@ -2426,14 +2443,14 @@ class NonVolatilePage(QtWidgets.QWidget):
                     total_bytes = self.get_device_size()
                     if total_bytes > 0:
                         progress = (bytes_copied / total_bytes) * 100
-                        self.progressBar.setValue(int(progress))
+                        self.ui.progressBar.setValue(int(progress))
                         copied_gb = bytes_copied / (1024**3)
                         total_gb = total_bytes / (1024**3)
-                        self.label_source_progress_val.setText(f"{copied_gb:.1f} GB / {total_gb:.1f} GB")
-                        self.label_speed_val.setText(f"{speed_mbs:.1f} MB/s")
+                        self.ui.label_source_progress_val.setText(f"{copied_gb:.1f} GB / {total_gb:.1f} GB")
+                        self.ui.label_speed_val.setText(f"{speed_mbs:.1f} MB/s")
                 elif error_output.strip():
                     # Nếu không phải dòng tiến độ, in ra như một lỗi
-                    self.textBrowser_log.append(f"<span style='color: red;'>{error_output}</span>")
+                    self.ui.textBrowser_log.append(f"<span style='color: red;'>{error_output}</span>")
 
     def pause_collection(self):
         """
@@ -2447,7 +2464,7 @@ class NonVolatilePage(QtWidgets.QWidget):
             process = self.imaging_process
 
         if not process:
-            self.textBrowser_log.append("<b>⚠️ Không tìm thấy tiến trình đang chạy để tạm dừng.</b>")
+            self.ui.textBrowser_log.append("<b>⚠️ Không tìm thấy tiến trình đang chạy để tạm dừng.</b>")
             return
 
         try:
@@ -2456,15 +2473,15 @@ class NonVolatilePage(QtWidgets.QWidget):
             if not self.paused:
                 ps_proc.suspend()
                 self.paused = True
-                self.pushButton_pause.setText("▶️ Tiếp tục")
-                self.textBrowser_log.append("<b>⏸️ Đã tạm dừng tiến trình thành công.</b>")
+                self.ui.pushButton_pause.setText("▶️ Tiếp tục")
+                self.ui.textBrowser_log.append("<b>⏸️ Đã tạm dừng tiến trình thành công.</b>")
             else:
                 ps_proc.resume()
                 self.paused = False
-                self.pushButton_pause.setText("⏸️ Tạm dừng")
-                self.textBrowser_log.append("<b>▶️ Đã tiếp tục tiến trình.</b>")
+                self.ui.pushButton_pause.setText("⏸️ Tạm dừng")
+                self.ui.textBrowser_log.append("<b>▶️ Đã tiếp tục tiến trình.</b>")
         except Exception as e:
-            self.textBrowser_log.append(f"<b>❌ Lỗi khi tạm dừng/tiếp tục tiến trình: {e}</b>")
+            self.ui.textBrowser_log.append(f"<b>❌ Lỗi khi tạm dừng/tiếp tục tiến trình: {e}</b>")
 
 
     def stop_collection(self):
@@ -2478,7 +2495,7 @@ class NonVolatilePage(QtWidgets.QWidget):
             process = self.imaging_process
 
         if not process:
-            self.textBrowser_log.append("<b>⚠️ Không có tiến trình nào để dừng.</b>")
+            self.ui.textBrowser_log.append("<b>⚠️ Không có tiến trình nào để dừng.</b>")
             return
 
         try:
@@ -2491,17 +2508,17 @@ class NonVolatilePage(QtWidgets.QWidget):
             if alive:
                 for p in alive:
                     p.kill()
-                self.textBrowser_log.append("<b>⚠️ Buộc dừng tiến trình sau 10 giây.</b>")
+                self.ui.textBrowser_log.append("<b>⚠️ Buộc dừng tiến trình sau 10 giây.</b>")
             else:
-                self.textBrowser_log.append("<b>✅ Đã dừng tiến trình thành công.</b>")
+                self.ui.textBrowser_log.append("<b>✅ Đã dừng tiến trình thành công.</b>")
         except Exception as e:
-            self.textBrowser_log.append(f"<b>❌ Lỗi khi dừng tiến trình: {e}</b>")
+            self.ui.textBrowser_log.append(f"<b>❌ Lỗi khi dừng tiến trình: {e}</b>")
 
         # Cập nhật lại nút
-        self.pushButton_start.setEnabled(True)
-        self.pushButton_previous.setEnabled(True)
-        self.pushButton_pause.setEnabled(False)
-        self.pushButton_stop.setEnabled(False)
+        self.ui.pushButton_start.setEnabled(True)
+        self.ui.pushButton_previous.setEnabled(True)
+        self.ui.pushButton_pause.setEnabled(False)
+        self.ui.pushButton_stop.setEnabled(False)
 
 
     # -----------------------------------------------------
@@ -2524,7 +2541,7 @@ class NonVolatilePage(QtWidgets.QWidget):
                 # Mở file ở chế độ ghi với mã hóa UTF-8
                 with open(filename, 'w', encoding='utf-8') as f:
                     # Ghi toàn bộ nội dung text từ textBrowser vào file
-                    f.write(self.textBrowser_log.toPlainText())
+                    f.write(self.ui.textBrowser_log.toPlainText())
                 # Thông báo cho người dùng đã lưu thành công
                 QtWidgets.QMessageBox.information(self, "Thành công", f"Đã lưu nhật ký vào: {filename}")
             except Exception as e:
@@ -2611,18 +2628,18 @@ class NonVolatilePage(QtWidgets.QWidget):
             
             # Hiển thị đường dẫn xem trước
             if hasattr(self, 'label_preview_path'):
-                self.label_preview_path.setText(f"File sẽ được lưu tại: {full_path}")
+                self.ui.label_preview_path.setText(f"File sẽ được lưu tại: {full_path}")
             
             # Kiểm tra xem file đã tồn tại hay chưa và cảnh báo nếu có
             if os.path.exists(full_path):
                 if hasattr(self, 'label_preview_path'):
-                    self.label_preview_path.setStyleSheet("color: red;") # Đổi màu chữ thành đỏ
-                    self.label_preview_path.setText(
+                    self.ui.label_preview_path.setStyleSheet("color: red;") # Đổi màu chữ thành đỏ
+                    self.ui.label_preview_path.setText(
                     f"⚠️ Cảnh báo: File đã tồn tại tại {full_path}"
                 )
             else:
                 if hasattr(self, 'label_preview_path'):
-                    self.label_preview_path.setStyleSheet("") # Trả về màu chữ mặc định
+                    self.ui.label_preview_path.setStyleSheet("") # Trả về màu chữ mặc định
 
 # ----------------------------------------------------------
 # ALIAS CHO TƯƠNG THÍCH (không sửa, giữ nguyên)
