@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1038</width>
-    <height>597</height>
+    <width>1200</width>
+    <height>800</height>
    </rect>
   </property>
   <property name="font">
@@ -16,25 +16,284 @@
    </font>
   </property>
   <property name="windowTitle">
-   <string>Form</string>
+   <string>Hệ thống báo cáo điều tra số</string>
   </property>
-  <layout class="QGridLayout" name="gridLayout">
-   <item row="0" column="0">
-    <widget class="QLabel" name="label">
+  
+  <layout class="QVBoxLayout" name="mainLayout">
+   
+   <!-- Header Section -->
+   <item>
+    <widget class="QLabel" name="headerLabel">
      <property name="font">
       <font>
-       <pointsize>10</pointsize>
+       <pointsize>16</pointsize>
+       <weight>75</weight>
+       <bold>true</bold>
       </font>
      </property>
      <property name="text">
-      <string>Report</string>
+      <string>📊 Hệ thống báo cáo điều tra số</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignCenter</set>
      </property>
+     <property name="styleSheet">
+      <string>color: #2c3e50; margin: 15px; padding: 10px; background-color: #ecf0f1; border-radius: 8px;</string>
+     </property>
     </widget>
    </item>
+   
+   <!-- Case Selection Section -->
+   <item>
+    <widget class="QGroupBox" name="caseGroup">
+     <property name="title">
+      <string> Chọn vụ án</string>
+     </property>
+     <property name="styleSheet">
+      <string>QGroupBox { font-weight: bold; color: #34495e; } QGroupBox::title { subcontrol-origin: margin; left: 10px; padding: 0 5px 0 5px; }</string>
+     </property>
+     <layout class="QHBoxLayout" name="caseLayout">
+      <item>
+       <widget class="QLabel" name="caseLabel">
+        <property name="text">
+         <string>Vụ án:</string>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>80</width>
+          <height>0</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QComboBox" name="caseCombo">
+        <property name="minimumSize">
+         <size>
+          <width>400</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="placeholderText">
+         <string>-- Chọn vụ án --</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="refreshButton">
+        <property name="text">
+         <string>🔄 Làm mới</string>
+        </property>
+        <property name="styleSheet">
+         <string>QPushButton { background-color: #3498db; color: white; border: none; padding: 8px 16px; border-radius: 4px; } QPushButton:hover { background-color: #2980b9; }</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   
+   <!-- Report Options Section -->
+   <item>
+    <widget class="QGroupBox" name="optionsGroup">
+     <property name="title">
+      <string> Tùy chọn báo cáo</string>
+     </property>
+     <property name="styleSheet">
+      <string>QGroupBox { font-weight: bold; color: #34495e; } QGroupBox::title { subcontrol-origin: margin; left: 10px; padding: 0 5px 0 5px; }</string>
+     </property>
+     <layout class="QVBoxLayout" name="optionsLayout">
+      
+      <!-- Report Type Selection -->
+      <item>
+       <layout class="QHBoxLayout" name="typeLayout">
+        <item>
+         <widget class="QLabel" name="typeLabel">
+          <property name="text">
+           <string>Loại báo cáo:</string>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>120</width>
+            <height>0</height>
+           </size>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QComboBox" name="typeCombo">
+          <property name="minimumSize">
+           <size>
+            <width>300</width>
+            <height>0</height>
+           </size>
+          </property>
+          <item>
+           <property name="text">
+            <string>Báo cáo tổng hợp</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Tóm tắt điều hành</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Báo cáo kỹ thuật</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Chain of Custody</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer2">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
+      </item>
+      
+      <!-- Checkboxes for Options -->
+      <item>
+       <layout class="QHBoxLayout" name="checkboxLayout">
+        <item>
+         <widget class="QCheckBox" name="evidenceCheckbox">
+          <property name="text">
+           <string> Bao gồm bằng chứng số</string>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="analysisCheckbox">
+          <property name="text">
+           <string>🔬 Bao gồm kết quả phân tích</string>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="activityCheckbox">
+          <property name="text">
+           <string> Bao gồm nhật ký hoạt động</string>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="cocCheckbox">
+          <property name="text">
+           <string>🔒 Bao gồm Chain of Custody</string>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   
+   <!-- Generate Button Section -->
+   <item>
+    <widget class="QPushButton" name="generateButton">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>50</height>
+      </size>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>14</pointsize>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>🚀 Tạo báo cáo</string>
+     </property>
+     <property name="styleSheet">
+      <string>QPushButton { background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #3498db, stop:1 #2980b9); color: white; border: none; border-radius: 8px; padding: 10px; } QPushButton:hover { background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #5dade2, stop:1 #3498db); } QPushButton:disabled { background: #bdc3c7; }</string>
+     </property>
+    </widget>
+   </item>
+   
+   <!-- Progress Bar Section -->
+   <item>
+    <widget class="QProgressBar" name="progressBar">
+     <property name="visible">
+      <bool>false</bool>
+     </property>
+     <property name="styleSheet">
+      <string>QProgressBar { border: 2px solid #bdc3c7; border-radius: 5px; text-align: center; } QProgressBar::chunk { background-color: #3498db; border-radius: 3px; }</string>
+     </property>
+    </widget>
+   </item>
+   
+   <!-- Recent Reports Section -->
+   <item>
+    <widget class="QGroupBox" name="reportsGroup">
+     <property name="title">
+      <string>📄 Báo cáo gần đây</string>
+     </property>
+     <property name="styleSheet">
+      <string>QGroupBox { font-weight: bold; color: #34495e; } QGroupBox::title { subcontrol-origin: margin; left: 10px; padding: 0 5px 0 5px; }</string>
+     </property>
+     <layout class="QVBoxLayout" name="reportsLayout">
+      <item>
+       <widget class="QTableWidget" name="reportsTable">
+        <property name="alternatingRowColors">
+         <bool>true</bool>
+        </property>
+        <property name="selectionBehavior">
+         <enum>QAbstractItemView::SelectRows</enum>
+        </property>
+        <property name="styleSheet">
+         <string>QTableWidget { gridline-color: #bdc3c7; } QTableWidget::item { padding: 8px; } QHeaderView::section { background-color: #ecf0f1; padding: 8px; border: 1px solid #bdc3c7; font-weight: bold; }</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   
   </layout>
+  
  </widget>
  <resources/>
  <connections/>
