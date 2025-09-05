@@ -1,6 +1,6 @@
 """
-Utility module for managing project paths dynamically.
-This ensures the application works regardless of where it's installed.
+Mô-đun tiện ích để quản lý đường dẫn của dự án một cách động.
+Điều này giúp ứng dụng hoạt động dù được đặt ở bất kỳ vị trí nào.
 """
 
 import os
@@ -8,92 +8,92 @@ import os
 
 def get_project_root():
     """
-    Get the project root directory (where main.py is located).
+    Lấy thư mục gốc của dự án (nơi chứa main.py).
     
-    Returns:
-        str: Absolute path to the project root directory
+    Trả về:
+        str: Đường dẫn tuyệt đối tới thư mục gốc của dự án
     """
-    # Get the directory containing this file
+    # Lấy thư mục đang chứa file này
     current_file_dir = os.path.dirname(os.path.abspath(__file__))
-    # Go up one level to reach the project root (where main.py is)
+    # Đi lên một cấp để tới thư mục gốc của dự án (chứa main.py)
     project_root = os.path.dirname(current_file_dir)
     return project_root
 
 
 def get_tools_dir():
     """
-    Get the tools directory path.
+    Lấy đường dẫn tới thư mục tools.
     
-    Returns:
-        str: Absolute path to the tools directory
+    Trả về:
+        str: Đường dẫn tuyệt đối tới thư mục tools
     """
     return os.path.join(get_project_root(), "tools")
 
 
 def get_database_path():
     """
-    Get the database file path.
+    Lấy đường dẫn tới file cơ sở dữ liệu.
     
-    Returns:
-        str: Absolute path to the database file
+    Trả về:
+        str: Đường dẫn tuyệt đối tới file cơ sở dữ liệu
     """
     return os.path.join(get_project_root(), "database", "forensic_system.db")
 
 
 def get_forensic_collection_dir():
     """
-    Get the forensic collection directory path.
+    Lấy đường dẫn tới thư mục thu thập chứng cứ (ForensicCollection).
     
-    Returns:
-        str: Absolute path to the forensic collection directory
+    Trả về:
+        str: Đường dẫn tuyệt đối tới thư mục ForensicCollection
     """
     return os.path.join(get_project_root(), "ForensicCollection")
 
 
 def get_evidence_dir():
     """
-    Get the evidence directory path.
+    Lấy đường dẫn tới thư mục chứa chứng cứ.
     
-    Returns:
-        str: Absolute path to the evidence directory
+    Trả về:
+        str: Đường dẫn tuyệt đối tới thư mục evidence
     """
     return os.path.join(get_project_root(), "evidence")
 
 
 def get_temp_dir():
     """
-    Get the temporary directory path.
+    Lấy đường dẫn tới thư mục tạm.
     
-    Returns:
-        str: Absolute path to the temp directory
+    Trả về:
+        str: Đường dẫn tuyệt đối tới thư mục temp
     """
     return os.path.join(get_project_root(), "temp")
 
 
 def get_static_dir():
     """
-    Get the static resources directory path.
+    Lấy đường dẫn tới thư mục tài nguyên tĩnh (static).
     
-    Returns:
-        str: Absolute path to the static directory
+    Trả về:
+        str: Đường dẫn tuyệt đối tới thư mục static
     """
     return os.path.join(get_project_root(), "static")
 
 
 def get_ui_dir():
     """
-    Get the UI directory path.
+    Lấy đường dẫn tới thư mục giao diện (ui).
     
-    Returns:
-        str: Absolute path to the UI directory
+    Trả về:
+        str: Đường dẫn tuyệt đối tới thư mục ui
     """
     return os.path.join(get_project_root(), "ui")
 
 
 def ensure_directories():
     """
-    Ensure all necessary directories exist.
-    Creates directories if they don't exist.
+    Đảm bảo các thư mục cần thiết tồn tại.
+    Tự động tạo thư mục nếu chưa có.
     """
     directories = [
         get_forensic_collection_dir(),
