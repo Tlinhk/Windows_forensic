@@ -60,16 +60,6 @@ def get_evidence_dir():
     return os.path.join(get_project_root(), "evidence")
 
 
-def get_temp_dir():
-    """
-    Lấy đường dẫn tới thư mục tạm.
-    
-    Trả về:
-        str: Đường dẫn tuyệt đối tới thư mục temp
-    """
-    return os.path.join(get_project_root(), "temp")
-
-
 def get_static_dir():
     """
     Lấy đường dẫn tới thư mục tài nguyên tĩnh (static).
@@ -98,7 +88,6 @@ def ensure_directories():
     directories = [
         get_forensic_collection_dir(),
         get_evidence_dir(),
-        get_temp_dir(),
     ]
     
     for directory in directories:
