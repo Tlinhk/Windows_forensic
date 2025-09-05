@@ -11,8 +11,9 @@ from db_manager import db
 def initialize_database():
     print("=== Khởi tạo database Windows Forensic System ===\n")
     
-    # Đường dẫn database trong cùng thư mục
-    db_path = os.path.join(os.path.dirname(__file__), "forensic_system.db")
+    # Sử dụng utility để lấy đường dẫn database
+    from utils.path_utils import get_database_path
+    db_path = get_database_path()
     
     # Kiểm tra nếu database đã tồn tại
     if os.path.exists(db_path):

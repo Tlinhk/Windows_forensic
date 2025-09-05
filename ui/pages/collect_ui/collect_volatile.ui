@@ -182,7 +182,7 @@ QCheckBox {
              </font>
             </property>
             <property name="text">
-             <string>E:\ForensicCollection</string>
+             <string>./ForensicCollection</string>
             </property>
             <property name="placeholderText">
              <string>Chọn thiết bị ngoài (USB/External HDD)</string>

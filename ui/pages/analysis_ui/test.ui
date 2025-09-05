@@ -253,7 +253,7 @@ QTreeWidget::branch {
            </property>
            <item>
             <property name="text">
-             <string>C:\</string>
+             <string>./</string>
             </property>
            </item>
            <item>

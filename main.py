@@ -1,3 +1,7 @@
+import warnings
+# Suppress PyQt5 sipPyTypeDict deprecation warning
+warnings.filterwarnings("ignore", message="sipPyTypeDict.*is deprecated.*sipPyTypeDictRef.*instead")
+
 from PyQt5.QtWidgets import QApplication, QMainWindow, QMessageBox, QPushButton, QMenu
 from PyQt5.QtCore import pyqtSignal, QTimer, Qt
 from datetime import datetime

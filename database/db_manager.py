@@ -9,9 +9,9 @@ from datetime import datetime
 class DatabaseManager:
     def __init__(self, db_path: str = None):
         if db_path is None:
-            # Đặt database trong thư mục database
-            db_dir = os.path.dirname(os.path.abspath(__file__))
-            self.db_path = os.path.join(db_dir, "forensic_system.db")
+            # Sử dụng utility để lấy đường dẫn database
+            from utils.path_utils import get_database_path
+            self.db_path = get_database_path()
         else:
             self.db_path = db_path
         self.connection = None
@@ -649,6 +649,17 @@ class DatabaseManager:
     def get_results_by_artifact(self, artifact_id: int) -> List[Dict]:
         query = "SELECT * FROM Results WHERE artefact_id = ? ORDER BY run_at DESC"
         return self.fetch_all(query, (artifact_id,))
+
+    def get_results_by_case(self, case_id: int) -> List[Dict]:
+        """Get all analysis results for a specific case"""
+        query = """
+            SELECT r.*, a.name as artifact_name, a.evidence_type
+            FROM Results r
+            JOIN Artefacts a ON r.artefact_id = a.artefact_id
+            WHERE a.case_id = ? AND a.is_deleted = 0
+            ORDER BY r.run_at DESC
+        """
+        return self.fetch_all(query, (case_id,))
 
     # ==================== REPORTS ====================
 

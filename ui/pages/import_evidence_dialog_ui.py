@@ -91,7 +91,7 @@ class Ui_ImportEvidenceDialog(object):
 "QLineEdit:focus {\n"
 "    border-color: #007bff;\n"
 "    outline: 0;\n"
-"    box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);\n"
+"    border: 2px solid #007bff;\n"
 "}\n"
 "\n"
 "QComboBox {\n"

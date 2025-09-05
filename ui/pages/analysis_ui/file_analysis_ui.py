@@ -492,7 +492,7 @@ class Ui_EvidenceAnalysisWidget(object):
         self.treeInvestigation.setSortingEnabled(False)
         self.treeInvestigation.topLevelItem(0).setText(0, _translate("EvidenceAnalysisWidget", "Data Sources"))
         self.treeInvestigation.topLevelItem(0).child(0).setText(0, _translate("EvidenceAnalysisWidget", "Surface_Laptop.dd"))
-        self.treeInvestigation.topLevelItem(0).child(0).child(0).setText(0, _translate("EvidenceAnalysisWidget", "C:\\"))
+        self.treeInvestigation.topLevelItem(0).child(0).child(0).setText(0, _translate("EvidenceAnalysisWidget", "./"))
         self.treeInvestigation.topLevelItem(0).child(0).child(1).setText(0, _translate("EvidenceAnalysisWidget", "$OrphanFiles"))
         self.treeInvestigation.topLevelItem(1).setText(0, _translate("EvidenceAnalysisWidget", "Views"))
         self.treeInvestigation.topLevelItem(1).child(0).setText(0, _translate("EvidenceAnalysisWidget", "By File Type"))

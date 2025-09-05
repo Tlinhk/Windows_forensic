@@ -2231,7 +2231,7 @@ class Ui_BrowserAnalysisWindow(object):
         self.browserTypeCombo.setItemText(1, _translate("BrowserAnalysisWindow", "Microsoft Edge"))
         self.browserTypeCombo.setItemText(2, _translate("BrowserAnalysisWindow", "Mozilla Firefox"))
         self.browserTypeCombo.setItemText(3, _translate("BrowserAnalysisWindow", "Internet Explorer"))
-        self.profilePathEdit.setPlaceholderText(_translate("BrowserAnalysisWindow", "C:\\Users\\...\\AppData\\Local\\Google\\Chrome\\User Data\\Default"))
+        self.profilePathEdit.setPlaceholderText(_translate("BrowserAnalysisWindow", "./Users/.../AppData/Local/Google/Chrome/User Data/Default"))
         self.analysisOptionsLabel.setText(_translate("BrowserAnalysisWindow", "Analysis Options:"))
         self.statusLabel.setText(_translate("BrowserAnalysisWindow", "Status: Ready"))
         self.label_11.setText(_translate("BrowserAnalysisWindow", "Evidences Browser of Case"))

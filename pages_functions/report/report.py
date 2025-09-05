@@ -327,7 +327,7 @@ class ReportGenerator(QThread):
                 .header {{ background: #2c3e50; color: white; padding: 20px; text-align: center; }}
                 .summary {{ background: #ecf0f1; padding: 20px; margin: 20px 0; border-radius: 8px; }}
                 .stats {{ display: flex; justify-content: space-around; margin: 20px 0; }}
-                .stat-box {{ background: white; padding: 20px; border-radius: 8px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }}
+                .stat-box {{ background: white; padding: 20px; border-radius: 8px; text-align: center; border: 1px solid #ddd; }}
             </style>
         </head>
         <body>

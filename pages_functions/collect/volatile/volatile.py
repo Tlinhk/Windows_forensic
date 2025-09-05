@@ -1330,7 +1330,10 @@ Current Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"""
         safe_case_name = "".join(
             c for c in self.current_case_name if c.isalnum() or c in (" ", "-", "_")
         ).rstrip()
-        output_path = f"E:\\ForensicCollection\\{safe_case_name}_evidence"
+        # Lấy đường dẫn thư mục forensic collection
+        from utils.path_utils import get_forensic_collection_dir
+        forensic_collection_dir = get_forensic_collection_dir()
+        output_path = os.path.join(forensic_collection_dir, f"{safe_case_name}_evidence")
         self.ui.outputPathEdit.setText(output_path)
 
     def set_case_id(self, case_id):

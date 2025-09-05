@@ -488,7 +488,7 @@ QPlainTextEdit QScrollBar::add-line, QPlainTextEdit QScrollBar::sub-line {
 </string>
         </property>
         <property name="placeholderText">
-         <string>C:\Users\...\AppData\Local\Google\Chrome\User Data\Default</string>
+         <string>./Users/.../AppData/Local/Google/Chrome/User Data/Default</string>
         </property>
        </widget>
       </item>

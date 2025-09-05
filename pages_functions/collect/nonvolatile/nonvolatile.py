@@ -26,10 +26,6 @@ if project_root not in sys.path:
 # Import các thành phần cần thiết từ thư viện PyQt5 để xây dựng giao diện người dùng
 from PyQt5 import QtCore, QtGui, QtWidgets
 # Import lớp UI được tạo từ Qt Designer
-import sys
-import os
-# Add the project root to the Python path
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../../../')))
 from ui.pages.collect_ui.collect_nonvolatile_ui import Ui_CollectNonvolatileForm
 
 # Kiểm tra xem thư viện WMI có khả dụng hay không.
@@ -407,7 +403,8 @@ class NonVolatilePage(QtWidgets.QWidget):
         self.strategy_group.addButton(self.ui.radioButton_full_image)
 
         # --- Đường dẫn đến thư mục chứa các công cụ pháp lý ---
-        self.tools_dir = r"E:\DoAn\Windows_forensic\tools"
+        from utils.path_utils import get_tools_dir
+        self.tools_dir = get_tools_dir()
         # EDD không còn được sử dụng
         self.kape_exe = os.path.join(self.tools_dir, "KAPE", "kape.exe") # Công cụ triage
         self.dc3dd_exe = os.path.join(self.tools_dir, "dc3dd", "dc3dd.exe") # Công cụ tạo ảnh RAW
@@ -477,24 +474,22 @@ class NonVolatilePage(QtWidgets.QWidget):
         try:
             if self.main_window and getattr(self.main_window, "current_case_id", None):
                 self.set_case_id(self.main_window.current_case_id)
-        except Exception:
+        except Exception as e:
+            print(f"Error loading case from main_window: {e}")
             pass
 
     def set_case_data(self, case_data: dict):
         """Nhận thông tin case và tự động điền thư mục đích Triage/Imaging theo archive_path."""
         try:
             self.case_data = case_data or {}
-            # Điền thông tin cơ bản nếu có
-            try:
-                if hasattr(self, "lineEdit_case_id") and self.case_data.get("case_id"):
-                    self.ui.lineEdit_case_id.setText(str(self.case_data["case_id"]))
-                if hasattr(self, "lineEdit_investigator") and self.case_data.get("investigator"):
-                    self.ui.lineEdit_investigator.setText(self.case_data["investigator"])
-            except Exception:
-                pass
+            
+            # Cập nhật UI với thông tin case
+            self.update_case_ui()
+            
             # Tự đảm bảo đường dẫn đích
             self.ensure_default_paths()
-        except Exception:
+        except Exception as e:
+            print(f"Error in set_case_data: {e}")
             pass
 
     def set_case_id(self, case_id: int):
@@ -506,15 +501,39 @@ class NonVolatilePage(QtWidgets.QWidget):
             if db.connect():
                 case = db.get_case_with_investigator(case_id)
             if case:
-                self.set_case_data({
+                case_data = {
                     "case_id": case_id,
                     "case_name": case.get("title", f"CASE-{case_id}"),
                     "investigator": case.get("full_name", "Unknown"),
                     "created_date": case.get("created_at", ""),
                     "archive_path": case.get("archive_path", ""),
                     "database_case_id": case_id,
-                })
-        except Exception:
+                }
+                self.set_case_data(case_data)
+        except Exception as e:
+            print(f"Error in set_case_id: {e}")
+            pass
+
+    def update_case_ui(self):
+        """Update UI elements with current case data."""
+        try:
+            if not self.case_data:
+                return
+                
+            # Update case ID
+            if hasattr(self.ui, "lineEdit_case_id") and self.case_data.get("case_id"):
+                self.ui.lineEdit_case_id.setText(str(self.case_data["case_id"]))
+                
+            # Update investigator name
+            if hasattr(self.ui, "lineEdit_investigator") and self.case_data.get("investigator"):
+                self.ui.lineEdit_investigator.setText(self.case_data["investigator"])
+                
+            # Update case description/name
+            if hasattr(self.ui, "lineEdit_case_description") and self.case_data.get("case_name"):
+                self.ui.lineEdit_case_description.setText(self.case_data["case_name"])
+                
+        except Exception as e:
+            print(f"Error updating case UI: {e}")
             pass
 
     def ensure_default_paths(self):
@@ -969,41 +988,47 @@ class NonVolatilePage(QtWidgets.QWidget):
         is_triage = self.ui.radioButton_triage.isChecked()
 
         # Bật/Tắt các frame và group box liên quan đến Triage
-        if hasattr(self, 'frame_targets'):
-            self.frame_targets.setEnabled(is_triage)
-        if hasattr(self, 'frame_modules'):
-            self.frame_modules.setEnabled(is_triage)
-        if hasattr(self, 'groupBox_modules'):
-            self.groupBox_modules.setEnabled(is_triage)
-        if hasattr(self, 'groupBox_module_options'):
-            self.groupBox_module_options.setEnabled(is_triage)
-        if hasattr(self, 'groupBox_export_options'):
-            self.groupBox_export_options.setEnabled(is_triage)
+        if hasattr(self.ui, 'frame_targets'):
+            self.ui.frame_targets.setEnabled(is_triage)
+        if hasattr(self.ui, 'frame_modules'):
+            self.ui.frame_modules.setEnabled(is_triage)
+        if hasattr(self.ui, 'groupBox_modules'):
+            self.ui.groupBox_modules.setEnabled(is_triage)
+        if hasattr(self.ui, 'groupBox_module_options'):
+            self.ui.groupBox_module_options.setEnabled(is_triage)
+        if hasattr(self.ui, 'groupBox_export_options'):
+            self.ui.groupBox_export_options.setEnabled(is_triage)
 
         # Bật/Tắt các group box và widget liên quan đến Imaging
-        if hasattr(self, 'groupBox_image_format'):
-            self.groupBox_image_format.setEnabled(not is_triage)
-        if hasattr(self, 'groupBox_image_settings'):
-            self.groupBox_image_settings.setEnabled(not is_triage)
-        if hasattr(self, 'groupBox_verification'):
-            self.groupBox_verification.setEnabled(not is_triage)
-        if hasattr(self, 'groupBox_hashing'):
-            self.groupBox_hashing.setEnabled(not is_triage)
-        if hasattr(self, 'groupBox_image_source'):
-            self.groupBox_image_source.setEnabled(not is_triage)
-        if hasattr(self, 'groupBox_image_destination'):
-            self.groupBox_image_destination.setEnabled(not is_triage)
+        if hasattr(self.ui, 'groupBox_image_format'):
+            self.ui.groupBox_image_format.setEnabled(not is_triage)
+        if hasattr(self.ui, 'groupBox_image_settings'):
+            self.ui.groupBox_image_settings.setEnabled(not is_triage)
+        if hasattr(self.ui, 'groupBox_verification'):
+            self.ui.groupBox_verification.setEnabled(not is_triage)
+        if hasattr(self.ui, 'groupBox_hashing'):
+            self.ui.groupBox_hashing.setEnabled(not is_triage)
+        if hasattr(self.ui, 'groupBox_image_source'):
+            self.ui.groupBox_image_source.setEnabled(not is_triage)
+        if hasattr(self.ui, 'groupBox_image_destination'):
+            self.ui.groupBox_image_destination.setEnabled(not is_triage)
         
         # Kiểm tra các thành phần UI khác trước khi truy cập
         for attr_name in ['lineEdit_destination_folder', 'lineEdit_image_filename', 'pushButton_browse_folder']:
-            if hasattr(self, attr_name):
-                getattr(self, attr_name).setEnabled(not is_triage)
+            if hasattr(self.ui, attr_name):
+                getattr(self.ui, attr_name).setEnabled(not is_triage)
         # Cố gắng tự điền lại đường dẫn theo case nếu có
         try:
             if self.case_data:
                 self.set_case_data(self.case_data)
         except Exception:
             pass
+        
+        # Ensure main checkboxes are always enabled
+        if hasattr(self.ui, 'checkBox_use_targets'):
+            self.ui.checkBox_use_targets.setEnabled(True)
+        if hasattr(self.ui, 'checkBox_use_modules'):
+            self.ui.checkBox_use_modules.setEnabled(True)
 
     # -----------------------------------------------------
     # 3. KIỂM TRA, VALIDATE DỮ LIỆU Ở MỖI BƯỚC
@@ -1408,33 +1433,78 @@ class NonVolatilePage(QtWidgets.QWidget):
 
     def toggle_target_options(self, enabled):
         """Bật hoặc tắt các vùng giao diện liên quan đến Targets."""
-        # Enable/disable the targets frame and related components
-        if hasattr(self, 'frame_targets'):
-            # Enable/disable specific sections within the frame
-            if hasattr(self, 'gridLayout_target_options'):
-                # Enable/disable individual widgets in the target options layout
-                for i in range(self.gridLayout_target_options.count()):
-                    widget = self.gridLayout_target_options.itemAt(i).widget()
-                    if widget:
-                        widget.setEnabled(enabled)
-            
-            if hasattr(self, 'tableWidget_targets'):
-                self.ui.tableWidget_targets.setEnabled(enabled)
-            if hasattr(self, 'lineEdit_targets_search'):
-                self.ui.lineEdit_targets_search.setEnabled(enabled)
+        # Enable/disable target source and destination fields
+        if hasattr(self.ui, 'lineEdit_target_source'):
+            self.ui.lineEdit_target_source.setEnabled(enabled)
+        if hasattr(self.ui, 'lineEdit_target_destination'):
+            self.ui.lineEdit_target_destination.setEnabled(enabled)
+        if hasattr(self.ui, 'toolButton_target_source'):
+            self.ui.toolButton_target_source.setEnabled(enabled)
+        if hasattr(self.ui, 'toolButton_target_destination'):
+            self.ui.toolButton_target_destination.setEnabled(enabled)
+        
+        # Enable/disable targets table and search
+        if hasattr(self.ui, 'tableWidget_targets'):
+            self.ui.tableWidget_targets.setEnabled(enabled)
+        if hasattr(self.ui, 'lineEdit_targets_search'):
+            self.ui.lineEdit_targets_search.setEnabled(enabled)
+        
+        # Do not toggle parent containers (to keep the checkbox clickable)
+        
+        # Enable/disable preset buttons
+        preset_buttons = [
+            'toolButton_sans', 'toolButton_quick', 'toolButton_browser', 
+            'toolButton_registry', 'toolButton_logs', 'toolButton_memory', 
+            'toolButton_persistence'
+        ]
+        for button_name in preset_buttons:
+            if hasattr(self.ui, button_name):
+                getattr(self.ui, button_name).setEnabled(enabled)
+        
+        # Enable/disable target control buttons
+        if hasattr(self.ui, 'pushButton_select_all_targets'):
+            self.ui.pushButton_select_all_targets.setEnabled(enabled)
+        if hasattr(self.ui, 'pushButton_clear_all_targets'):
+            self.ui.pushButton_clear_all_targets.setEnabled(enabled)
+        
+        # Enable/disable target options checkboxes
+        target_options = [
+            'checkBox_flush', 'checkBox_add_date', 'checkBox_add_machine',
+            'checkBox_deduplicate', 'checkBox_process_vscs'
+        ]
+        for option_name in target_options:
+            if hasattr(self.ui, option_name):
+                getattr(self.ui, option_name).setEnabled(enabled)
     
     def toggle_module_options(self, enabled):
         """Bật hoặc tắt các vùng giao diện liên quan đến Modules."""
-        # Các groupbox này có thể không tồn tại trên UI, cần kiểm tra trước
-        if hasattr(self, 'groupBox_module_options'):
-            self.groupBox_module_options.setEnabled(enabled)
-        if hasattr(self, 'groupBox_modules'):
-            self.groupBox_modules.setEnabled(enabled)
-        if hasattr(self, 'groupBox_export_options'):
-            self.groupBox_export_options.setEnabled(enabled)
-        if hasattr(self, 'frame_modules'):
-            # Also enable/disable the entire modules frame if needed
-            pass  # The frame is handled separately
+        # Enable/disable module source and destination fields
+        if hasattr(self.ui, 'lineEdit_module_source'):
+            self.ui.lineEdit_module_source.setEnabled(enabled)
+        if hasattr(self.ui, 'lineEdit_module_destination'):
+            self.ui.lineEdit_module_destination.setEnabled(enabled)
+        if hasattr(self.ui, 'toolButton_module_source'):
+            self.ui.toolButton_module_source.setEnabled(enabled)
+        if hasattr(self.ui, 'toolButton_module_destination'):
+            self.ui.toolButton_module_destination.setEnabled(enabled)
+        
+        # Enable/disable modules table and search
+        if hasattr(self.ui, 'tableWidget_modules'):
+            self.ui.tableWidget_modules.setEnabled(enabled)
+        if hasattr(self.ui, 'lineEdit_modules_search'):
+            self.ui.lineEdit_modules_search.setEnabled(enabled)
+        
+        # Enable/disable export format options
+        if hasattr(self.ui, 'radioButton_export_csv'):
+            self.ui.radioButton_export_csv.setEnabled(enabled)
+        if hasattr(self.ui, 'radioButton_export_json'):
+            self.ui.radioButton_export_json.setEnabled(enabled)
+        if hasattr(self.ui, 'radioButton_export_html'):
+            self.ui.radioButton_export_html.setEnabled(enabled)
+        if hasattr(self.ui, 'radioButton_export_default'):
+            self.ui.radioButton_export_default.setEnabled(enabled)
+        
+        # Do not toggle parent containers (to keep the checkbox clickable)
     
     def browse_folder(self, line_edit):
         """Mở hộp thoại cho phép người dùng chọn một thư mục."""
