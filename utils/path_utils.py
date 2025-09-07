@@ -33,11 +33,11 @@ def get_tools_dir():
 def get_database_path():
     """
     Lấy đường dẫn tới file cơ sở dữ liệu.
-    
+
     Trả về:
         str: Đường dẫn tuyệt đối tới file cơ sở dữ liệu
     """
-    return os.path.join(get_project_root(), "database", "forensic_system.db")
+    return os.path.join(get_project_root(), "models", "forensic_system.db")
 
 
 def get_forensic_collection_dir():
