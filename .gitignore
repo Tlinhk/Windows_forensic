@@ -176,6 +176,7 @@ settings.ini
 *.backup
 *~ 
 
+*.pdb
 
 
 # Ignore all analysis output folders
