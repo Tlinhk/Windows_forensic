@@ -12,6 +12,19 @@ import hashlib
 from datetime import datetime
 from models.db_manager import DatabaseManager
 
+# Word document generation (python-docx)
+try:
+    from docx import Document
+    from docx.shared import Inches, Pt, RGBColor
+    from docx.enum.text import WD_PARAGRAPH_ALIGNMENT
+    from docx.enum.style import WD_STYLE_TYPE
+    DOCX_AVAILABLE = True
+except ImportError:
+    Document = None
+    WD_PARAGRAPH_ALIGNMENT = None
+    DOCX_AVAILABLE = False
+    print("Cảnh báo: Chưa cài đặt thư viện python-docx. Cài đặt bằng: pip install python-docx")
+
 # Sửa import statement này
 from views.pages.report_ui.report_ui import Ui_Form
 
@@ -29,6 +42,10 @@ class ReportGenerator(QThread):
         
     def run(self):
         try:
+            # Check if DOCX library is available
+            if not DOCX_AVAILABLE:
+                raise Exception("Thiếu thư viện python-docx. Cài đặt bằng: pip install python-docx")
+
             self.db.connect()
             
             if self.report_type == "comprehensive":
@@ -49,7 +66,7 @@ class ReportGenerator(QThread):
                 self.db.create_report(
                     case_id=self.case_id,
                     file_path=file_path,
-                    format=os.path.splitext(file_path)[1][1:].upper(),
+                    format="DOCX",
                     sha256=sha256
                 )
                 
@@ -66,7 +83,8 @@ class ReportGenerator(QThread):
     def generate_comprehensive_report(self):
         """Generate comprehensive case report with all details"""
         case_info = self.db.get_case_with_investigator(self.case_id)
-        if not case_info:
+        if not case_info or not isinstance(case_info, dict):
+            print(f"ERROR - Invalid case info returned: {case_info}")
             return None
             
         # Get all case data
@@ -74,444 +92,567 @@ class ReportGenerator(QThread):
         results = self.db.get_results_by_case(self.case_id)
         activity_logs = self.db.get_activity_logs(case_id=self.case_id)
         
-        # Create comprehensive HTML report
-        html_content = self._create_comprehensive_html(
-            case_info, artifacts, results, activity_logs
-        )
+        # Ensure data is iterable (handle cases where database might return unexpected types)
+        if not isinstance(artifacts, (list, tuple)):
+            print(f"WARNING - Artifacts is not iterable (type: {type(artifacts)}), converting to empty list")
+            artifacts = []
+        if not isinstance(results, (list, tuple)):
+            print(f"WARNING - Results is not iterable (type: {type(results)}), converting to empty list")
+            results = []
+        if not isinstance(activity_logs, (list, tuple)):
+            print(f"WARNING - Activity logs is not iterable (type: {type(activity_logs)}), converting to empty list")
+            activity_logs = []
+
+        # Create comprehensive Word document
+        doc = self._create_comprehensive_docx(case_info, artifacts, results, activity_logs)
         
         # Save report
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        filename = f"Case_{self.case_id}_Comprehensive_Report_{timestamp}.html"
-        file_path = os.path.join(case_info['archive_path'], filename)
+        filename = f"Case_{self.case_id}_Comprehensive_Report_{timestamp}.docx"
+
+        archive_path = case_info.get('archive_path')
+        if not archive_path:
+            print(f"ERROR - No archive path found in case info: {case_info}")
+            return None
+
+        file_path = os.path.join(archive_path, filename)
         
-        with open(file_path, 'w', encoding='utf-8') as f:
-            f.write(html_content)
+        doc.save(file_path)
             
         return file_path
     
     def generate_executive_summary(self):
         """Generate executive summary report"""
         case_info = self.db.get_case_with_investigator(self.case_id)
-        if not case_info:
+        if not case_info or not isinstance(case_info, dict):
+            print(f"ERROR - Invalid case info returned: {case_info}")
             return None
             
         # Get summary data
         artifacts = self.db.get_artifacts_by_case(self.case_id)
         results = self.db.get_results_by_case(self.case_id)
         
-        html_content = self._create_executive_html(case_info, artifacts, results)
+        # Ensure data is iterable
+        if not isinstance(artifacts, (list, tuple)):
+            artifacts = []
+        if not isinstance(results, (list, tuple)):
+            results = []
+        
+        doc = self._create_executive_docx(case_info, artifacts, results)
         
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        filename = f"Case_{self.case_id}_Executive_Summary_{timestamp}.html"
-        file_path = os.path.join(case_info['archive_path'], filename)
+        filename = f"Case_{self.case_id}_Executive_Summary_{timestamp}.docx"
+
+        archive_path = case_info.get('archive_path')
+        if not archive_path:
+            print(f"ERROR - No archive path found in case info: {case_info}")
+            return None
+
+        file_path = os.path.join(archive_path, filename)
         
-        with open(file_path, 'w', encoding='utf-8') as f:
-            f.write(html_content)
+        doc.save(file_path)
             
         return file_path
     
     def generate_technical_report(self):
         """Generate technical detailed report"""
         case_info = self.db.get_case_with_investigator(self.case_id)
-        if not case_info:
+        if not case_info or not isinstance(case_info, dict):
+            print(f"ERROR - Invalid case info returned: {case_info}")
             return None
             
         artifacts = self.db.get_artifacts_by_case(self.case_id)
         results = self.db.get_results_by_case(self.case_id)
         activity_logs = self.db.get_activity_logs(case_id=self.case_id)
         
-        html_content = self._create_technical_html(case_info, artifacts, results, activity_logs)
+        # Ensure data is iterable
+        if not isinstance(artifacts, (list, tuple)):
+            artifacts = []
+        if not isinstance(results, (list, tuple)):
+            results = []
+        if not isinstance(activity_logs, (list, tuple)):
+            activity_logs = []
+
+        doc = self._create_technical_docx(case_info, artifacts, results, activity_logs)
         
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        filename = f"Case_{self.case_id}_Technical_Report_{timestamp}.html"
-        file_path = os.path.join(case_info['archive_path'], filename)
+        filename = f"Case_{self.case_id}_Technical_Report_{timestamp}.docx"
+
+        archive_path = case_info.get('archive_path')
+        if not archive_path:
+            print(f"ERROR - No archive path found in case info: {case_info}")
+            return None
+
+        file_path = os.path.join(archive_path, filename)
         
-        with open(file_path, 'w', encoding='utf-8') as f:
-            f.write(html_content)
+        doc.save(file_path)
             
         return file_path
     
     def generate_chain_of_custody(self):
         """Generate Chain of Custody report"""
         case_info = self.db.get_case_with_investigator(self.case_id)
-        if not case_info:
+        if not case_info or not isinstance(case_info, dict):
+            print(f"ERROR - Invalid case info returned: {case_info}")
             return None
             
         artifacts = self.db.get_artifacts_by_case(self.case_id)
         activity_logs = self.db.get_activity_logs(case_id=self.case_id)
         
-        html_content = self._create_coc_html(case_info, artifacts, activity_logs)
+        # Ensure data is iterable
+        if not isinstance(artifacts, (list, tuple)):
+            artifacts = []
+        if not isinstance(activity_logs, (list, tuple)):
+            activity_logs = []
+
+        doc = self._create_coc_docx(case_info, artifacts, activity_logs)
         
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        filename = f"Case_{self.case_id}_Chain_of_Custody_{timestamp}.html"
-        file_path = os.path.join(case_info['archive_path'], filename)
+        filename = f"Case_{self.case_id}_Chain_of_Custody_{timestamp}.docx"
+
+        archive_path = case_info.get('archive_path')
+        if not archive_path:
+            print(f"ERROR - No archive path found in case info: {case_info}")
+            return None
+
+        file_path = os.path.join(archive_path, filename)
         
-        with open(file_path, 'w', encoding='utf-8') as f:
-            f.write(html_content)
+        doc.save(file_path)
             
         return file_path
 
-    def _create_comprehensive_html(self, case_info, artifacts, results, activity_logs):
-        """Create comprehensive HTML report content"""
-        html = f"""
-        <!DOCTYPE html>
-        <html lang="vi">
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Báo cáo tổng hợp - Case {case_info['case_id']}</title>
-            <style>
-                body {{ font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 20px; }}
-                .header {{ background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 10px; }}
-                .section {{ margin: 20px 0; padding: 20px; border: 1px solid #ddd; border-radius: 8px; }}
-                .evidence-table {{ width: 100%; border-collapse: collapse; margin: 10px 0; }}
-                .evidence-table th, .evidence-table td {{ border: 1px solid #ddd; padding: 12px; text-align: left; }}
-                .evidence-table th {{ background-color: #f5f5f5; font-weight: bold; }}
-                .chain-of-custody {{ background-color: #f9f9f9; padding: 15px; border-left: 4px solid #007acc; }}
-                .risk-high {{ color: #d32f2f; font-weight: bold; }}
-                .risk-medium {{ color: #f57c00; font-weight: bold; }}
-                .risk-low {{ color: #388e3c; font-weight: bold; }}
-                .timestamp {{ color: #666; font-size: 0.9em; }}
-            </style>
-        </head>
-        <body>
-            <div class="header">
-                <h1>🔍 Báo cáo điều tra số tổng hợp</h1>
-                <h2>Case ID: {case_info['case_id']} - {case_info['title']}</h2>
-                <p>Điều tra viên: {case_info.get('full_name', 'N/A')} | Ngày tạo: {case_info.get('created_at', 'N/A')}</p>
-            </div>
-            
-            <div class="section">
-                <h3> Thông tin vụ án</h3>
-                <table class="evidence-table">
-                    <tr><th>Case ID</th><td>{case_info['case_id']}</td></tr>
-                    <tr><th>Tên vụ án</th><td>{case_info['title']}</td></tr>
-                    <tr><th>Trạng thái</th><td>{case_info.get('status', 'N/A')}</td></tr>
-                    <tr><th>Điều tra viên</th><td>{case_info.get('full_name', 'N/A')}</td></tr>
-                    <tr><th>Ngày tạo</th><td>{case_info.get('created_at', 'N/A')}</td></tr>
-                    <tr><th>Đường dẫn lưu trữ</th><td>{case_info.get('archive_path', 'N/A')}</td></tr>
-                </table>
-            </div>
-            
-            <div class="section">
-                <h3>📁 Bằng chứng số (Digital Evidence)</h3>
-                <table class="evidence-table">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Tên</th>
-                            <th>Loại</th>
-                            <th>Kích thước</th>
-                            <th>Ngày thu thập</th>
-                            <th>Hash SHA-256</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-        """
-        
+    def _create_comprehensive_docx(self, case_info, artifacts, results, activity_logs):
+        """Create comprehensive Word document"""
+        from docx.shared import Pt, RGBColor
+        from docx.enum.style import WD_STYLE_TYPE
+
+        doc = Document()
+
+        # Setup styles
+        self._setup_word_styles(doc)
+
+        # Header
+        title = doc.add_paragraph("BÁO CÁO ĐIỀU TRA SỐ TỔNG HỢP", style='CustomHeading1')
+        title.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
+
+        subtitle = doc.add_paragraph("CHAIN OF CUSTODY - EVIDENCE INTEGRITY", style='CustomHeading2')
+        subtitle.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
+
+        case_title = doc.add_paragraph(f"Case ID: {case_info['case_id']} - {case_info['title']}")
+        case_title.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
+
+        doc.add_paragraph("")
+
+        # Case Information Section
+        heading = doc.add_paragraph("THÔNG TIN VỤ ÁN", style='CustomHeading2')
+
+        info_table = doc.add_table(rows=6, cols=2)
+        info_table.style = 'Table Grid'
+
+        # Headers
+        hdr_cells = info_table.rows[0].cells
+        hdr_cells[0].text = "Thông tin"
+        hdr_cells[1].text = "Giá trị"
+
+        # Data rows
+        rows_data = [
+            ("Case ID", case_info['case_id']),
+            ("Tên vụ án", case_info['title']),
+            ("Trạng thái", case_info.get('status', 'N/A')),
+            ("Điều tra viên", case_info.get('full_name', 'N/A')),
+            ("Ngày tạo", case_info.get('created_at', 'N/A')),
+            ("Đường dẫn lưu trữ", case_info.get('archive_path', 'N/A'))
+        ]
+
+        for i, (label, value) in enumerate(rows_data, 1):
+            row_cells = info_table.rows[i].cells
+            row_cells[0].text = label
+            row_cells[1].text = value
+
+        doc.add_page_break()
+
+        # Evidence Section
+        heading = doc.add_paragraph("BẰNG CHỨNG SỐ (DIGITAL EVIDENCE)", style='CustomHeading2')
+
+        if artifacts:
+            evidence_table = doc.add_table(rows=1, cols=6)
+            evidence_table.style = 'Table Grid'
+
+            # Header row
+            hdr_cells = evidence_table.rows[0].cells
+            hdr_cells[0].text = "ID"
+            hdr_cells[1].text = "Tên"
+            hdr_cells[2].text = "Loại"
+            hdr_cells[3].text = "Kích thước"
+            hdr_cells[4].text = "Ngày thu thập"
+            hdr_cells[5].text = "Hash SHA-256"
+
+            # Data rows
         for artifact in artifacts:
-            html += f"""
-                        <tr>
-                            <td>{artifact['artefact_id']}</td>
-                            <td>{artifact['name']}</td>
-                            <td>{artifact.get('evidence_type', 'N/A')}</td>
-                            <td>{artifact.get('size', 'N/A')} bytes</td>
-                            <td>{artifact.get('collected_at', 'N/A')}</td>
-                            <td><code>{artifact.get('sha256', 'N/A')}</code></td>
-                        </tr>
-            """
-        
-        html += """
-                    </tbody>
-                </table>
-            </div>
-            
-            <div class="section">
-                <h3>🔬 Kết quả phân tích</h3>
-                <table class="evidence-table">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Công cụ</th>
-                            <th>Thời gian chạy</th>
-                            <th>Tóm tắt</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-        """
-        
+                row_cells = evidence_table.add_row().cells
+                row_cells[0].text = str(artifact['artefact_id'])
+                row_cells[1].text = artifact['name']
+                row_cells[2].text = artifact.get('evidence_type', 'N/A')
+                row_cells[3].text = f"{artifact.get('size', 0):,} bytes"
+                row_cells[4].text = artifact.get('collected_at', 'N/A')
+                row_cells[5].text = artifact.get('sha256', 'N/A')
+        else:
+            doc.add_paragraph("Không có bằng chứng nào được tìm thấy.")
+
+        doc.add_page_break()
+
+        # Analysis Results Section
+        heading = doc.add_paragraph("KẾT QUẢ PHÂN TÍCH", style='CustomHeading2')
+
+        if results:
+            results_table = doc.add_table(rows=1, cols=4)
+            results_table.style = 'Table Grid'
+
+            # Header row
+            hdr_cells = results_table.rows[0].cells
+            hdr_cells[0].text = "ID"
+            hdr_cells[1].text = "Công cụ"
+            hdr_cells[2].text = "Thời gian chạy"
+            hdr_cells[3].text = "Tóm tắt"
+
+            # Data rows
         for result in results:
-            html += f"""
-                        <tr>
-                            <td>{result['result_id']}</td>
-                            <td>{result.get('tool_used', 'N/A')}</td>
-                            <td>{result.get('run_at', 'N/A')}</td>
-                            <td>{result.get('summary', 'N/A')}</td>
-                        </tr>
-            """
-        
-        html += """
-                    </tbody>
-                </table>
-            </div>
-            
-            <div class="section">
-                <h3>📝 Nhật ký hoạt động (Activity Log)</h3>
-                <table class="evidence-table">
-                    <thead>
-                        <tr>
-                            <th>Thời gian</th>
-                            <th>Hành động</th>
-                            <th>Người thực hiện</th>
-                            <th>Công cụ</th>
-                            <th>Chi tiết</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-        """
-        
+                row_cells = results_table.add_row().cells
+                row_cells[0].text = str(result['result_id'])
+                row_cells[1].text = result.get('tool_used', 'N/A')
+                row_cells[2].text = result.get('run_at', 'N/A')
+                row_cells[3].text = result.get('summary', 'N/A')
+        else:
+            doc.add_paragraph("Không có kết quả phân tích nào.")
+
+        doc.add_page_break()
+
+        # Activity Log Section
+        heading = doc.add_paragraph("NHẬT KÝ HOẠT ĐỘNG", style='CustomHeading2')
+
+        if activity_logs:
+            activity_table = doc.add_table(rows=1, cols=5)
+            activity_table.style = 'Table Grid'
+
+            # Header row
+            hdr_cells = activity_table.rows[0].cells
+            hdr_cells[0].text = "Thời gian"
+            hdr_cells[1].text = "Hành động"
+            hdr_cells[2].text = "Người thực hiện"
+            hdr_cells[3].text = "Công cụ"
+            hdr_cells[4].text = "Chi tiết"
+
+            # Data rows
         for log in activity_logs:
-            html += f"""
-                        <tr>
-                            <td class="timestamp">{log.get('timestamp', 'N/A')}</td>
-                            <td>{log.get('action', 'N/A')}</td>
-                            <td>{log.get('username', 'N/A')}</td>
-                            <td>{log.get('tool_used', 'N/A')}</td>
-                            <td>{log.get('details', 'N/A')}</td>
-                        </tr>
-            """
-        
-        html += """
-                    </tbody>
-                </table>
-            </div>
-            
-            <div class="section chain-of-custody">
-                <h3> Chain of Custody (Chuỗi bảo quản)</h3>
-                <p><strong>Báo cáo này đảm bảo tính toàn vẹn của bằng chứng số:</strong></p>
-                <ul>
-                    <li>✅ Tất cả bằng chứng đều có hash SHA-256 để xác minh tính toàn vẹn</li>
-                    <li>✅ Nhật ký hoạt động ghi lại mọi thao tác với bằng chứng</li>
-                    <li>✅ Timestamp cho mọi hoạt động thu thập và phân tích</li>
-                    <li>✅ Thông tin người thực hiện và công cụ sử dụng</li>
-                </ul>
-                <p><strong>Báo cáo được tạo vào:</strong> {datetime.now().strftime('%d/%m/%Y %H:%M:%S')}</p>
-            </div>
-            
-            <div class="section">
-                <h3>📊 Tóm tắt và khuyến nghị</h3>
-                <p>Dựa trên kết quả phân tích, vụ án này cần:</p>
-                <ul>
-                    <li>🔍 Tiếp tục thu thập thêm bằng chứng nếu cần thiết</li>
-                    <li> Hoàn thiện chuỗi bảo quản bằng chứng</li>
-                    <li>⚖️ Chuẩn bị báo cáo cho cơ quan có thẩm quyền</li>
-                    <li>💾 Lưu trữ an toàn tất cả bằng chứng số</li>
-                </ul>
-            </div>
-        </body>
-        </html>
-        """
-        
-        return html
+                row_cells = activity_table.add_row().cells
+                row_cells[0].text = log.get('timestamp', 'N/A')
+                row_cells[1].text = log.get('action', 'N/A')
+                row_cells[2].text = log.get('username', 'N/A')
+                row_cells[3].text = log.get('tool_used', 'N/A')
+                row_cells[4].text = log.get('details', 'N/A')
+        else:
+            doc.add_paragraph("Không có nhật ký hoạt động nào.")
 
-    def _create_executive_html(self, case_info, artifacts, results):
-        """Create executive summary HTML"""
-        html = f"""
-        <!DOCTYPE html>
-        <html lang="vi">
-        <head>
-            <meta charset="UTF-8">
-            <title>Executive Summary - Case {case_info['case_id']}</title>
-            <style>
-                body {{ font-family: Arial, sans-serif; margin: 20px; }}
-                .header {{ background: #2c3e50; color: white; padding: 20px; text-align: center; }}
-                .summary {{ background: #ecf0f1; padding: 20px; margin: 20px 0; border-radius: 8px; }}
-                .stats {{ display: flex; justify-content: space-around; margin: 20px 0; }}
-                .stat-box {{ background: white; padding: 20px; border-radius: 8px; text-align: center; border: 1px solid #ddd; }}
-            </style>
-        </head>
-        <body>
-            <div class="header">
-                <h1>📊 Executive Summary</h1>
-                <h2>Case {case_info['case_id']}: {case_info['title']}</h2>
-            </div>
-            
-            <div class="summary">
-                <h3>📋 Tóm tắt vụ án</h3>
-                <p><strong>Điều tra viên:</strong> {case_info.get('full_name', 'N/A')}</p>
-                <p><strong>Ngày tạo:</strong> {case_info.get('created_at', 'N/A')}</p>
-                <p><strong>Trạng thái:</strong> {case_info.get('status', 'N/A')}</p>
-            </div>
-            
-            <div class="stats">
-                <div class="stat-box">
-                    <h3>📁 Bằng chứng</h3>
-                    <h2>{len(artifacts)}</h2>
-                    <p>items</p>
-                </div>
-                <div class="stat-box">
-                    <h3>🔬 Phân tích</h3>
-                    <h2>{len(results)}</h2>
-                    <p>results</p>
-                </div>
-            </div>
-            
-            <div class="summary">
-                <h3> Kết luận chính</h3>
-                <p>Vụ án đã được điều tra với {len(artifacts)} bằng chứng số và {len(results)} kết quả phân tích.</p>
-                <p>Chuỗi bảo quản bằng chứng đã được duy trì theo đúng quy trình.</p>
-            </div>
-        </body>
-        </html>
-        """
-        return html
+        doc.add_page_break()
 
-    def _create_technical_html(self, case_info, artifacts, results, activity_logs):
-        """Create technical detailed HTML"""
-        html = f"""
-        <!DOCTYPE html>
-        <html lang="vi">
-        <head>
-            <meta charset="UTF-8">
-            <title>Technical Report - Case {case_info['case_id']}</title>
-            <style>
-                body {{ font-family: 'Courier New', monospace; margin: 20px; }}
-                .header {{ background: #34495e; color: white; padding: 20px; }}
-                .section {{ margin: 20px 0; padding: 20px; border: 1px solid #ddd; }}
-                .code {{ background: #f8f9fa; padding: 10px; border-radius: 4px; font-family: monospace; }}
-            </style>
-        </head>
-        <body>
-            <div class="header">
-                <h1> Technical Report</h1>
-                <h2>Case {case_info['case_id']}: {case_info['title']}</h2>
-            </div>
-            
-            <div class="section">
-                <h3>📊 Technical Details</h3>
-                <div class="code">
-                    <p>Case ID: {case_info['case_id']}</p>
-                    <p>Investigator: {case_info.get('full_name', 'N/A')}</p>
-                    <p>Created: {case_info.get('created_at', 'N/A')}</p>
-                    <p>Status: {case_info.get('status', 'N/A')}</p>
-                </div>
-            </div>
-            
-            <div class="section">
-                <h3>📁 Evidence Collection</h3>
-                <div class="code">
-                    <p>Total Artifacts: {len(artifacts)}</p>
-                    <p>Total Results: {len(results)}</p>
-                    <p>Total Activities: {len(activity_logs)}</p>
-                </div>
-            </div>
-            
-            <div class="section">
-                <h3> Analysis Results</h3>
-                <div class="code">
-        """
-        
+        # Chain of Custody Section
+        heading = doc.add_paragraph("CHAIN OF CUSTODY", style='CustomHeading2')
+
+        coc_paragraph = doc.add_paragraph()
+        coc_paragraph.add_run("Báo cáo này đảm bảo tính toàn vẹn của bằng chứng số:").bold = True
+
+        coc_items = [
+            "Tất cả bằng chứng đều có hash SHA-256 để xác minh tính toàn vẹn",
+            "Nhật ký hoạt động ghi lại mọi thao tác với bằng chứng",
+            "Timestamp cho mọi hoạt động thu thập và phân tích",
+            "Thông tin người thực hiện và công cụ sử dụng"
+        ]
+
+        for item in coc_items:
+            p = doc.add_paragraph(item, style='List Bullet')
+
+        doc.add_paragraph("")
+        doc.add_paragraph(f"Báo cáo được tạo vào: {datetime.now().strftime('%d/%m/%Y %H:%M:%S')}")
+
+        doc.add_page_break()
+
+        # Recommendations Section
+        heading = doc.add_paragraph("TÓM TẮT VÀ KHUYẾN NGHỊ", style='CustomHeading2')
+
+        rec_paragraph = doc.add_paragraph()
+        rec_paragraph.add_run("Dựa trên kết quả phân tích, vụ án này cần:").bold = True
+
+        recommendations = [
+            "Tiếp tục thu thập thêm bằng chứng nếu cần thiết",
+            "Hoàn thiện chuỗi bảo quản bằng chứng",
+            "Chuẩn bị báo cáo cho cơ quan có thẩm quyền",
+            "Lưu trữ an toàn tất cả bằng chứng số"
+        ]
+
+        for rec in recommendations:
+            p = doc.add_paragraph(rec, style='List Bullet')
+
+        return doc
+
+    def _create_executive_docx(self, case_info, artifacts, results):
+        """Create executive summary Word document"""
+        doc = Document()
+
+        # Setup styles
+        self._setup_word_styles(doc)
+
+        # Header
+        title = doc.add_paragraph("EXECUTIVE SUMMARY", style='CustomHeading1')
+        title.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
+
+        case_title = doc.add_paragraph(f"Case {case_info['case_id']}: {case_info['title']}")
+        case_title.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
+
+        doc.add_paragraph("")
+
+        # Case Summary Section
+        heading = doc.add_paragraph("TÓM TẮT VỤ ÁN", style='CustomHeading2')
+
+        summary_table = doc.add_table(rows=3, cols=2)
+        summary_table.style = 'Table Grid'
+
+        # Data rows
+        rows_data = [
+            ("Điều tra viên", case_info.get('full_name', 'N/A')),
+            ("Ngày tạo", case_info.get('created_at', 'N/A')),
+            ("Trạng thái", case_info.get('status', 'N/A'))
+        ]
+
+        for i, (label, value) in enumerate(rows_data):
+            row_cells = summary_table.rows[i].cells
+            row_cells[0].text = label
+            row_cells[1].text = value
+
+        doc.add_paragraph("")
+
+        # Statistics Section
+        heading = doc.add_paragraph("THỐNG KÊ", style='CustomHeading2')
+
+        stats_table = doc.add_table(rows=2, cols=2)
+        stats_table.style = 'Table Grid'
+
+        # Header row
+        hdr_cells = stats_table.rows[0].cells
+        hdr_cells[0].text = "Loại"
+        hdr_cells[1].text = "Số lượng"
+
+        # Data rows
+        stats_data = [
+            ("Bằng chứng số", str(len(artifacts))),
+            ("Kết quả phân tích", str(len(results)))
+        ]
+
+        for i, (label, value) in enumerate(stats_data, 1):
+            row_cells = stats_table.rows[i].cells
+            row_cells[0].text = label
+            row_cells[1].text = value
+
+        doc.add_page_break()
+
+        # Conclusion Section
+        heading = doc.add_paragraph("KẾT LUẬN CHÍNH", style='CustomHeading2')
+
+        conclusion = doc.add_paragraph()
+        conclusion.add_run(f"Vụ án đã được điều tra với {len(artifacts)} bằng chứng số và {len(results)} kết quả phân tích.").bold = True
+
+        doc.add_paragraph("")
+        doc.add_paragraph("Chuỗi bảo quản bằng chứng đã được duy trì theo đúng quy trình pháp y số.")
+
+        return doc
+
+    def _create_technical_docx(self, case_info, artifacts, results, activity_logs):
+        """Create technical detailed Word document"""
+        doc = Document()
+
+        # Setup styles
+        self._setup_word_styles(doc)
+
+        # Header
+        title = doc.add_paragraph("TECHNICAL REPORT", style='CustomHeading1')
+        title.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
+
+        case_title = doc.add_paragraph(f"Case {case_info['case_id']}: {case_info['title']}")
+        case_title.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
+
+        doc.add_paragraph("")
+
+        # Technical Details Section
+        heading = doc.add_paragraph("TECHNICAL DETAILS", style='CustomHeading2')
+
+        details_table = doc.add_table(rows=4, cols=2)
+        details_table.style = 'Table Grid'
+
+        # Data rows
+        rows_data = [
+            ("Case ID", case_info['case_id']),
+            ("Investigator", case_info.get('full_name', 'N/A')),
+            ("Created", case_info.get('created_at', 'N/A')),
+            ("Status", case_info.get('status', 'N/A'))
+        ]
+
+        for i, (label, value) in enumerate(rows_data):
+            row_cells = details_table.rows[i].cells
+            row_cells[0].text = label
+            row_cells[1].text = value
+
+        doc.add_page_break()
+
+        # Evidence Collection Section
+        heading = doc.add_paragraph("EVIDENCE COLLECTION", style='CustomHeading2')
+
+        collection_table = doc.add_table(rows=3, cols=2)
+        collection_table.style = 'Table Grid'
+
+        # Data rows
+        collection_data = [
+            ("Total Artifacts", str(len(artifacts))),
+            ("Total Results", str(len(results))),
+            ("Total Activities", str(len(activity_logs)))
+        ]
+
+        for i, (label, value) in enumerate(collection_data):
+            row_cells = collection_table.rows[i].cells
+            row_cells[0].text = label
+            row_cells[1].text = value
+
+        doc.add_page_break()
+
+        # Analysis Results Section
+        heading = doc.add_paragraph("ANALYSIS RESULTS", style='CustomHeading2')
+
+        if results:
+            results_table = doc.add_table(rows=1, cols=3)
+            results_table.style = 'Table Grid'
+
+            # Header row
+            hdr_cells = results_table.rows[0].cells
+            hdr_cells[0].text = "ID"
+            hdr_cells[1].text = "Tool"
+            hdr_cells[2].text = "Summary"
+
+            # Data rows
         for result in results:
-            html += f"""
-                    <p>Result {result['result_id']}: {result.get('tool_used', 'N/A')} - {result.get('summary', 'N/A')}</p>
-            """
-        
-        html += """
-                </div>
-            </div>
-        </body>
-        </html>
-        """
-        return html
+                row_cells = results_table.add_row().cells
+                row_cells[0].text = str(result['result_id'])
+                row_cells[1].text = result.get('tool_used', 'N/A')
+                row_cells[2].text = result.get('summary', 'N/A')
+        else:
+            doc.add_paragraph("No analysis results available.")
 
-    def _create_coc_html(self, case_info, artifacts, activity_logs):
-        """Create Chain of Custody HTML"""
-        html = f"""
-        <!DOCTYPE html>
-        <html lang="vi">
-        <head>
-            <meta charset="UTF-8">
-            <title>Chain of Custody - Case {case_info['case_id']}</title>
-            <style>
-                body {{ font-family: Arial, sans-serif; margin: 20px; }}
-                .header {{ background: #27ae60; color: white; padding: 20px; text-align: center; }}
-                .coc-table {{ width: 100%; border-collapse: collapse; margin: 20px 0; }}
-                .coc-table th, .coc-table td {{ border: 1px solid #ddd; padding: 12px; text-align: left; }}
-                .coc-table th {{ background-color: #2ecc71; color: white; }}
-                .signature {{ border-top: 2px solid #27ae60; margin-top: 20px; padding-top: 20px; }}
-            </style>
-        </head>
-        <body>
-            <div class="header">
-                <h1> Chain of Custody</h1>
-                <h2>Case {case_info['case_id']}: {case_info['title']}</h2>
-            </div>
-            
-            <h3> Evidence Chain</h3>
-            <table class="coc-table">
-                <thead>
-                    <tr>
-                        <th>Item #</th>
-                        <th>Description</th>
-                        <th>Collected By</th>
-                        <th>Date/Time</th>
-                        <th>Hash SHA-256</th>
-                        <th>Signature</th>
-                    </tr>
-                </thead>
-                <tbody>
-        """
-        
+        return doc
+
+    def _create_coc_docx(self, case_info, artifacts, activity_logs):
+        """Create Chain of Custody Word document"""
+        doc = Document()
+
+        # Setup styles
+        self._setup_word_styles(doc)
+
+        # Header
+        title = doc.add_paragraph("CHAIN OF CUSTODY", style='CustomHeading1')
+        title.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
+
+        case_title = doc.add_paragraph(f"Case {case_info['case_id']}: {case_info['title']}")
+        case_title.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
+
+        doc.add_paragraph("")
+
+        # Evidence Chain Section
+        heading = doc.add_paragraph("EVIDENCE CHAIN", style='CustomHeading2')
+
+        if artifacts:
+            coc_table = doc.add_table(rows=1, cols=6)
+            coc_table.style = 'Table Grid'
+
+            # Header row
+            hdr_cells = coc_table.rows[0].cells
+            hdr_cells[0].text = "Item #"
+            hdr_cells[1].text = "Description"
+            hdr_cells[2].text = "Collected By"
+            hdr_cells[3].text = "Date/Time"
+            hdr_cells[4].text = "Hash SHA-256"
+            hdr_cells[5].text = "Signature"
+
+            # Data rows
         for i, artifact in enumerate(artifacts, 1):
-            html += f"""
-                    <tr>
-                        <td>{i}</td>
-                        <td>{artifact['name']}</td>
-                        <td>{case_info.get('full_name', 'N/A')}</td>
-                        <td>{artifact.get('collected_at', 'N/A')}</td>
-                        <td><code>{artifact.get('sha256', 'N/A')}</code></td>
-                        <td>_________________</td>
-                    </tr>
-            """
-        
-        html += """
-                </tbody>
-            </table>
-            
-            <div class="signature">
-                <h3>📝 Custody Transfer Log</h3>
-                <table class="coc-table">
-                    <thead>
-                        <tr>
-                            <th>From</th>
-                            <th>To</th>
-                            <th>Date/Time</th>
-                            <th>Purpose</th>
-                            <th>Signature</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>{case_info.get('full_name', 'N/A')}</td>
-                            <td>Evidence Storage</td>
-                            <td>{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}</td>
-                            <td>Secure Storage</td>
-                            <td>_________________</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-            
-            <div class="signature">
-                <h3>✅ Integrity Verification</h3>
-                <p>All evidence items have been verified with SHA-256 hashes.</p>
-                <p>Chain of custody has been maintained throughout the investigation.</p>
-                <p><strong>Report generated:</strong> {datetime.now().strftime('%d/%m/%Y %H:%M:%S')}</p>
-            </div>
-        </body>
-        </html>
-        """
-        return html
+                row_cells = coc_table.add_row().cells
+                row_cells[0].text = str(i)
+                row_cells[1].text = artifact['name']
+                row_cells[2].text = case_info.get('full_name', 'N/A')
+                row_cells[3].text = artifact.get('collected_at', 'N/A')
+                row_cells[4].text = artifact.get('sha256', 'N/A')
+                row_cells[5].text = "_________________"
+        else:
+            doc.add_paragraph("No evidence items found.")
+
+        doc.add_page_break()
+
+        # Custody Transfer Log Section
+        heading = doc.add_paragraph("CUSTODY TRANSFER LOG", style='CustomHeading2')
+
+        transfer_table = doc.add_table(rows=1, cols=5)
+        transfer_table.style = 'Table Grid'
+
+        # Header row
+        hdr_cells = transfer_table.rows[0].cells
+        hdr_cells[0].text = "From"
+        hdr_cells[1].text = "To"
+        hdr_cells[2].text = "Date/Time"
+        hdr_cells[3].text = "Purpose"
+        hdr_cells[4].text = "Signature"
+
+        # Data row
+        row_cells = transfer_table.add_row().cells
+        row_cells[0].text = case_info.get('full_name', 'N/A')
+        row_cells[1].text = "Evidence Storage"
+        row_cells[2].text = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        row_cells[3].text = "Secure Storage"
+        row_cells[4].text = "_________________"
+
+        doc.add_page_break()
+
+        # Integrity Verification Section
+        heading = doc.add_paragraph("INTEGRITY VERIFICATION", style='CustomHeading2')
+
+        verification_items = [
+            "All evidence items have been verified with SHA-256 hashes.",
+            "Chain of custody has been maintained throughout the investigation.",
+            f"Report generated: {datetime.now().strftime('%d/%m/%Y %H:%M:%S')}"
+        ]
+
+        for item in verification_items:
+            p = doc.add_paragraph(item, style='List Bullet')
+
+        return doc
+
+    def _setup_word_styles(self, doc):
+        """Setup Word document styles"""
+        from docx.shared import Pt, RGBColor
+        from docx.enum.style import WD_STYLE_TYPE
+
+        styles = doc.styles
+
+        # Heading 1 style
+        h1_style = styles.add_style('CustomHeading1', WD_STYLE_TYPE.PARAGRAPH)
+        h1_style.font.size = Pt(18)
+        h1_style.font.bold = True
+        h1_style.font.color.rgb = RGBColor(31, 73, 125)
+
+        # Heading 2 style
+        h2_style = styles.add_style('CustomHeading2', WD_STYLE_TYPE.PARAGRAPH)
+        h2_style.font.size = Pt(14)
+        h2_style.font.bold = True
+        h2_style.font.color.rgb = RGBColor(79, 129, 189)
+
+        # Normal text style
+        normal_style = styles['Normal']
+        normal_style.font.size = Pt(11)
+        normal_style.font.name = 'Times New Roman'
 
 class Report(QWidget):
     def __init__(self, main_window=None):
@@ -620,8 +761,8 @@ class Report(QWidget):
             
             for row, report in enumerate(reports):
                 self.ui.reportsTable.setItem(row, 0, QTableWidgetItem(str(report['report_id'])))
-                self.ui.reportsTable.setItem(row, 1, QTableWidgetItem(report.get('format', 'N/A')))
-                self.ui.reportsTable.setItem(row, 2, QTableWidgetItem(report.get('format', 'N/A')))
+                self.ui.reportsTable.setItem(row, 1, QTableWidgetItem(report.get('format', 'DOCX')))
+                self.ui.reportsTable.setItem(row, 2, QTableWidgetItem('DOCX'))
                 self.ui.reportsTable.setItem(row, 3, QTableWidgetItem(report.get('created_at', 'N/A')))
                 
                 # Truncate hash for display
@@ -643,10 +784,10 @@ class Report(QWidget):
             
         # Get report options
         report_type_map = {
-            "Báo cáo tổng hợp": "comprehensive",
-            "Tóm tắt điều hành": "executive", 
-            "Báo cáo kỹ thuật": "technical",
-            "Chain of Custody": "coc"
+            "Báo cáo tổng hợp (Word)": "comprehensive",
+            "Tóm tắt điều hành (Word)": "executive",
+            "Báo cáo kỹ thuật (Word)": "technical",
+            "Chain of Custody (Word)": "coc"
         }
         
         report_type = report_type_map.get(self.ui.typeCombo.currentText(), "comprehensive")
@@ -695,9 +836,9 @@ class Report(QWidget):
             QMessageBox.information(
                 self, 
                 "✅ Hoàn thành", 
-                f"Báo cáo đã được tạo thành công!\n\n"
+                f"Báo cáo Word đã được tạo thành công!\n\n"
                 f"📁 Đường dẫn: {file_path}\n"
-                f" Loại: {report_type}\n\n"
+                f"📄 Loại: {report_type}\n\n"
                 f"Báo cáo đã được lưu vào database với hash SHA-256."
             )
             
@@ -708,7 +849,7 @@ class Report(QWidget):
             QMessageBox.critical(
                 self, 
                 "❌ Lỗi", 
-                "Không thể tạo báo cáo. Vui lòng kiểm tra log và thử lại!"
+                "Không thể tạo báo cáo Word. Vui lòng kiểm tra log và thử lại!"
             )
             
     def set_case_id(self, case_id):
