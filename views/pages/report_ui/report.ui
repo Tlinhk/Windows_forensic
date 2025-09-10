@@ -117,7 +117,7 @@
      </property>
      <layout class="QVBoxLayout" name="optionsLayout">
       
-      <!-- Report Type Selection -->
+      <!-- Report Type Display (Fixed) -->
       <item>
        <layout class="QHBoxLayout" name="typeLayout">
         <item>
@@ -134,33 +134,19 @@
          </widget>
         </item>
         <item>
-         <widget class="QComboBox" name="typeCombo">
+         <widget class="QLabel" name="reportTypeDisplay">
+          <property name="text">
+           <string>📊 Báo cáo tổng hợp (Comprehensive Report)</string>
+          </property>
+          <property name="styleSheet">
+           <string>QLabel { color: #2c3e50; font-weight: bold; padding: 8px; background-color: #ecf0f1; border-radius: 4px; }</string>
+          </property>
           <property name="minimumSize">
            <size>
             <width>300</width>
             <height>0</height>
            </size>
           </property>
-          <item>
-           <property name="text">
-            <string>Báo cáo tổng hợp</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>Tóm tắt điều hành</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>Báo cáo kỹ thuật</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>Chain of Custody</string>
-           </property>
-          </item>
          </widget>
         </item>
         <item>
@@ -179,46 +165,100 @@
        </layout>
       </item>
       
-      <!-- Checkboxes for Options -->
+      <!-- Section Selection Options -->
       <item>
-       <layout class="QHBoxLayout" name="checkboxLayout">
-        <item>
+       <widget class="QLabel" name="sectionLabel">
+        <property name="text">
+         <string>Chọn các phần cần hiển thị trong báo cáo:</string>
+        </property>
+        <property name="font">
+         <font>
+          <weight>75</weight>
+          <bold>true</bold>
+         </font>
+        </property>
+        <property name="styleSheet">
+         <string>color: #34495e; margin: 5px 0px;</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <layout class="QGridLayout" name="checkboxLayout">
+        <item row="0" column="0">
+         <widget class="QCheckBox" name="caseInfoCheckbox">
+          <property name="text">
+           <string>📋 Thông tin vụ án</string>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+          <property name="toolTip">
+           <string>Hiển thị thông tin cơ bản về vụ án: ID, tên, điều tra viên, ngày tạo...</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
          <widget class="QCheckBox" name="evidenceCheckbox">
           <property name="text">
-           <string> Bao gồm bằng chứng số</string>
+           <string>🗂️ Bằng chứng số</string>
           </property>
           <property name="checked">
            <bool>true</bool>
           </property>
+          <property name="toolTip">
+           <string>Hiển thị danh sách bằng chứng số đã thu thập</string>
+          </property>
          </widget>
         </item>
-        <item>
+        <item row="1" column="0">
          <widget class="QCheckBox" name="analysisCheckbox">
           <property name="text">
-           <string>🔬 Bao gồm kết quả phân tích</string>
+           <string>🔬 Kết quả phân tích</string>
           </property>
           <property name="checked">
            <bool>true</bool>
           </property>
+          <property name="toolTip">
+           <string>Hiển thị kết quả phân tích từ các công cụ forensics</string>
+          </property>
          </widget>
         </item>
-        <item>
+        <item row="1" column="1">
          <widget class="QCheckBox" name="activityCheckbox">
           <property name="text">
-           <string> Bao gồm nhật ký hoạt động</string>
+           <string>📝 Nhật ký hoạt động</string>
           </property>
           <property name="checked">
            <bool>true</bool>
+          </property>
+          <property name="toolTip">
+           <string>Hiển thị lịch sử các hoạt động đã thực hiện</string>
           </property>
          </widget>
         </item>
-        <item>
+        <item row="2" column="0">
          <widget class="QCheckBox" name="cocCheckbox">
           <property name="text">
-           <string>🔒 Bao gồm Chain of Custody</string>
+           <string>🔒 Chain of Custody</string>
           </property>
           <property name="checked">
            <bool>true</bool>
+          </property>
+          <property name="toolTip">
+           <string>Hiển thị chuỗi bảo quản bằng chứng và tính toàn vẹn</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="1">
+         <widget class="QCheckBox" name="summaryCheckbox">
+          <property name="text">
+           <string>📊 Tóm tắt &amp; Khuyến nghị</string>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+          <property name="toolTip">
+           <string>Hiển thị phần tóm tắt và khuyến nghị dựa trên kết quả điều tra</string>
           </property>
          </widget>
         </item>
