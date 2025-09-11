@@ -341,7 +341,7 @@ class Ui_RegistryAnalysisWidget(object):
         self.txtSearch.setPlaceholderText(_translate("RegistryAnalysisWidget", "Search keys, values, data..."))
         self.btnSearchOptions.setText(_translate("RegistryAnalysisWidget", "▼"))
         self.statusIndicator.setText(_translate("RegistryAnalysisWidget", "● Ready"))
-        self.btnExport.setText(_translate("RegistryAnalysisWidget", "Export"))
+        self.btnExport.setText(_translate("RegistryAnalysisWidget", "Xuất dữ liệu"))
         self.btnExpandAll.setText(_translate("RegistryAnalysisWidget", "+"))
         self.btnExpandAll.setToolTip(_translate("RegistryAnalysisWidget", "Expand All"))
         self.btnCollapseAll.setText(_translate("RegistryAnalysisWidget", "-"))

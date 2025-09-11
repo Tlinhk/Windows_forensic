@@ -250,13 +250,13 @@ class ReportGenerator(QThread):
         self._setup_word_styles(doc)
 
         # Header
-        title = doc.add_paragraph("BÁO CÁO ĐIỀU TRA SỐ TỔNG HỢP", style='CustomHeading1')
+        title = doc.add_paragraph("BÁO CÁO ĐIỀU TRA PHÁP Y SỐ TỔNG HỢP", style='CustomHeading1')
         title.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
 
-        subtitle = doc.add_paragraph("CHAIN OF CUSTODY - EVIDENCE INTEGRITY", style='CustomHeading2')
+        subtitle = doc.add_paragraph("CHUỖI BẢO QUẢN - TÍNH TOÀN VẸN BẰNG CHỨNG", style='CustomHeading2')
         subtitle.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
 
-        case_title = doc.add_paragraph(f"Case ID: {case_info['case_id']} - {case_info['title']}")
+        case_title = doc.add_paragraph(f"Mã số vụ án: {case_info['case_id']} - {case_info['title']}")
         case_title.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
 
         doc.add_paragraph("")
@@ -274,12 +274,12 @@ class ReportGenerator(QThread):
 
         # Data rows
         rows_data = [
-            ("Case ID", case_info['case_id']),
+            ("Mã số vụ án", case_info['case_id']),
             ("Tên vụ án", case_info['title']),
-            ("Trạng thái", case_info.get('status', 'N/A')),
-            ("Điều tra viên", case_info.get('full_name', 'N/A')),
-            ("Ngày tạo", case_info.get('created_at', 'N/A')),
-            ("Đường dẫn lưu trữ", case_info.get('archive_path', 'N/A'))
+            ("Trạng thái", case_info.get('status', 'Không xác định')),
+            ("Điều tra viên", case_info.get('full_name', 'Không xác định')),
+            ("Ngày tạo", case_info.get('created_at', 'Không xác định')),
+            ("Đường dẫn lưu trữ", case_info.get('archive_path', 'Không xác định'))
         ]
 
         for i, (label, value) in enumerate(rows_data, 1):
@@ -290,7 +290,7 @@ class ReportGenerator(QThread):
         doc.add_page_break()
 
         # Evidence Section
-        heading = doc.add_paragraph("BẰNG CHỨNG SỐ (DIGITAL EVIDENCE)", style='CustomHeading2')
+        heading = doc.add_paragraph("BẰNG CHỨNG SỐ", style='CustomHeading2')
 
         if artifacts:
             evidence_table = doc.add_table(rows=1, cols=6)
@@ -298,27 +298,27 @@ class ReportGenerator(QThread):
 
             # Header row
             hdr_cells = evidence_table.rows[0].cells
-            hdr_cells[0].text = "ID"
-            hdr_cells[1].text = "Tên"
-            hdr_cells[2].text = "Loại"
+            hdr_cells[0].text = "Mã số"
+            hdr_cells[1].text = "Tên bằng chứng"
+            hdr_cells[2].text = "Loại bằng chứng"
             hdr_cells[3].text = "Kích thước"
             hdr_cells[4].text = "Ngày thu thập"
-            hdr_cells[5].text = "Hash SHA-256"
+            hdr_cells[5].text = "Mã băm SHA-256"
 
             # Data rows
             for artifact in artifacts:
                 row_cells = evidence_table.add_row().cells
                 row_cells[0].text = str(artifact['artefact_id'])
                 row_cells[1].text = artifact['name']
-                row_cells[2].text = artifact.get('evidence_type', 'N/A')
+                row_cells[2].text = artifact.get('evidence_type', 'Không xác định')
                 row_cells[3].text = f"{artifact.get('size', 0):,} bytes"
-                row_cells[4].text = artifact.get('collected_at', 'N/A')
+                row_cells[4].text = artifact.get('collected_at', 'Không xác định')
                 
                 # Get SHA-256 hash from artifacts table or hashes table
-                sha256_value = artifact.get('sha256', 'N/A')
-                row_cells[5].text = str(sha256_value) if sha256_value is not None else 'N/A'
+                sha256_value = artifact.get('sha256', 'Không có')
+                row_cells[5].text = str(sha256_value) if sha256_value is not None else 'Không có'
         else:
-            doc.add_paragraph("Không có bằng chứng nào được tìm thấy.")
+            doc.add_paragraph("Chưa có bằng chứng số nào được thu thập.")
 
         doc.add_page_break()
 
@@ -331,20 +331,20 @@ class ReportGenerator(QThread):
 
             # Header row
             hdr_cells = results_table.rows[0].cells
-            hdr_cells[0].text = "ID"
-            hdr_cells[1].text = "Công cụ"
-            hdr_cells[2].text = "Thời gian chạy"
-            hdr_cells[3].text = "Tóm tắt"
+            hdr_cells[0].text = "Mã số"
+            hdr_cells[1].text = "Công cụ sử dụng"
+            hdr_cells[2].text = "Thời gian thực hiện"
+            hdr_cells[3].text = "Tóm tắt kết quả"
 
             # Data rows
             for result in results:
                 row_cells = results_table.add_row().cells
                 row_cells[0].text = str(result['result_id'])
-                row_cells[1].text = result.get('tool_used', 'N/A')
-                row_cells[2].text = result.get('run_at', 'N/A')
-                row_cells[3].text = result.get('summary', 'N/A')
+                row_cells[1].text = result.get('tool_used', 'Không xác định')
+                row_cells[2].text = result.get('run_at', 'Không xác định')
+                row_cells[3].text = result.get('summary', 'Không có thông tin')
         else:
-            doc.add_paragraph("Không có kết quả phân tích nào.")
+            doc.add_paragraph("Chưa có kết quả phân tích nào được thực hiện.")
 
         doc.add_page_break()
 
@@ -360,32 +360,32 @@ class ReportGenerator(QThread):
             hdr_cells[0].text = "Thời gian"
             hdr_cells[1].text = "Hành động"
             hdr_cells[2].text = "Người thực hiện"
-            hdr_cells[3].text = "Công cụ"
+            hdr_cells[3].text = "Công cụ sử dụng"
             hdr_cells[4].text = "Chi tiết"
 
             # Data rows
             for log in activity_logs:
                 row_cells = activity_table.add_row().cells
-                row_cells[0].text = log.get('timestamp', 'N/A')
-                row_cells[1].text = log.get('action', 'N/A')
-                row_cells[2].text = log.get('username', 'N/A')
-                row_cells[3].text = log.get('tool_used', 'N/A')
-                row_cells[4].text = log.get('details', 'N/A')
+                row_cells[0].text = log.get('timestamp', 'Không xác định')
+                row_cells[1].text = log.get('action', 'Không xác định')
+                row_cells[2].text = log.get('username', 'Không xác định')
+                row_cells[3].text = log.get('tool_used', 'Không có')
+                row_cells[4].text = log.get('details', 'Không có')
         else:
-            doc.add_paragraph("Không có nhật ký hoạt động nào.")
+            doc.add_paragraph("Chưa có hoạt động nào được ghi nhận trong hệ thống.")
 
         doc.add_page_break()
 
         # Chain of Custody Section
-        heading = doc.add_paragraph("CHAIN OF CUSTODY", style='CustomHeading2')
+        heading = doc.add_paragraph("CHUỖI BẢO QUẢN BẰNG CHỨNG", style='CustomHeading2')
 
         coc_paragraph = doc.add_paragraph()
         coc_paragraph.add_run("Báo cáo này đảm bảo tính toàn vẹn của bằng chứng số:").bold = True
 
         coc_items = [
-            "Tất cả bằng chứng đều có hash SHA-256 để xác minh tính toàn vẹn",
+            "Tất cả bằng chứng đều có mã băm SHA-256 để xác minh tính toàn vẹn",
             "Nhật ký hoạt động ghi lại mọi thao tác với bằng chứng",
-            "Timestamp cho mọi hoạt động thu thập và phân tích",
+            "Dấu thời gian cho mọi hoạt động thu thập và phân tích",
             "Thông tin người thực hiện và công cụ sử dụng"
         ]
 
@@ -405,9 +405,9 @@ class ReportGenerator(QThread):
 
         recommendations = [
             "Tiếp tục thu thập thêm bằng chứng nếu cần thiết",
-            "Hoàn thiện chuỗi bảo quản bằng chứng",
-            "Chuẩn bị báo cáo cho cơ quan có thẩm quyền",
-            "Lưu trữ an toàn tất cả bằng chứng số"
+            "Hoàn thiện và duy trì chuỗi bảo quản bằng chứng",
+            "Chuẩn bị báo cáo chi tiết cho cơ quan có thẩm quyền",
+            "Lưu trữ an toàn và bảo mật tất cả bằng chứng số"
         ]
 
         for rec in recommendations:
@@ -423,10 +423,10 @@ class ReportGenerator(QThread):
         self._setup_word_styles(doc)
 
         # Header
-        title = doc.add_paragraph("EXECUTIVE SUMMARY", style='CustomHeading1')
+        title = doc.add_paragraph("TÓM TẮT BAN GIÁM ĐỐC", style='CustomHeading1')
         title.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
 
-        case_title = doc.add_paragraph(f"Case {case_info['case_id']}: {case_info['title']}")
+        case_title = doc.add_paragraph(f"Vụ án {case_info['case_id']}: {case_info['title']}")
         case_title.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
 
         doc.add_paragraph("")
@@ -439,9 +439,9 @@ class ReportGenerator(QThread):
 
         # Data rows
         rows_data = [
-            ("Điều tra viên", case_info.get('full_name', 'N/A')),
-            ("Ngày tạo", case_info.get('created_at', 'N/A')),
-            ("Trạng thái", case_info.get('status', 'N/A'))
+            ("Điều tra viên", case_info.get('full_name', 'Không xác định')),
+            ("Ngày tạo", case_info.get('created_at', 'Không xác định')),
+            ("Trạng thái", case_info.get('status', 'Không xác định'))
         ]
 
         for i, (label, value) in enumerate(rows_data):
@@ -494,26 +494,26 @@ class ReportGenerator(QThread):
         self._setup_word_styles(doc)
 
         # Header
-        title = doc.add_paragraph("TECHNICAL REPORT", style='CustomHeading1')
+        title = doc.add_paragraph("BÁO CÁO KỸ THUẬT", style='CustomHeading1')
         title.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
 
-        case_title = doc.add_paragraph(f"Case {case_info['case_id']}: {case_info['title']}")
+        case_title = doc.add_paragraph(f"Vụ án {case_info['case_id']}: {case_info['title']}")
         case_title.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
 
         doc.add_paragraph("")
 
         # Technical Details Section
-        heading = doc.add_paragraph("TECHNICAL DETAILS", style='CustomHeading2')
+        heading = doc.add_paragraph("CHI TIẾT KỸ THUẬT", style='CustomHeading2')
 
         details_table = doc.add_table(rows=4, cols=2)
         details_table.style = 'Table Grid'
 
         # Data rows
         rows_data = [
-            ("Case ID", case_info['case_id']),
-            ("Investigator", case_info.get('full_name', 'N/A')),
-            ("Created", case_info.get('created_at', 'N/A')),
-            ("Status", case_info.get('status', 'N/A'))
+            ("Mã số vụ án", case_info['case_id']),
+            ("Điều tra viên", case_info.get('full_name', 'Không xác định')),
+            ("Ngày tạo", case_info.get('created_at', 'Không xác định')),
+            ("Trạng thái", case_info.get('status', 'Không xác định'))
         ]
 
         for i, (label, value) in enumerate(rows_data):
@@ -524,16 +524,16 @@ class ReportGenerator(QThread):
         doc.add_page_break()
 
         # Evidence Collection Section
-        heading = doc.add_paragraph("EVIDENCE COLLECTION", style='CustomHeading2')
+        heading = doc.add_paragraph("THU THẬP BẰNG CHỨNG", style='CustomHeading2')
 
         collection_table = doc.add_table(rows=3, cols=2)
         collection_table.style = 'Table Grid'
 
         # Data rows
         collection_data = [
-            ("Total Artifacts", str(len(artifacts))),
-            ("Total Results", str(len(results))),
-            ("Total Activities", str(len(activity_logs)))
+            ("Tổng số bằng chứng", str(len(artifacts))),
+            ("Tổng số kết quả", str(len(results))),
+            ("Tổng số hoạt động", str(len(activity_logs)))
         ]
 
         for i, (label, value) in enumerate(collection_data):
@@ -544,7 +544,7 @@ class ReportGenerator(QThread):
         doc.add_page_break()
 
         # Analysis Results Section
-        heading = doc.add_paragraph("ANALYSIS RESULTS", style='CustomHeading2')
+        heading = doc.add_paragraph("KẾT QUẢ PHÂN TÍCH", style='CustomHeading2')
 
         if results:
             results_table = doc.add_table(rows=1, cols=3)
@@ -552,18 +552,18 @@ class ReportGenerator(QThread):
 
             # Header row
             hdr_cells = results_table.rows[0].cells
-            hdr_cells[0].text = "ID"
-            hdr_cells[1].text = "Tool"
-            hdr_cells[2].text = "Summary"
+            hdr_cells[0].text = "Mã số"
+            hdr_cells[1].text = "Công cụ"
+            hdr_cells[2].text = "Tóm tắt"
 
             # Data rows
             for result in results:
                 row_cells = results_table.add_row().cells
                 row_cells[0].text = str(result['result_id'])
-                row_cells[1].text = result.get('tool_used', 'N/A')
-                row_cells[2].text = result.get('summary', 'N/A')
+                row_cells[1].text = result.get('tool_used', 'Không xác định')
+                row_cells[2].text = result.get('summary', 'Không có thông tin')
         else:
-            doc.add_paragraph("No analysis results available.")
+            doc.add_paragraph("Chưa có kết quả phân tích nào.")
 
         return doc
 
@@ -575,16 +575,16 @@ class ReportGenerator(QThread):
         self._setup_word_styles(doc)
 
         # Header
-        title = doc.add_paragraph("CHAIN OF CUSTODY", style='CustomHeading1')
+        title = doc.add_paragraph("CHUỖI BẢO QUẢN BẰNG CHỨNG", style='CustomHeading1')
         title.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
 
-        case_title = doc.add_paragraph(f"Case {case_info['case_id']}: {case_info['title']}")
+        case_title = doc.add_paragraph(f"Vụ án {case_info['case_id']}: {case_info['title']}")
         case_title.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
 
         doc.add_paragraph("")
 
         # Evidence Chain Section
-        heading = doc.add_paragraph("EVIDENCE CHAIN", style='CustomHeading2')
+        heading = doc.add_paragraph("CHUỖI BẰNG CHỨNG", style='CustomHeading2')
 
         if artifacts:
             coc_table = doc.add_table(rows=1, cols=6)
@@ -592,58 +592,58 @@ class ReportGenerator(QThread):
 
             # Header row
             hdr_cells = coc_table.rows[0].cells
-            hdr_cells[0].text = "Item #"
-            hdr_cells[1].text = "Description"
-            hdr_cells[2].text = "Collected By"
-            hdr_cells[3].text = "Date/Time"
-            hdr_cells[4].text = "Hash SHA-256"
-            hdr_cells[5].text = "Signature"
+            hdr_cells[0].text = "STT"
+            hdr_cells[1].text = "Mô tả"
+            hdr_cells[2].text = "Người thu thập"
+            hdr_cells[3].text = "Ngày/Giờ"
+            hdr_cells[4].text = "Mã băm SHA-256"
+            hdr_cells[5].text = "Chữ ký"
 
             # Data rows
             for i, artifact in enumerate(artifacts, 1):
                 row_cells = coc_table.add_row().cells
                 row_cells[0].text = str(i)
                 row_cells[1].text = artifact['name']
-                row_cells[2].text = case_info.get('full_name', 'N/A')
-                row_cells[3].text = artifact.get('collected_at', 'N/A')
-                row_cells[4].text = artifact.get('sha256', 'N/A')
+                row_cells[2].text = case_info.get('full_name', 'Không xác định')
+                row_cells[3].text = artifact.get('collected_at', 'Không xác định')
+                row_cells[4].text = artifact.get('sha256', 'Không có')
                 row_cells[5].text = "_________________"
         else:
-            doc.add_paragraph("No evidence items found.")
+            doc.add_paragraph("Không tìm thấy bằng chứng nào.")
 
         doc.add_page_break()
 
         # Custody Transfer Log Section
-        heading = doc.add_paragraph("CUSTODY TRANSFER LOG", style='CustomHeading2')
+        heading = doc.add_paragraph("NHẬT KÝ CHUYỂN GIAO BẢO QUẢN", style='CustomHeading2')
 
         transfer_table = doc.add_table(rows=1, cols=5)
         transfer_table.style = 'Table Grid'
 
         # Header row
         hdr_cells = transfer_table.rows[0].cells
-        hdr_cells[0].text = "From"
-        hdr_cells[1].text = "To"
-        hdr_cells[2].text = "Date/Time"
-        hdr_cells[3].text = "Purpose"
-        hdr_cells[4].text = "Signature"
+        hdr_cells[0].text = "Từ"
+        hdr_cells[1].text = "Đến"
+        hdr_cells[2].text = "Ngày/Giờ"
+        hdr_cells[3].text = "Mục đích"
+        hdr_cells[4].text = "Chữ ký"
 
         # Data row
         row_cells = transfer_table.add_row().cells
-        row_cells[0].text = case_info.get('full_name', 'N/A')
-        row_cells[1].text = "Evidence Storage"
+        row_cells[0].text = case_info.get('full_name', 'Không xác định')
+        row_cells[1].text = "Kho lưu trữ bằng chứng"
         row_cells[2].text = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        row_cells[3].text = "Secure Storage"
+        row_cells[3].text = "Lưu trữ an toàn"
         row_cells[4].text = "_________________"
 
         doc.add_page_break()
 
         # Integrity Verification Section
-        heading = doc.add_paragraph("INTEGRITY VERIFICATION", style='CustomHeading2')
+        heading = doc.add_paragraph("XÁC MINH TÍNH TOÀN VẸN", style='CustomHeading2')
 
         verification_items = [
-            "All evidence items have been verified with SHA-256 hashes.",
-            "Chain of custody has been maintained throughout the investigation.",
-            f"Report generated: {datetime.now().strftime('%d/%m/%Y %H:%M:%S')}"
+            "Tất cả bằng chứng đã được xác minh bằng mã băm SHA-256.",
+            "Chuỗi bảo quản đã được duy trì trong suốt quá trình điều tra.",
+            f"Báo cáo được tạo: {datetime.now().strftime('%d/%m/%Y %H:%M:%S')}"
         ]
 
         for item in verification_items:
@@ -704,6 +704,7 @@ class ReportGenerator(QThread):
                 "include_summary": True
             }
         
+        
         doc = Document()
         
         # Title (always included)
@@ -716,100 +717,251 @@ class ReportGenerator(QThread):
         
         # Case info section
         if options.get("include_case_info", True):
-            doc.add_paragraph("📋 THÔNG TIN VỤ ÁN", style='Heading 2')
-            doc.add_paragraph(f"🆔 Case ID: {case_info['case_id']}")
-            doc.add_paragraph(f"📝 Tên vụ án: {case_info['title']}")
-            doc.add_paragraph(f"👨‍💼 Điều tra viên: {case_info.get('full_name', 'N/A')}")
-            doc.add_paragraph(f"📊 Trạng thái: {case_info.get('status', 'N/A')}")
-            doc.add_paragraph(f"📅 Ngày tạo: {case_info.get('created_at', 'N/A')}")
-            doc.add_paragraph(f"📂 Lưu trữ: {case_info.get('archive_path', 'N/A')}")
+            doc.add_paragraph("THÔNG TIN VỤ ÁN", style='Heading 2')
+            doc.add_paragraph(f"Mã số vụ án: {case_info['case_id']}")
+            doc.add_paragraph(f"Tên vụ án: {case_info['title']}")
+            doc.add_paragraph(f"Điều tra viên phụ trách: {case_info.get('full_name', 'Không xác định')}")
+            doc.add_paragraph(f"Trạng thái hiện tại: {case_info.get('status', 'Không xác định')}")
+            doc.add_paragraph(f"Ngày khởi tạo: {case_info.get('created_at', 'Không xác định')}")
+            doc.add_paragraph(f"Thư mục lưu trữ: {case_info.get('archive_path', 'Không xác định')}")
             doc.add_paragraph("")
         
         # Artifacts section
         if options.get("include_evidence", True):
-            doc.add_paragraph("🗂️ BẰNG CHỨNG SỐ", style='Heading 2')
+            doc.add_paragraph("BẰNG CHỨNG SỐ", style='Heading 2')
             if artifacts and len(artifacts) > 0:
-                doc.add_paragraph(f"📊 Tổng số bằng chứng: {len(artifacts)}")
+                doc.add_paragraph(f"Tổng số bằng chứng thu thập được: {len(artifacts)} mục")
                 for i, artifact in enumerate(artifacts, 1):
-                    doc.add_paragraph(f"{i}. 📄 {artifact['name']}")
-                    doc.add_paragraph(f"   • 🏷️ Loại: {artifact.get('evidence_type', 'N/A')}")
-                    doc.add_paragraph(f"   • 📏 Kích thước: {artifact.get('size', 0):,} bytes")
-                    doc.add_paragraph(f"   • 📅 Ngày thu thập: {artifact.get('collected_at', 'N/A')}")
-                    doc.add_paragraph(f"   • 🔐 Hash: {artifact.get('sha256', 'N/A')[:32]}...")
+                    doc.add_paragraph(f"{i}. Tên bằng chứng: {artifact['name']}")
+                    doc.add_paragraph(f"   - Loại bằng chứng: {artifact.get('evidence_type', 'Không xác định')}")
+                    doc.add_paragraph(f"   - Kích thước tệp: {artifact.get('size', 0):,} bytes")
+                    doc.add_paragraph(f"   - Thời gian thu thập: {artifact.get('collected_at', 'Không xác định')}")
+                    doc.add_paragraph(f"   - Mã băm SHA-256: {artifact.get('sha256', 'Không có')[:32]}...")
             else:
-                doc.add_paragraph("⚠️ Không có bằng chứng số nào.")
+                doc.add_paragraph("Chưa có bằng chứng số nào được thu thập trong vụ án này.")
             doc.add_paragraph("")
         
         # Results section
         if options.get("include_analysis", True):
-            doc.add_paragraph("🔬 KẾT QUẢ PHÂN TÍCH", style='Heading 2')
+            doc.add_paragraph("KẾT QUẢ PHÂN TÍCH", style='Heading 2')
             if results and len(results) > 0:
-                doc.add_paragraph(f"📊 Tổng số kết quả phân tích: {len(results)}")
+                doc.add_paragraph(f"Tổng số kết quả phân tích: {len(results)} kết quả")
                 for i, result in enumerate(results, 1):
-                    doc.add_paragraph(f"{i}. 🛠️ Công cụ: {result.get('tool_used', 'N/A')}")
-                    doc.add_paragraph(f"   • ⏰ Thời gian: {result.get('run_at', 'N/A')}")
-                    doc.add_paragraph(f"   • 📝 Tóm tắt: {result.get('summary', 'N/A')}")
+                    doc.add_paragraph(f"{i}. Công cụ sử dụng: {result.get('tool_used', 'Không xác định')}")
+                    doc.add_paragraph(f"   - Thời gian thực hiện: {result.get('run_at', 'Không xác định')}")
+                    doc.add_paragraph(f"   - Tóm tắt kết quả: {result.get('summary', 'Không có thông tin')}")
                     if result.get('result_path'):
-                        doc.add_paragraph(f"   • 📁 File kết quả: {result.get('result_path', 'N/A')}")
+                        doc.add_paragraph(f"   - Đường dẫn tệp kết quả: {result.get('result_path', 'Không có')}")
             else:
-                doc.add_paragraph("⚠️ Chưa có kết quả phân tích nào.")
+                doc.add_paragraph("Chưa có kết quả phân tích nào được thực hiện cho vụ án này.")
             doc.add_paragraph("")
         
         # Activity logs section
         if options.get("include_activity", True):
-            doc.add_paragraph("📝 NHẬT KÝ HOẠT ĐỘNG", style='Heading 2')
+            doc.add_paragraph("NHẬT KÝ HOẠT ĐỘNG", style='Heading 2')
             if activity_logs and len(activity_logs) > 0:
-                doc.add_paragraph(f"📊 Tổng số hoạt động: {len(activity_logs)}")
+                doc.add_paragraph(f"Tổng số hoạt động được ghi nhận: {len(activity_logs)} hoạt động")
                 for i, log in enumerate(activity_logs, 1):
-                    doc.add_paragraph(f"{i}. 🔧 {log.get('action', 'N/A')}")
-                    doc.add_paragraph(f"   • ⏰ Thời gian: {log.get('timestamp', 'N/A')}")
-                    doc.add_paragraph(f"   • 👤 Người thực hiện: {log.get('username', 'N/A')}")
+                    doc.add_paragraph(f"{i}. Hành động: {log.get('action', 'Không xác định')}")
+                    doc.add_paragraph(f"   - Thời gian thực hiện: {log.get('timestamp', 'Không xác định')}")
+                    doc.add_paragraph(f"   - Người thực hiện: {log.get('username', 'Không xác định')}")
                     if log.get('tool_used'):
-                        doc.add_paragraph(f"   • 🛠️ Công cụ: {log.get('tool_used', '')}")
+                        doc.add_paragraph(f"   - Công cụ sử dụng: {log.get('tool_used', '')}")
                     if log.get('details'):
-                        doc.add_paragraph(f"   • 📋 Chi tiết: {log.get('details', '')}")
+                        doc.add_paragraph(f"   - Chi tiết thêm: {log.get('details', '')}")
             else:
-                doc.add_paragraph("⚠️ Không có nhật ký hoạt động.")
+                doc.add_paragraph("Chưa có hoạt động nào được ghi nhận trong hệ thống.")
             doc.add_paragraph("")
         
         # Chain of custody section
         if options.get("include_coc", True):
-            doc.add_paragraph("🔒 CHAIN OF CUSTODY", style='Heading 2')
-            doc.add_paragraph("🛡️ Tính toàn vẹn bằng chứng:")
-            doc.add_paragraph("• ✅ Tất cả bằng chứng được bảo quản theo quy trình pháp y số")
-            doc.add_paragraph("• ✅ Nhật ký hoạt động ghi lại mọi thao tác")
-            doc.add_paragraph("• ✅ Hash SHA-256 đảm bảo tính toàn vẹn")
-            doc.add_paragraph("• ✅ Chuỗi bảo quản được duy trì liên tục")
+            doc.add_paragraph("BIỂU MẪU CHUỖI BẢO QUẢN BẰNG CHỨNG", style='Heading 2')
+            doc.add_paragraph("")
+            
+            # Evidence/Property Custody Document Header
+            doc.add_paragraph("BIÊN BẢN BẢO QUẢN BẰNG CHỨNG VẬT CHỨNG", style='Heading 3')
+            
+            # Case information table
+            case_info_table = doc.add_table(rows=3, cols=4)
+            case_info_table.style = 'Table Grid'
+            
+            # Row 1: Tracking number and Case ID
+            row1_cells = case_info_table.rows[0].cells
+            row1_cells[0].text = "SỐ THEO DÕI"
+            row1_cells[1].text = f"VỤ ÁN-{case_info['case_id']}-{datetime.now().strftime('%Y%m%d')}"
+            row1_cells[2].text = "MÃ SỐ VỤ ÁN"
+            row1_cells[3].text = str(case_info['case_id'])
+            
+            # Row 2: Receiving activity and Location
+            row2_cells = case_info_table.rows[1].cells
+            row2_cells[0].text = "HOẠT ĐỘNG TIẾP NHẬN"
+            row2_cells[1].text = "Điều tra pháp y số"
+            row2_cells[2].text = "ĐỊA ĐIỂM"
+            row2_cells[3].text = "Phòng lab pháp y số"
+            
+            # Row 3: Name/address and other info
+            row3_cells = case_info_table.rows[2].cells
+            row3_cells[0].text = "TÊN, VĂN PHÒNG VÀ CHỨC DANH NGƯỜI GIAO BẰNG CHỨNG"
+            row3_cells[1].text = f"Chủ sở hữu: {case_info.get('full_name', 'Không xác định')}"
+            row3_cells[2].text = "ĐỊA CHỈ (Bao gồm mã bưu điện)"
+            row3_cells[3].text = case_info.get('archive_path', 'Không xác định')
+            
+            doc.add_paragraph("")
+            
+            # Location and reason table
+            location_table = doc.add_table(rows=1, cols=3)
+            location_table.style = 'Table Grid'
+            
+            loc_cells = location_table.rows[0].cells
+            loc_cells[0].text = "ĐỊA ĐIỂM THU THẬP"
+            loc_cells[1].text = "LÝ DO THU THẬP"
+            loc_cells[2].text = "NGÀY/GIỜ THU THẬP"
+            
+            # Add data row
+            data_row = location_table.add_row()
+            data_cells = data_row.cells
+            data_cells[0].text = case_info.get('archive_path', 'Không xác định')
+            data_cells[1].text = "Điều tra pháp y số"
+            data_cells[2].text = case_info.get('created_at', 'Không xác định')
+            
+            doc.add_paragraph("")
+            
+            # Evidence items table
+            doc.add_paragraph("MÔ TẢ VẬT CHỨNG", style='Heading 3')
+            
+            evidence_table = doc.add_table(rows=1, cols=3)
+            evidence_table.style = 'Table Grid'
+            
+            # Header
+            ev_hdr = evidence_table.rows[0].cells
+            ev_hdr[0].text = "STT"
+            ev_hdr[1].text = "SỐ LƯỢNG"
+            ev_hdr[2].text = "MÔ TẢ VẬT CHỨNG\n(Bao gồm model, số serial, tình trạng và các dấu hiệu đặc biệt)"
+            
+            # Add evidence items
+            if artifacts and len(artifacts) > 0:
+                for i, artifact in enumerate(artifacts, 1):
+                    ev_row = evidence_table.add_row()
+                    ev_cells = ev_row.cells
+                    ev_cells[0].text = str(i)
+                    ev_cells[1].text = "1"
+                    
+                    description = f"Bằng chứng số: {artifact['name']}\n"
+                    description += f"Loại: {artifact.get('evidence_type', 'Không xác định')}\n"
+                    description += f"Kích thước: {artifact.get('size', 0):,} bytes\n"
+                    description += f"Mã băm SHA256: {artifact.get('sha256', 'Không có')[:32]}...\n" if artifact.get('sha256', 'Không có') != 'Không có' else "Mã băm SHA256: Không có\n"
+                    description += f"Đường dẫn: {artifact.get('source_path', 'Không xác định')}"
+                    
+                    ev_cells[2].text = description
+            else:
+                ev_row = evidence_table.add_row()
+                ev_cells = ev_row.cells
+                ev_cells[0].text = "1"
+                ev_cells[1].text = "0"
+                ev_cells[2].text = "Chưa có bằng chứng số nào được xử lý"
+            
+            doc.add_paragraph("")
+            
+            # Chain of Custody tracking table
+            doc.add_paragraph("CHUỖI BẢO QUẢN BẰNG CHỨNG", style='Heading 3')
+            
+            coc_table = doc.add_table(rows=1, cols=6)
+            coc_table.style = 'Table Grid'
+            
+            # Header
+            coc_hdr = coc_table.rows[0].cells
+            coc_hdr[0].text = "STT VẬT CHỨNG"
+            coc_hdr[1].text = "NGÀY THÁNG"
+            coc_hdr[2].text = "NGƯỜI GIAO\nCHỮ KÝ"
+            coc_hdr[3].text = "NGƯỜI NHẬN\nCHỮ KÝ"
+            coc_hdr[4].text = "MỤC ĐÍCH CHUYỂN GIAO"
+            coc_hdr[5].text = "TÊN, CẤP BẬC HOẶC CHỨC DANH"
+            
+            # Add initial custody entry
+            coc_row1 = coc_table.add_row()
+            coc_cells1 = coc_row1.cells
+            coc_cells1[0].text = "TẤT CẢ"
+            coc_cells1[1].text = case_info.get('created_at', datetime.now().strftime('%Y-%m-%d'))
+            coc_cells1[2].text = "THU THẬP BAN ĐẦU"
+            coc_cells1[3].text = case_info.get('full_name', 'Chuyên viên pháp y số')
+            coc_cells1[4].text = "Thu thập bằng chứng"
+            coc_cells1[5].text = case_info.get('full_name', 'Không xác định')
+            
+            # Add analysis entry
+            coc_row2 = coc_table.add_row()
+            coc_cells2 = coc_row2.cells
+            coc_cells2[0].text = "TẤT CẢ"
+            coc_cells2[1].text = datetime.now().strftime('%Y-%m-%d')
+            coc_cells2[2].text = case_info.get('full_name', 'Không xác định')
+            coc_cells2[3].text = "Hệ thống pháp y số"
+            coc_cells2[4].text = "Phân tích pháp y số"
+            coc_cells2[5].text = "Phân tích toàn diện"
+            
+            # Add empty rows for future custody transfers
+            for i in range(3):
+                coc_row = coc_table.add_row()
+                coc_cells = coc_row.cells
+                for cell in coc_cells:
+                    cell.text = ""
+            
+            doc.add_paragraph("")
+            
+            # Final disposal section
+            doc.add_paragraph("HÀNH ĐỘNG XỬ LÝ CUỐI CÙNG", style='Heading 3')
+            
+            disposal_table = doc.add_table(rows=4, cols=1)
+            disposal_table.style = 'Table Grid'
+            
+            disposal_table.rows[0].cells[0].text = f"TRẢ LẠI CHO CHỦ SỞ HỮU HOẶC KHÁC (Tên/Tổ chức): {case_info.get('full_name', 'Không xác định')}"
+            disposal_table.rows[1].cells[0].text = "HỦY BỎ: _______________"
+            disposal_table.rows[2].cells[0].text = "KHÁC (Ghi rõ): Phân tích số hoàn tất - Bằng chứng được trả lại"
+            disposal_table.rows[3].cells[0].text = "CƠ QUAN THẨM QUYỀN XỬ LÝ CUỐI: Phòng Pháp y Số"
+            
+            doc.add_paragraph("")
+            
+            # Certification
+            cert_text = f"TÔI XÁC NHẬN RẰNG THÔNG TIN TRÊN LÀ BẢN GHI CHÍNH XÁC VỀ VIỆC BẢO QUẢN TRONG QUÁ TRÌNH ĐIỀU TRA/KHẢO SÁT CÁC VẬT CHỨNG: Bằng chứng số\n"
+            cert_text += f"VÀ CÁC VẬT CHỨNG ĐÃ ĐƯỢC BẢO QUẢN VÀ XỬ LÝ ĐÚNG QUY ĐỊNH NHƯ ĐƯỢC CHỈ RA Ở TRÊN.\n\n"
+            cert_text += f"CẦN THIẾT LÀM BẰNG CHỨNG VÀ CÓ THỂ ĐƯỢC XỬ LÝ NHƯ CHỈ RA Ở TRÊN. (Nếu vật phẩm phải được giữ lại thì không ký mà giải thích trong văn bản riêng.)\n\n"
+            cert_text += f"Điều tra viên: {case_info.get('full_name', 'Không xác định')}\n"
+            cert_text += f"Chữ ký: ___________________________ Ngày: {datetime.now().strftime('%Y-%m-%d')}\n\n"
+            cert_text += f"NHÂN CHỨNG VIỆC HỦY BỎ BẰNG CHỨNG\n"
+            cert_text += f"CÁC VẬT PHẨM ĐƯỢC LIỆT KÊ TẠI MỤC SỐ: Tệp bằng chứng số\n"
+            cert_text += f"ĐÃ ĐƯỢC NGƯỜI BẢO QUẢN BẰNG CHỨNG HỦY BỎ TRƯỚC MẶT TÔI, VÀO NGÀY NHƯ CHỈ RA Ở TRÊN.\n\n"
+            cert_text += f"Nhân chứng: ___________________________\n"
+            cert_text += f"Chữ ký: ___________________________ Ngày: ___________"
+            
+            doc.add_paragraph(cert_text)
             doc.add_paragraph("")
         
         # Summary and recommendations section
         if options.get("include_summary", True):
-            doc.add_paragraph("📊 TÓM TẮT & KHUYẾN NGHỊ", style='Heading 2')
+            doc.add_paragraph("TÓM TẮT VÀ KHUYẾN NGHỊ", style='Heading 2')
             
             # Statistics
-            doc.add_paragraph("📈 Thống kê tổng quan:")
-            doc.add_paragraph(f"• 🗂️ Bằng chứng số: {len(artifacts) if artifacts else 0}")
-            doc.add_paragraph(f"• 🔬 Kết quả phân tích: {len(results) if results else 0}")
-            doc.add_paragraph(f"• 📝 Hoạt động: {len(activity_logs) if activity_logs else 0}")
+            doc.add_paragraph("Thống kê tổng quan:")
+            doc.add_paragraph(f"- Tổng số bằng chứng số: {len(artifacts) if artifacts else 0} mục")
+            doc.add_paragraph(f"- Tổng số kết quả phân tích: {len(results) if results else 0} kết quả")
+            doc.add_paragraph(f"- Tổng số hoạt động ghi nhận: {len(activity_logs) if activity_logs else 0} hoạt động")
             doc.add_paragraph("")
             
             # Recommendations
-            doc.add_paragraph("💡 Khuyến nghị:")
+            doc.add_paragraph("Khuyến nghị:")
             if len(artifacts) == 0:
-                doc.add_paragraph("• ⚠️ Cần thu thập thêm bằng chứng số")
+                doc.add_paragraph("- Cần thu thập thêm bằng chứng số để hỗ trợ quá trình điều tra")
             if len(results) == 0:
-                doc.add_paragraph("• ⚠️ Cần thực hiện phân tích với các công cụ forensics")
+                doc.add_paragraph("- Cần thực hiện phân tích với các công cụ pháp y số chuyên dụng")
             
-            doc.add_paragraph("• 📋 Hoàn thiện chuỗi bảo quản bằng chứng")
-            doc.add_paragraph("• 📄 Chuẩn bị báo cáo cho cơ quan có thẩm quyền")
-            doc.add_paragraph("• 💾 Lưu trữ an toàn tất cả bằng chứng số")
+            doc.add_paragraph("- Hoàn thiện và duy trì chuỗi bảo quản bằng chứng theo quy định")
+            doc.add_paragraph("- Chuẩn bị báo cáo chi tiết để trình cơ quan có thẩm quyền")
+            doc.add_paragraph("- Lưu trữ an toàn và bảo mật tất cả bằng chứng số thu thập được")
             doc.add_paragraph("")
         
         # Footer (always included)
         doc.add_paragraph("─" * 60)
-        footer_text = f"📅 Báo cáo được tạo vào: {datetime.now().strftime('%d/%m/%Y %H:%M:%S')}"
-        footer_text += f"\n🏢 Hệ thống điều tra số - Digital Forensics System"
-        footer_text += f"\n👨‍💼 Điều tra viên: {case_info.get('full_name', 'N/A')}"
+        footer_text = f"Báo cáo được tạo vào: {datetime.now().strftime('%d/%m/%Y %H:%M:%S')}"
+        footer_text += f"\nHệ thống pháp y số - Windows Forensic System"
+        footer_text += f"\nĐiều tra viên phụ trách: {case_info.get('full_name', 'Không xác định')}"
         doc.add_paragraph(footer_text)
         
         return doc

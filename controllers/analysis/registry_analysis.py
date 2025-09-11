@@ -34,18 +34,8 @@ from PyQt5.QtGui import QStandardItemModel, QStandardItem, QIcon, QColor, QFont
 # Import giao diện người dùng - LƯU Ý: import đúng tên file UI
 from views.pages.analysis_ui.registry_analysis_ui import Ui_RegistryAnalysisWidget
 
-# Word document generation (python-docx)
-try:
-    from docx import Document
-    from docx.shared import Inches, Pt, RGBColor
-    from docx.enum.text import WD_PARAGRAPH_ALIGNMENT
-    from docx.enum.style import WD_STYLE_TYPE
-    DOCX_AVAILABLE = True
-except ImportError:
-    Document = None
-    WD_PARAGRAPH_ALIGNMENT = None
-    DOCX_AVAILABLE = False
-    print("Cảnh báo: Chưa cài đặt thư viện python-docx. Cài đặt bằng: pip install python-docx")
+# Các thư viện xuất dữ liệu
+# CSV được import ở đầu file
 
 # ============= Các Hàm Tiện Ích (giữ nguyên từ code cũ) =============
 
@@ -494,7 +484,6 @@ class RegistryAnalysis(QWidget):
         self.current_case_id = None
         self.current_analysis_thread = None
         self.registry_objects = {}  # Cache các đối tượng registry
-        self.reports_dir = None  # Thư mục lưu báo cáo
 
         # Models cho QTreeView và QTableView
         self.tree_model = QStandardItemModel()
@@ -631,14 +620,12 @@ class RegistryAnalysis(QWidget):
 
             case_info = db.get_case_with_investigator(case_id)
             if case_info and case_info.get('archive_path'):
-                # Thiết lập thư mục output và reports trong thư mục case
+                # Thiết lập thư mục output trong thư mục case
                 case_path = case_info['archive_path']
                 self.output_dir = os.path.join(case_path, "analysis_results", "registry")
-                self.reports_dir = os.path.join(case_path, "reports", "registry")
                 
-                # Tạo các thư mục cần thiết
+                # Tạo thư mục cần thiết
                 os.makedirs(self.output_dir, exist_ok=True)
-                os.makedirs(self.reports_dir, exist_ok=True)
 
                 # Tải kết quả phân tích đã có (nếu có) - PHẢI TRƯỚC auto_load_case_registry
                 print(f"🔄 Đang tải kết quả cũ cho case {self.current_case_id}")
@@ -663,14 +650,11 @@ class RegistryAnalysis(QWidget):
             from utils.path_utils import get_temp_dir
             temp_root = get_temp_dir() if callable(get_temp_dir) else "temp"
             self.output_dir = os.path.join(temp_root, "registry_analysis")
-            self.reports_dir = os.path.join(temp_root, "reports", "registry")
         except:
             base_dir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
             self.output_dir = os.path.join(base_dir, "temp", "registry_analysis")
-            self.reports_dir = os.path.join(base_dir, "temp", "reports", "registry")
 
         os.makedirs(self.output_dir, exist_ok=True)
-        os.makedirs(self.reports_dir, exist_ok=True)
         self.update_status("Sử dụng thư mục output tạm thời", "yellow")
 
     def _load_existing_analysis_results(self, db):
@@ -1586,9 +1570,8 @@ class RegistryAnalysis(QWidget):
         menu.addAction("🔬 Chạy Phân Tích Mới", self.run_new_analysis)
         menu.addSeparator()
         
-        menu.addAction("📄 Xuất Báo Cáo Word", self.export_html)
-        menu.addSeparator()
-        menu.addAction("📋 Tạo Mẫu Báo Cáo Word", self.create_word_template)
+        menu.addAction("📊 Xuất Dữ Liệu CSV", self.export_csv)
+        menu.addAction("📋 Xuất Timeline", self.export_timeline)
 
         menu.exec_(self.ui.btnExport.mapToGlobal(self.ui.btnExport.rect().bottomLeft()))
 
@@ -1893,680 +1876,90 @@ class RegistryAnalysis(QWidget):
             self.update_timeline()
             self.update_status("Đã làm mới view", "green")
             
-    def export_html(self):
-        """Xuất báo cáo Registry Analysis dưới dạng Word (.docx)."""
-        if not DOCX_AVAILABLE:
-            QMessageBox.warning(self, "Lỗi", "Thiếu thư viện python-docx. Cài đặt bằng: pip install python-docx")
+    def export_csv(self):
+        """Xuất dữ liệu phân tích registry ra CSV."""
+        if not self.analysis_results:
+            QMessageBox.warning(self, "Không có dữ liệu", "Chưa có kết quả phân tích nào để xuất.")
             return
 
-        if not self.current_case_id:
-            QMessageBox.warning(self, "Lỗi", "Vui lòng chọn case trước khi xuất báo cáo.")
+        file_dialog = QFileDialog()
+        file_dialog.setAcceptMode(QFileDialog.AcceptSave)
+        file_dialog.setNameFilter("CSV files (*.csv)")
+        file_dialog.setDefaultSuffix("csv")
+        
+        if file_dialog.exec_():
+            filepath = file_dialog.selectedFiles()[0]
+            try:
+                self._export_analysis_to_csv(filepath)
+                self.update_status("Đã xuất dữ liệu CSV", "green")
+                QMessageBox.information(self, "Thành công", f"Dữ liệu đã được xuất:\n{filepath}")
+            except Exception as e:
+                QMessageBox.critical(self, "Lỗi", f"Lỗi xuất CSV: {str(e)}")
+
+    def export_timeline(self):
+        """Xuất timeline registry ra CSV."""
+        if self.ui.timelineTable.rowCount() == 0:
+            QMessageBox.warning(self, "Không có dữ liệu", "Chưa có timeline nào để xuất.")
             return
 
-        if not hasattr(self, 'reports_dir') or not self.reports_dir:
-            QMessageBox.warning(self, "Lỗi", "Thư mục reports chưa được thiết lập.")
-            return
+        file_dialog = QFileDialog()
+        file_dialog.setAcceptMode(QFileDialog.AcceptSave)
+        file_dialog.setNameFilter("CSV files (*.csv)")
+        file_dialog.setDefaultSuffix("csv")
+        
+        if file_dialog.exec_():
+            filepath = file_dialog.selectedFiles()[0]
+            try:
+                self._export_timeline_to_csv(filepath)
+                self.update_status("Đã xuất timeline CSV", "green")
+                QMessageBox.information(self, "Thành công", f"Timeline đã được xuất:\n{filepath}")
+            except Exception as e:
+                QMessageBox.critical(self, "Lỗi", f"Lỗi xuất timeline: {str(e)}")
 
-        # Tự động tạo tên file với timestamp
-        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-        filename = f"registry_report_case_{self.current_case_id}_{timestamp}.docx"
-        filepath = os.path.join(self.reports_dir, filename)
-
+    def _export_analysis_to_csv(self, filepath):
+        """Xuất kết quả phân tích registry ra file CSV."""
         try:
-            self._generate_word_report(filepath)
-            # Lưu thông tin báo cáo vào database với hash
-            self._save_report_to_database(filepath)
-            self.update_status("Đã xuất báo cáo Word", "green")
-            QMessageBox.information(self, "Thành công", f"Báo cáo đã được xuất:\n{filepath}")
-        except Exception as e:
-            QMessageBox.critical(self, "Lỗi", f"Lỗi xuất báo cáo: {str(e)}")
-
-    def create_word_template(self):
-        """Tạo mẫu báo cáo Word trống."""
-        if not DOCX_AVAILABLE:
-            QMessageBox.warning(self, "Lỗi", "Thiếu thư viện python-docx. Cài đặt bằng: pip install python-docx")
-            return
-
-        if not self.current_case_id:
-            QMessageBox.warning(self, "Lỗi", "Vui lòng chọn case trước khi tạo mẫu báo cáo.")
-            return
-
-        if not hasattr(self, 'reports_dir') or not self.reports_dir:
-            QMessageBox.warning(self, "Lỗi", "Thư mục reports chưa được thiết lập.")
-            return
-
-        # Tự động tạo tên file với timestamp
-        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-        filename = f"registry_template_case_{self.current_case_id}_{timestamp}.docx"
-        filepath = os.path.join(self.reports_dir, filename)
-
-        try:
-            self._create_word_template(filepath)
-            self.update_status("Đã tạo mẫu báo cáo Word", "green")
-            QMessageBox.information(self, "Thành công", f"Mẫu báo cáo đã được tạo:\n{filepath}")
-        except Exception as e:
-            QMessageBox.critical(self, "Lỗi", f"Lỗi tạo mẫu báo cáo: {str(e)}")
-
-    def _create_word_template(self, filepath):
-        """Tạo mẫu báo cáo Word trống với cấu trúc chuẩn."""
-        try:
-
-            # Tạo document mới
-            doc = Document()
-
-            # Thiết lập style cho document
-            self._setup_word_styles(doc)
-
-            # Header với thông tin case
-            self._add_template_header(doc)
-
-            # Các section trống
-            self._add_template_coc_section(doc)
-            self._add_template_summary_section(doc)
-            self._add_template_detailed_section(doc)
-            self._add_template_activity_section(doc)
-            self._add_template_signature_section(doc)
-
-            # Lưu document
-            doc.save(filepath)
-
-        except ImportError:
-            raise Exception("Thiếu thư viện python-docx. Cài đặt bằng: pip install python-docx")
-        except Exception as e:
-            raise Exception(f"Lỗi tạo mẫu báo cáo Word: {str(e)}")
-
-    def _add_template_header(self, doc):
-        """Thêm header mẫu với thông tin case."""
-        # Tiêu đề chính
-        title = doc.add_paragraph("BÁO CÁO PHÂN TÍCH REGISTRY", style='CustomHeading1')
-        title.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
-
-        subtitle = doc.add_paragraph("CHAIN OF CUSTODY - EVIDENCE INTEGRITY", style='CustomHeading2')
-        subtitle.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
-
-        doc.add_paragraph("")
-
-        # Thông tin case mẫu
-        info_table = doc.add_table(rows=6, cols=2)
-        info_table.style = 'Table Grid'
-
-        # Headers
-        hdr_cells = info_table.rows[0].cells
-        hdr_cells[0].text = "Thông tin Case"
-        hdr_cells[1].text = "Giá trị"
-
-        # Case ID
-        row_cells = info_table.rows[1].cells
-        row_cells[0].text = "Case ID:"
-        row_cells[1].text = "[Nhập Case ID]"
-
-        # Tiêu đề case
-        row_cells = info_table.rows[2].cells
-        row_cells[0].text = "Tiêu đề Case:"
-        row_cells[1].text = "[Nhập tiêu đề case]"
-
-        # Điều tra viên
-        row_cells = info_table.rows[3].cells
-        row_cells[0].text = "Điều tra viên:"
-        row_cells[1].text = "[Nhập tên điều tra viên]"
-
-        # Ngày tạo báo cáo
-        row_cells = info_table.rows[4].cells
-        row_cells[0].text = "Ngày tạo báo cáo:"
-        row_cells[1].text = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-
-        # Báo cáo ID
-        row_cells = info_table.rows[5].cells
-        row_cells[0].text = "Báo cáo ID:"
-        row_cells[1].text = f"REG_[Case ID]_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
-
-        doc.add_page_break()
-
-    def _add_template_coc_section(self, doc):
-        """Thêm section Chain of Custody mẫu."""
-        heading = doc.add_paragraph("CHAIN OF CUSTODY - EVIDENCE INTEGRITY", style='CustomHeading2')
-        heading.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
-
-        # Tạo bảng artifacts mẫu
-        table = doc.add_table(rows=2, cols=6)
-        table.style = 'Table Grid'
-
-        # Header row
-        hdr_cells = table.rows[0].cells
-        hdr_cells[0].text = "Artifact"
-        hdr_cells[1].text = "Loại"
-        hdr_cells[2].text = "Đường dẫn"
-        hdr_cells[3].text = "Kích thước"
-        hdr_cells[4].text = "SHA256 Hash"
-        hdr_cells[5].text = "Thời gian thu thập"
-
-        # Sample row
-        row_cells = table.rows[1].cells
-        row_cells[0].text = "[Tên artifact]"
-        row_cells[1].text = "[Loại evidence]"
-        row_cells[2].text = "[Đường dẫn file]"
-        row_cells[3].text = "[Kích thước file]"
-        row_cells[4].text = "[Hash SHA256]"
-        row_cells[5].text = "[Thời gian thu thập]"
-
-        doc.add_paragraph("[Mô tả chi tiết về Chain of Custody]")
-        doc.add_page_break()
-
-    def _add_template_summary_section(self, doc):
-        """Thêm section tóm tắt mẫu."""
-        heading = doc.add_paragraph("TÓM TẮT PHÂN TÍCH", style='CustomHeading2')
-
-        summary_table = doc.add_table(rows=5, cols=2)
-        summary_table.style = 'Table Grid'
-
-        # Số lượng kết quả phân tích
-        row_cells = summary_table.rows[0].cells
-        row_cells[0].text = "Số lượng kết quả phân tích:"
-        row_cells[1].text = "[Nhập số lượng]"
-
-        # Số lượng hoạt động đã log
-        row_cells = summary_table.rows[1].cells
-        row_cells[0].text = "Số lượng hoạt động đã log:"
-        row_cells[1].text = "[Nhập số lượng]"
-
-        # Số loại hive được phân tích
-        row_cells = summary_table.rows[2].cells
-        row_cells[0].text = "Số loại hive được phân tích:"
-        row_cells[1].text = "[Nhập số loại hive]"
-
-        # Công cụ sử dụng
-        row_cells = summary_table.rows[3].cells
-        row_cells[0].text = "Công cụ sử dụng:"
-        row_cells[1].text = "RECmd (Registry Explorer Command Line)"
-
-        # Tổng số artifacts
-        row_cells = summary_table.rows[4].cells
-        row_cells[0].text = "Tổng số artifacts:"
-        row_cells[1].text = "[Nhập tổng số]"
-
-        doc.add_paragraph("[Mô tả chi tiết về kết quả phân tích]")
-        doc.add_page_break()
-
-    def _add_template_detailed_section(self, doc):
-        """Thêm section chi tiết kết quả mẫu."""
-        heading = doc.add_paragraph("CHI TIẾT KẾT QUẢ PHÂN TÍCH THEO HIVE", style='CustomHeading2')
-
-        table = doc.add_table(rows=2, cols=6)
-        table.style = 'Table Grid'
-
-        # Header row
-        hdr_cells = table.rows[0].cells
-        hdr_cells[0].text = "ID"
-        hdr_cells[1].text = "Loại Hive"
-        hdr_cells[2].text = "Công cụ"
-        hdr_cells[3].text = "Tóm tắt"
-        hdr_cells[4].text = "Đường dẫn kết quả"
-        hdr_cells[5].text = "Thời gian chạy"
-
-        # Sample row
-        row_cells = table.rows[1].cells
-        row_cells[0].text = "[ID kết quả]"
-        row_cells[1].text = "[Loại hive: SYSTEM/SOFTWARE/SAM/ETC]"
-        row_cells[2].text = "[Công cụ sử dụng]"
-        row_cells[3].text = "[Tóm tắt kết quả]"
-        row_cells[4].text = "[Đường dẫn file kết quả]"
-        row_cells[5].text = "[Thời gian phân tích]"
-
-        doc.add_paragraph("[Mô tả chi tiết về từng kết quả phân tích]")
-        doc.add_page_break()
-
-    def _add_template_activity_section(self, doc):
-        """Thêm section lịch sử hoạt động mẫu."""
-        heading = doc.add_paragraph("LỊCH SỬ HOẠT ĐỘNG (CHAIN OF CUSTODY LOG)", style='CustomHeading2')
-
-        table = doc.add_table(rows=2, cols=4)
-        table.style = 'Table Grid'
-
-        # Header row
-        hdr_cells = table.rows[0].cells
-        hdr_cells[0].text = "Thời gian"
-        hdr_cells[1].text = "Hành động"
-        hdr_cells[2].text = "Công cụ"
-        hdr_cells[3].text = "Chi tiết"
-
-        # Sample row
-        row_cells = table.rows[1].cells
-        row_cells[0].text = "[Thời gian hoạt động]"
-        row_cells[1].text = "[Hành động đã thực hiện]"
-        row_cells[2].text = "[Công cụ sử dụng]"
-        row_cells[3].text = "[Chi tiết hoạt động]"
-
-        doc.add_paragraph("[Mô tả chi tiết về lịch sử hoạt động]")
-        doc.add_page_break()
-
-    def _add_template_signature_section(self, doc):
-        """Thêm section xác nhận điều tra viên mẫu."""
-        heading = doc.add_paragraph("XÁC NHẬN ĐIỀU TRA VIÊN", style='CustomHeading2')
-        heading.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
-
-        doc.add_paragraph("Tôi xác nhận rằng:")
-
-        # Danh sách xác nhận mẫu
-        confirmations = [
-            "Tất cả evidence đã được xử lý theo đúng quy trình Chain of Custody",
-            "Hash values đã được kiểm tra để đảm bảo tính toàn vẹn dữ liệu",
-            "Các công cụ phân tích được sử dụng là đáng tin cậy và được kiểm định",
-            "Kết quả phân tích được lưu trữ an toàn và có thể truy xuất"
-        ]
-
-        for confirmation in confirmations:
-            p = doc.add_paragraph(confirmation, style='List Bullet')
-
-        doc.add_paragraph("")
-
-        # Thông tin ký tên mẫu
-        signature_table = doc.add_table(rows=3, cols=2)
-        signature_table.style = 'Table Grid'
-
-        # Điều tra viên
-        row_cells = signature_table.rows[0].cells
-        row_cells[0].text = "Điều tra viên:"
-        row_cells[1].text = "[Nhập tên điều tra viên]"
-
-        # Ngày ký
-        row_cells = signature_table.rows[1].cells
-        row_cells[0].text = "Ngày ký:"
-        row_cells[1].text = datetime.now().strftime('%Y-%m-%d')
-
-        # Chữ ký
-        row_cells = signature_table.rows[2].cells
-        row_cells[0].text = "Chữ ký:"
-        row_cells[1].text = "_______________________"
-
-
-    def _generate_word_report(self, filepath):
-        """Tạo báo cáo Word (.docx) từ dữ liệu database."""
-        try:
-            # Kiểm tra thư viện python-docx
-            if not DOCX_AVAILABLE:
-                raise Exception("Thiếu thư viện python-docx. Cài đặt bằng: pip install python-docx")
-
-            from models.db_manager import DatabaseManager
-            db = DatabaseManager()
-            db.connect()
-
-            # Lấy thông tin case
-            case_info = db.get_case_with_investigator(self.current_case_id) if self.current_case_id else None
-
-            # Lấy kết quả phân tích
-            results = db.get_results_by_case(self.current_case_id) if self.current_case_id else []
-            registry_results = [r for r in results if 'registry' in r.get('tool_used', '').lower()]
-
-            # Lấy activity logs
-            activity_logs = db.get_activity_logs(case_id=self.current_case_id) if self.current_case_id else []
-            registry_logs = [log for log in activity_logs if 'registry' in log.get('action', '').lower()]
-
-            # Tạo document Word
-            self._create_word_report_content(filepath, case_info, registry_results, registry_logs)
-
-            db.disconnect()
-
-        except Exception as e:
-            raise Exception(f"Lỗi tạo báo cáo Word: {str(e)}")
-
-
-
-    def _create_word_report_content(self, filepath, case_info, registry_results, registry_logs):
-        """Tạo nội dung Word (.docx) cho báo cáo với đầy đủ thông tin CoC."""
-
-        # Tạo document mới
-        doc = Document()
-
-        # Thiết lập style cho document
-        self._setup_word_styles(doc)
-
-        # Lấy thông tin artifacts và hash để đảm bảo CoC
-        artifacts_info = self._get_artifacts_with_hash() if self.current_case_id else []
-
-        # Header với thông tin case
-        self._add_report_header(doc, case_info)
-
-        # Chain of Custody Section
-        self._add_coc_section(doc, artifacts_info)
-
-        # Tóm tắt phân tích
-        self._add_summary_section(doc, registry_results, registry_logs)
-
-        # Chi tiết kết quả phân tích theo hive
-        self._add_detailed_results_section(doc, registry_results)
-
-        # Lịch sử hoạt động
-        self._add_activity_log_section(doc, registry_logs)
-
-        # Phần xác nhận điều tra viên
-        self._add_signature_section(doc, case_info)
-
-        # Lưu document
-        doc.save(filepath)
-
-    def _setup_word_styles(self, doc):
-        """Thiết lập các style cho document Word."""
-
-        # Style cho heading 1
-        styles = doc.styles
-        h1_style = styles.add_style('CustomHeading1', WD_STYLE_TYPE.PARAGRAPH)
-        h1_style.font.size = Pt(18)
-        h1_style.font.bold = True
-        h1_style.font.color.rgb = RGBColor(31, 73, 125)
-
-        # Style cho heading 2
-        h2_style = styles.add_style('CustomHeading2', WD_STYLE_TYPE.PARAGRAPH)
-        h2_style.font.size = Pt(14)
-        h2_style.font.bold = True
-        h2_style.font.color.rgb = RGBColor(79, 129, 189)
-
-        # Style cho normal text
-        normal_style = styles['Normal']
-        normal_style.font.size = Pt(11)
-        normal_style.font.name = 'Times New Roman'
-
-    def _add_report_header(self, doc, case_info):
-        """Thêm header báo cáo với thông tin case."""
-        # Tiêu đề chính
-        title = doc.add_paragraph("BÁO CÁO PHÂN TÍCH REGISTRY", style='CustomHeading1')
-        title.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
-
-        subtitle = doc.add_paragraph("CHAIN OF CUSTODY - EVIDENCE INTEGRITY", style='CustomHeading2')
-        subtitle.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
-
-        doc.add_paragraph("")
-
-        # Thông tin case
-        info_table = doc.add_table(rows=6, cols=2)
-        info_table.style = 'Table Grid'
-
-        # Headers
-        hdr_cells = info_table.rows[0].cells
-        hdr_cells[0].text = "Thông tin Case"
-        hdr_cells[1].text = "Giá trị"
-
-        # Case ID
-        row_cells = info_table.rows[1].cells
-        row_cells[0].text = "Case ID:"
-        row_cells[1].text = case_info.get('case_id', 'N/A') if case_info else 'N/A'
-
-        # Tiêu đề case
-        row_cells = info_table.rows[2].cells
-        row_cells[0].text = "Tiêu đề Case:"
-        row_cells[1].text = case_info.get('title', 'N/A') if case_info else 'N/A'
-
-        # Điều tra viên
-        row_cells = info_table.rows[3].cells
-        row_cells[0].text = "Điều tra viên:"
-        row_cells[1].text = case_info.get('full_name', 'N/A') if case_info else 'N/A'
-
-        # Ngày tạo báo cáo
-        row_cells = info_table.rows[4].cells
-        row_cells[0].text = "Ngày tạo báo cáo:"
-        row_cells[1].text = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-
-        # Báo cáo ID
-        row_cells = info_table.rows[5].cells
-        row_cells[0].text = "Báo cáo ID:"
-        row_cells[1].text = f"REG_{self.current_case_id}_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
-
-        doc.add_page_break()
-
-    def _add_coc_section(self, doc, artifacts_info):
-        """Thêm section Chain of Custody."""
-        heading = doc.add_paragraph("CHAIN OF CUSTODY - EVIDENCE INTEGRITY", style='CustomHeading2')
-        heading.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
-
-        if artifacts_info:
-            # Tạo bảng artifacts
-            table = doc.add_table(rows=1, cols=6)
-            table.style = 'Table Grid'
-
-            # Header row
-            hdr_cells = table.rows[0].cells
-            hdr_cells[0].text = "Artifact"
-            hdr_cells[1].text = "Loại"
-            hdr_cells[2].text = "Đường dẫn"
-            hdr_cells[3].text = "Kích thước"
-            hdr_cells[4].text = "SHA256 Hash"
-            hdr_cells[5].text = "Thời gian thu thập"
-
-            # Data rows
-            for artifact in artifacts_info:
-                row_cells = table.add_row().cells
-                row_cells[0].text = artifact.get('name', 'N/A')
-                row_cells[1].text = artifact.get('evidence_type', 'N/A')
-                row_cells[2].text = artifact.get('source_path', 'N/A')
-                row_cells[3].text = f"{artifact.get('size', 0):,} bytes"
-                row_cells[4].text = artifact.get('sha256', 'N/A')
-                row_cells[5].text = artifact.get('collected_at', 'N/A')
-
-            doc.add_paragraph(f"Tổng số artifacts được phân tích: {len(artifacts_info)}")
-        else:
-            doc.add_paragraph("Không có thông tin artifacts.")
-
-        doc.add_page_break()
-
-    def _add_summary_section(self, doc, registry_results, registry_logs):
-        """Thêm section tóm tắt phân tích."""
-        heading = doc.add_paragraph("TÓM TẮT PHÂN TÍCH", style='CustomHeading2')
-
-        summary_table = doc.add_table(rows=5, cols=2)
-        summary_table.style = 'Table Grid'
-
-        # Số lượng kết quả phân tích
-        row_cells = summary_table.rows[0].cells
-        row_cells[0].text = "Số lượng kết quả phân tích:"
-        row_cells[1].text = str(len(registry_results))
-
-        # Số lượng hoạt động đã log
-        row_cells = summary_table.rows[1].cells
-        row_cells[0].text = "Số lượng hoạt động đã log:"
-        row_cells[1].text = str(len(registry_logs))
-
-        # Số loại hive được phân tích
-        hive_types = set()
-        for r in registry_results:
-            tool_used = r.get('tool_used', '')
-            if ' - ' in tool_used:
-                hive_types.add(tool_used.split(' - ')[-1])
-
-        row_cells = summary_table.rows[2].cells
-        row_cells[0].text = "Số loại hive được phân tích:"
-        row_cells[1].text = str(len(hive_types))
-
-        # Công cụ sử dụng
-        row_cells = summary_table.rows[3].cells
-        row_cells[0].text = "Công cụ sử dụng:"
-        row_cells[1].text = "RECmd (Registry Explorer Command Line)"
-
-        # Tổng số artifacts
-        total_artifacts = sum(len(r) for r in self.analysis_results.values()) if self.analysis_results else 0
-        row_cells = summary_table.rows[4].cells
-        row_cells[0].text = "Tổng số artifacts:"
-        row_cells[1].text = str(total_artifacts)
-
-        doc.add_page_break()
-
-    def _add_detailed_results_section(self, doc, registry_results):
-        """Thêm section chi tiết kết quả phân tích theo hive."""
-        heading = doc.add_paragraph("CHI TIẾT KẾT QUẢ PHÂN TÍCH THEO HIVE", style='CustomHeading2')
-
-        if registry_results:
-            table = doc.add_table(rows=1, cols=6)
-            table.style = 'Table Grid'
-
-            # Header row
-            hdr_cells = table.rows[0].cells
-            hdr_cells[0].text = "ID"
-            hdr_cells[1].text = "Loại Hive"
-            hdr_cells[2].text = "Công cụ"
-            hdr_cells[3].text = "Tóm tắt"
-            hdr_cells[4].text = "Đường dẫn kết quả"
-            hdr_cells[5].text = "Thời gian chạy"
-
-            # Data rows
-            for result in registry_results:
-                row_cells = table.add_row().cells
-                hive_type = result.get('tool_used', '').split(' - ')[-1] if ' - ' in result.get('tool_used', '') else 'Unknown'
-
-                row_cells[0].text = str(result.get('result_id', 'N/A'))
-                row_cells[1].text = hive_type
-                row_cells[2].text = result.get('tool_used', 'N/A')
-                row_cells[3].text = result.get('summary', 'N/A')
-                row_cells[4].text = result.get('result_path', 'N/A')
-                row_cells[5].text = result.get('run_at', 'N/A')
-        else:
-            doc.add_paragraph("Không có kết quả phân tích nào.")
-
-        doc.add_page_break()
-
-    def _add_activity_log_section(self, doc, registry_logs):
-        """Thêm section lịch sử hoạt động."""
-        heading = doc.add_paragraph("LỊCH SỬ HOẠT ĐỘNG (CHAIN OF CUSTODY LOG)", style='CustomHeading2')
-
-        if registry_logs:
-            table = doc.add_table(rows=1, cols=4)
-            table.style = 'Table Grid'
-
-            # Header row
-            hdr_cells = table.rows[0].cells
-            hdr_cells[0].text = "Thời gian"
-            hdr_cells[1].text = "Hành động"
-            hdr_cells[2].text = "Công cụ"
-            hdr_cells[3].text = "Chi tiết"
-
-            # Data rows
-            for log in registry_logs:
-                row_cells = table.add_row().cells
-                row_cells[0].text = str(log.get('timestamp', 'N/A'))
-                row_cells[1].text = log.get('action', 'N/A')
-                row_cells[2].text = log.get('tool_used', 'N/A')
-                row_cells[3].text = log.get('details', 'N/A')
-        else:
-            doc.add_paragraph("Không có lịch sử hoạt động nào.")
-
-        doc.add_page_break()
-
-    def _add_signature_section(self, doc, case_info):
-        """Thêm section xác nhận điều tra viên."""
-        heading = doc.add_paragraph("XÁC NHẬN ĐIỀU TRA VIÊN", style='CustomHeading2')
-        heading.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
-
-        doc.add_paragraph("Tôi xác nhận rằng:")
-
-        # Danh sách xác nhận
-        confirmations = [
-            "Tất cả evidence đã được xử lý theo đúng quy trình Chain of Custody",
-            "Hash values đã được kiểm tra để đảm bảo tính toàn vẹn dữ liệu",
-            "Các công cụ phân tích được sử dụng là đáng tin cậy và được kiểm định",
-            "Kết quả phân tích được lưu trữ an toàn và có thể truy xuất"
-        ]
-
-        for confirmation in confirmations:
-            p = doc.add_paragraph(confirmation, style='List Bullet')
-
-        doc.add_paragraph("")
-
-        # Thông tin ký tên
-        signature_table = doc.add_table(rows=3, cols=2)
-        signature_table.style = 'Table Grid'
-
-        # Điều tra viên
-        row_cells = signature_table.rows[0].cells
-        row_cells[0].text = "Điều tra viên:"
-        row_cells[1].text = case_info.get('full_name', 'N/A') if case_info else 'N/A'
-
-        # Ngày ký
-        row_cells = signature_table.rows[1].cells
-        row_cells[0].text = "Ngày ký:"
-        row_cells[1].text = datetime.now().strftime('%Y-%m-%d')
-
-        # Chữ ký
-        row_cells = signature_table.rows[2].cells
-        row_cells[0].text = "Chữ ký:"
-        row_cells[1].text = "_______________________"
-
-    def _get_artifacts_with_hash(self):
-        """Lấy thông tin artifacts cùng với hash để đảm bảo CoC."""
-        try:
-            from models.db_manager import DatabaseManager
-            db = DatabaseManager()
-            db.connect()
-
-            # Lấy artifacts registry của case hiện tại
-            artifacts = db.get_artifacts_by_case(self.current_case_id)
-            registry_artifacts = [a for a in artifacts if 'REGISTRY' in a.get('evidence_type', '')]
-
-            # Lấy hash cho từng artifact
-            artifacts_with_hash = []
-            for artifact in registry_artifacts:
-                artifact_id = artifact['artefact_id']
-                hashes = self._get_hashes_by_artifact(db, artifact_id)
+            with open(filepath, 'w', newline='', encoding='utf-8') as csvfile:
+                writer = csv.writer(csvfile)
                 
-                # Lấy SHA256 hash
-                sha256_hash = 'N/A'
-                for hash_info in hashes:
-                    if hash_info['hash_type'] == 'SHA256':
-                        sha256_hash = hash_info['sha256']
-                        break
-
-                artifact_info = {
-                    'name': artifact['name'],
-                    'evidence_type': artifact['evidence_type'],
-                    'source_path': artifact['source_path'],
-                    'size': artifact['size'],
-                    'collected_at': artifact['collected_at'],
-                    'sha256': sha256_hash
-                }
-                artifacts_with_hash.append(artifact_info)
-
-            db.disconnect()
-            return artifacts_with_hash
-
+                # Header
+                writer.writerow(['Hive File', 'Key Path', 'Value Name', 'Value Type', 'Value Data', 'Last Modified'])
+                
+                # Xuất dữ liệu từ analysis_results
+                for hive_file, results in self.analysis_results.items():
+                    hive_name = os.path.basename(hive_file)
+                    for result in results:
+                        writer.writerow([
+                            hive_name,
+                            result.get('KeyPath', ''),
+                            result.get('ValueName', ''),
+                            result.get('ValueType', ''),
+                            result.get('ValueData', ''),
+                            result.get('LastWrite', '')
+                        ])
+                        
         except Exception as e:
-            print(f"Lỗi lấy thông tin artifacts: {e}")
-            return []
+            raise Exception(f"Lỗi xuất CSV: {str(e)}")
 
-    def _get_hashes_by_artifact(self, db, artifact_id):
-        """Lấy tất cả hash của một artifact."""
+    def _export_timeline_to_csv(self, filepath):
+        """Xuất timeline registry ra file CSV."""
         try:
-            query = "SELECT * FROM Hashes WHERE artefact_id = ?"
-            return db.fetch_all(query, (artifact_id,))
+            with open(filepath, 'w', newline='', encoding='utf-8') as csvfile:
+                writer = csv.writer(csvfile)
+                
+                # Header
+                writer.writerow(['Timestamp', 'Key', 'Action', 'Details'])
+                
+                # Xuất dữ liệu từ timeline table
+                for row in range(self.ui.timelineTable.rowCount()):
+                    row_data = []
+                    for col in range(self.ui.timelineTable.columnCount()):
+                        item = self.ui.timelineTable.item(row, col)
+                        row_data.append(item.text() if item else '')
+                    writer.writerow(row_data)
+                    
         except Exception as e:
-            print(f"Lỗi lấy hash cho artifact {artifact_id}: {e}")
-            return []
+            raise Exception(f"Lỗi xuất timeline CSV: {str(e)}")
 
-    def _save_report_to_database(self, filepath, format_type="DOCX"):
-        """Lưu thông tin báo cáo Word vào database với hash để đảm bảo CoC."""
-        try:
-            from models.db_manager import DatabaseManager
 
-            # Tính hash cho file báo cáo
-            report_hash = self._calculate_file_hash(filepath)
 
-            db = DatabaseManager()
-            db.connect()
-
-            # Lưu vào bảng Reports
-            report_id = db.create_report(
-                case_id=self.current_case_id,
-                file_path=filepath,
-                format="DOCX",
-                sha256=report_hash
-            )
-
-            if report_id:
-                # Log hoạt động
-                db.log_activity(
-                    case_id=self.current_case_id,
-                    action="REPORT_GENERATED",
-                    tool_used="Registry Analysis - DOCX",
-                    details=f"Tạo báo cáo Word: {os.path.basename(filepath)}, SHA256: {report_hash}"
-                )
-                print(f"Đã lưu thông tin báo cáo vào database: Report ID {report_id}")
-
-            db.disconnect()
-
-        except Exception as e:
-            print(f"Lỗi lưu báo cáo vào database: {e}")
