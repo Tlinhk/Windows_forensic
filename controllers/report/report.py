@@ -80,6 +80,26 @@ class ReportGenerator(QThread):
         finally:
             self.db.disconnect()
     
+    def _enhance_artifacts_with_hashes(self, artifacts):
+        """Helper method to add hash information to artifacts"""
+        for artifact in artifacts:
+            try:
+                # Get the most recent SHA256 hash for this artifact
+                hashes = self.db.get_artefact_hashes(artifact['artefact_id'])
+                sha256_hash = None
+                
+                # Look for SHA256 hash (prefer most recent)
+                for hash_record in reversed(hashes):  # Most recent first
+                    if 'sha256' in hash_record and hash_record['sha256']:
+                        sha256_hash = hash_record['sha256']
+                        break
+                
+                # Add hash to artifact data
+                artifact['sha256'] = sha256_hash or 'Không có'
+            except Exception as e:
+                print(f"Error getting hash for artifact {artifact.get('artefact_id')}: {e}")
+                artifact['sha256'] = 'Không có'
+    
     def generate_comprehensive_report(self):
         """Generate comprehensive case report with all details"""
         case_info = self.db.get_case_with_investigator(self.case_id)
@@ -95,6 +115,10 @@ class ReportGenerator(QThread):
             elif not isinstance(artifacts, (list, tuple)):
                 print(f"WARNING - Artifacts returned unexpected type: {type(artifacts)}, value: {artifacts}")
                 artifacts = []
+            
+            # Enhance artifacts with hash information
+            self._enhance_artifacts_with_hashes(artifacts)
+                    
         except Exception as e:
             print(f"ERROR getting artifacts: {e}")
             artifacts = []
@@ -155,6 +179,9 @@ class ReportGenerator(QThread):
             artifacts = []
         if not isinstance(results, (list, tuple)):
             results = []
+            
+        # Enhance artifacts with hash information
+        self._enhance_artifacts_with_hashes(artifacts)
         
         doc = self._create_executive_docx(case_info, artifacts, results)
         
@@ -190,6 +217,9 @@ class ReportGenerator(QThread):
             results = []
         if not isinstance(activity_logs, (list, tuple)):
             activity_logs = []
+            
+        # Enhance artifacts with hash information
+        self._enhance_artifacts_with_hashes(artifacts)
 
         doc = self._create_technical_docx(case_info, artifacts, results, activity_logs)
         
@@ -222,6 +252,9 @@ class ReportGenerator(QThread):
             artifacts = []
         if not isinstance(activity_logs, (list, tuple)):
             activity_logs = []
+            
+        # Enhance artifacts with hash information
+        self._enhance_artifacts_with_hashes(artifacts)
 
         doc = self._create_coc_docx(case_info, artifacts, activity_logs)
         
@@ -250,7 +283,7 @@ class ReportGenerator(QThread):
         self._setup_word_styles(doc)
 
         # Header
-        title = doc.add_paragraph("BÁO CÁO ĐIỀU TRA PHÁP Y SỐ TỔNG HỢP", style='CustomHeading1')
+        title = doc.add_paragraph("BÁO CÁO ĐIỀU TRA SỐ TỔNG HỢP", style='CustomHeading1')
         title.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
 
         subtitle = doc.add_paragraph("CHUỖI BẢO QUẢN - TÍNH TOÀN VẸN BẰNG CHỨNG", style='CustomHeading2')

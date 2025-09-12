@@ -15,10 +15,15 @@ from views.pages.analysis_ui.metadata_analysis_ui import Ui_Form
 class MetadataAnalysis(QWidget):
     """Single-page workbench for file/folder metadata analysis."""
 
-    def __init__(self):
+    def __init__(self, main_window=None):
         super(MetadataAnalysis, self).__init__()
         self.ui = Ui_Form()
         self.ui.setupUi(self)
+        
+        # Database integration for reporting
+        self.main_window = main_window
+        self.current_case_id = None
+        self.db_manager = None
         try:
             # Suppress noisy ICC profile warnings from Qt image loader
             QLoggingCategory.setFilterRules("qt.gui.icc=false")
@@ -101,6 +106,212 @@ class MetadataAnalysis(QWidget):
             pass
 
         self._clear_all()
+        
+        # Load case data if available
+        if main_window and hasattr(main_window, 'current_case_id'):
+            self.load_case_data(main_window.current_case_id)
+
+    # ===== Case Management =====
+    def load_case_data(self, case_id):
+        """Load case information for database integration"""
+        self.current_case_id = case_id
+        
+        try:
+            from models.db_manager import DatabaseManager
+            self.db_manager = DatabaseManager()
+            self.db_manager.connect()
+            
+            case_info = self.db_manager.get_case_with_investigator(case_id)
+            if case_info:
+                print(f"Metadata Analysis loaded case: {case_info['title']} (ID: {case_id})")
+            
+            self.db_manager.disconnect()
+                    
+        except Exception as e:
+            print(f"Error loading case data: {e}")
+            if self.db_manager:
+                self.db_manager.disconnect()
+    
+    def save_file_as_artifact(self, file_path):
+        """Save file as artifact for evidence tracking"""
+        try:
+            if not self.db_manager:
+                from models.db_manager import DatabaseManager
+                self.db_manager = DatabaseManager()
+            
+            if not self.db_manager.connect():
+                return None
+            
+            file_name = os.path.basename(file_path)
+            file_size = os.path.getsize(file_path)
+            
+            # Calculate file hash for integrity
+            try:
+                md5, sha1, sha256 = self._compute_hashes(file_path)
+            except:
+                md5 = sha1 = sha256 = None
+            
+            # Determine evidence type based on file extension
+            ext = os.path.splitext(file_name)[1].lower()
+            evidence_types = {
+                '.jpg': 'IMAGE_JPEG', '.jpeg': 'IMAGE_JPEG', '.png': 'IMAGE_PNG',
+                '.pdf': 'DOCUMENT_PDF', '.docx': 'DOCUMENT_WORD', '.xlsx': 'DOCUMENT_EXCEL',
+                '.exe': 'EXECUTABLE', '.dll': 'LIBRARY'
+            }
+            evidence_type = evidence_types.get(ext, 'FILE_OTHER')
+            
+            # Add artifact to database
+            artifact_id = self.db_manager.add_artifact(
+                case_id=self.current_case_id,
+                name=f"Metadata Analysis - {file_name}",
+                source_path=file_path,
+                evidence_type=evidence_type,
+                size=file_size,
+                mime_type=self._guess_mime_type(file_name)
+            )
+            
+            if artifact_id and sha256:
+                # Add hash for integrity verification
+                self.db_manager.add_hash(artifact_id, "SHA256", sha256)
+                if md5:
+                    self.db_manager.add_hash(artifact_id, "MD5", md5)
+                if sha1:
+                    self.db_manager.add_hash(artifact_id, "SHA1", sha1)
+                
+                print(f"File saved as artifact: Artifact ID {artifact_id}")
+            
+            self.db_manager.disconnect()
+            return artifact_id
+            
+        except Exception as e:
+            print(f"Error saving file as artifact: {e}")
+            if self.db_manager:
+                self.db_manager.disconnect()
+            return None
+    
+    def _guess_mime_type(self, filename):
+        """Guess MIME type from filename"""
+        import mimetypes
+        mime_type, _ = mimetypes.guess_type(filename)
+        return mime_type or "application/octet-stream"
+    
+    def save_metadata_analysis_to_database(self, file_path, author_text, embedded_times, artifact_id=None):
+        """Save metadata analysis results to database"""
+        try:
+            if not self.db_manager:
+                from models.db_manager import DatabaseManager
+                self.db_manager = DatabaseManager()
+            
+            if not self.db_manager.connect():
+                print("Failed to connect to database for metadata analysis")
+                return None
+            
+            file_name = os.path.basename(file_path)
+            
+            # Create comprehensive summary
+            summary = f"Metadata Analysis - {file_name}\n"
+            summary += f"File Type: {self.ui.fileTypeValueLabel.text()}\n"
+            summary += f"File Size: {self.ui.fileSizeValueLabel.text()}\n"
+            summary += f"Author/Device: {author_text if author_text != '-' else 'Unknown'}\n"
+            
+            # Add embedded times
+            if embedded_times.get('original') != '-':
+                summary += f"Original Date: {embedded_times.get('original')}\n"
+            if embedded_times.get('create') != '-':
+                summary += f"Created Date: {embedded_times.get('create')}\n"
+            if embedded_times.get('modify') != '-':
+                summary += f"Modified Date: {embedded_times.get('modify')}\n"
+            
+            # Add risk analysis
+            try:
+                risk_score = self.ui.riskScoreBadgeLabel.text() if hasattr(self.ui, 'riskScoreBadgeLabel') else "0"
+                summary += f"Risk Score: {risk_score}\n"
+                
+                # Add alerts
+                alerts = []
+                try:
+                    for i in range(self.ui.alertsListWidget.count()):
+                        alerts.append(self.ui.alertsListWidget.item(i).text())
+                except:
+                    pass
+                
+                if alerts:
+                    summary += f"Alerts: {'; '.join(alerts[:3])}...\n"  # First 3 alerts
+            except:
+                pass
+            
+            # Add GPS if available
+            try:
+                if self._last_exiftool_tags:
+                    lat = self._last_exiftool_tags.get("GPS:GPSLatitude")
+                    lon = self._last_exiftool_tags.get("GPS:GPSLongitude")
+                    if isinstance(lat, (int, float)) and isinstance(lon, (int, float)):
+                        summary += f"GPS Location: {lat:.6f},{lon:.6f}\n"
+            except:
+                pass
+            
+            # Add hashes
+            try:
+                md5, sha1, sha256 = self._compute_hashes(file_path)
+                summary += f"Hashes: MD5={md5[:16]}..., SHA1={sha1[:16]}..., SHA256={sha256[:16]}..."
+            except:
+                pass
+            
+            # Save analysis result
+            result_id = self.db_manager.add_analysis_result(
+                artifact_id=artifact_id,  # Link to artifact if available
+                tool_used="Metadata Analysis",
+                summary=summary,
+                result_path=None
+            )
+            
+            if result_id:
+                # Log the activity
+                self.db_manager.log_activity(
+                    case_id=self.current_case_id,
+                    action=f"METADATA_ANALYSIS: {file_name}",
+                    tool_used="Metadata Analysis",
+                    details=f"Analyzed metadata for {file_name}, Risk Score: {risk_score if 'risk_score' in locals() else '0'}"
+                )
+                
+                print(f"Metadata analysis saved to database: Result ID {result_id}")
+            
+            self.db_manager.disconnect()
+            return result_id
+            
+        except Exception as e:
+            print(f"Error saving metadata analysis to database: {e}")
+            if self.db_manager:
+                self.db_manager.disconnect()
+            return None
+    
+    def log_report_export(self, report_path):
+        """Log metadata report export activity"""
+        try:
+            if not self.db_manager:
+                from models.db_manager import DatabaseManager
+                self.db_manager = DatabaseManager()
+            
+            if not self.db_manager.connect():
+                return
+            
+            file_name = os.path.basename(report_path) if report_path else "metadata_report.html"
+            
+            # Log the activity
+            self.db_manager.log_activity(
+                case_id=self.current_case_id,
+                action=f"METADATA_REPORT_EXPORTED: {file_name}",
+                tool_used="Metadata Analysis",
+                details=f"Exported metadata analysis report to: {report_path}"
+            )
+            
+            print(f"Metadata report export logged: {file_name}")
+            self.db_manager.disconnect()
+            
+        except Exception as e:
+            print(f"Error logging metadata report export: {e}")
+            if self.db_manager:
+                self.db_manager.disconnect()
 
     # ===== Public API =====
     def analyze_file(self, file_path: str) -> None:
@@ -243,6 +454,13 @@ class MetadataAnalysis(QWidget):
                 self._update_compare_table()
         except Exception:
             pass
+        
+        # Save analysis results to database if case is selected
+        if self.current_case_id:
+            # Save file as artifact if not already saved
+            artifact_id = self.save_file_as_artifact(file_path)
+            # Save metadata analysis results
+            self.save_metadata_analysis_to_database(file_path, author_text, embedded_times, artifact_id)
 
     # ===== ExifTool integration =====
     def _find_exiftool(self) -> str:
@@ -667,6 +885,11 @@ class MetadataAnalysis(QWidget):
                          "</pre>", "</body></html>"])
             with open(save_path, "w", encoding="utf-8") as f:
                 f.write("\n".join(html))
+            
+            # Log report export activity
+            if self.current_case_id:
+                self.log_report_export(save_path)
+                
             QMessageBox.information(self, "Xuất báo cáo", f"Đã lưu:\n{save_path}")
         except Exception as e:
             QMessageBox.warning(self, "Xuất báo cáo", str(e))

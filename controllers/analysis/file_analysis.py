@@ -35,6 +35,9 @@ class FileAnalysis(QWidget):
         self.volume_info = None  # pytsk3.Volume_Info: thông tin phân vùng (nếu có)
         self.fs_info = None  # pytsk3.FS_Info: hệ thống tệp đang được duyệt
         
+        # Database manager for saving analysis results
+        self.db_manager = None
+        
         # Setup UI
         self.setup_ui()
         self.setup_connections()
@@ -205,18 +208,22 @@ class FileAnalysis(QWidget):
         
         try:
             from models.db_manager import DatabaseManager
-            db = DatabaseManager()  # Quản lý kết nối CSDL
-            db.connect()  # Mở kết nối
+            self.db_manager = DatabaseManager()  # Lưu reference để dùng sau
+            self.db_manager.connect()  # Mở kết nối
             
-            case_info = db.get_case_with_investigator(case_id)  # Lấy thông tin vụ án + điều tra viên
+            case_info = self.db_manager.get_case_with_investigator(case_id)  # Lấy thông tin vụ án + điều tra viên
             if case_info:
                 text = f"File Analysis - Case: {case_info['title']} (ID: {case_id})"
                 label_case = self.get_ui_component('labelCaseInfo')  # Cập nhật tiêu đề
                 if label_case:
                     label_case.setText(text)
+            
+            self.db_manager.disconnect()
                     
         except Exception as e:
-            pass
+            print(f"Error loading case data: {e}")
+            if self.db_manager:
+                self.db_manager.disconnect()
     
     def load_evidence_dialog(self):
         """Hiển thị hộp thoại chọn tệp chứng cứ (ảnh đĩa) để phân tích."""
@@ -300,11 +307,14 @@ class FileAnalysis(QWidget):
             progress.setValue(100)
             progress.close()
             
+            # Save evidence to database if case is selected
+            artifact_id = None
+            if self.current_case_id:
+                artifact_id = self.save_evidence_to_database(file_path, image_size)
+            
             # Show success message
             deleted_count = len([f for f in self.file_list if f.get('deleted', False)])  # Đếm số tệp đã xóa
-            QMessageBox.information(
-                self, 
-                "Evidence Loaded Successfully", 
+            success_msg = (
                 f"✅ Successfully loaded evidence file!\n\n"
                 f"📁 File: {file_name}\n"
                 f"💾 Size: {self.format_file_size(image_size)}\n"
@@ -314,12 +324,222 @@ class FileAnalysis(QWidget):
                 f"Use the tree view to navigate and explore the evidence."
             )
             
+            if artifact_id:
+                success_msg += f"\n\n💾 Evidence saved to database (Artifact ID: {artifact_id})"
+            elif self.current_case_id:
+                success_msg += f"\n\n⚠️ Could not save evidence to database"
+            else:
+                success_msg += f"\n\n💡 Select a case to save evidence to database"
+                
+            QMessageBox.information(self, "Evidence Loaded Successfully", success_msg)
+            
         except Exception as e:
             if 'progress' in locals():
                 progress.close()  # Đảm bảo đóng tiến trình nếu xảy ra lỗi
             
             error_msg = f"Failed to load evidence file:\n\n{str(e)}"
             QMessageBox.critical(self, "Error Loading Evidence", error_msg)
+    
+    def save_evidence_to_database(self, file_path, file_size):
+        """Save evidence file information to database as artifact"""
+        try:
+            if not self.db_manager:
+                from models.db_manager import DatabaseManager
+                self.db_manager = DatabaseManager()
+            
+            if not self.db_manager.connect():
+                print("Failed to connect to database")
+                return None
+            
+            # Calculate file hash for integrity
+            file_hash = self.calculate_file_hash(file_path)
+            file_name = os.path.basename(file_path)
+            
+            # Determine evidence type based on file extension
+            ext = os.path.splitext(file_name)[1].lower()
+            evidence_types = {
+                '.dd': 'DISK_IMAGE_DD',
+                '.img': 'DISK_IMAGE_IMG', 
+                '.raw': 'DISK_IMAGE_RAW',
+                '.e01': 'DISK_IMAGE_E01',
+                '.001': 'DISK_IMAGE_001'
+            }
+            evidence_type = evidence_types.get(ext, 'DISK_IMAGE')
+            
+            # Add artifact to database
+            artifact_id = self.db_manager.add_artifact(
+                case_id=self.current_case_id,
+                name=f"Disk Image - {file_name}",
+                source_path=file_path,
+                evidence_type=evidence_type,
+                size=file_size,
+                mime_type="application/octet-stream"
+            )
+            
+            if artifact_id and file_hash:
+                # Add hash for integrity verification
+                self.db_manager.add_hash(artifact_id, "SHA256", file_hash)
+                
+                # Log the activity
+                self.db_manager.log_activity(
+                    case_id=self.current_case_id,
+                    artefact_id=artifact_id,
+                    action=f"EVIDENCE_LOADED: {file_name}",
+                    tool_used="File Analysis",
+                    details=f"Loaded disk image: {file_name}, Size: {file_size:,} bytes, SHA256: {file_hash}"
+                )
+                
+                print(f"Evidence saved to database: Artifact ID {artifact_id}")
+            
+            self.db_manager.disconnect()
+            return artifact_id
+            
+        except Exception as e:
+            print(f"Error saving evidence to database: {e}")
+            if self.db_manager:
+                self.db_manager.disconnect()
+            return None
+    
+    def calculate_file_hash(self, file_path):
+        """Calculate SHA256 hash of file"""
+        try:
+            hash_sha256 = hashlib.sha256()
+            with open(file_path, "rb") as f:
+                # Read file in chunks to handle large files
+                for chunk in iter(lambda: f.read(4096), b""):
+                    hash_sha256.update(chunk)
+            return hash_sha256.hexdigest()
+        except Exception as e:
+            print(f"Error calculating file hash: {e}")
+            return None
+    
+    def save_search_results_to_database(self, keyword, search_results):
+        """Save search analysis results to database"""
+        try:
+            if not self.db_manager:
+                from models.db_manager import DatabaseManager
+                self.db_manager = DatabaseManager()
+            
+            if not self.db_manager.connect():
+                print("Failed to connect to database for search results")
+                return None
+            
+            # Create summary of search results
+            total_files = len(search_results)
+            deleted_files = len([r for r in search_results if r['file_info'].get('deleted', False)])
+            file_types = {}
+            
+            for result in search_results:
+                file_type = result['file_info'].get('type', 'Unknown')
+                file_types[file_type] = file_types.get(file_type, 0) + 1
+            
+            # Create detailed summary
+            summary = f"File Search Analysis - Keyword: '{keyword}'\n"
+            summary += f"Total files found: {total_files}\n"
+            summary += f"Deleted files: {deleted_files}\n"
+            summary += f"Active files: {total_files - deleted_files}\n"
+            summary += f"File types found: {', '.join([f'{k}({v})' for k, v in file_types.items()])}"
+            
+            # Save analysis result
+            result_id = self.db_manager.add_analysis_result(
+                artifact_id=None,  # General analysis, not tied to specific artifact
+                tool_used="File Analysis - Search",
+                summary=summary,
+                result_path=None  # Could save detailed results to file if needed
+            )
+            
+            if result_id:
+                # Log the activity
+                self.db_manager.log_activity(
+                    case_id=self.current_case_id,
+                    action=f"FILE_SEARCH: '{keyword}'",
+                    tool_used="File Analysis",
+                    details=f"Search completed: {total_files} files found, {deleted_files} deleted"
+                )
+                
+                print(f"Search results saved to database: Result ID {result_id}")
+            
+            self.db_manager.disconnect()
+            return result_id
+            
+        except Exception as e:
+            print(f"Error saving search results to database: {e}")
+            if self.db_manager:
+                self.db_manager.disconnect()
+            return None
+    
+    def save_deleted_files_analysis(self, deleted_files_count):
+        """Save deleted files analysis results to database"""
+        try:
+            if not self.current_case_id or not self.db_manager:
+                return None
+            
+            if not self.db_manager.connect():
+                return None
+            
+            # Create summary
+            summary = f"Deleted Files Analysis\n"
+            summary += f"Total deleted files found: {deleted_files_count}\n"
+            summary += f"Analysis method: Unallocated inode scanning + Directory entry walking\n"
+            summary += f"Recoverable files: {deleted_files_count}"
+            
+            # Save analysis result
+            result_id = self.db_manager.add_analysis_result(
+                artifact_id=None,
+                tool_used="File Analysis - Deleted Files Recovery",
+                summary=summary,
+                result_path=None
+            )
+            
+            if result_id:
+                # Log the activity
+                self.db_manager.log_activity(
+                    case_id=self.current_case_id,
+                    action=f"DELETED_FILES_ANALYSIS: {deleted_files_count} files found",
+                    tool_used="File Analysis",
+                    details=f"Deleted files scan completed using inode analysis and directory walking"
+                )
+                
+                print(f"Deleted files analysis saved to database: Result ID {result_id}")
+            
+            self.db_manager.disconnect()
+            return result_id
+            
+        except Exception as e:
+            print(f"Error saving deleted files analysis to database: {e}")
+            if self.db_manager:
+                self.db_manager.disconnect()
+            return None
+    
+    def log_file_recovery(self, file_info, save_path, recovered_size):
+        """Log file recovery activity to database"""
+        try:
+            if not self.db_manager:
+                from models.db_manager import DatabaseManager
+                self.db_manager = DatabaseManager()
+            
+            if not self.db_manager.connect():
+                return
+            
+            # Log the recovery activity
+            self.db_manager.log_activity(
+                case_id=self.current_case_id,
+                action=f"FILE_RECOVERED: {file_info['name']}",
+                tool_used="File Analysis - Recovery",
+                details=f"Recovered deleted file: {file_info['name']}, "
+                       f"Original size: {file_info.get('size', 0):,} bytes, "
+                       f"Recovered size: {recovered_size:,} bytes, "
+                       f"Saved to: {save_path}, "
+                       f"Inode: {file_info.get('inode', 'Unknown')}"
+            )
+            
+            print(f"File recovery logged to database: {file_info['name']}")
+            self.db_manager.disconnect()
+            
+        except Exception as e:
+            print(f"Error logging file recovery to database: {e}")
+            if self.db_manager:
+                self.db_manager.disconnect()
     
     def build_evidence_tree(self, evidence_name, partitions):
         """Xây dựng cây dữ liệu chứng cứ (giống Autopsy) gồm ảnh đĩa, phân vùng và hệ thống tệp."""
@@ -817,6 +1037,11 @@ class FileAnalysis(QWidget):
             
             if len(self.file_list) > 0:
                 self.update_file_table()
+                
+                # Save deleted files analysis to database
+                if self.current_case_id:
+                    self.save_deleted_files_analysis(len(self.file_list))
+                
                 QMessageBox.information(
                     self,
                     "Deleted Files Found",
@@ -1454,6 +1679,10 @@ class FileAnalysis(QWidget):
         if tab_work:
             tab_work.setCurrentIndex(2)  # Search tab is index 2
         
+        # Save search results to database if case is selected
+        if self.current_case_id and len(self.search_results) > 0:
+            self.save_search_results_to_database(keyword, self.search_results)
+        
         QMessageBox.information(
             self, 
             "Search Complete", 
@@ -2076,6 +2305,10 @@ class FileAnalysis(QWidget):
             if content:
                 with open(save_path, 'wb') as f:
                     f.write(content)
+                
+                # Log recovery activity to database
+                if self.current_case_id:
+                    self.log_file_recovery(file_info, save_path, len(content))
                 
                 QMessageBox.information(
                     self,
