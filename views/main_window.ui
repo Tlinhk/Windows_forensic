@@ -122,7 +122,7 @@ border: none;
              <normaloff>:/icons/icons/antivirus_2894894.png</normaloff>:/icons/icons/antivirus_2894894.png</iconset>
            </attribute>
            <attribute name="label">
-            <string>Điều tra máy tính</string>
+            <string>Computer Investigation</string>
            </attribute>
            <layout class="QVBoxLayout" name="verticalLayout">
             <property name="spacing">
@@ -151,7 +151,7 @@ border: none;
                <enum>Qt::NoFocus</enum>
               </property>
               <property name="text">
-               <string>Bảng điều khiển</string>
+               <string>Dashboard</string>
               </property>
               <property name="checkable">
                <bool>true</bool>
@@ -172,7 +172,7 @@ border: none;
                <enum>Qt::NoFocus</enum>
               </property>
               <property name="text">
-               <string>Quản lý vụ án</string>
+               <string>Case Management</string>
               </property>
               <property name="checkable">
                <bool>true</bool>
@@ -190,7 +190,7 @@ border: none;
                <enum>Qt::NoFocus</enum>
               </property>
               <property name="text">
-               <string>Quản lý người dùng</string>
+               <string>User Management</string>
               </property>
               <property name="checkable">
                <bool>true</bool>
@@ -226,7 +226,7 @@ border: none;
              <normaloff>:/icons/icons/icons8-collect-50.png</normaloff>:/icons/icons/icons8-collect-50.png</iconset>
            </attribute>
            <attribute name="label">
-            <string>Thu thập dữ liệu</string>
+            <string>Data Collection</string>
            </attribute>
            <layout class="QVBoxLayout" name="verticalLayout_2">
             <property name="spacing">
@@ -255,7 +255,7 @@ border: none;
                <enum>Qt::NoFocus</enum>
               </property>
               <property name="text">
-               <string>Dữ liệu khả biến</string>
+               <string>Volatile Data</string>
               </property>
               <property name="checkable">
                <bool>true</bool>
@@ -273,7 +273,7 @@ border: none;
                <enum>Qt::NoFocus</enum>
               </property>
               <property name="text">
-               <string>Dữ liệu bất biển</string>
+               <string>Non-volatile Data</string>
               </property>
               <property name="checkable">
                <bool>true</bool>
@@ -309,7 +309,7 @@ border: none;
              <normaloff>:/icons/icons/icons8-combo-chart-50.png</normaloff>:/icons/icons/icons8-combo-chart-50.png</iconset>
            </attribute>
            <attribute name="label">
-            <string>Phân tích dữ liệu</string>
+            <string>Data Analysis</string>
            </attribute>
            <layout class="QVBoxLayout" name="verticalLayout_3">
             <property name="spacing">
@@ -338,7 +338,7 @@ border: none;
                <enum>Qt::NoFocus</enum>
               </property>
               <property name="text">
-               <string>Phân tích bộ nhớ</string>
+               <string>Memory Analysis</string>
               </property>
               <property name="checkable">
                <bool>true</bool>
@@ -356,7 +356,7 @@ border: none;
                <enum>Qt::NoFocus</enum>
               </property>
               <property name="text">
-               <string>Phân tích Registry</string>
+               <string>Registry Analysis</string>
               </property>
               <property name="checkable">
                <bool>true</bool>
@@ -374,7 +374,7 @@ border: none;
                <enum>Qt::NoFocus</enum>
               </property>
               <property name="text">
-               <string>Phân tích trình duyệt</string>
+               <string>Browser Analysis</string>
               </property>
               <property name="checkable">
                <bool>true</bool>
@@ -392,7 +392,7 @@ border: none;
                <enum>Qt::NoFocus</enum>
               </property>
               <property name="text">
-               <string>Phân tích hệ thống tệp</string>
+               <string>File System Analysis</string>
               </property>
               <property name="checkable">
                <bool>false</bool>
@@ -410,7 +410,7 @@ border: none;
                <enum>Qt::NoFocus</enum>
               </property>
               <property name="text">
-               <string>Phân tích siêu dữ liệu</string>
+               <string>Metadata Analysis</string>
               </property>
               <property name="checkable">
                <bool>true</bool>
@@ -428,7 +428,7 @@ border: none;
                <enum>Qt::NoFocus</enum>
               </property>
               <property name="text">
-               <string>Phân tích nhật ký sự kiện</string>
+               <string>Event Log Analysis</string>
               </property>
               <property name="checkable">
                <bool>true</bool>
@@ -464,7 +464,7 @@ border: none;
              <normaloff>:/icons/icons/icons8-report-50 (1).png</normaloff>:/icons/icons/icons8-report-50 (1).png</iconset>
            </attribute>
            <attribute name="label">
-            <string>Báo cáo</string>
+            <string>Reports</string>
            </attribute>
            <layout class="QVBoxLayout" name="verticalLayout_4">
             <property name="spacing">
@@ -490,7 +490,7 @@ border: none;
                </font>
               </property>
               <property name="text">
-               <string>Tạo báo cáo</string>
+               <string>Generate Report</string>
               </property>
              </widget>
             </item>
@@ -523,7 +523,7 @@ border: none;
              <normaloff>:/icons/icons/icons8-system-setting-53 (1).png</normaloff>:/icons/icons/icons8-system-setting-53 (1).png</iconset>
            </attribute>
            <attribute name="label">
-            <string>Cài đặt hệ thống</string>
+            <string>System Settings</string>
            </attribute>
            <layout class="QVBoxLayout" name="verticalLayout_5">
             <property name="spacing">
@@ -570,7 +570,7 @@ border: none;
              <normaloff>:/icons/icons/icons8-logout-50.png</normaloff>:/icons/icons/icons8-logout-50.png</iconset>
            </attribute>
            <attribute name="label">
-            <string>Đăng xuất</string>
+            <string>Logout</string>
            </attribute>
            <layout class="QGridLayout" name="gridLayout_3">
             <property name="leftMargin">
@@ -713,7 +713,7 @@ border: none;
 }</string>
              </property>
              <property name="text">
-              <string>Người dùng</string>
+              <string>User</string>
              </property>
             </widget>
            </item>

@@ -72,16 +72,16 @@ class MainController(QObject):
         """Setup menu buttons dictionary"""
         self.menu_btns_list = {
             self.view.dashboard_btn: ("Dashboard", lambda: Dashboard()),
-            self.view.case_btn: ("Quản lý vụ án", lambda: Case(main_window=self)),
+            self.view.case_btn: ("Case Management", lambda: Case(main_window=self)),
             self.view.user_management_btn: ("User Management", lambda: UserManagement()),
             self.view.volatile_btn: ("Volatile", lambda: Volatile()),
-            self.view.nonvolatile_btn: ("Thu thập dữ liệu bất biến", lambda: NonVolatilePage()),
-            self.view.memory_btn: ("Phân tích bộ nhớ", lambda: MemoryAnalysisWindow()),
-            self.view.registry_btn: ("Registry", lambda: RegistryAnalysis(main_window=self)),
-            self.view.browser_btn: ("Browser", lambda: BrowserAnalysis(main_window=self)),
-            self.view.file_btn: ("File", lambda: FileAnalysis(main_window=self)),
-            self.view.metadata_btn: ("Metadata", lambda: MetadataAnalysis()),
-            self.view.eventlog_btn: ("Event Log", lambda: EventlogAnalysis()),
+            self.view.nonvolatile_btn: ("Non-volatile Data Collection", lambda: NonVolatilePage()),
+            self.view.memory_btn: ("Memory Analysis", lambda: MemoryAnalysisWindow()),
+            self.view.registry_btn: ("Registry Analysis", lambda: RegistryAnalysis(main_window=self)),
+            self.view.browser_btn: ("Browser Analysis", lambda: BrowserAnalysis(main_window=self)),
+            self.view.file_btn: ("File Analysis", lambda: FileAnalysis(main_window=self)),
+            self.view.metadata_btn: ("Metadata Analysis", lambda: MetadataAnalysis()),
+            self.view.eventlog_btn: ("Event Log Analysis", lambda: EventlogAnalysis()),
             self.view.report_btn: ("Report", lambda: Report(main_window=self)),
         }
 

@@ -16,22 +16,22 @@ import controllers.welcome_dialog as welcome_dialog
 if __name__ == "__main__":
     app = QApplication(sys.argv)
 
-    # Biến global để giữ reference main window
+    # Global variable to hold main window reference
     main_window = None
 
-    # Hiển thị login window trước
+    # Show login window first
     login_window = LoginWindow()
 
     def show_main_window():
-        """Hiển thị main window sau khi đăng nhập thành công"""
+        """Show main window after successful login"""
         global main_window
         login_window.hide()
         main_window = main_controller.MainController()
 
-        # Lấy thông tin user thực tế từ login
+        # Get actual user information from login
         user_data = login_window.get_logged_in_user()
         if user_data:
-            # Import db để set current user
+            # Import db to set current user
             from models.db_manager import DatabaseManager
             db = DatabaseManager()
             db.set_current_user(user_data["user_id"])
@@ -39,14 +39,14 @@ if __name__ == "__main__":
 
         main_window.show_main_window()
 
-        # Kết nối signal logout từ main window
+        # Connect logout signal from main window
         main_window.logout_requested.connect(show_login_window)
 
-        # Hiển thị Welcome Dialog sau khi main window ready
+        # Show Welcome Dialog after main window is ready
         QTimer.singleShot(500, show_welcome_dialog)
 
     def show_welcome_dialog():
-        """Hiển thị Welcome Dialog với 3 lựa chọn"""
+        """Show Welcome Dialog with 3 options"""
         global main_window
         if not main_window:
             return
@@ -63,11 +63,11 @@ if __name__ == "__main__":
         welcome.exec_()
 
     def handle_new_case(main_window):
-        """Xử lý tạo case mới"""
-        # Switch to case management tab và hiện dialog tạo case
+        """Handle creating new case"""
+        # Switch to case management tab and show create case dialog
         main_window.view.case_btn.click()
 
-        # Delay để tab được tạo
+        # Delay to allow tab to be created
         def show_create_dialog():
             current_tab = main_window.view.tabWidget.currentWidget()
             if hasattr(current_tab, "show_create_case_dialog_with_workflow"):
@@ -76,89 +76,89 @@ if __name__ == "__main__":
         QTimer.singleShot(200, show_create_dialog)
 
     def handle_open_recent(main_window, welcome_dialog):
-        """Xử lý mở case gần đây"""
+        """Handle opening recent case"""
         case_id = welcome_dialog.get_selected_case_id()
         case_data = welcome_dialog.get_selected_case_data()
 
         if case_id and case_data:
             print(f"Opening recent case: {case_id}")
 
-            # Chuyển đến tab Case Management
+            # Switch to Case Management tab
             main_window.view.case_btn.click()
 
-            # Đợi một chút để tab được tạo rồi load case
+            # Wait a bit for tab to be created then load case
             QTimer.singleShot(
                 300, lambda: load_case_in_tab(main_window, case_id, case_data)
             )
 
     def load_case_in_tab(main_window, case_id, case_data):
-        """Load case trong case management tab"""
+        """Load case in case management tab"""
         try:
-            # Tìm case management widget trong tab hiện tại
+            # Find case management widget in current tab
             current_tab_index = main_window.view.tabWidget.currentIndex()
             if current_tab_index >= 0:
                 current_widget = main_window.view.tabWidget.widget(current_tab_index)
 
-                # Kiểm tra xem có phải case management tab không
+                # Check if it's a case management tab
                 if hasattr(current_widget, "load_specific_case"):
-                    # Method mới để load case cụ thể
+                    # New method to load specific case
                     current_widget.load_specific_case(case_id, case_data)
                 elif hasattr(current_widget, "ui") and hasattr(
                     current_widget.ui, "caseComboBox"
                 ):
-                    # Fallback: set case trong combobox và load
+                    # Fallback: set case in combobox and load
                     current_widget.set_current_case(case_id)
                     current_widget.load_evidence()
 
-                    # Hiển thị thông báo thành công
+                    # Show success message
                     from PyQt5.QtWidgets import QMessageBox
 
                     QMessageBox.information(
                         main_window.main_window,
-                        "✅ Mở Case thành công",
-                        f"📁 Case đã được mở:\n\n"
+                        "✅ Case Opened Successfully",
+                        f"📁 Case has been opened:\n\n"
                         f"🆔 ID: {case_data.get('case_id', 'N/A')}\n"
-                        f"📝 Tên: {case_data.get('title', 'N/A')}\n"
-                        f"👨‍💼 Điều tra viên: {case_data.get('investigator', 'N/A')}\n"
-                        f"📅 Ngày tạo: {case_data.get('created_at', 'N/A')}\n\n"
-                        f"✨ Bạn có thể bắt đầu làm việc với case này!",
+                        f"📝 Name: {case_data.get('title', 'N/A')}\n"
+                        f"👨‍💼 Investigator: {case_data.get('investigator', 'N/A')}\n"
+                        f"📅 Created: {case_data.get('created_at', 'N/A')}\n\n"
+                        f"✨ You can now start working with this case!",
                     )
                 else:
-                    print("Case management widget không có method load case")
+                    print("Case management widget does not have load case method")
         except Exception as e:
-            print(f"Lỗi khi load case: {e}")
+            print(f"Error loading case: {e}")
             from PyQt5.QtWidgets import QMessageBox
 
             QMessageBox.warning(
                 main_window.main_window,
-                "❌ Lỗi mở Case",
-                f"Không thể mở case:\n{str(e)}\n\nVui lòng thử lại.",
+                "❌ Error Opening Case",
+                f"Cannot open case:\n{str(e)}\n\nPlease try again.",
             )
 
     def handle_case_management(main_window):
-        """Xử lý chuyển đến case management"""
+        """Handle switching to case management"""
         main_window.view.case_btn.click()
 
     def show_login_window():
-        """Hiển thị lại login window khi logout"""
+        """Show login window again on logout"""
         global main_window
         if main_window:
             main_window.main_window.hide()
 
-        # Reset trạng thái login
+        # Reset login state
         login_window.login_success = False
         login_window.ui.username_input.clear()
         login_window.ui.password_input.clear()
         login_window.ui.error_label.hide()
         login_window.ui.username_input.setFocus()
 
-        # Hiển thị login window
+        # Show login window
         login_window.show()
 
-    # Kết nối signal đăng nhập thành công với việc hiển thị main window
+    # Connect successful login signal to show main window
     login_window.login_successful.connect(show_main_window)
 
-    # Hiển thị login window
+    # Show login window
     login_window.show()
 
     sys.exit(app.exec_())

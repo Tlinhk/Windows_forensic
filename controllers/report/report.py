@@ -769,7 +769,7 @@ class ReportGenerator(QThread):
                     doc.add_paragraph(f"   - Loại bằng chứng: {artifact.get('evidence_type', 'Không xác định')}")
                     doc.add_paragraph(f"   - Kích thước tệp: {artifact.get('size', 0):,} bytes")
                     doc.add_paragraph(f"   - Thời gian thu thập: {artifact.get('collected_at', 'Không xác định')}")
-                    doc.add_paragraph(f"   - Mã băm SHA-256: {artifact.get('sha256', 'Không có')[:32]}...")
+                    doc.add_paragraph(f"   - Mã băm SHA-256: {artifact.get('sha256', 'Không có')}")
             else:
                 doc.add_paragraph("Chưa có bằng chứng số nào được thu thập trong vụ án này.")
             doc.add_paragraph("")
@@ -882,7 +882,7 @@ class ReportGenerator(QThread):
                     description = f"Bằng chứng số: {artifact['name']}\n"
                     description += f"Loại: {artifact.get('evidence_type', 'Không xác định')}\n"
                     description += f"Kích thước: {artifact.get('size', 0):,} bytes\n"
-                    description += f"Mã băm SHA256: {artifact.get('sha256', 'Không có')[:32]}...\n" if artifact.get('sha256', 'Không có') != 'Không có' else "Mã băm SHA256: Không có\n"
+                    description += f"Mã băm SHA256: {artifact.get('sha256', 'Không có')}\n" if artifact.get('sha256', 'Không có') != 'Không có' else "Mã băm SHA256: Không có\n"
                     description += f"Đường dẫn: {artifact.get('source_path', 'Không xác định')}"
                     
                     ev_cells[2].text = description
