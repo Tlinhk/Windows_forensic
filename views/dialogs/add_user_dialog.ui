@@ -1,0 +1,270 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>AddUserDialog</class>
+ <widget class="QDialog" name="AddUserDialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>450</width>
+    <height>400</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Add/Edit User</string>
+  </property>
+  <property name="modal">
+   <bool>true</bool>
+  </property>
+  <property name="styleSheet">
+   <string>QDialog {
+    background-color: #f8f9fa;
+    border-radius: 8px;
+}
+QLabel {
+    color: #2c3e50;
+    font-weight: bold;
+    margin-bottom: 2px;
+}
+QLineEdit {
+    border: 2px solid #dee2e6;
+    border-radius: 6px;
+    padding: 8px;
+    font-size: 12px;
+    background-color: white;
+}
+QLineEdit:focus {
+    border-color: #007bff;
+    background-color: #f8f9ff;
+}
+QComboBox {
+    border: 2px solid #dee2e6;
+    border-radius: 6px;
+    padding: 6px;
+    font-size: 12px;
+    background-color: white;
+}
+QComboBox:focus {
+    border-color: #007bff;
+}
+QComboBox::drop-down {
+    border: none;
+}
+QComboBox::down-arrow {
+    image: url(:/icons/icons8-arrow-31-48.ico);
+    width: 12px;
+    height: 12px;
+}
+QPushButton {
+    border: none;
+    border-radius: 6px;
+    padding: 10px 20px;
+    font-weight: bold;
+    font-size: 12px;
+    min-width: 80px;
+}
+QPushButton:hover {
+    opacity: 0.9;
+}
+QPushButton:pressed {
+    opacity: 0.8;
+}</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <property name="spacing">
+    <number>10</number>
+   </property>
+   <property name="leftMargin">
+    <number>20</number>
+   </property>
+   <property name="topMargin">
+    <number>20</number>
+   </property>
+   <property name="rightMargin">
+    <number>20</number>
+   </property>
+   <property name="bottomMargin">
+    <number>20</number>
+   </property>
+   <item>
+    <widget class="QLabel" name="usernameLabel">
+     <property name="text">
+      <string>👤 Username:</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLineEdit" name="usernameEdit">
+     <property name="placeholderText">
+      <string>Enter username...</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="passwordLabel">
+     <property name="text">
+      <string>🔒 Password:</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLineEdit" name="passwordEdit">
+     <property name="echoMode">
+      <enum>QLineEdit::Password</enum>
+     </property>
+     <property name="placeholderText">
+      <string>Enter password...</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="fullNameLabel">
+     <property name="text">
+      <string>👨‍💼 Full Name:</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLineEdit" name="fullNameEdit">
+     <property name="placeholderText">
+      <string>Enter full name...</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="phoneLabel">
+     <property name="text">
+      <string>📱 Phone:</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLineEdit" name="phoneEdit">
+     <property name="placeholderText">
+      <string>Enter phone number...</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="emailLabel">
+     <property name="text">
+      <string>📧 Email:</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLineEdit" name="emailEdit">
+     <property name="placeholderText">
+      <string>Enter email address...</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="roleLabel">
+     <property name="text">
+      <string>🎭 Role:</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QComboBox" name="roleCombo">
+     <item>
+      <property name="text">
+       <string>ANALYST</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>ADMIN</string>
+      </property>
+     </item>
+    </widget>
+   </item>
+   <item>
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="buttonLayout">
+     <property name="spacing">
+      <number>10</number>
+     </property>
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="saveBtn">
+       <property name="minimumSize">
+        <size>
+         <width>100</width>
+         <height>35</height>
+        </size>
+       </property>
+       <property name="styleSheet">
+        <string>QPushButton {
+    background-color: #28a745;
+    color: white;
+}
+QPushButton:hover {
+    background-color: #218838;
+}
+QPushButton:pressed {
+    background-color: #1e7e34;
+}</string>
+       </property>
+       <property name="text">
+        <string>💾 Save</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="cancelBtn">
+       <property name="minimumSize">
+        <size>
+         <width>100</width>
+         <height>35</height>
+        </size>
+       </property>
+       <property name="styleSheet">
+        <string>QPushButton {
+    background-color: #6c757d;
+    color: white;
+}
+QPushButton:hover {
+    background-color: #5a6268;
+}
+QPushButton:pressed {
+    background-color: #545b62;
+}</string>
+       </property>
+       <property name="text">
+        <string>❌ Cancel</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

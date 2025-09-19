@@ -1,0 +1,295 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>DeleteConfirmDialog</class>
+ <widget class="QDialog" name="DeleteConfirmDialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>500</width>
+    <height>450</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Confirm Permanent Deletion</string>
+  </property>
+  <property name="modal">
+   <bool>true</bool>
+  </property>
+  <property name="styleSheet">
+   <string>QDialog {
+    background-color: #f8f9fa;
+    border-radius: 8px;
+}
+QLabel {
+    color: #2c3e50;
+}
+QLineEdit {
+    border: 2px solid #dc3545;
+    border-radius: 6px;
+    padding: 8px;
+    font-size: 12px;
+    background-color: white;
+}
+QLineEdit:focus {
+    border-color: #a71e2a;
+    background-color: #fff5f5;
+}
+QPushButton {
+    border: none;
+    border-radius: 6px;
+    padding: 10px 20px;
+    font-weight: bold;
+    font-size: 12px;
+    min-width: 100px;
+    min-height: 35px;
+}
+QPushButton:hover {
+    opacity: 0.9;
+}
+QPushButton:pressed {
+    opacity: 0.8;
+}</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <property name="spacing">
+    <number>10</number>
+   </property>
+   <property name="leftMargin">
+    <number>20</number>
+   </property>
+   <property name="topMargin">
+    <number>20</number>
+   </property>
+   <property name="rightMargin">
+    <number>20</number>
+   </property>
+   <property name="bottomMargin">
+    <number>20</number>
+   </property>
+   <item>
+    <widget class="QLabel" name="headerLabel">
+     <property name="text">
+      <string>💀 CONFIRM PERMANENT DELETION</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+     <property name="styleSheet">
+      <string>QLabel {
+    font-size: 16px;
+    font-weight: bold;
+    color: #dc3545;
+    margin: 10px;
+}</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QFrame" name="infoFrame">
+     <property name="frameShape">
+      <enum>QFrame::StyledPanel</enum>
+     </property>
+     <property name="styleSheet">
+      <string>QFrame {
+    background-color: #f8d7da;
+    border: 2px solid #dc3545;
+    border-radius: 8px;
+    padding: 10px;
+}</string>
+     </property>
+     <layout class="QVBoxLayout" name="infoLayout">
+      <item>
+       <widget class="QLabel" name="infoLabel">
+        <property name="text">
+         <string>📋 User Information to be PERMANENTLY DELETED:</string>
+        </property>
+        <property name="styleSheet">
+         <string>QLabel {
+    font-weight: bold;
+    font-size: 11px;
+    line-height: 1.4;
+}</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="userInfoLabel">
+        <property name="text">
+         <string>👤 Username: [username]
+👨‍💼 Full Name: [full_name]
+🎭 Role: [role]
+📧 Email: [email]</string>
+        </property>
+        <property name="styleSheet">
+         <string>QLabel {
+    padding: 5px;
+    background-color: rgba(255, 255, 255, 0.5);
+    border-radius: 4px;
+}</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QFrame" name="warningFrame">
+     <property name="frameShape">
+      <enum>QFrame::StyledPanel</enum>
+     </property>
+     <property name="styleSheet">
+      <string>QFrame {
+    background-color: #fff3cd;
+    border: 2px solid #ffc107;
+    border-radius: 8px;
+    padding: 10px;
+}</string>
+     </property>
+     <layout class="QVBoxLayout" name="warningLayout">
+      <item>
+       <widget class="QLabel" name="warningHeaderLabel">
+        <property name="text">
+         <string>🚨 SERIOUS WARNING:</string>
+        </property>
+        <property name="styleSheet">
+         <string>QLabel {
+    font-weight: bold;
+    color: #856404;
+}</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="warningContentLabel">
+        <property name="text">
+         <string>💀 WHAT WILL BE LOST PERMANENTLY:
+• All user information
+• All related data
+
+⚠️ THIS ACTION CANNOT BE UNDONE!
+
+💡 SUGGESTION: If you only want to prevent login,
+   use the "🔄 Toggle Status" button instead.</string>
+        </property>
+        <property name="styleSheet">
+         <string>QLabel {
+    font-size: 11px;
+    line-height: 1.4;
+    color: #856404;
+}</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="confirmLabel">
+     <property name="text">
+      <string>🔐 CONFIRM PERMANENT DELETION:</string>
+     </property>
+     <property name="styleSheet">
+      <string>QLabel {
+    font-weight: bold;
+    margin: 10px 0 5px 0;
+}</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="instructionLabel">
+     <property name="text">
+      <string>Type '[username]' to confirm:</string>
+     </property>
+     <property name="styleSheet">
+      <string>QLabel {
+    margin: 0 0 5px 0;
+}</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLineEdit" name="confirmInput">
+     <property name="placeholderText">
+      <string>Type username here to confirm...</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="buttonLayout">
+     <property name="spacing">
+      <number>10</number>
+     </property>
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="cancelBtn">
+       <property name="styleSheet">
+        <string>QPushButton {
+    background-color: #6c757d;
+    color: white;
+}
+QPushButton:hover {
+    background-color: #5a6268;
+}</string>
+       </property>
+       <property name="text">
+        <string>❌ Cancel</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="deleteBtn">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="styleSheet">
+        <string>QPushButton {
+    background-color: #dc3545;
+    color: white;
+}
+QPushButton:hover:enabled {
+    background-color: #c82333;
+}
+QPushButton:disabled {
+    background-color: #6c757d;
+    color: #adb5bd;
+}</string>
+       </property>
+       <property name="text">
+        <string>💀 DELETE PERMANENTLY</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

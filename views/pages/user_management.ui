@@ -16,7 +16,7 @@
    </font>
   </property>
   <property name="windowTitle">
-   <string>Quản lý người dùng</string>
+    <string>User Management</string>
   </property>
   <layout class="QVBoxLayout" name="mainLayout">
    <property name="spacing">
@@ -61,7 +61,7 @@
          <string notr="true">color: #2c3e50;</string>
         </property>
         <property name="text">
-         <string>👥 Quản lý người dùng</string>
+         <string>👥 User Management</string>
         </property>
        </widget>
       </item>
@@ -91,7 +91,7 @@
          <string notr="true">color: #6c757d;</string>
         </property>
         <property name="text">
-         <string>📊 Tổng: 0 users</string>
+         <string>📊 Total: 0 users</string>
         </property>
        </widget>
       </item>
@@ -143,7 +143,7 @@ QPushButton:pressed {
 }</string>
         </property>
         <property name="text">
-         <string>➕ Thêm người dùng</string>
+         <string>➕ Add User</string>
         </property>
        </widget>
       </item>
@@ -180,7 +180,7 @@ QPushButton:disabled {
 }</string>
         </property>
         <property name="text">
-         <string>✏️ Sửa</string>
+         <string>✏️ Edit</string>
         </property>
        </widget>
       </item>
@@ -217,7 +217,7 @@ QPushButton:disabled {
 }</string>
         </property>
         <property name="text">
-         <string>🔄 Đổi trạng thái</string>
+         <string>🔄 Toggle Status</string>
         </property>
        </widget>
       </item>
@@ -254,7 +254,7 @@ QPushButton:disabled {
 }</string>
         </property>
         <property name="text">
-         <string>🗑️ Xóa</string>
+         <string>🗑️ Delete</string>
         </property>
        </widget>
       </item>
@@ -281,7 +281,7 @@ QPushButton:disabled {
          </font>
         </property>
         <property name="text">
-         <string>🔍 Tìm kiếm:</string>
+         <string>🔍 Search:</string>
         </property>
        </widget>
       </item>
@@ -311,7 +311,7 @@ QLineEdit:focus {
 }</string>
         </property>
         <property name="placeholderText">
-         <string>Nhập tên đăng nhập, email...</string>
+         <string>Enter username, email...</string>
         </property>
        </widget>
       </item>
@@ -341,7 +341,7 @@ QPushButton:hover {
 }</string>
         </property>
         <property name="text">
-         <string>🔄 Làm mới</string>
+         <string>🔄 Refresh</string>
         </property>
        </widget>
       </item>
@@ -400,7 +400,7 @@ QHeaderView::section {
      </column>
      <column>
       <property name="text">
-       <string>👤 Tên đăng nhập</string>
+       <string>👤 Username</string>
       </property>
      </column>
      <column>
@@ -410,17 +410,17 @@ QHeaderView::section {
      </column>
      <column>
       <property name="text">
-       <string>🎭 Vai trò</string>
+       <string>🎭 Role</string>
       </property>
      </column>
      <column>
       <property name="text">
-       <string>📅 Ngày tạo</string>
+       <string>📅 Created Date</string>
       </property>
      </column>
      <column>
       <property name="text">
-       <string>🔘 Trạng thái</string>
+       <string>🔘 Status</string>
       </property>
      </column>
     </widget>
@@ -450,7 +450,7 @@ QHeaderView::section {
          <string notr="true">color: #6c757d;</string>
         </property>
         <property name="text">
-         <string>Sẵn sàng</string>
+         <string>Ready</string>
         </property>
        </widget>
       </item>
@@ -480,7 +480,7 @@ QHeaderView::section {
          <string notr="true">color: #28a745;</string>
         </property>
         <property name="text">
-         <string>🟢 Hoạt động: 0</string>
+         <string>🟢 Active: 0</string>
         </property>
        </widget>
       </item>
@@ -497,7 +497,7 @@ QHeaderView::section {
          <string notr="true">color: #dc3545;</string>
         </property>
         <property name="text">
-         <string>🔴 Không hoạt động: 0</string>
+         <string>🔴 Inactive: 0</string>
         </property>
        </widget>
       </item>

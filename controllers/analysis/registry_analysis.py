@@ -1,15 +1,11 @@
 # -*- coding: utf-8 -*-
 
 import os
-import sys
 import csv
-import json
 import subprocess
-import hashlib
 import traceback
 from datetime import datetime, timedelta
 from pathlib import Path
-from collections import defaultdict
 
 # Phân tích Registry (Windows Registry)
 try:
@@ -24,30 +20,27 @@ except ImportError:
 from PyQt5.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QMessageBox, QFileDialog,
     QTableWidgetItem, QProgressDialog, QApplication,
-    QComboBox, QLabel, QPushButton, QTextEdit, QTabWidget,
-    QAbstractItemView, QMenu, QAction, QListWidgetItem, QTreeWidgetItem,
-    QHeaderView, QDialog, QCheckBox, QScrollArea, QFrame, QSizePolicy
+    QComboBox, QLabel, QPushButton, QTextEdit,
+    QMenu, QAction, QListWidgetItem, QTreeWidgetItem,
+    QDialog, QCheckBox, QScrollArea, QFrame
 )
-from PyQt5.QtCore import Qt, QThread, pyqtSignal, QTimer, QDateTime, QModelIndex
-from PyQt5.QtGui import QStandardItemModel, QStandardItem, QIcon, QColor, QFont
+from PyQt5.QtCore import Qt, QThread, pyqtSignal, QTimer, QModelIndex
+from PyQt5.QtGui import QStandardItemModel, QStandardItem, QColor, QFont
 
-# Import giao diện người dùng - LƯU Ý: import đúng tên file UI
+# Import giao diện người dùng
 from views.pages.analysis_ui.registry_analysis_ui import Ui_RegistryAnalysisWidget
 
-# Các thư viện xuất dữ liệu
-# CSV được import ở đầu file
-
-# ============= Các Hàm Tiện Ích (giữ nguyên từ code cũ) =============
+# ============= CÁC HÀM TIỆN ÍCH =============
 
 def format_as_hex(data):
     """Định dạng dữ liệu thành hex dump với preview ASCII."""
     if not data:
         return "Không có dữ liệu"
-
+    
     try:
         if isinstance(data, str):
             data = data.encode("utf-8", errors="ignore")
-
+        
         lines = []
         for offset in range(0, len(data), 16):
             chunk = data[offset:offset+16]
@@ -62,7 +55,7 @@ def decode_registry_data(data, format_type):
     """Giải mã dữ liệu registry dựa trên định dạng được chọn."""
     if not data:
         return "Không có dữ liệu để giải mã"
-
+    
     try:
         if format_type == "Auto-detect":
             return auto_decode_data(data)
@@ -93,16 +86,16 @@ def auto_decode_data(data):
     """Tự động phát hiện định dạng và giải mã dữ liệu."""
     if not data:
         return "Không có dữ liệu"
-
+    
     try:
         # Thử dưới dạng số
         if isinstance(data, int):
             return f"Số nguyên: {data}\nHex: 0x{data:X}"
-
+        
         # Thử dưới dạng chuỗi
         if isinstance(data, str):
             return f"Chuỗi: {data}"
-
+        
         # Thử dưới dạng bytes
         if isinstance(data, bytes):
             # Thử UTF-16 trước (thường dùng trong Windows)
@@ -112,7 +105,7 @@ def auto_decode_data(data):
                     return f"Chuỗi UTF-16: {utf16}"
             except:
                 pass
-
+            
             # Thử UTF-8
             try:
                 utf8 = data.decode("utf-8", errors="strict").rstrip('\x00')
@@ -120,7 +113,7 @@ def auto_decode_data(data):
                     return f"Chuỗi UTF-8: {utf8}"
             except:
                 pass
-
+            
             # Kiểm tra các pattern thường gặp
             if len(data) == 4:
                 value = int.from_bytes(data, byteorder="little")
@@ -128,10 +121,10 @@ def auto_decode_data(data):
             elif len(data) == 8:
                 value = int.from_bytes(data, byteorder="little")
                 return f"QWORD: {value}\nHex: 0x{value:016X}"
-
+            
             # Mặc định hiển thị hex
             return format_as_hex(data)
-
+        
         return str(data)
     except Exception as e:
         return f"Lỗi tự động giải mã: {str(e)}"
@@ -181,14 +174,14 @@ def decode_sid(data):
             revision = data[0]
             sub_auth_count = data[1]
             authority = int.from_bytes(data[2:8], byteorder="big")
-
+            
             sid_string = f"S-{revision}-{authority}"
-
+            
             for i in range(sub_auth_count):
                 if 8 + (i * 4) + 4 <= len(data):
                     sub_auth = int.from_bytes(data[8+(i*4):8+(i*4)+4], byteorder="little")
                     sid_string += f"-{sub_auth}"
-
+            
             return f"SID: {sid_string}"
         return "Dữ liệu SID không hợp lệ"
     except Exception as e:
@@ -204,14 +197,14 @@ def decode_guid(data):
             p3 = data[6:8][::-1].hex()
             p4 = data[8:10].hex()
             p5 = data[10:16].hex()
-
+            
             guid = f"{{{p1}-{p2}-{p3}-{p4}-{p5}}}".upper()
             return f"GUID: {guid}"
         return "Dữ liệu GUID không hợp lệ"
     except Exception as e:
         return f"Lỗi giải mã GUID: {str(e)}"
 
-# ============= Thread Phân Tích Registry (giữ nguyên) =============
+# ============= THREAD PHÂN TÍCH REGISTRY =============
 
 class RegistryAnalysisThread(QThread):
     """Thread để chạy phân tích RECmd mà không chặn UI."""
@@ -302,7 +295,7 @@ class RegistryAnalysisThread(QThread):
         except Exception as e:
             raise Exception(f"Lỗi đọc CSV {csv_file}: {str(e)}")
 
-# ============= Dialog Chọn Registry Hives =============
+# ============= DIALOG CHỌN REGISTRY HIVES =============
 
 class HiveSelectionDialog(QDialog):
     """Dialog để chọn registry hives muốn phân tích."""
@@ -462,10 +455,10 @@ class HiveSelectionDialog(QDialog):
                 selected.append(checkbox.file_path)
         return selected
 
-# ============= Widget Phân Tích Registry Chính =============
+# ============= WIDGET PHÂN TÍCH REGISTRY CHÍNH =============
 
 class RegistryAnalysis(QWidget):
-    """Widget Phân Tích Registry - phù hợp với UI mới."""
+    """Widget Phân Tích Registry - phiên bản đã tối ưu hóa."""
 
     def __init__(self, main_window=None):
         super().__init__()
@@ -480,7 +473,6 @@ class RegistryAnalysis(QWidget):
         self.loaded_hives = {}
         self.analysis_results = {}
         self.bookmarks = []
-        self.timeline_events = []
         self.current_case_id = None
         self.current_analysis_thread = None
         self.registry_objects = {}  # Cache các đối tượng registry
@@ -492,12 +484,30 @@ class RegistryAnalysis(QWidget):
         # Thiết lập UI
         self.setup_ui()
         self.setup_connections()
-        self.setup_quick_access()
 
-        # Tải dữ liệu case nếu có sẵn (load ngầm)
+        # Tải dữ liệu case nếu có sẵn
         if main_window and hasattr(main_window, 'current_case_id'):
-            # Sử dụng QTimer để load case sau khi UI đã hiển thị
             QTimer.singleShot(100, lambda: self.load_case_data(main_window.current_case_id))
+            
+    def showEvent(self, event):
+        """Override showEvent để refresh hive artifacts khi widget được hiển thị."""
+        super().showEvent(event)
+        
+        # Kiểm tra và cập nhật case_id từ main_window (giống File Analysis)
+        if self.main_window and hasattr(self.main_window, 'current_case_id'):
+            main_case_id = self.main_window.current_case_id
+            # Nếu case đã thay đổi, load case mới
+            if main_case_id != self.current_case_id:
+                if main_case_id:
+                    QTimer.singleShot(100, lambda: self.load_case_data(main_case_id))
+                else:
+                    # Nếu không có case, reset về trạng thái rỗng
+                    self.current_case_id = None
+                    self.reset_to_empty_state()
+        
+        # Refresh hive artifacts nếu có case
+        if self.current_case_id and hasattr(self.ui, 'cmbHiveArtifacts'):
+            QTimer.singleShot(200, self.refresh_hive_artifacts)
             
     def _initialize_paths(self):
         """Khởi tạo đường dẫn công cụ."""
@@ -521,13 +531,14 @@ class RegistryAnalysis(QWidget):
 
     def setup_ui(self):
         """Thiết lập các thành phần UI."""
-        # Thiết lập thuộc tính cửa sổ
         self.setWindowTitle("Phân Tích Registry - Công Cụ Điều Tra Pháp Y Số")
 
         # Cập nhật header
         self.update_case_info()
         self.update_status("Sẵn sàng")
         
+        # Khởi tạo trạng thái ban đầu
+        self.ui.btnLoadSelectedHive.setEnabled(False)
 
         # Thiết lập models cho QTreeView
         self.tree_model.setHorizontalHeaderLabels(["Các Key Registry"])
@@ -536,7 +547,6 @@ class RegistryAnalysis(QWidget):
 
         # Thiết lập model cho QTableView
         self.ui.valuesTable.setModel(self.table_model)
-        self.ui.valuesTable.setContextMenuPolicy(Qt.CustomContextMenu)
 
         # Cấu hình hex view
         self.ui.hexView.setReadOnly(True)
@@ -549,28 +559,25 @@ class RegistryAnalysis(QWidget):
         # Thiết lập bảng timeline
         self.setup_timeline_table()
 
-        # Thiết lập kích thước splitter ban đầu
+        # Cấu hình splitter
         self.ui.mainSplitter.setSizes([350, 850])
         self.ui.verticalSplitter.setSizes([400, 200])
         
     def setup_connections(self):
         """Kết nối signals và slots."""
-        # Các hành động toolbar
-        self.ui.btnLoadHive.clicked.connect(self.load_registry_hives)
-        self.ui.txtSearch.textChanged.connect(self.on_search_text_changed)
-        self.ui.txtSearch.returnPressed.connect(self.perform_search)
-        self.ui.btnSearchOptions.clicked.connect(self.show_search_menu)
+        # Toolbar actions
+        self.ui.cmbHiveArtifacts.currentIndexChanged.connect(self.on_hive_artifact_changed)
+        self.ui.btnLoadSelectedHive.clicked.connect(self.load_selected_hive_artifact)
+        self.ui.btnRefreshHives.clicked.connect(self.refresh_hive_artifacts)
         self.ui.btnExport.clicked.connect(self.show_export_menu)
         
-
-        # Các hành động tree
+        # Tree actions
         self.ui.registryTree.clicked.connect(self.on_tree_item_clicked)
         self.ui.registryTree.customContextMenuRequested.connect(self.show_tree_context_menu)
         self.ui.btnExpandAll.clicked.connect(lambda: self.ui.registryTree.expandAll())
         self.ui.btnCollapseAll.clicked.connect(lambda: self.ui.registryTree.collapseAll())
-        self.ui.txtTreeFilter.textChanged.connect(self.filter_tree)
 
-        # Lựa chọn bảng
+        # Table actions
         self.ui.valuesTable.selectionModel().selectionChanged.connect(self.on_value_selected)
 
         # Bookmarks
@@ -579,23 +586,15 @@ class RegistryAnalysis(QWidget):
         self.ui.btnGoToBookmark.clicked.connect(self.go_to_bookmark)
         self.ui.bookmarksList.itemDoubleClicked.connect(self.bookmark_double_clicked)
 
-        # Truy cập nhanh (nếu có trong UI)
-        # self.ui.quickAccessList.itemDoubleClicked.connect(self.quick_access_double_clicked)
-
-        # Combo định dạng
+        # Format combo
         self.ui.cmbFormat.currentTextChanged.connect(self.update_decoded_view)
 
-        # Ghi chú
+        # Notes
         self.ui.btnSaveNotes.clicked.connect(self.save_notes)
 
-        # Thanh đường dẫn
+        # Path
         self.ui.btnCopyPath.clicked.connect(self.copy_current_path)
         
-        
-    def setup_quick_access(self):
-        """Thiết lập các vị trí truy cập nhanh - đã được điền sẵn trong file UI."""
-        pass  # Các mục truy cập nhanh đã được thiết lập trong file UI
-
     def setup_timeline_table(self):
         """Thiết lập các cột của bảng timeline."""
         self.ui.timelineTable.setColumnCount(4)
@@ -605,14 +604,17 @@ class RegistryAnalysis(QWidget):
         self.ui.timelineTable.horizontalHeader().setStretchLastSection(True)
         self.ui.timelineTable.setAlternatingRowColors(True)
         self.ui.timelineTable.setSortingEnabled(True)
-        
+
     def load_case_data(self, case_id):
         """Tải dữ liệu cụ thể của case."""
-            
+        # Clear previous data first
+        if case_id != self.current_case_id:
+            self.clear_previous_data()
+        
         self.current_case_id = case_id
         self.update_case_info()
 
-        # Thử tự động tải file registry từ case và thiết lập thư mục output
+        # Thiết lập thư mục output và load hive artifacts từ case
         try:
             from models.db_manager import DatabaseManager
             db = DatabaseManager()
@@ -627,12 +629,8 @@ class RegistryAnalysis(QWidget):
                 # Tạo thư mục cần thiết
                 os.makedirs(self.output_dir, exist_ok=True)
 
-                # Tải kết quả phân tích đã có (nếu có) - PHẢI TRƯỚC auto_load_case_registry
-                print(f"🔄 Đang tải kết quả cũ cho case {self.current_case_id}")
-                self._load_existing_analysis_results(db)
-
-                # Delay một chút để đảm bảo restore hoàn tất trước khi load registry files
-                QTimer.singleShot(500, lambda: self.auto_load_case_registry(case_path))
+                # Load hive artifacts từ case
+                self.load_hive_artifacts_from_case(db)
                 self.update_status(f"Case đã tải - Output: {self.output_dir}", "green")
             else:
                 # Dự phòng về temp nếu không có đường dẫn case
@@ -644,8 +642,42 @@ class RegistryAnalysis(QWidget):
             # Dự phòng về temp nếu có lỗi
             self._set_fallback_output_dir()
 
+    def clear_previous_data(self):
+        """Clear dữ liệu case trước đó khi chuyển sang case mới."""
+        try:
+            # Clear tree và table models
+            if hasattr(self, 'tree_model'):
+                self.tree_model.clear()
+                self.tree_model.setHorizontalHeaderLabels(["Các Key Registry"])
+            
+            if hasattr(self, 'table_model'):
+                self.table_model.clear()
+                self.table_model.setHorizontalHeaderLabels(["Tên", "Kiểu", "Dữ liệu"])
+            
+            # Clear views
+            if hasattr(self.ui, 'hexView'):
+                self.ui.hexView.clear()
+            if hasattr(self.ui, 'decodedView'):
+                self.ui.decodedView.clear()
+            if hasattr(self.ui, 'analysisView'):
+                self.ui.analysisView.clear()
+            if hasattr(self.ui, 'txtCurrentPath'):
+                self.ui.txtCurrentPath.clear()
+            
+            # Clear timeline
+            if hasattr(self.ui, 'timelineTable'):
+                self.ui.timelineTable.setRowCount(0)
+            
+            # Clear loaded data
+            self.loaded_hives = {}
+            self.analysis_results = {}
+            self.registry_objects = {}
+            
+        except Exception as e:
+            print(f"Error clearing previous data: {e}")
+
     def _set_fallback_output_dir(self):
-        """Thiết lập thư mục output dự phòng khi không có đường dẫn case."""
+        """Thiết lập thư mục output dự phòng."""
         try:
             from utils.path_utils import get_temp_dir
             temp_root = get_temp_dir() if callable(get_temp_dir) else "temp"
@@ -657,289 +689,217 @@ class RegistryAnalysis(QWidget):
         os.makedirs(self.output_dir, exist_ok=True)
         self.update_status("Sử dụng thư mục output tạm thời", "yellow")
 
-    def _load_existing_analysis_results(self, db):
-        """Tải kết quả phân tích đã có từ database và file CSV."""
+    def load_hive_artifacts_from_case(self, db):
+        """Load danh sách hive artifacts từ case hiện tại."""
         try:
-            print(f"🔍 Đang kiểm tra kết quả cũ cho case: {self.current_case_id}")
+            # Xóa danh sách cũ
+            self.ui.cmbHiveArtifacts.clear()
+            self.ui.cmbHiveArtifacts.addItem("-- Chọn Registry Hive --", None)
             
-            # Lấy kết quả phân tích registry cho case hiện tại
-            results = db.get_results_by_case(self.current_case_id)
-            registry_results = [r for r in results if 'registry' in r.get('tool_used', '').lower()]
+            # Lấy tất cả artifacts của case
+            artifacts = db.get_artifacts_by_case(self.current_case_id)
+            print(f"🔍 DEBUG: Tìm thấy {len(artifacts)} artifacts tổng cộng trong case {self.current_case_id}")
             
-            print(f"📊 Tìm thấy {len(results)} kết quả tổng cộng")
-            print(f"🔧 Tìm thấy {len(registry_results)} kết quả registry")
+            # Lọc ra các registry hive artifacts
+            registry_artifacts = []
+            for artifact in artifacts:
+                evidence_type = artifact.get('evidence_type', '').upper()
+                name = artifact.get('name', '').upper()
+                source_path = artifact.get('source_path', '').upper()
+                
+                # Kiểm tra xem có phải registry hive không
+                is_registry = False
+                
+                # Kiểm tra theo evidence_type
+                if 'REGISTRY' in evidence_type:
+                    is_registry = True
+                    print(f"  ✅ Registry artifact (by type): {name}")
+                
+                # Kiểm tra theo tên file
+                elif any(hive_type in name for hive_type in ['SYSTEM', 'SOFTWARE', 'SAM', 'SECURITY', 'NTUSER', 'USRCLASS', 'DEFAULT']):
+                    is_registry = True
+                    print(f"  ✅ Registry artifact (by name): {name}")
+                
+                # Kiểm tra theo đường dẫn file
+                elif any(hive_type in source_path for hive_type in ['SYSTEM', 'SOFTWARE', 'SAM', 'SECURITY', 'NTUSER.DAT', 'USRCLASS.DAT', 'DEFAULT']):
+                    is_registry = True
+                    print(f"  ✅ Registry artifact (by path): {name}")
+                
+                # Kiểm tra extension đặc biệt
+                elif source_path.endswith('.DAT') or 'CONFIG\\' in source_path:
+                    is_registry = True
+                    print(f"  ✅ Registry artifact (by extension/path): {name}")
+                
+                if is_registry:
+                    registry_artifacts.append(artifact)
+                else:
+                    print(f"  ❌ Not registry: {name}")
             
-            if registry_results:
-                print("✅ Có kết quả cũ, đang restore từ CSV...")
-                self.update_status(f"Đã tìm thấy {len(registry_results)} kết quả cũ", "green")
+            # Thêm vào combo box
+            for artifact in registry_artifacts:
+                artifact_name = artifact.get('name', 'Unknown')
+                hive_type = self._detect_hive_type_from_artifact(artifact)
+                display_name = f"{artifact_name} ({hive_type})"
                 
-                # Thử load lại kết quả từ file CSV
-                self._restore_analysis_results_from_files()
-                
-                # Tải timeline từ database nếu có
-                self._load_timeline_from_database(db)
-                
+                self.ui.cmbHiveArtifacts.addItem(display_name, artifact)
+                print(f"  📋 Added to combo: {display_name}")
+            
+            if registry_artifacts:
+                self.update_status(f"Tìm thấy {len(registry_artifacts)} registry hive artifacts", "green")
+                print(f"✅ Đã load {len(registry_artifacts)} registry artifacts vào combo box")
             else:
-                print("❌ Không có kết quả cũ")
-                self.update_status("Chưa có kết quả phân tích nào được lưu", "yellow")
+                self.update_status("Không tìm thấy registry hive artifacts trong case", "yellow")
+                print("❌ Không tìm thấy registry artifacts nào")
                 
         except Exception as e:
-            print(f"❌ Lỗi tải kết quả đã có: {e}")
+            print(f"❌ Lỗi load hive artifacts: {e}")
             import traceback
             traceback.print_exc()
-            
-    def _restore_analysis_results_from_files(self):
-        """Khôi phục kết quả phân tích từ file CSV đã lưu."""
-        print(f"🔍 Kiểm tra output_dir: {self.output_dir}")
+            self.update_status("Lỗi tải danh sách hive artifacts", "red")
+
+    def _detect_hive_type_from_artifact(self, artifact):
+        """Phát hiện loại hive từ artifact."""
+        name = artifact.get('name', '').upper()
+        evidence_type = artifact.get('evidence_type', '').upper()
         
-        if not self.output_dir or not os.path.exists(self.output_dir):
-            print(f"❌ Output dir không tồn tại: {self.output_dir}")
+        if 'SYSTEM' in name or 'SYSTEM' in evidence_type:
+            return 'SYSTEM'
+        elif 'SOFTWARE' in name or 'SOFTWARE' in evidence_type:
+            return 'SOFTWARE'
+        elif 'SAM' in name or 'SAM' in evidence_type:
+            return 'SAM'
+        elif 'SECURITY' in name or 'SECURITY' in evidence_type:
+            return 'SECURITY'
+        elif 'NTUSER' in name or 'NTUSER' in evidence_type:
+            return 'NTUSER'
+        elif 'USRCLASS' in name or 'USRCLASS' in evidence_type:
+            return 'USRCLASS'
+        elif 'DEFAULT' in name or 'DEFAULT' in evidence_type:
+            return 'DEFAULT'
+        else:
+            return 'REGISTRY'
+
+    def on_hive_artifact_changed(self, index):
+        """Xử lý sự kiện thay đổi hive artifact được chọn."""
+        if index <= 0:  # Index 0 là "-- Chọn Registry Hive --"
+            self.ui.btnLoadSelectedHive.setEnabled(False)
             return
             
-        # Liệt kê tất cả file trong output_dir
-        try:
-            all_files = os.listdir(self.output_dir)
-            print(f"📁 Tất cả files trong output_dir: {all_files}")
-        except Exception as e:
-            print(f"❌ Lỗi list files: {e}")
-            
-        try:
-            import glob
-            csv_pattern = os.path.join(self.output_dir, "*_analysis.csv")
-            csv_files = glob.glob(csv_pattern)
-            print(f"🔍 Tìm CSV với pattern: {csv_pattern}")
-            print(f"📁 Tìm thấy {len(csv_files)} CSV files: {csv_files}")
-            
-            if csv_files:
-                restored_results = {}
-                total_records = 0
-                
-                for csv_file in csv_files:
-                    try:
-                        print(f"📄 Đang xử lý CSV: {csv_file}")
-                        
-                        # Xác định hive file từ tên CSV
-                        csv_name = os.path.basename(csv_file)
-                        hive_name = csv_name.replace('_analysis.csv', '')
-                        print(f"🏷️ Hive name từ CSV: {hive_name}")
-                        
-                        # Tìm hive file tương ứng trong case
-                        possible_hive_paths = self._find_hive_file_by_name(hive_name)
-                        print(f"📂 Tìm thấy {len(possible_hive_paths)} hive paths: {possible_hive_paths}")
-                        
-                        if possible_hive_paths:
-                            hive_file = possible_hive_paths[0]  # Lấy file đầu tiên
-                            
-                            # Parse CSV results
-                            csv_results = self._parse_csv_file(csv_file)
-                            if csv_results:
-                                restored_results[hive_file] = csv_results
-                                total_records += len(csv_results)
-                                print(f"✅ Restored {len(csv_results)} records từ {csv_file}")
-                        else:
-                            print(f"❌ Không tìm thấy hive file cho {hive_name}")
-                                
-                    except Exception as e:
-                        print(f"❌ Lỗi load CSV {csv_file}: {e}")
-                
-                if restored_results:
-                    self.analysis_results = restored_results
-                    print(f"🎉 Tổng cộng restored {total_records} artifacts từ {len(restored_results)} hives")
-                    self.update_status(f"Đã khôi phục {total_records} artifacts từ {len(csv_files)} file", "green")
-                else:
-                    print("❌ Không restore được kết quả nào")
-            else:
-                print("❌ Không tìm thấy CSV file nào")
-                    
-        except Exception as e:
-            print(f"❌ Lỗi khôi phục kết quả: {e}")
-            import traceback
-            traceback.print_exc()
-            
-    def _find_hive_file_by_name(self, hive_name):
-        """Tìm file hive theo tên trong case hiện tại."""
-        try:
-            from models.db_manager import DatabaseManager
-            db = DatabaseManager()
-            db.connect()
-            
-            case_info = db.get_case_with_investigator(self.current_case_id)
-            db.disconnect()
-            
-            if case_info and case_info.get('archive_path'):
-                archive_path = Path(case_info['archive_path'])
-                
-                # Tìm file có tên chứa hive_name
-                patterns = [
-                    f"**/*{hive_name}*",
-                    f"**/{hive_name}",
-                    f"**/{hive_name.upper()}*",
-                    f"**/{hive_name.lower()}*"
-                ]
-                
-                found_files = []
-                for pattern in patterns:
-                    found_files.extend(archive_path.glob(pattern))
-                
-                return [str(f) for f in found_files if f.is_file()]
-                
-        except Exception as e:
-            print(f"Lỗi tìm hive file: {e}")
-            
-        return []
+        self.ui.btnLoadSelectedHive.setEnabled(True)
         
-    def _parse_csv_file(self, csv_file):
-        """Parse file CSV và trả về kết quả."""
-        try:
-            results = []
-            with open(csv_file, "r", encoding="utf-8", errors="ignore") as f:
-                reader = csv.DictReader(f)
-                for row in reader:
-                    results.append(row)
-            return results
-        except Exception as e:
-            print(f"Lỗi parse CSV {csv_file}: {e}")
-            return []
-            
-    def _load_timeline_from_database(self, db):
-        """Tải timeline từ activity logs trong database."""
-        try:
-            activity_logs = db.get_activity_logs(case_id=self.current_case_id)
-            registry_logs = [log for log in activity_logs if 'registry' in log.get('action', '').lower()]
-            
-            if registry_logs:
-                # Cập nhật timeline table
-                self.ui.timelineTable.setRowCount(len(registry_logs))
-                
-                for i, log in enumerate(registry_logs):
-                    self.ui.timelineTable.setItem(i, 0, QTableWidgetItem(str(log.get('timestamp', ''))))
-                    self.ui.timelineTable.setItem(i, 1, QTableWidgetItem('Database Activity'))
-                    self.ui.timelineTable.setItem(i, 2, QTableWidgetItem(log.get('action', '')))
-                    self.ui.timelineTable.setItem(i, 3, QTableWidgetItem(log.get('details', '')))
-                
-                self.ui.timelineTable.resizeColumnsToContents()
-                
-        except Exception as e:
-            print(f"Lỗi tải timeline từ database: {e}")
+        # Lấy artifact được chọn
+        artifact = self.ui.cmbHiveArtifacts.itemData(index)
+        if artifact:
+            self.update_status(f"Đã chọn: {artifact.get('name', 'Unknown')}", "yellow")
 
-    def _check_and_run_analysis_if_needed(self):
-        """Kiểm tra và chỉ chạy phân tích nếu cần thiết."""
+    def load_selected_hive_artifact(self):
+        """Load hive artifact được chọn."""
+        current_index = self.ui.cmbHiveArtifacts.currentIndex()
+        if current_index <= 0:
+            QMessageBox.warning(self, "Chưa chọn Hive", "Vui lòng chọn một Registry Hive từ danh sách.")
+            return
+            
+        artifact = self.ui.cmbHiveArtifacts.itemData(current_index)
+        if not artifact:
+            QMessageBox.warning(self, "Lỗi", "Không thể lấy thông tin artifact.")
+            return
+            
+        # Lấy đường dẫn file từ artifact
+        source_path = artifact.get('source_path')
+        if not source_path or not os.path.exists(source_path):
+            QMessageBox.warning(self, "File không tồn tại", 
+                              f"File hive không tồn tại tại đường dẫn:\n{source_path}")
+            return
+            
+        # Load hive file
+        self.update_status(f"Đang load hive: {artifact.get('name', 'Unknown')}", "yellow")
+        self.process_hive_files([source_path])
+        
+        # Tự động chạy phân tích nếu chưa có kết quả
+        if not self.analysis_results:
+            QTimer.singleShot(1000, self.start_analysis)
+
+    def refresh_hive_artifacts(self):
+        """Refresh danh sách hive artifacts từ case."""
         if not self.current_case_id:
-            # Không có case, chạy phân tích luôn
-            self.start_comprehensive_analysis()
+            QMessageBox.warning(self, "Chưa chọn Case", "Vui lòng chọn case trước.")
             return
-
+            
         try:
             from models.db_manager import DatabaseManager
             db = DatabaseManager()
             db.connect()
-
-            # Kiểm tra xem đã có kết quả phân tích registry chưa
-            results = db.get_results_by_case(self.current_case_id)
-            registry_results = [r for r in results if 'registry' in r.get('tool_used', '').lower()]
-
-            db.disconnect()
-
-            if registry_results:
-                # Đã có kết quả cũ, hỏi user có muốn chạy lại không
-                reply = QMessageBox.question(
-                    self,
-                    "Đã có kết quả phân tích",
-                    f"Case này đã có {len(registry_results)} kết quả phân tích Registry.\n\n"
-                    f"Bạn có muốn chạy phân tích mới để cập nhật kết quả?",
-                    QMessageBox.Yes | QMessageBox.No,
-                    QMessageBox.No  # Default là No
-                )
-                
-                if reply == QMessageBox.Yes:
-                    self.start_comprehensive_analysis()
-                else:
-                    self.update_status("Sử dụng kết quả phân tích đã có", "green")
-            else:
-                # Chưa có kết quả, chạy phân tích tự động
-                self.start_comprehensive_analysis()
-
-        except Exception as e:
-            print(f"Lỗi kiểm tra kết quả cũ: {e}")
-            # Nếu có lỗi, chạy phân tích luôn
-            self.start_comprehensive_analysis()
-
-    def _auto_load_registry_files_if_needed(self, registry_files):
-        """Tự động load registry files nếu cần thiết."""
-        if not self.current_case_id:
-            # Không có case, load file đầu tiên
-            if registry_files:
-                self.process_hive_files([str(registry_files[0])])
-            return
-
-        try:
-            from models.db_manager import DatabaseManager
-            db = DatabaseManager()
-            db.connect()
-
-            # Kiểm tra xem đã có kết quả phân tích registry chưa
-            results = db.get_results_by_case(self.current_case_id)
-            registry_results = [r for r in results if 'registry' in r.get('tool_used', '').lower()]
-
-            db.disconnect()
-
-            if not registry_results:
-                # Chưa có kết quả, tự động load file đầu tiên
-                if registry_files:
-                    self.process_hive_files([str(registry_files[0])])
-            else:
-                # Đã có kết quả, chỉ load registry files mà KHÔNG chạy phân tích
-                self.update_status("Đã có kết quả phân tích registry từ trước", "green")
-                if registry_files:
-                    # Load hive files để hiển thị tree nhưng không chạy analysis
-                    self._load_hive_files_without_analysis([str(registry_files[0])])
-
-        except Exception as e:
-            print(f"Lỗi kiểm tra auto load: {e}")
-            # Nếu có lỗi, load file đầu tiên
-            if registry_files:
-                self.process_hive_files([str(registry_files[0])])
-
-    def _load_hive_files_without_analysis(self, file_paths):
-        """Load registry files chỉ để hiển thị tree, không chạy phân tích."""
-        if not REGISTRY_AVAILABLE:
-            return
             
-        valid_hives = []
-        
-        for file_path in file_paths:
-            try:
-                # Parse registry file
-                registry = Registry.Registry(file_path)
-                self.registry_objects[file_path] = registry
-                
-                hive_info = {
-                    "path": file_path,
-                    "name": os.path.basename(file_path),
-                    "type": self.detect_hive_type(file_path),
-                    "size": os.path.getsize(file_path),
-                    "modified": datetime.fromtimestamp(os.path.getmtime(file_path)),
-                    "registry": registry
-                }
-                
-                valid_hives.append(hive_info)
-                self.loaded_hives[file_path] = hive_info
-                
-            except Exception as e:
-                print(f"Error loading {file_path}: {e}")
-                
-        if valid_hives:
-            self.build_registry_tree()
-            self.update_timeline()
-            self.update_status(f"Đã tải {len(valid_hives)} hive(s) (sử dụng kết quả cũ)", "green")
-            # KHÔNG gọi _check_and_run_analysis_if_needed() ở đây
+            print(f"🔄 Refreshing hive artifacts for case {self.current_case_id}")
+            self.load_hive_artifacts_from_case(db)
             
+            db.disconnect()
+            self.update_status("Đã refresh danh sách hive artifacts", "green")
+            
+        except Exception as e:
+            print(f"Lỗi refresh hive artifacts: {e}")
+            self.update_status("Lỗi refresh danh sách hive artifacts", "red")
+
     def update_case_info(self):
         """Cập nhật thông tin case trong header."""
         if self.current_case_id:
             self.ui.caseInfoLabel.setText(f"Case ID: {self.current_case_id}")
         else:
             self.ui.caseInfoLabel.setText("Case: Chưa chọn")
+
+    def reset_to_empty_state(self):
+        """Reset Registry Analysis về trạng thái rỗng khi không có case."""
+        try:
+            # Clear combo box
+            if hasattr(self.ui, 'cmbHiveArtifacts'):
+                self.ui.cmbHiveArtifacts.clear()
+                self.ui.cmbHiveArtifacts.addItem("-- Chọn Registry Hive --", None)
+            
+            # Disable load button
+            if hasattr(self.ui, 'btnLoadSelectedHive'):
+                self.ui.btnLoadSelectedHive.setEnabled(False)
+            
+            # Clear tree model
+            if hasattr(self, 'tree_model'):
+                self.tree_model.clear()
+                self.tree_model.setHorizontalHeaderLabels(["Các Key Registry"])
+            
+            # Clear table model
+            if hasattr(self, 'table_model'):
+                self.table_model.clear()
+                self.table_model.setHorizontalHeaderLabels(["Tên", "Kiểu", "Dữ liệu"])
+            
+            # Clear views
+            if hasattr(self.ui, 'hexView'):
+                self.ui.hexView.clear()
+            if hasattr(self.ui, 'decodedView'):
+                self.ui.decodedView.clear()
+            if hasattr(self.ui, 'analysisView'):
+                self.ui.analysisView.clear()
+            if hasattr(self.ui, 'txtCurrentPath'):
+                self.ui.txtCurrentPath.clear()
+            
+            # Clear timeline table
+            if hasattr(self.ui, 'timelineTable'):
+                self.ui.timelineTable.setRowCount(0)
+            
+            # Clear bookmarks
+            if hasattr(self.ui, 'bookmarksList'):
+                self.ui.bookmarksList.clear()
+            if hasattr(self, 'bookmarks'):
+                self.bookmarks = []
+            
+            # Clear loaded data
+            self.loaded_hives = {}
+            self.analysis_results = {}
+            self.registry_objects = {}
+            
+            # Update case info and status
+            self.update_case_info()
+            self.update_status("Chưa chọn case", "yellow")
+            
+        except Exception as e:
+            print(f"Error resetting registry analysis state: {e}")
 
     def update_status(self, status, color="green"):
         """Cập nhật chỉ báo trạng thái."""
@@ -953,122 +913,7 @@ class RegistryAnalysis(QWidget):
 
         # Cũng cập nhật status bar
         self.ui.statusBar.showMessage(status, 5000)
-            
-    def auto_load_case_registry(self, archive_path):
-        """Tự động tải file registry từ kho lưu trữ case."""
-        archive_path = Path(archive_path)
-        if not archive_path.exists():
-            return
 
-        self.update_status("Đang tìm kiếm registry hives...", "yellow")
-        QTimer.singleShot(200, lambda: self._search_registry_files(archive_path))
-        
-    def _search_registry_files(self, archive_path):
-        """Tìm kiếm registry files trong background."""
-        # Các pattern file registry thường gặp
-        patterns = [
-            "**/*SYSTEM", "**/*SOFTWARE", "**/*SAM",
-            "**/*SECURITY", "**/*NTUSER.DAT", "**/*UsrClass.dat"
-        ]
-
-        registry_files = []
-        for pattern in patterns:
-            found_files = list(archive_path.glob(pattern))
-            registry_files.extend(found_files)
-
-        if registry_files:
-            # Kiểm tra xem đã có kết quả phân tích chưa
-            print(f"🔍 Kiểm tra analysis_results: {len(self.analysis_results) if self.analysis_results else 0} items")
-            print(f"📊 Analysis results keys: {list(self.analysis_results.keys()) if self.analysis_results else 'None'}")
-            
-            # Sử dụng hàm kiểm tra mạnh mẽ hơn
-            has_results = self.has_existing_results()
-            print(f"🔍 has_existing_results() = {has_results}")
-            
-            if has_results and self.analysis_results:
-                print("✅ Đã có kết quả cũ, load registry files mà không hiển thị dialog")
-                # Đã có kết quả cũ, chỉ load registry files mà không hiển thị dialog
-                self._load_registry_files_without_dialog(registry_files)
-            else:
-                print("❌ Chưa có kết quả hoặc chưa restore được, hiển thị dialog để user chọn hives")
-                # Chưa có kết quả, hiển thị dialog để user chọn hives muốn phân tích
-                self.show_hive_selection_dialog(registry_files)
-        else:
-            self.update_status("Không tìm thấy registry file nào trong case", "yellow")
-    
-    def show_hive_selection_dialog(self, registry_files):
-        """Hiển thị dialog để chọn hives muốn phân tích."""
-        dialog = HiveSelectionDialog(registry_files, self)
-        
-        if dialog.exec_() == QDialog.Accepted:
-            selected_files = dialog.get_selected_files()
-            
-            if selected_files:
-                self.update_status(f"Đã chọn {len(selected_files)} hives", "green")
-                self.process_hive_files([str(f) for f in selected_files])
-                QTimer.singleShot(1000, self.start_silent_analysis)
-            else:
-                self.update_status("Không có hive nào được chọn", "yellow")
-        else:
-            self.update_status("Đã hủy chọn hives", "yellow")
-    
-    def has_existing_results(self):
-        """Kiểm tra xem có kết quả cũ không (cho debug)."""
-        if not self.current_case_id:
-            return False
-            
-        try:
-            from models.db_manager import DatabaseManager
-            db = DatabaseManager()
-            db.connect()
-            
-            results = db.get_results_by_case(self.current_case_id)
-            registry_results = [r for r in results if 'registry' in r.get('tool_used', '').lower()]
-            
-            db.disconnect()
-            
-            # Kiểm tra cả database và CSV files
-            has_db_results = len(registry_results) > 0
-            has_csv_files = False
-            
-            if self.output_dir and os.path.exists(self.output_dir):
-                import glob
-                csv_files = glob.glob(os.path.join(self.output_dir, "*_analysis.csv"))
-                has_csv_files = len(csv_files) > 0
-            
-            print(f"🔍 has_existing_results: DB={has_db_results}, CSV={has_csv_files}")
-            return has_db_results and has_csv_files
-            
-        except Exception as e:
-            print(f"❌ Lỗi kiểm tra kết quả cũ: {e}")
-            return False
-    
-    def _load_registry_files_without_dialog(self, registry_files):
-        """Load registry files mà không hiển thị dialog (dành cho kết quả cũ)."""
-        if not REGISTRY_AVAILABLE:
-            return
-            
-        # Load tất cả hive files tìm thấy
-        file_paths = [str(f) for f in registry_files]
-        self.process_hive_files(file_paths)
-        
-        self.update_status(f"Đã load {len(registry_files)} hives (sử dụng kết quả cũ)", "green")
-            
-    def load_registry_hives(self):
-        """Tải file registry hive."""
-        file_dialog = QFileDialog()
-        file_dialog.setFileMode(QFileDialog.ExistingFiles)
-        file_dialog.setNameFilter("Registry Hives (*);;Tất cả Files (*)")
-        file_dialog.setWindowTitle("Chọn File Registry Hive")
-
-        if file_dialog.exec_():
-            files = file_dialog.selectedFiles()
-            if files:
-                # Convert string paths to Path objects
-                path_objects = [Path(f) for f in files]
-                # Hiển thị dialog chọn hive
-                self.show_hive_selection_dialog(path_objects)
-                
     def process_hive_files(self, file_paths):
         """Xử lý và tải file hive."""
         if not REGISTRY_AVAILABLE:
@@ -1107,7 +952,7 @@ class RegistryAnalysis(QWidget):
             self.build_registry_tree()
             self.update_timeline()
             self.update_status(f"Đã tải {len(valid_hives)} hive(s)", "green")
-            
+
     def detect_hive_type(self, file_path):
         """Phát hiện loại hive từ tên file."""
         filename = os.path.basename(file_path).upper()
@@ -1199,7 +1044,7 @@ class RegistryAnalysis(QWidget):
             # Cập nhật đường dẫn
             self.ui.txtCurrentPath.setText(data["path"])
 
-            # Cập nhật phân tích
+            # Phân tích key
             self.analyze_key(data["key"], data["path"])
 
         elif data["type"] == "hive":
@@ -1428,42 +1273,10 @@ class RegistryAnalysis(QWidget):
         """Xử lý sự kiện double-click bookmark."""
         self.go_to_bookmark()
 
-                
     def find_and_select_tree_item(self, target_path):
         """Tìm và chọn item trong tree theo đường dẫn."""
         # Implementation sẽ tìm trong tree và chọn item phù hợp
         self.update_status(f"Điều hướng đến: {target_path}", "yellow")
-
-    # def on_quick_load_selected(self, index):
-    #     """Xử lý sự kiện lựa chọn quick load."""
-    #     if index <= 0:
-    #         return
-
-    #     file_path = self.ui.cmbQuickLoad.itemData(index)
-    #     if file_path and os.path.exists(file_path):
-    #         self.process_hive_files([file_path])
-
-    def on_search_text_changed(self, text):
-        """Xử lý sự kiện thay đổi text tìm kiếm."""
-        if len(text) >= 3:
-            # Có thể implement live search
-            pass
-            
-    def perform_search(self):
-        """Thực hiện tìm kiếm registry."""
-        search_text = self.ui.txtSearch.text()
-        if not search_text:
-            return
-
-        self.update_status(f"Đang tìm kiếm: {search_text}", "yellow")
-
-        # Implementation tìm kiếm sẽ được thêm vào đây
-        QMessageBox.information(self, "Tìm kiếm", f"Chức năng tìm kiếm cho '{search_text}' đang được triển khai.")
-        
-    def filter_tree(self, text):
-        """Lọc tree view."""
-        # Implementation lọc tree
-        pass
 
     def copy_current_path(self):
         """Sao chép đường dẫn hiện tại vào clipboard."""
@@ -1507,67 +1320,12 @@ class RegistryAnalysis(QWidget):
         elif action == add_bookmark:
             self.add_bookmark()
             
-    def show_search_menu(self):
-        """Hiển thị menu tùy chọn tìm kiếm."""
-        menu = QMenu()
-
-        menu.addAction("🔍 Phân biệt hoa thường").setCheckable(True)
-        menu.addAction("📝 Biểu thức chính quy").setCheckable(True)
-        menu.addAction("🗑️ Bao gồm đã xóa").setCheckable(True)
-        menu.addSeparator()
-        menu.addAction("🐛 Debug: Kiểm tra kết quả cũ", self.debug_check_existing_results)
-
-        menu.exec_(self.ui.btnSearchOptions.mapToGlobal(self.ui.btnSearchOptions.rect().bottomLeft()))
-        
-    def debug_check_existing_results(self):
-        """Debug: Kiểm tra kết quả cũ."""
-        print("🐛 ===== DEBUG CHECK EXISTING RESULTS =====")
-        print(f"Current case ID: {self.current_case_id}")
-        print(f"Output dir: {self.output_dir}")
-        print(f"Analysis results: {len(self.analysis_results) if self.analysis_results else 0} items")
-        
-        # Kiểm tra database
-        try:
-            from models.db_manager import DatabaseManager
-            db = DatabaseManager()
-            db.connect()
-            results = db.get_results_by_case(self.current_case_id)
-            registry_results = [r for r in results if 'registry' in r.get('tool_used', '').lower()]
-            db.disconnect()
-            
-            print(f"Database results: {len(results)} total, {len(registry_results)} registry")
-            for r in registry_results:
-                print(f"  - {r.get('tool_used', 'N/A')}: {r.get('summary', 'N/A')}")
-        except Exception as e:
-            print(f"Error checking database: {e}")
-        
-        # Kiểm tra CSV files
-        if self.output_dir and os.path.exists(self.output_dir):
-            try:
-                import glob
-                csv_files = glob.glob(os.path.join(self.output_dir, "*_analysis.csv"))
-                print(f"CSV files found: {len(csv_files)}")
-                for csv_file in csv_files:
-                    print(f"  - {csv_file}")
-            except Exception as e:
-                print(f"Error checking CSV files: {e}")
-        else:
-            print("Output dir does not exist")
-            
-        # Kiểm tra has_existing_results
-        has_results = self.has_existing_results()
-        print(f"has_existing_results(): {has_results}")
-        
-        print("🐛 ===== END DEBUG =====")
-        
-        QMessageBox.information(self, "Debug", f"Check console output for debug info.\n\nCase: {self.current_case_id}\nHas results: {has_results}")
-        
     def show_export_menu(self):
         """Hiển thị menu tùy chọn xuất dữ liệu."""
         menu = QMenu()
 
         # Thêm nút chạy phân tích mới
-        menu.addAction("🔬 Chạy Phân Tích Mới", self.run_new_analysis)
+        menu.addAction("🔬 Chạy Phân Tích Mới", self.start_analysis)
         menu.addSeparator()
         
         menu.addAction("📊 Xuất Dữ Liệu CSV", self.export_csv)
@@ -1575,87 +1333,7 @@ class RegistryAnalysis(QWidget):
 
         menu.exec_(self.ui.btnExport.mapToGlobal(self.ui.btnExport.rect().bottomLeft()))
 
-    def run_new_analysis(self):
-        """Chạy phân tích mới (được gọi từ menu)."""
-        if not self.loaded_hives:
-            # Nếu chưa có hive, thử tự động load
-            if self.current_case_id:
-                try:
-                    from models.db_manager import DatabaseManager
-                    db = DatabaseManager()
-                    db.connect()
-                    case_info = db.get_case_with_investigator(self.current_case_id)
-                    db.disconnect()
-                    
-                    if case_info and case_info.get('archive_path'):
-                        # Thử tự động load registry files
-                        self.auto_load_case_registry(case_info['archive_path'])
-                        
-                        # Nếu vẫn không có hive, thông báo
-                        if not self.loaded_hives:
-                            QMessageBox.warning(self, "Không có Hive", "Không tìm thấy registry hive trong case này.")
-                            return
-                    else:
-                        QMessageBox.warning(self, "Không có Hive", "Vui lòng tải registry hive trước.")
-                        return
-                except Exception as e:
-                    QMessageBox.warning(self, "Lỗi", f"Lỗi tải registry files: {str(e)}")
-                    return
-            else:
-                QMessageBox.warning(self, "Không có Hive", "Vui lòng tải registry hive trước.")
-                return
-        
-        # Chạy phân tích
-        self.start_comprehensive_analysis()
-        
-    def start_silent_analysis(self):
-        """Bắt đầu phân tích ngầm không hiển thị dialog."""
-        if not self.loaded_hives:
-            return
-            
-        # Kiểm tra thư mục output đã được thiết lập chưa
-        if not self.output_dir:
-            self._set_fallback_output_dir()
-
-        # Tìm file batch
-        batch_file = os.path.join(self.batch_dir, "DFIRBatch.reb")
-        if not os.path.exists(batch_file):
-            # Tìm bất kỳ file batch nào
-            import glob
-            batch_files = glob.glob(os.path.join(self.batch_dir, "*.reb"))
-            if batch_files:
-                batch_file = batch_files[0]
-            else:
-                self.update_status("Không tìm thấy file batch RECmd", "red")
-                return
-
-        self.update_status("Đang phân tích...", "yellow")
-        
-        # Tạo analysis thread (không hiển thị progress dialog)
-        hive_files = list(self.loaded_hives.keys())
-        self.current_analysis_thread = RegistryAnalysisThread(
-            self.recmd_path, batch_file, hive_files, self.output_dir
-        )
-
-        # Kết nối signals
-        self.current_analysis_thread.status_updated.connect(lambda s: self.update_status(f"RECmd: {s}", "yellow"))
-        self.current_analysis_thread.analysis_completed.connect(self.on_silent_analysis_completed)
-        self.current_analysis_thread.error_occurred.connect(self.on_analysis_error)
-
-        # Bắt đầu phân tích ngầm
-        self.current_analysis_thread.start()
-        
-    def on_silent_analysis_completed(self, results):
-        """Xử lý hoàn thành phân tích ngầm."""
-        print(f"🎯 on_silent_analysis_completed được gọi với {len(results)} hives")
-        self.analysis_results = results
-        total_records = sum(len(r) for r in results.values())
-
-        self._save_analysis_results_to_database(results)
-        self.update_status(f"Hoàn thành: {total_records} artifacts", "green")
-        
-            
-    def start_comprehensive_analysis(self):
+    def start_analysis(self):
         """Bắt đầu phân tích RECmd."""
         if not self.loaded_hives:
             QMessageBox.warning(self, "Không có Hive", "Vui lòng tải registry hive trước.")
@@ -1678,7 +1356,6 @@ class RegistryAnalysis(QWidget):
                 QMessageBox.warning(self, "Không có Batch File", "Không tìm thấy file batch RECmd.")
                 return
 
-                
         # Tạo progress dialog
         progress = QProgressDialog("Đang chạy phân tích RECmd...", "Hủy", 0, 100, self)
         progress.setWindowModality(Qt.WindowModal)
@@ -1700,182 +1377,20 @@ class RegistryAnalysis(QWidget):
         # Bắt đầu phân tích
         self.current_analysis_thread.start()
         progress.exec_()
-        
+
     def on_analysis_completed(self, results):
         """Xử lý hoàn thành phân tích."""
         print(f"🎯 on_analysis_completed được gọi với {len(results)} hives")
         self.analysis_results = results
         total_records = sum(len(r) for r in results.values())
 
-        # Lưu kết quả vào database
-        self._save_analysis_results_to_database(results)
-
         self.update_status(f"Phân tích hoàn thành: {total_records} bản ghi", "green")
 
-
-    def _save_analysis_results_to_database(self, results):
-        """Lưu kết quả phân tích vào database để xuất báo cáo với CoC."""
-        print(f"🔄 Bắt đầu lưu {len(results)} hive results vào database")
-        print(f"📋 Case ID: {self.current_case_id}")
-        
-        if not self.current_case_id:
-            print("❌ Không có case được chọn, bỏ qua việc lưu database")
-            return
-
-        try:
-            from models.db_manager import DatabaseManager
-            db = DatabaseManager()
-            db.connect()
-
-            # Lưu kết quả cho từng hive file riêng biệt
-            total_results_saved = 0
-            
-            for hive_file, hive_results in results.items():
-                # Tạo artifact riêng cho từng hive file
-                artifact_id = self._create_hive_artifact_with_hash(db, hive_file)
-                
-                if artifact_id:
-                    # Phân tích loại hive
-                    hive_type = self.detect_hive_type(hive_file)
-                    hive_name = os.path.basename(hive_file)
-                    
-                    # Tạo tóm tắt chi tiết
-                    summary = f"Phân tích {hive_type} Hive ({hive_name}): Tìm thấy {len(hive_results)} artifacts"
-                    
-                    # Lưu kết quả với đường dẫn CSV file thực tế
-                    hive_name_clean = os.path.splitext(os.path.basename(hive_file))[0]
-                    csv_result_path = os.path.join(self.output_dir, f"{hive_name_clean}_analysis.csv")
-                    
-                    print(f"🔄 Đang lưu result vào DB: artifact_id={artifact_id}, tool={hive_type}")
-                    result_id = db.add_analysis_result(
-                        artifact_id=artifact_id,
-                        tool_used=f"RECmd Registry Analysis - {hive_type}",
-                        summary=summary,
-                        result_path=csv_result_path
-                    )
-                    print(f"✅ Đã lưu result_id: {result_id}")
-
-                    # Log hoạt động chi tiết cho từng hive
-                    if result_id:
-                        db.log_activity(
-                            case_id=self.current_case_id,
-                            artefact_id=artifact_id,
-                            action=f"REGISTRY_ANALYSIS_{hive_type}: Phân tích {hive_name} ({hive_type}): {len(hive_results)} artifacts. Result ID: {result_id}",
-                            tool_used="RECmd"
-                        )
-                        total_results_saved += 1
-
-            # Log tổng kết
-            if total_results_saved > 0:
-                db.log_activity(
-                    case_id=self.current_case_id,
-                    action=f"REGISTRY_ANALYSIS_BATCH_COMPLETED: Hoàn thành phân tích {total_results_saved} hive files với tổng {sum(len(r) for r in results.values())} artifacts",
-                    tool_used="RECmd"
-                )
-
-            db.disconnect()
-            print(f"Đã lưu {total_results_saved} kết quả phân tích registry vào database cho case {self.current_case_id}")
-
-        except Exception as e:
-            print(f"Lỗi lưu vào database: {e}")
-            traceback.print_exc()
-
-    def _create_hive_artifact_with_hash(self, db, hive_file):
-        """Tạo artifact cho hive file cụ thể với hash để đảm bảo CoC."""
-        try:
-            hive_name = os.path.basename(hive_file)
-            hive_type = self.detect_hive_type(hive_file)
-            
-            print(f"🔄 Tạo artifact cho {hive_name} ({hive_type})")
-            
-            # Tính hash SHA256 cho file
-            file_hash = self._calculate_file_hash(hive_file)
-            file_size = os.path.getsize(hive_file)
-            
-            # Tạo artifact với tên chi tiết
-            artifact_name = f"Registry {hive_type} Hive - {hive_name}"
-            
-            artifact_id = db.add_artifact(
-                case_id=self.current_case_id,
-                name=artifact_name,
-                source_path=hive_file,
-                evidence_type=f"REGISTRY_{hive_type}",
-                size=file_size,
-                mime_type="application/octet-stream"
-            )
-            
-            print(f"✅ Tạo artifact_id: {artifact_id}")
-            
-            if artifact_id and file_hash:
-                # Lưu hash vào bảng Hashes
-                db.add_hash(artifact_id, "SHA256", file_hash)
-                
-                # Log việc tạo artifact
-                db.log_activity(
-                    case_id=self.current_case_id,
-                    artefact_id=artifact_id,
-                    action=f"ARTIFACT_CREATED: {artifact_name}, SHA256: {file_hash}",
-                    tool_used="Registry Analysis"
-                )
-            
-            return artifact_id
-            
-        except Exception as e:
-            print(f"Lỗi tạo artifact cho {hive_file}: {e}")
-            return None
-
-    def _calculate_file_hash(self, file_path):
-        """Tính hash SHA256 cho file."""
-        try:
-            sha256_hash = hashlib.sha256()
-            with open(file_path, "rb") as f:
-                # Đọc file theo chunk để tiết kiệm memory
-                for chunk in iter(lambda: f.read(4096), b""):
-                    sha256_hash.update(chunk)
-            return sha256_hash.hexdigest()
-        except Exception as e:
-            print(f"Lỗi tính hash cho {file_path}: {e}")
-            return None
-
-    def _get_or_create_registry_artifact(self, db):
-        """Lấy artifact registry hiện có hoặc tạo mới."""
-        try:
-            # Kiểm tra xem artifact registry đã tồn tại cho case này chưa
-            artifacts = db.get_artifacts_by_case(self.current_case_id)
-            for artifact in artifacts:
-                if artifact['evidence_type'] == 'REGISTRY_HIVE':
-                    return artifact['artefact_id']
-
-            # Tạo artifact mới cho kết quả phân tích registry
-            registry_path = os.path.join(self.output_dir, "registry_analysis_results")
-            os.makedirs(registry_path, exist_ok=True)
-
-            artifact_id = db.add_artifact(
-                case_id=self.current_case_id,
-                name="Kết quả phân tích Registry",
-                source_path=registry_path,
-                evidence_type="REGISTRY_HIVE",
-                mime_type="application/octet-stream"
-            )
-
-            return artifact_id
-
-        except Exception as e:
-            print(f"Lỗi lấy/tạo registry artifact: {e}")
-            return None
-        
     def on_analysis_error(self, error):
         """Xử lý lỗi phân tích."""
         self.update_status(f"Phân tích thất bại: {error}", "red")
         QMessageBox.critical(self, "Lỗi phân tích", f"Phân tích thất bại:\n{error}")
 
-    def refresh_view(self):
-        """Làm mới view hiện tại."""
-        if self.loaded_hives:
-            self.build_registry_tree()
-            self.update_timeline()
-            self.update_status("Đã làm mới view", "green")
-            
     def export_csv(self):
         """Xuất dữ liệu phân tích registry ra CSV."""
         if not self.analysis_results:
@@ -1960,6 +1475,3 @@ class RegistryAnalysis(QWidget):
                     
         except Exception as e:
             raise Exception(f"Lỗi xuất timeline CSV: {str(e)}")
-
-
-

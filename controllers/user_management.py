@@ -1,140 +1,260 @@
-from PyQt5.QtWidgets import (QWidget, QMessageBox, QDialog, QVBoxLayout, 
-                              QHBoxLayout, QLabel, QLineEdit, QPushButton, 
-                              QComboBox, QTableWidgetItem, QHeaderView, QInputDialog)
-from PyQt5.QtCore import Qt, QTimer
-from PyQt5.QtGui import QIcon, QFont
+from PyQt5.QtWidgets import QWidget, QMessageBox, QDialog, QTableWidgetItem
+from PyQt5.QtCore import Qt, QTimer, pyqtSignal
+from PyQt5.QtGui import QFont
 import sys
 import os
+from typing import Dict, List, Optional, Tuple
 
 # Import UI và database
 from views.pages.user_management_ui import Ui_Form
+from views.dialogs.add_user_dialog_ui import Ui_AddUserDialog
+from views.dialogs.delete_confirm_dialog_ui import Ui_DeleteConfirmDialog
 from models.db_manager import DatabaseManager
 
-class AddUserDialog(QDialog):
-    """Dialog thêm/sửa người dùng"""
-    def __init__(self, parent=None, user_data=None):
-        super(AddUserDialog, self).__init__(parent)
-        self.user_data = user_data  # None = thêm mới, có data = sửa
-        self.setupUI()
-        
-        if user_data:
-            self.setWindowTitle("✏️ Sửa người dùng")
-            self.populate_fields()
-        else:
-            self.setWindowTitle("➕ Thêm người dùng mới")
+
+class UserService:
+    """Service xử lý business logic - thuần backend"""
     
-    def setupUI(self):
-        self.setFixedSize(450, 400)
-        layout = QVBoxLayout(self)
-        
-        # Username
-        layout.addWidget(QLabel("👤 Tên đăng nhập:"))
-        self.username_edit = QLineEdit()
-        layout.addWidget(self.username_edit)
-        
-        # Password (chỉ hiện khi thêm mới)
-        if not self.user_data:
-            layout.addWidget(QLabel("🔒 Mật khẩu:"))
-            self.password_edit = QLineEdit()
-            self.password_edit.setEchoMode(QLineEdit.Password)
-            layout.addWidget(self.password_edit)
-        
-        # Full Name
-        layout.addWidget(QLabel("👨‍💼 Họ tên đầy đủ:"))
-        self.full_name_edit = QLineEdit()
-        layout.addWidget(self.full_name_edit)
-        
-        # Phone Number
-        layout.addWidget(QLabel("📱 Số điện thoại:"))
-        self.phone_edit = QLineEdit()
-        layout.addWidget(self.phone_edit)
-        
-        # Email
-        layout.addWidget(QLabel("📧 Email:"))
-        self.email_edit = QLineEdit()
-        layout.addWidget(self.email_edit)
-        
-        # Role
-        layout.addWidget(QLabel("🎭 Vai trò:"))
-        self.role_combo = QComboBox()
-        self.role_combo.addItems(["ANALYST", "ADMIN"])
-        layout.addWidget(self.role_combo)
-        
-        # Buttons
-        button_layout = QHBoxLayout()
-        
-        self.save_btn = QPushButton("💾 Lưu")
-        self.save_btn.clicked.connect(self.save_user)
-        
-        self.cancel_btn = QPushButton("❌ Hủy")
-        self.cancel_btn.clicked.connect(self.reject)
-        
-        button_layout.addWidget(self.save_btn)
-        button_layout.addWidget(self.cancel_btn)
-        layout.addLayout(button_layout)
+    def __init__(self):
+        self.db_manager = None
     
-    def populate_fields(self):
-        """Fill fields khi sửa user"""
-        if self.user_data:
-            self.username_edit.setText(self.user_data.get('username', ''))
-            self.full_name_edit.setText(self.user_data.get('full_name', ''))
-            self.phone_edit.setText(self.user_data.get('phone_number', ''))
-            self.email_edit.setText(self.user_data.get('email', ''))
-            role = self.user_data.get('role', 'ANALYST')
-            index = self.role_combo.findText(role)
-            if index >= 0:
-                self.role_combo.setCurrentIndex(index)
+    def _get_db_connection(self) -> bool:
+        """Lấy kết nối database"""
+        try:
+            self.db_manager = DatabaseManager()
+            return self.db_manager.connect()
+        except Exception:
+            return False
     
-    def save_user(self):
-        username = self.username_edit.text().strip()
-        full_name = self.full_name_edit.text().strip()
-        phone_number = self.phone_edit.text().strip()
-        email = self.email_edit.text().strip()
-        role = self.role_combo.currentText()
+    def create_user(self, username: str, password: str, email: str, role: str, 
+                   full_name: str = None, phone_number: str = None) -> Tuple[bool, str]:
+        """Tạo user mới - Returns: (success, message)"""
+        if not username.strip():
+            return False, "Tên đăng nhập không được rỗng!"
         
-        # Validation
-        if not username:
-            QMessageBox.warning(self, "Lỗi", "Tên đăng nhập không được rỗng!")
-            return
+        if not password.strip():
+            return False, "Mật khẩu không được rỗng!"
         
-        # Nếu không có full_name, dùng username
-        if not full_name:
+        if not full_name or not full_name.strip():
             full_name = username
         
         try:
-            db_manager = DatabaseManager()
-            if not db_manager.connect():
-                QMessageBox.critical(self, "Lỗi", "Không thể kết nối database!")
-                return
+            if not self._get_db_connection():
+                return False, "Không thể kết nối database!"
             
-            if self.user_data:  # Sửa user
-                # Cập nhật thông tin user (không có update full_name và phone trong hàm update_user cũ)
-                # Cần sửa hàm update_user hoặc dùng query trực tiếp
-                query = """
-                    UPDATE Users 
-                    SET username=?, full_name=?, phone_number=?, email=?, role=? 
-                    WHERE user_id=?
-                """
-                cursor = db_manager.execute_query(query, (username, full_name, phone_number, email, role, self.user_data['user_id']))
-                success = cursor is not None
-                message = "Cập nhật user thành công!" if success else "Có lỗi khi cập nhật user!"
-            else:  # Thêm user mới
-                password = self.password_edit.text().strip()
-                if not password:
-                    QMessageBox.warning(self, "Lỗi", "Mật khẩu không được rỗng!")
-                    return
-                
-                success = db_manager.create_user(username, password, email, role, full_name, phone_number)
-                message = "Tạo user thành công!" if success else "Có lỗi khi tạo user!"
+            success = self.db_manager.create_user(username, password, email, role, full_name, phone_number)
+            return (True, "Tạo user thành công!") if success else (False, "Có lỗi khi tạo user!")
+        except Exception as e:
+            return False, f"Có lỗi xảy ra: {str(e)}"
+    
+    def update_user(self, user_id: int, username: str, full_name: str, 
+                   phone_number: str, email: str, role: str) -> Tuple[bool, str]:
+        """Cập nhật user - Returns: (success, message)"""
+        if not username.strip():
+            return False, "Tên đăng nhập không được rỗng!"
+        
+        if not full_name or not full_name.strip():
+            full_name = username
+        
+        try:
+            if not self._get_db_connection():
+                return False, "Không thể kết nối database!"
+            
+            query = "UPDATE Users SET username=?, full_name=?, phone_number=?, email=?, role=? WHERE user_id=?"
+            cursor = self.db_manager.execute_query(query, (username, full_name, phone_number, email, role, user_id))
+            
+            success = cursor is not None
+            return (True, "Cập nhật user thành công!") if success else (False, "Có lỗi khi cập nhật user!")
+        except Exception as e:
+            return False, f"Có lỗi xảy ra: {str(e)}"
+    
+    def get_users(self) -> Tuple[bool, List[Dict], str]:
+        """Lấy danh sách users - Returns: (success, users_list, message)"""
+        try:
+            if not self._get_db_connection():
+                return False, [], "Không thể kết nối database!"
+            
+            users = self.db_manager.get_users()
+            return True, users, "List users successfully"
+        except Exception as e:
+            return False, [], f"Cannot load list users: {str(e)}"
+    
+    def get_user_by_id(self, user_id: int) -> Tuple[bool, Optional[Dict], str]:
+        """Lấy user theo ID - Returns: (success, user_data, message)"""
+        try:
+            if not self._get_db_connection():
+                return False, None, "Không thể kết nối database!"
+            
+            user = self.db_manager.fetch_one(
+                "SELECT user_id, username, full_name, phone_number, email, role FROM Users WHERE user_id = ?", 
+                (user_id,)
+            )
+            
+            if user:
+                return True, user, "Lấy thông tin user thành công"
+            else:
+                return False, None, "Không tìm thấy user"
+        except Exception as e:
+            return False, None, f"Lỗi khi lấy thông tin user: {str(e)}"
+    
+    def toggle_user_status(self, user_id: int) -> Tuple[bool, str]:
+        """Đổi trạng thái user - Returns: (success, message)"""
+        try:
+            if not self._get_db_connection():
+                return False, "Không thể kết nối database!"
+            
+            current_user = self.db_manager.fetch_one("SELECT is_active, username FROM Users WHERE user_id = ?", (user_id,))
+            if not current_user:
+                return False, "Không tìm thấy user trong database!"
+            
+            new_status = not current_user['is_active']
+            success = self.db_manager.update_user(user_id, is_active=new_status)
             
             if success:
-                QMessageBox.information(self, "Thành công", message)
-                self.accept()
+                status_text = "kích hoạt" if new_status else "vô hiệu hóa"
+                return True, f"Đã {status_text} user '{current_user['username']}'"
             else:
-                QMessageBox.warning(self, "Lỗi", message)
-                
+                return False, "Có lỗi khi cập nhật trạng thái user!"
         except Exception as e:
-            QMessageBox.critical(self, "Lỗi", f"Có lỗi xảy ra: {str(e)}")
+            return False, f"Có lỗi xảy ra: {str(e)}"
+    
+    def can_delete_user(self, user_id: int, current_user_username: str) -> Tuple[bool, str]:
+        """Kiểm tra có thể xóa user không - Returns: (can_delete, reason)"""
+        try:
+            if not self._get_db_connection():
+                return False, "Không thể kết nối database!"
+            
+            user = self.db_manager.fetch_one("SELECT username FROM Users WHERE user_id = ?", (user_id,))
+            if not user:
+                return False, "Không tìm thấy user!"
+            
+            if user['username'] == current_user_username:
+                return False, "Bạn không thể xóa chính tài khoản của mình!"
+            
+            case_count = self.db_manager.fetch_one("SELECT COUNT(*) as count FROM Cases WHERE user_id = ?", (user_id,))
+            if case_count and case_count['count'] > 0:
+                return False, f"User đang được gán vào {case_count['count']} case(s)! Vui lòng remove user khỏi tất cả cases trước."
+            
+            return True, "Có thể xóa user"
+        except Exception as e:
+            return False, f"Lỗi khi kiểm tra: {str(e)}"
+    
+    def hard_delete_user(self, user_id: int) -> Tuple[bool, str, Dict]:
+        """Xóa vĩnh viễn user - Returns: (success, message, stats)"""
+        try:
+            if not self._get_db_connection():
+                return False, "Không thể kết nối database!", {}
+            
+            user = self.db_manager.fetch_one("SELECT username FROM Users WHERE user_id = ?", (user_id,))
+            if not user:
+                return False, "Không tìm thấy user!", {}
+            
+            activity_count = self.db_manager.fetch_one("SELECT COUNT(*) as count FROM Activity_Logs WHERE user_id = ?", (user_id,))
+            success = self.db_manager.hard_delete_user(user_id)
+            
+            stats = {
+                'username': user['username'],
+                'activity_logs_deleted': activity_count['count'] if activity_count else 0
+            }
+            
+            if success:
+                return True, f"Đã XÓA VĨNH VIỄN user '{user['username']}'!", stats
+            else:
+                return False, f"Có lỗi nghiêm trọng khi xóa vĩnh viễn user '{user['username']}'!", {}
+        except Exception as e:
+            return False, f"Có lỗi nghiêm trọng: {str(e)}", {}
+
+class AddUserDialog(QDialog):
+    """Dialog thêm/sửa người dùng - Bridge giữa UI và Service"""
+    def __init__(self, parent=None, user_data=None):
+        super(AddUserDialog, self).__init__(parent)
+        self.user_data = user_data  # None = thêm mới, có data = sửa
+        self.user_service = UserService()
+        
+        # Setup UI từ file đã tạo
+        self.ui = Ui_AddUserDialog()
+        self.ui.setupUi(self)
+        
+        # Setup dialog behavior
+        self.setup_dialog()
+        
+        # Connect signals
+        self.connect_signals()
+        
+        # Populate fields nếu đang sửa
+        if user_data:
+            self.populate_fields()
+    
+    def setup_dialog(self):
+        """Thiết lập dialog properties"""
+        if self.user_data:
+            self.setWindowTitle("Sửa người dùng")
+            # Ẩn password fields khi sửa user
+            self.ui.passwordLabel.setVisible(False)
+            self.ui.passwordEdit.setVisible(False)
+        else:
+            self.setWindowTitle("Thêm người dùng mới")
+    
+    def connect_signals(self):
+        """Connect UI signals"""
+        self.ui.saveBtn.clicked.connect(self.save_user)
+        self.ui.cancelBtn.clicked.connect(self.reject)
+    
+    def populate_fields(self):
+        """Fill fields với data"""
+        if self.user_data:
+            self.ui.usernameEdit.setText(self.user_data.get('username', ''))
+            self.ui.fullNameEdit.setText(self.user_data.get('full_name', ''))
+            self.ui.phoneEdit.setText(self.user_data.get('phone_number', ''))
+            self.ui.emailEdit.setText(self.user_data.get('email', ''))
+            role = self.user_data.get('role', 'ANALYST')
+            index = self.ui.roleCombo.findText(role)
+            if index >= 0:
+                self.ui.roleCombo.setCurrentIndex(index)
+    
+    def get_form_data(self):
+        """Lấy dữ liệu từ form"""
+        data = {
+            'username': self.ui.usernameEdit.text().strip(),
+            'full_name': self.ui.fullNameEdit.text().strip(),
+            'phone_number': self.ui.phoneEdit.text().strip(),
+            'email': self.ui.emailEdit.text().strip(),
+            'role': self.ui.roleCombo.currentText()
+        }
+        
+        if not self.user_data:  # Thêm password nếu không phải edit mode
+            data['password'] = self.ui.passwordEdit.text().strip()
+        return data
+    
+    def save_user(self):
+        """Bridge method - gọi service và hiển thị kết quả"""
+        form_data = self.get_form_data()
+        
+        if self.user_data:  # Edit mode
+            success, message = self.user_service.update_user(
+                self.user_data['user_id'],
+                form_data['username'],
+                form_data['full_name'],
+                form_data['phone_number'],
+                form_data['email'],
+                form_data['role']
+            )
+        else:  # Add mode
+            success, message = self.user_service.create_user(
+                form_data['username'],
+                form_data['password'],
+                form_data['email'],
+                form_data['role'],
+                form_data['full_name'],
+                form_data['phone_number']
+            )
+        
+        # Hiển thị kết quả
+        if success:
+            QMessageBox.information(self, "Thành công", message)
+            self.accept()
+        else:
+            QMessageBox.warning(self, "Lỗi", message)
 
 class UserManagement(QWidget):
     def __init__(self):
@@ -142,11 +262,12 @@ class UserManagement(QWidget):
         self.ui = Ui_Form()
         self.ui.setupUi(self)
         
+        # Initialize service
+        self.user_service = UserService()
+        self.users_data = []  # Cache for users data
+        
         # Get current user info
         self.current_user = self.get_current_user()
-        
-        # Connect database
-        self.connect_database()
         
         # Setup UI
         self.setup_table()
@@ -202,20 +323,9 @@ class UserManagement(QWidget):
                 self.ui.toggleStatusBtn.setToolTip("Chỉ Admin mới có quyền thay đổi trạng thái người dùng")
             
         else:
-            self.update_status("✅ Admin có đầy đủ quyền quản lý người dùng")
+            self.update_status("Admin có đầy đủ quyền quản lý người dùng")
             return True
     
-    def connect_database(self):
-        """Kết nối database"""
-        try:
-            self.db_manager = DatabaseManager()
-            if not self.db_manager.connect():
-                QMessageBox.critical(self, "Lỗi Database", "Không thể kết nối database!")
-                return False
-            return True
-        except Exception as e:
-            QMessageBox.critical(self, "Lỗi", f"Lỗi kết nối database: {str(e)}")
-            return False
     
     def setup_table(self):
         """Thiết lập bảng users"""
@@ -256,18 +366,16 @@ class UserManagement(QWidget):
             self.ui.usersTable.itemSelectionChanged.connect(self.on_selection_changed)
     
     def load_users(self):
-        """Load danh sách users từ database"""
-        try:
-            if not self.connect_database():
-                return
-            
-            users = self.db_manager.get_users()
+        """Load danh sách users từ service"""
+        success, users, message = self.user_service.get_users()
+        
+        if success:
+            self.users_data = users  # Cache data
             self.populate_table(users)
             self.update_statistics(users)
-            self.update_status("Đã tải danh sách người dùng")
-            
-        except Exception as e:
-            QMessageBox.critical(self, "Lỗi", f"Không thể tải danh sách users: {str(e)}")
+            self.update_status(message)
+        else:
+            QMessageBox.critical(self, "Lỗi", message)
     
     def populate_table(self, users):
         """Fill data vào table"""
@@ -288,10 +396,9 @@ class UserManagement(QWidget):
             email = user.get('email', '') or 'N/A'
             self.ui.usersTable.setItem(row, 2, QTableWidgetItem(email))
             
-            # Role
+            # Role - chỉ hiển thị text thuần túy
             role = user['role']
-            role_icon = "👑" if role == "ADMIN" else "🔍"
-            self.ui.usersTable.setItem(row, 3, QTableWidgetItem(f"{role_icon} {role}"))
+            self.ui.usersTable.setItem(row, 3, QTableWidgetItem(role))
             
             # Created date
             created_at = user.get('created_at', '')
@@ -307,32 +414,34 @@ class UserManagement(QWidget):
                 formatted_date = "N/A"
             self.ui.usersTable.setItem(row, 4, QTableWidgetItem(formatted_date))
             
-            # Status
-            status = "🟢 Hoạt động" if user['is_active'] else "🔴 Không hoạt động"
+            # Status - chỉ hiển thị text thuần túy
+            status = "Hoạt động" if user['is_active'] else "Không hoạt động"
             self.ui.usersTable.setItem(row, 5, QTableWidgetItem(status))
     
     def update_statistics(self, users):
-        """Cập nhật thống kê"""
+        """Cập nhật thống kê UI"""
+        # Tính toán thống kê từ service logic (nhưng không cần tách riêng vì đơn giản)
         total = len(users)
-        active = len([u for u in users if u['is_active']])
+        active = len([u for u in users if u.get('is_active', True)])
         inactive = total - active
-        admin = len([u for u in users if u['role'] == 'ADMIN'])
-        analyst = len([u for u in users if u['role'] == 'ANALYST'])
+        admin = len([u for u in users if u.get('role') == 'ADMIN'])
+        analyst = len([u for u in users if u.get('role') == 'ANALYST'])
         
+        # Cập nhật UI - loại bỏ emoji
         if hasattr(self.ui, 'statsLabel'):
-            self.ui.statsLabel.setText(f"📊 Tổng: {total} users")
-        
+            self.ui.statsLabel.setText(f"Total: {total} users")
+
         if hasattr(self.ui, 'activeUsersLabel'):
-            self.ui.activeUsersLabel.setText(f"🟢 Hoạt động: {active}")
-        
+            self.ui.activeUsersLabel.setText(f"Active: {active}")
+
         if hasattr(self.ui, 'inactiveUsersLabel'):
-            self.ui.inactiveUsersLabel.setText(f"🔴 Không hoạt động: {inactive}")
-        
+            self.ui.inactiveUsersLabel.setText(f"Inactive: {inactive}")
+
         if hasattr(self.ui, 'adminUsersLabel'):
-            self.ui.adminUsersLabel.setText(f"👑 Admin: {admin}")
-        
+            self.ui.adminUsersLabel.setText(f"Admin: {admin}")
+
         if hasattr(self.ui, 'analystUsersLabel'):
-            self.ui.analystUsersLabel.setText(f"🔍 Analyst: {analyst}")
+            self.ui.analystUsersLabel.setText(f"Analyst: {analyst}")
     
     def update_status(self, message):
         """Cập nhật status bar"""
@@ -372,16 +481,9 @@ class UserManagement(QWidget):
         row = list(selected_rows)[0]
         user_id = int(self.ui.usersTable.item(row, 0).text())
         
-        # Lấy thông tin đầy đủ từ database thay vì từ table
-        try:
-            if not self.connect_database():
-                return None
-            
-            user = self.db_manager.fetch_one("SELECT user_id, username, full_name, phone_number, email, role FROM Users WHERE user_id = ?", (user_id,))
-            return user
-        except Exception as e:
-            print(f"Error getting user info: {e}")
-            return None
+        # Lấy thông tin từ service
+        success, user, message = self.user_service.get_user_by_id(user_id)
+        return user if success else None
     
     def add_user(self):
         """Thêm user mới"""
@@ -409,28 +511,25 @@ class UserManagement(QWidget):
         
         # Kiểm tra quyền admin
         if not self.current_user or self.current_user.get('role') != 'ADMIN':
-            QMessageBox.warning(self, "🔒 Quyền truy cập", "Chỉ Admin mới có quyền xóa người dùng!")
+            QMessageBox.warning(self, "Quyền truy cập", "Chỉ Admin mới có quyền xóa người dùng!")
             return
         
-        # Không cho phép xóa chính mình
-        if user['username'] == self.current_user.get('username'):
-            QMessageBox.warning(
-                self, 
-                "❌ Không thể xóa", 
-                "Bạn không thể xóa chính tài khoản của mình!\n\n"
-                "Vui lòng sử dụng tài khoản admin khác để thực hiện thao tác này."
-            )
+        # Kiểm tra có thể xóa user không từ service
+        can_delete, reason = self.user_service.can_delete_user(user['user_id'], self.current_user.get('username'))
+        
+        if not can_delete:
+            QMessageBox.warning(self, "Không thể xóa", reason)
             return
         
         # Kiểm tra nếu user đang hoạt động - gợi ý dùng toggle status
         if user.get('is_active', True):
             QMessageBox.information(
                 self,
-                "💡 Gợi ý",
+                "Gợi ý",
                 f"User '{user['username']}' đang ở trạng thái hoạt động.\n\n"
-                f"💡 GỢI Ý: Nếu bạn chỉ muốn ngăn user đăng nhập,\n"
-                f"hãy sử dụng nút '🔄 Đổi trạng thái' thay vì xóa vĩnh viễn.\n\n"
-                f"🗑️ Nút 'Xóa' sẽ XÓA VĨNH VIỄN user khỏi hệ thống."
+                f"GỢI Ý: Nếu bạn chỉ muốn ngăn user đăng nhập,\n"
+                f"hãy sử dụng nút 'Đổi trạng thái' thay vì xóa vĩnh viễn.\n\n"
+                f"Nút 'Xóa' sẽ XÓA VĨNH VIỄN user khỏi hệ thống."
             )
         
         # Hiển thị dialog xác nhận xóa vĩnh viễn
@@ -443,62 +542,34 @@ class UserManagement(QWidget):
                 QMessageBox.information(self, "Thông báo", "Bạn đã hủy xóa vĩnh viễn user.")
     
     def perform_hard_delete(self, user):
-        """Thực hiện hard delete với kiểm tra bổ sung"""
-        try:
-            if not self.connect_database():
-                return
-            
-            # Kiểm tra dữ liệu sẽ bị mất
-            db_instance = self.db_manager
-            activity_count = db_instance.fetch_one("SELECT COUNT(*) as count FROM Activity_Logs WHERE user_id = ?", (user['user_id'],))
-            case_count = db_instance.fetch_one("SELECT COUNT(*) as count FROM Case_Assignees WHERE user_id = ?", (user['user_id'],))
-            
-            # Ngăn chặn xóa nếu đang có case assignments
-            if case_count and case_count['count'] > 0:
-                QMessageBox.critical(
-                    self,
-                    "❌ Không thể xóa vĩnh viễn",
-                    f"User '{user['username']}' đang được gán vào {case_count['count']} case(s)!\n\n"
-                    f"🔧 Vui lòng:\n"
-                    f"1. Remove user khỏi tất cả cases trước\n"
-                    f"2. Hoặc chọn '🔄 Đổi trạng thái' để vô hiệu hóa thay vì xóa vĩnh viễn"
-                )
-                return
-            
-            # Thực hiện hard delete
-            success = self.db_manager.hard_delete_user(user['user_id'])
-            
-            if success:
-                # Thông báo thành công với thống kê
-                success_msg = f"💀 Đã XÓA VĨNH VIỄN user '{user['username']}'!\n\n"
-                success_msg += f"🗑️ User đã bị xóa hoàn toàn khỏi hệ thống.\n"
-                
-                if activity_count and activity_count['count'] > 0:
-                    success_msg += f"📝 {activity_count['count']} activity logs đã bị xóa vĩnh viễn.\n"
-                else:
-                    success_msg += f"📝 Không có activity logs nào bị mất.\n"
-                    
-                success_msg += f"\n⚠️ Thao tác đã hoàn tất và không thể hoàn tác."
-                
-                QMessageBox.information(self, "💀 Xóa vĩnh viễn thành công", success_msg)
-                self.load_users()  # Refresh table
+        """Thực hiện hard delete sử dụng service"""
+        # Gọi service để hard delete
+        success, message, stats = self.user_service.hard_delete_user(user['user_id'])
+        
+        if success:
+            # Thông báo thành công với thống kê
+            success_msg = f"{message}\n\n"
+            success_msg += f"User đã bị xóa hoàn toàn khỏi hệ thống.\n"
+
+            activity_count = stats.get('activity_logs_deleted', 0)
+            if activity_count > 0:
+                success_msg += f"{activity_count} activity logs đã bị xóa vĩnh viễn.\n"
             else:
-                QMessageBox.critical(
-                    self, 
-                    "❌ Hard delete thất bại", 
-                    f"Có lỗi nghiêm trọng khi xóa vĩnh viễn user '{user['username']}'!\n\n"
-                    f"🔍 Nguyên nhân có thể:\n"
-                    f"• User là admin cuối cùng trong hệ thống\n"
-                    f"• Có ràng buộc dữ liệu chưa được xử lý\n"
-                    f"• Lỗi kết nối database"
-                )
-                
-        except Exception as e:
+                success_msg += f"Không có activity logs nào bị mất.\n"
+
+            success_msg += f"\nThao tác đã hoàn tất và không thể hoàn tác."
+
+            QMessageBox.information(self, "Xóa vĩnh viễn thành công", success_msg)
+            self.load_users()  # Refresh table
+        else:
             QMessageBox.critical(
-                self, 
-                "❌ Lỗi nghiêm trọng", 
-                f"Có lỗi nghiêm trọng khi xóa vĩnh viễn user:\n{str(e)}\n\n"
-                f"🛡️ Hệ thống đã dừng thao tác để bảo vệ dữ liệu."
+                self,
+                "Hard delete thất bại",
+                f"{message}\n\n"
+                f"Nguyên nhân có thể:\n"
+                f"User là admin cuối cùng trong hệ thống\n"
+                f"Có ràng buộc dữ liệu chưa được xử lý\n"
+                f"Lỗi kết nối database"
             )
     
     def toggle_user_status(self):
@@ -508,28 +579,14 @@ class UserManagement(QWidget):
             QMessageBox.warning(self, "Lỗi", "Vui lòng chọn user để thay đổi trạng thái!")
             return
         
-        try:
-            if not self.connect_database():
-                return
-            
-            # Get current status từ database
-            db_user = self.db_manager.fetch_one("SELECT is_active FROM Users WHERE user_id = ?", (user['user_id'],))
-            if not db_user:
-                QMessageBox.warning(self, "Lỗi", "Không tìm thấy user trong database!")
-                return
-            
-            new_status = not db_user['is_active']
-            success = self.db_manager.update_user(user['user_id'], is_active=new_status)
-            
-            if success:
-                status_text = "kích hoạt" if new_status else "vô hiệu hóa"
-                QMessageBox.information(self, "Thành công", f"Đã {status_text} user '{user['username']}'")
-                self.load_users()
-            else:
-                QMessageBox.warning(self, "Lỗi", "Có lỗi khi cập nhật trạng thái user!")
-                
-        except Exception as e:
-            QMessageBox.critical(self, "Lỗi", f"Có lỗi xảy ra: {str(e)}")
+        # Gọi service để toggle status
+        success, message = self.user_service.toggle_user_status(user['user_id'])
+        
+        if success:
+            QMessageBox.information(self, "Thành công", message)
+            self.load_users()  # Refresh data
+        else:
+            QMessageBox.warning(self, "Lỗi", message)
     
     def on_search_changed(self):
         """Xử lý khi search text thay đổi"""
@@ -556,195 +613,70 @@ class UserManagement(QWidget):
             self.ui.usersTable.setRowHidden(row, not show_row)
 
 class DeleteTypeDialog(QDialog):
-    """Dialog xác nhận xóa vĩnh viễn người dùng"""
+    """Dialog xác nhận xóa vĩnh viễn người dùng - Bridge giữa UI và logic"""
     
     def __init__(self, parent=None, user_info=None):
         super(DeleteTypeDialog, self).__init__(parent)
         self.user_info = user_info or {}
         self.confirmed = False
         
-        self.setWindowTitle("💀 Xác nhận xóa vĩnh viễn")
-        self.setFixedSize(500, 450)
+        # Setup UI từ file đã tạo
+        self.ui = Ui_DeleteConfirmDialog()
+        self.ui.setupUi(self)
+        
+        # Setup dialog
+        self.setup_dialog()
+        
+        # Connect signals
+        self.connect_signals()
+        
+        # Populate user info
+        self.populate_user_info()
+        
+    def setup_dialog(self):
+        """Thiết lập dialog properties"""
+        self.setWindowTitle("Xác nhận xóa vĩnh viễn")
         self.setModal(True)
+    
+    def connect_signals(self):
+        """Connect UI signals"""
+        self.ui.cancelBtn.clicked.connect(self.reject)
+        self.ui.deleteBtn.clicked.connect(self.confirm_delete)
+        self.ui.confirmInput.textChanged.connect(self.check_confirmation)
+    
+    def populate_user_info(self):
+        """Điền thông tin user vào UI"""
+        username = self.user_info.get('username', 'N/A')
+        full_name = self.user_info.get('full_name', 'N/A')
+        role = self.user_info.get('role', 'N/A')
+        email = self.user_info.get('email', 'N/A')
         
-        self.setup_ui()
+        # Cập nhật thông tin user
+        user_info_text = f"""Username: {username} Full Name: {full_name} Role: {role} Email: {email}"""
         
-    def setup_ui(self):
-        layout = QVBoxLayout()
-        
-        # Header
-        header_label = QLabel("💀 XÁC NHẬN XÓA VĨNH VIỄN")
-        header_label.setAlignment(Qt.AlignCenter)
-        header_font = QFont()
-        header_font.setPointSize(16)
-        header_font.setBold(True)
-        header_label.setFont(header_font)
-        header_label.setStyleSheet("color: #dc3545; margin: 10px;")
-        layout.addWidget(header_label)
-        
-        # User info
-        info_label = QLabel(f"""
-📋 Thông tin người dùng sẽ bị XÓA VĨNH VIỄN:
-👤 Username: {self.user_info.get('username', 'N/A')}
-👨‍💼 Họ tên: {self.user_info.get('full_name', 'N/A')}
-🎭 Role: {self.user_info.get('role', 'N/A')}
-📧 Email: {self.user_info.get('email', 'N/A')}
-        """)
-        info_label.setStyleSheet("""
-            background-color: #f8d7da;
-            border: 2px solid #dc3545;
-            border-radius: 8px;
-            padding: 15px;
-            margin: 10px;
-            font-weight: bold;
-        """)
-        layout.addWidget(info_label)
-        
-        # Warning box
-        warning_label = QLabel("""
-🚨 CẢNH BÁO NGHIÊM TRỌNG:
-
-💀 NHỮNG GÌ SẼ BỊ MẤT VĨNH VIỄN:
-• Toàn bộ thông tin user
-• Mọi dữ liệu liên quan
-
-⚠️ THAO TÁC NÀY KHÔNG THỂ HOÀN TÁC!
-
-💡 GỢI Ý: Nếu bạn chỉ muốn ngăn user đăng nhập,
-   hãy sử dụng nút "🔄 Đổi trạng thái" thay vì xóa.
-        """)
-        warning_label.setStyleSheet("""
-            background-color: #fff3cd;
-            border: 2px solid #ffc107;
-            border-radius: 8px;
-            padding: 15px;
-            margin: 10px;
-            font-size: 11px;
-            line-height: 1.4;
-        """)
-        layout.addWidget(warning_label)
-        
-        # Confirmation checkbox or text input
-        confirm_label = QLabel("🔐 XÁC NHẬN XÓA VĨNH VIỄN:")
-        confirm_label.setStyleSheet("font-weight: bold; margin: 10px 0 5px 0;")
-        layout.addWidget(confirm_label)
-        
-        instruction_label = QLabel(f"Nhập chính xác '{self.user_info.get('username', '')}' để xác nhận:")
-        instruction_label.setStyleSheet("margin: 0 0 5px 10px;")
-        layout.addWidget(instruction_label)
-        
-        self.confirm_input = QLineEdit()
-        self.confirm_input.setPlaceholderText(f"Nhập '{self.user_info.get('username', '')}' ở đây...")
-        self.confirm_input.setStyleSheet("""
-            QLineEdit {
-                border: 2px solid #dc3545;
-                border-radius: 6px;
-                padding: 8px;
-                font-size: 12px;
-                margin: 5px 10px;
-            }
-            QLineEdit:focus {
-                border-color: #a71e2a;
-                background-color: #fff5f5;
-            }
-        """)
-        self.confirm_input.textChanged.connect(self.check_confirmation)
-        layout.addWidget(self.confirm_input)
-        
-        # Buttons
-        button_layout = QHBoxLayout()
-        
-        # Cancel button
-        cancel_btn = QPushButton("❌ Hủy")
-        cancel_btn.setMinimumHeight(45)
-        cancel_btn.setStyleSheet("""
-            QPushButton {
-                background-color: #6c757d;
-                color: white;
-                border: none;
-                border-radius: 8px;
-                padding: 10px 20px;
-                font-weight: bold;
-                font-size: 12px;
-            }
-            QPushButton:hover {
-                background-color: #545b62;
-            }
-        """)
-        cancel_btn.clicked.connect(self.reject)
-        button_layout.addWidget(cancel_btn)
-        
-        # Delete button
-        self.delete_btn = QPushButton("💀 XÓA VĨNH VIỄN")
-        self.delete_btn.setMinimumHeight(45)
-        self.delete_btn.setEnabled(False)
-        self.delete_btn.setStyleSheet("""
-            QPushButton {
-                background-color: #dc3545;
-                color: white;
-                border: none;
-                border-radius: 8px;
-                padding: 10px 20px;
-                font-weight: bold;
-                font-size: 12px;
-            }
-            QPushButton:hover:enabled {
-                background-color: #c82333;
-            }
-            QPushButton:disabled {
-                background-color: #6c757d;
-                color: #adb5bd;
-            }
-        """)
-        self.delete_btn.clicked.connect(self.confirm_delete)
-        button_layout.addWidget(self.delete_btn)
-        
-        layout.addLayout(button_layout)
-        
-        self.setLayout(layout)
+        self.ui.userInfoLabel.setText(user_info_text)
+        self.ui.instructionLabel.setText(f"Type '{username}' to confirm:")
+        self.ui.confirmInput.setPlaceholderText(f"Type '{username}' here to confirm...")
     
     def check_confirmation(self):
-        """Kiểm tra xác nhận username"""
-        entered_text = self.confirm_input.text().strip()
+        """Kiểm tra input confirmation - UI logic"""
+        entered_text = self.ui.confirmInput.text().strip()
         expected_username = self.user_info.get('username', '')
         
         if entered_text == expected_username:
-            self.delete_btn.setEnabled(True)
-            self.confirm_input.setStyleSheet("""
-                QLineEdit {
-                    border: 2px solid #28a745;
-                    border-radius: 6px;
-                    padding: 8px;
-                    font-size: 12px;
-                    margin: 5px 10px;
-                    background-color: #f8fff8;
-                }
-            """)
+            self.ui.deleteBtn.setEnabled(True)
         else:
-            self.delete_btn.setEnabled(False)
-            self.confirm_input.setStyleSheet("""
-                QLineEdit {
-                    border: 2px solid #dc3545;
-                    border-radius: 6px;
-                    padding: 8px;
-                    font-size: 12px;
-                    margin: 5px 10px;
-                }
-                QLineEdit:focus {
-                    border-color: #a71e2a;
-                    background-color: #fff5f5;
-                }
-            """)
+            self.ui.deleteBtn.setEnabled(False)
     
     def confirm_delete(self):
-        """Xác nhận cuối cùng trước khi xóa"""
+        """Final confirmation dialog"""
         final_warning = QMessageBox.critical(
             self,
-            "💀 XÁC NHẬN CUỐI CÙNG",
-            f"🚨 CẢNH BÁO CUỐI CÙNG!\n\n"
+            "XÁC NHẬN CUỐI CÙNG",
+            f"CẢNH BÁO CUỐI CÙNG!\n\n"
             f"Bạn THỰC SỰ muốn XÓA VĨNH VIỄN user '{self.user_info.get('username', '')}'?\n\n"
-            f"💀 User sẽ bị xóa hoàn toàn khỏi database\n"
-            f"⚠️ KHÔNG THỂ HOÀN TÁC!\n\n"
+            f"User sẽ bị xóa hoàn toàn khỏi database\n"
+            f"KHÔNG THỂ HOÀN TÁC!\n\n"
             f"Nhấn 'Yes' để XÓA VĨNH VIỄN ngay lập tức.",
             QMessageBox.Yes | QMessageBox.No,
             QMessageBox.No
