@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1200</width>
-    <height>800</height>
+    <width>1300</width>
+    <height>850</height>
    </rect>
   </property>
   <property name="font">
@@ -16,133 +16,9 @@
    </font>
   </property>
   <property name="windowTitle">
-   <string>Metadata analysis</string>
+   <string>Metadata Analysis - Case Evidence</string>
   </property>
   <layout class="QVBoxLayout" name="mainLayout">
-    <item>
-     <widget class="QWidget" name="toolbarWidget" native="true">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-      <property name="maximumSize">
-       <size>
-        <width>16777215</width>
-        <height>36</height>
-       </size>
-      </property>
-      <layout class="QHBoxLayout" name="toolbarLayout">
-       <property name="spacing">
-        <number>6</number>
-       </property>
-       <property name="leftMargin">
-        <number>0</number>
-       </property>
-       <property name="topMargin">
-        <number>0</number>
-       </property>
-        <property name="rightMargin">
-        <number>0</number>
-       </property>
-       <property name="bottomMargin">
-        <number>0</number>
-       </property>
-       <item>
-        <widget class="QPushButton" name="btnLoadSources">
-         <property name="maximumSize">
-          <size>
-           <width>16777215</width>
-           <height>28</height>
-          </size>
-         </property>
-         <property name="text">
-          <string>📁 Tải Tệp / Thư mục...</string>
-         </property>
-        </widget>
-       </item>
-       
-       <item>
-        <widget class="QPushButton" name="btnExportCSV">
-         <property name="maximumSize">
-          <size>
-           <width>16777215</width>
-           <height>28</height>
-          </size>
-         </property>
-         <property name="text">
-          <string>Xuất CSV</string>
-        </property>
-        <property name="toolTip">
-           <string>Xuất metadata dạng CSV</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-        <widget class="QPushButton" name="btnExportXML">
-         <property name="maximumSize">
-          <size>
-           <width>16777215</width>
-           <height>28</height>
-          </size>
-         </property>
-         <property name="text">
-          <string>Xuất XML</string>
-        </property>
-        <property name="toolTip">
-           <string>Xuất metadata dạng XML</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-        <widget class="QPushButton" name="btnExtractPreviews">
-         <property name="maximumSize">
-          <size>
-           <width>16777215</width>
-           <height>28</height>
-          </size>
-         </property>
-         <property name="text">
-          <string>Trích xuất Preview</string>
-        </property>
-        <property name="toolTip">
-           <string>Trích xuất Thumbnail/Preview/ICC nếu có</string>
-        </property>
-       </widget>
-      </item>
-       <item>
-        <widget class="QPushButton" name="btnExportReport">
-         <property name="maximumSize">
-          <size>
-           <width>16777215</width>
-           <height>28</height>
-          </size>
-         </property>
-         <property name="text">
-          <string>Xuất báo cáo</string>
-         </property>
-         <property name="toolTip">
-          <string>Xuất báo cáo tóm tắt (HTML)</string>
-         </property>
-        </widget>
-       </item>
-      <item>
-        <spacer name="toolbarSpacer">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>10</width>
-           <height>20</height>
-          </size>
-         </property>
-        </spacer>
-      </item>
-     </layout>
-    </widget>
-   </item>
    <item>
     <widget class="QSplitter" name="workbenchSplitter">
      <property name="orientation">
@@ -151,16 +27,136 @@
      <widget class="QWidget" name="leftPanel" native="true">
       <layout class="QVBoxLayout" name="leftLayout">
        <item>
-        <widget class="QGroupBox" name="sourcesGroup">
+        <widget class="QGroupBox" name="caseInfoGroup">
          <property name="title">
-          <string>Nguồn dữ liệu</string>
+          <string>Case Information</string>
          </property>
-         <layout class="QVBoxLayout" name="sourcesLayout">
+         <layout class="QVBoxLayout" name="caseInfoLayout">
           <item>
-           <widget class="QTreeWidget" name="sourcesTree">
-            <property name="headerHidden">
+           <layout class="QFormLayout" name="caseInfoFormLayout">
+            <item row="0" column="0">
+             <widget class="QLabel" name="labelCaseTitle">
+              <property name="text">
+               <string>Case:</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1">
+             <widget class="QLabel" name="caseTitleLabel">
+              <property name="text">
+               <string>-</string>
+              </property>
+              <property name="textInteractionFlags">
+               <set>Qt::TextSelectableByMouse</set>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="0">
+             <widget class="QLabel" name="labelEvidenceCount">
+              <property name="text">
+               <string>Total Evidence:</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="1">
+             <widget class="QLabel" name="evidenceCountLabel">
+              <property name="text">
+               <string>0</string>
+              </property>
+              <property name="textInteractionFlags">
+               <set>Qt::TextSelectableByMouse</set>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="evidenceGroup">
+         <property name="title">
+          <string>All Evidence in Case (Click to Analyze)</string>
+         </property>
+         <layout class="QVBoxLayout" name="evidenceLayout">
+          <item>
+           <layout class="QHBoxLayout" name="evidenceControlsLayout">
+            <item>
+             <widget class="QPushButton" name="btnRefreshEvidence">
+              <property name="toolTip">
+               <string>Refresh evidence list</string>
+              </property>
+              <property name="text">
+               <string>Refresh</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="evidenceSpacer">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>10</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <widget class="QListWidget" name="evidenceListWidget">
+            <property name="alternatingRowColors">
              <bool>true</bool>
             </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QGroupBox" name="thumbnailGroup">
+            <property name="title">
+             <string>Thumbnail &amp; Preview</string>
+            </property>
+            <layout class="QHBoxLayout" name="thumbnailLayout">
+             <item>
+              <widget class="QFrame" name="thumbnailFrame">
+               <property name="minimumSize">
+                <size>
+                 <width>200</width>
+                 <height>200</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>250</width>
+                 <height>250</height>
+                </size>
+               </property>
+               <property name="frameShape">
+                <enum>QFrame::Box</enum>
+               </property>
+               <property name="frameShadow">
+                <enum>QFrame::Sunken</enum>
+               </property>
+               <property name="lineWidth">
+                <number>1</number>
+               </property>
+               <layout class="QVBoxLayout" name="thumbnailInnerLayout">
+                <item>
+                 <widget class="QLabel" name="thumbnailLabel">
+                  <property name="text">
+                   <string>Thumbnail / Preview</string>
+                  </property>
+                  <property name="alignment">
+                   <set>Qt::AlignCenter</set>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </widget>
+             </item>
+            </layout>
            </widget>
           </item>
          </layout>
@@ -168,23 +164,26 @@
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="centerPanel" native="true">
-      <layout class="QVBoxLayout" name="centerLayout">
+     <widget class="QWidget" name="rightPanel" native="true">
+      <layout class="QVBoxLayout" name="rightLayout">
        <item>
-        <layout class="QHBoxLayout" name="overviewHeaderLayout">
-         <property name="leftMargin"><number>0</number></property>
-         <property name="rightMargin"><number>0</number></property>
-         <property name="topMargin"><number>0</number></property>
-         <property name="bottomMargin"><number>4</number></property>
+        <layout class="QHBoxLayout" name="headerLayout">
          <item>
-          <widget class="QLabel" name="overviewLabel">
+          <widget class="QLabel" name="analysisLabel">
+           <property name="font">
+            <font>
+             <pointsize>12</pointsize>
+             <weight>75</weight>
+             <bold>true</bold>
+            </font>
+           </property>
            <property name="text">
-            <string>Tổng quan</string>
+            <string>Metadata Analysis</string>
            </property>
           </widget>
          </item>
          <item>
-          <spacer name="overviewSpacer">
+          <spacer name="headerSpacer">
            <property name="orientation">
             <enum>Qt::Horizontal</enum>
            </property>
@@ -197,699 +196,187 @@
           </spacer>
          </item>
          <item>
-          <widget class="QToolButton" name="btnPin">
-           <property name="text">
-            <string>📌 Ghim</string>
+          <widget class="QLabel" name="currentFileLabel">
+           <property name="styleSheet">
+            <string notr="true">font-style: italic; color: #6c757d;</string>
            </property>
-           <property name="checkable">
-            <bool>true</bool>
+           <property name="text">
+            <string>No file selected</string>
            </property>
           </widget>
          </item>
         </layout>
        </item>
-        <item>
-         <widget class="QGroupBox" name="insightsGroupBox">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>16777215</width>
-            <height>150</height>
-           </size>
-          </property>
+       <item>
+        <widget class="QGroupBox" name="basicInfoGroup">
          <property name="title">
-          <string>Cảnh báo &amp; Gợi ý</string>
+          <string>Basic Information</string>
          </property>
-         <layout class="QVBoxLayout" name="insightsLayout">
+         <layout class="QVBoxLayout" name="basicInfoLayout">
           <item>
-           <layout class="QHBoxLayout" name="riskRowLayout">
-            <item>
-             <widget class="QLabel" name="riskScoreTextLabel">
+           <layout class="QFormLayout" name="basicInfoFormLayout">
+            <item row="0" column="0">
+             <widget class="QLabel" name="labelFileName">
               <property name="text">
-               <string>Điểm rủi ro:</string>
+               <string>File Name:</string>
               </property>
              </widget>
             </item>
-            <item>
-             <widget class="QLabel" name="riskScoreBadgeLabel">
+            <item row="0" column="1">
+             <widget class="QLabel" name="fileNameValueLabel">
               <property name="text">
-               <string>0</string>
+               <string>-</string>
               </property>
-              <property name="styleSheet">
-               <string notr="true">QLabel { padding: 3px 10px; border-radius: 10px; color: white; background-color: #28a745; font-weight: bold; }</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignCenter</set>
+              <property name="textInteractionFlags">
+               <set>Qt::TextSelectableByMouse</set>
               </property>
              </widget>
             </item>
-            <item>
-             <spacer name="riskSpacer">
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
+            <item row="1" column="0">
+             <widget class="QLabel" name="labelFileSize">
+              <property name="text">
+               <string>File Size:</string>
               </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>40</width>
-                <height>20</height>
-               </size>
+             </widget>
+            </item>
+            <item row="1" column="1">
+             <widget class="QLabel" name="fileSizeValueLabel">
+              <property name="text">
+               <string>-</string>
               </property>
-             </spacer>
+              <property name="textInteractionFlags">
+               <set>Qt::TextSelectableByMouse</set>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="0">
+             <widget class="QLabel" name="labelFileType">
+              <property name="text">
+               <string>File Type:</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="1">
+             <widget class="QLabel" name="fileTypeValueLabel">
+              <property name="text">
+               <string>-</string>
+              </property>
+              <property name="textInteractionFlags">
+               <set>Qt::TextSelectableByMouse</set>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="0">
+             <widget class="QLabel" name="labelAuthorDevice">
+              <property name="text">
+               <string>Author/Device:</string>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="1">
+             <widget class="QLabel" name="authorDeviceValueLabel">
+              <property name="text">
+               <string>-</string>
+              </property>
+              <property name="textInteractionFlags">
+               <set>Qt::TextSelectableByMouse</set>
+              </property>
+             </widget>
             </item>
            </layout>
           </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QTabWidget" name="metadataTabWidget">
+         <property name="currentIndex">
+          <number>4</number>
+         </property>
+         <widget class="QWidget" name="tabMetadata">
+          <attribute name="title">
+           <string>Metadata</string>
+          </attribute>
+          <layout class="QVBoxLayout" name="metadataLayout">
            <item>
-            <widget class="QListWidget" name="alertsListWidget">
-             <property name="maximumSize">
-              <size>
-               <width>16777215</width>
-               <height>80</height>
-              </size>
-             </property>
-             <property name="alternatingRowColors">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <layout class="QHBoxLayout" name="actionsRowLayout">
+            <layout class="QHBoxLayout" name="metadataControlsLayout">
              <item>
-              <widget class="QPushButton" name="btnCopyHashes">
+              <widget class="QLabel" name="labelSearch">
                <property name="text">
-                <string>Sao chép băm</string>
-               </property>
-               <property name="toolTip">
-                <string>Sao chép MD5/SHA1/SHA256 vào clipboard</string>
+                <string>Search:</string>
                </property>
               </widget>
              </item>
              <item>
-              <widget class="QPushButton" name="btnOpenFileLocation">
-               <property name="text">
-                <string>Mở thư mục tệp</string>
-               </property>
-               <property name="toolTip">
-                <string>Mở vị trí lưu tệp trong Explorer</string>
+              <widget class="QLineEdit" name="searchMetadataLineEdit">
+               <property name="placeholderText">
+                <string>Search metadata...</string>
                </property>
               </widget>
              </item>
              <item>
-              <widget class="QPushButton" name="btnOpenMap">
-               <property name="text">
-                <string>Mở bản đồ</string>
-               </property>
-               <property name="toolTip">
-                <string>Mở vị trí GPS trên bản đồ (nếu có)</string>
-               </property>
-               <property name="enabled">
-                <bool>false</bool>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <spacer name="actionsSpacer">
+              <spacer name="metadataSpacer">
                <property name="orientation">
                 <enum>Qt::Horizontal</enum>
                </property>
                <property name="sizeHint" stdset="0">
                 <size>
-                 <width>40</width>
+                 <width>20</width>
                  <height>20</height>
                 </size>
                </property>
               </spacer>
              </item>
-            </layout>
-           </item>
-         </layout>
-        </widget>
-       </item>
-       <item>
-         <widget class="QGroupBox" name="quickSummaryGroupBox">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
-            <horstretch>0</horstretch>
-            <verstretch>1</verstretch>
-           </sizepolicy>
-          </property>
-         <property name="title">
-          <string>Tóm tắt nhanh</string>
-         </property>
-         <layout class="QVBoxLayout" name="quickSummaryLayout">
-          <item>
-           <layout class="QHBoxLayout" name="summaryHeaderLayout">
-            <item>
-             <widget class="QFrame" name="thumbnailFrame">
-              <property name="minimumSize">
-               <size>
-                <width>180</width>
-                <height>180</height>
-               </size>
-              </property>
-              <property name="maximumSize">
-               <size>
-                <width>240</width>
-                <height>240</height>
-               </size>
-              </property>
-              <property name="frameShape">
-               <enum>QFrame::StyledPanel</enum>
-              </property>
-              <property name="frameShadow">
-               <enum>QFrame::Raised</enum>
-              </property>
-              <layout class="QVBoxLayout" name="thumbnailLayout">
-               <item>
-                <widget class="QLabel" name="thumbnailLabel">
-                 <property name="text">
-                  <string>Thumbnail / Biểu tượng</string>
-                 </property>
-                 <property name="alignment">
-                  <set>Qt::AlignCenter</set>
-  </property>
-                </widget>
-               </item>
-              </layout>
-             </widget>
-            </item>
-            <item>
-             <layout class="QFormLayout" name="identityFormLayout">
-   <item row="0" column="0">
-               <widget class="QLabel" name="labelFileName">
-                <property name="text">
-                 <string>Tên tệp:</string>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="1">
-               <widget class="QLabel" name="fileNameValueLabel">
-                <property name="text">
-                 <string>IMG_2025.JPG</string>
-                </property>
-                <property name="textInteractionFlags">
-                 <set>Qt::TextSelectableByMouse</set>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="0">
-               <widget class="QLabel" name="labelFileType">
-                <property name="text">
-                 <string>Loại tệp:</string>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="1">
-               <widget class="QLabel" name="fileTypeValueLabel">
-                <property name="text">
-                 <string>JPEG Image</string>
-                </property>
-                <property name="textInteractionFlags">
-                 <set>Qt::TextSelectableByMouse</set>
-                </property>
-               </widget>
-              </item>
-              <item row="2" column="0">
-               <widget class="QLabel" name="labelFileSize">
-                <property name="text">
-                 <string>Kích thước:</string>
-                </property>
-               </widget>
-              </item>
-              <item row="2" column="1">
-               <widget class="QLabel" name="fileSizeValueLabel">
-                <property name="text">
-                 <string>4.5 MB</string>
-                </property>
-                <property name="textInteractionFlags">
-                 <set>Qt::TextSelectableByMouse</set>
-                </property>
-               </widget>
-              </item>
-              <item row="3" column="0">
-               <widget class="QLabel" name="labelAuthorDevice">
-                <property name="text">
-                 <string>Tác giả/Thiết bị:</string>
-                </property>
-               </widget>
-              </item>
-              <item row="3" column="1">
-               <widget class="QLabel" name="authorDeviceValueLabel">
-                <property name="text">
-                 <string>John Doe / Apple iPhone 16 Pro</string>
-                </property>
-                <property name="textInteractionFlags">
-                 <set>Qt::TextSelectableByMouse</set>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </item>
-           </layout>
-          </item>
-           
-         </layout>
-        </widget>
-       </item>
-        <item>
-         <widget class="QGroupBox" name="timelineGroupBox">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>16777215</width>
-            <height>180</height>
-           </size>
-          </property>
-         <property name="title">
-          <string>Dòng thời gian của tệp</string>
-         </property>
-         <layout class="QVBoxLayout" name="timelineLayout">
-           
-          <item>
-           <layout class="QFormLayout" name="timeFormLayout">
-        <item row="0" column="0">
-         <widget class="QLabel" name="labelEmbeddedTime">
-          <property name="text">
-           <string>Thời gian chụp (Embedded):</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="1">
-         <widget class="QLabel" name="embeddedTimeValueLabel">
-          <property name="text">
-           <string>2025-08-10 14:30:00</string>
-          </property>
-          <property name="textInteractionFlags">
-           <set>Qt::TextSelectableByMouse</set>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="0">
-         <widget class="QLabel" name="labelFileCreateTime">
-          <property name="text">
-           <string>Thời gian tạo tệp (File System):</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="1">
-         <widget class="QLabel" name="fileCreateTimeValueLabel">
-          <property name="text">
-           <string>2025-08-14 07:15:00</string>
-          </property>
-          <property name="textInteractionFlags">
-           <set>Qt::TextSelectableByMouse</set>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="0">
-         <widget class="QLabel" name="labelFileModifyTime">
-          <property name="text">
-           <string>Thời gian sửa đổi (File System):</string>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="1">
-         <widget class="QLabel" name="fileModifyTimeValueLabel">
-          <property name="text">
-           <string>-</string>
-          </property>
-          <property name="textInteractionFlags">
-           <set>Qt::TextSelectableByMouse</set>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="0">
-         <widget class="QLabel" name="labelFileAccessTime">
-          <property name="text">
-           <string>Thời gian truy cập (File System):</string>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="1">
-         <widget class="QLabel" name="fileAccessTimeValueLabel">
-          <property name="text">
-           <string>-</string>
-          </property>
-          <property name="textInteractionFlags">
-           <set>Qt::TextSelectableByMouse</set>
-          </property>
-         </widget>
-        </item>
-        <item row="4" column="0">
-         <widget class="QLabel" name="labelFileChangeTime">
-          <property name="text">
-           <string>MFT Changed (File System):</string>
-          </property>
-         </widget>
-        </item>
-        <item row="4" column="1">
-         <widget class="QLabel" name="fileChangeTimeValueLabel">
-          <property name="text">
-           <string>-</string>
-          </property>
-          <property name="textInteractionFlags">
-           <set>Qt::TextSelectableByMouse</set>
-          </property>
-         </widget>
-        </item>
-        <item row="5" column="0">
-         <widget class="QLabel" name="labelEmbeddedCreateTime">
-          <property name="text">
-           <string>Embedded Created:</string>
-          </property>
-         </widget>
-        </item>
-        <item row="5" column="1">
-         <widget class="QLabel" name="embeddedCreateTimeValueLabel">
-          <property name="text">
-           <string>-</string>
-          </property>
-          <property name="textInteractionFlags">
-           <set>Qt::TextSelectableByMouse</set>
-          </property>
-         </widget>
-        </item>
-        <item row="6" column="0">
-         <widget class="QLabel" name="labelEmbeddedModifyTime">
-          <property name="text">
-           <string>Embedded Modified:</string>
-          </property>
-         </widget>
-        </item>
-        <item row="6" column="1">
-         <widget class="QLabel" name="embeddedModifyTimeValueLabel">
-          <property name="text">
-           <string>-</string>
-          </property>
-          <property name="textInteractionFlags">
-           <set>Qt::TextSelectableByMouse</set>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </item>
-      <item>
-       <widget class="QLabel" name="discrepancyWarningLabel">
-        <property name="styleSheet">
-         <string notr="true">color: #d9534f;</string>
-        </property>
-        <property name="text">
-         <string>⚠️ Cảnh báo: Thời gian tạo tệp trên ổ đĩa muộn hơn thời gian chụp gốc. Đây có thể là dấu hiệu của việc sao chép.</string>
-        </property>
-        <property name="wordWrap">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-       </item>
-      </layout>
-     </widget>
-     <widget class="QWidget" name="rightPanel" native="true">
-      <layout class="QVBoxLayout" name="rightLayout">
-       <item>
-        <widget class="QTabWidget" name="tabWidget">
-         <property name="currentIndex">
-          <number>0</number>
-         </property>
-         <widget class="QWidget" name="tabKeyProperties">
-          <attribute name="title">
-           <string>Thuộc tính chính</string>
-          </attribute>
-          <layout class="QVBoxLayout" name="keyPropsLayout">
-           <item>
-            <layout class="QFormLayout" name="keyPropsFormLayout">
-             <item row="0" column="0">
-              <widget class="QLabel" name="labelCreator">
-               <property name="text">
-                <string>Creator:</string>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="1">
-              <widget class="QLabel" name="creatorValueLabel">
-               <property name="text">
-                <string>-</string>
-               </property>
-               <property name="textInteractionFlags">
-                <set>Qt::TextSelectableByMouse</set>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="0">
-              <widget class="QLabel" name="labelCompany">
-               <property name="text">
-                <string>Company:</string>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="1">
-              <widget class="QLabel" name="companyValueLabel">
-               <property name="text">
-                <string>-</string>
-               </property>
-               <property name="textInteractionFlags">
-                <set>Qt::TextSelectableByMouse</set>
-               </property>
-              </widget>
-             </item>
-             <item row="2" column="0">
-              <widget class="QLabel" name="labelCopyright">
-               <property name="text">
-                <string>Copyright:</string>
-               </property>
-              </widget>
-             </item>
-             <item row="2" column="1">
-              <widget class="QLabel" name="copyrightValueLabel">
-               <property name="text">
-                <string>-</string>
-               </property>
-               <property name="textInteractionFlags">
-                <set>Qt::TextSelectableByMouse</set>
-               </property>
-              </widget>
-             </item>
-             <item row="3" column="0">
-              <widget class="QLabel" name="labelSoftware">
-               <property name="text">
-                <string>Software:</string>
-               </property>
-              </widget>
-             </item>
-             <item row="3" column="1">
-              <widget class="QLabel" name="softwareValueLabel">
-               <property name="text">
-                <string>-</string>
-               </property>
-               <property name="textInteractionFlags">
-                <set>Qt::TextSelectableByMouse</set>
-               </property>
-              </widget>
-             </item>
-             <item row="4" column="0">
-              <widget class="QLabel" name="labelModifyDate">
-               <property name="text">
-                <string>Modify Date (nhúng):</string>
-               </property>
-              </widget>
-             </item>
-             <item row="4" column="1">
-              <widget class="QLabel" name="modifyDateValueLabel">
-               <property name="text">
-                <string>-</string>
-               </property>
-               <property name="textInteractionFlags">
-                <set>Qt::TextSelectableByMouse</set>
-               </property>
-              </widget>
-             </item>
-             <item row="5" column="0">
-              <widget class="QLabel" name="labelMake">
-               <property name="text">
-                <string>Make:</string>
-               </property>
-              </widget>
-             </item>
-             <item row="5" column="1">
-              <widget class="QLabel" name="makeValueLabel">
-               <property name="text">
-                <string>-</string>
-               </property>
-               <property name="textInteractionFlags">
-                <set>Qt::TextSelectableByMouse</set>
-               </property>
-              </widget>
-             </item>
-             <item row="6" column="0">
-              <widget class="QLabel" name="labelModel">
-               <property name="text">
-                <string>Model:</string>
-               </property>
-              </widget>
-             </item>
-             <item row="6" column="1">
-              <widget class="QLabel" name="modelValueLabel">
-               <property name="text">
-                <string>-</string>
-               </property>
-               <property name="textInteractionFlags">
-                <set>Qt::TextSelectableByMouse</set>
-               </property>
-              </widget>
-             </item>
-             <item row="7" column="0">
-              <widget class="QLabel" name="labelSerialNumber">
-               <property name="text">
-                <string>Serial Number:</string>
-               </property>
-              </widget>
-             </item>
-             <item row="7" column="1">
-              <widget class="QLabel" name="serialNumberValueLabel">
-               <property name="text">
-                <string>-</string>
-               </property>
-               <property name="textInteractionFlags">
-                <set>Qt::TextSelectableByMouse</set>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </item>
-          </layout>
-         </widget>
-         <widget class="QWidget" name="tabAllExif">
-          <attribute name="title">
-           <string>Dữ liệu EXIF</string>
-          </attribute>
-          <layout class="QVBoxLayout" name="allExifLayout">
-           <item>
-            <layout class="QHBoxLayout" name="searchLayout">
              <item>
-              <widget class="QLabel" name="labelSearch">
-               <property name="text">
-                <string>Tìm kiếm:</string>
+              <widget class="QPushButton" name="btnExportMetadata">
+               <property name="toolTip">
+                <string>Export metadata to JSON</string>
                </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QLineEdit" name="searchExifLineEdit">
-               <property name="placeholderText">
-                <string>Nhập từ khóa (ví dụ: GPS)</string>
+               <property name="text">
+                <string>Export</string>
                </property>
               </widget>
              </item>
             </layout>
            </item>
            <item>
-            <widget class="QTreeWidget" name="exifTreeWidget">
+            <widget class="QTreeWidget" name="metadataTreeWidget">
              <property name="columnCount">
-              <number>2</number>
+              <number>3</number>
              </property>
              <attribute name="headerVisible">
-              <bool>true</bool>
+              <bool>false</bool>
              </attribute>
              <column>
               <property name="text">
-               <string>Thẻ</string>
+               <string>Group</string>
               </property>
              </column>
              <column>
               <property name="text">
-               <string>Giá trị</string>
+               <string>Property</string>
+              </property>
+             </column>
+             <column>
+              <property name="text">
+               <string>Value</string>
               </property>
              </column>
             </widget>
            </item>
           </layout>
          </widget>
-         <widget class="QWidget" name="tabDocumentProps">
+         <widget class="QWidget" name="tabRaw">
           <attribute name="title">
-           <string>Thuộc tính tài liệu</string>
+           <string>Raw Data</string>
           </attribute>
-          <layout class="QVBoxLayout" name="docPropsLayout">
-           <item>
-            <widget class="QTableWidget" name="documentPropsTable">
-             <property name="columnCount">
-              <number>2</number>
-             </property>
-             <column>
-              <property name="text">
-               <string>Thuộc tính</string>
-              </property>
-             </column>
-             <column>
-              <property name="text">
-               <string>Giá trị</string>
-              </property>
-             </column>
-            </widget>
-           </item>
-          </layout>
-         </widget>
-         <widget class="QWidget" name="tabPEHeader">
-          <attribute name="title">
-           <string>PE Header</string>
-          </attribute>
-          <layout class="QVBoxLayout" name="peLayout">
-           <item>
-            <widget class="QTableWidget" name="peHeaderTable">
-             <property name="columnCount">
-              <number>2</number>
-             </property>
-             <column>
-              <property name="text">
-               <string>Trường</string>
-              </property>
-             </column>
-             <column>
-              <property name="text">
-               <string>Giá trị</string>
-              </property>
-             </column>
-            </widget>
-           </item>
-           <item>
-            <widget class="QTreeWidget" name="peImportsTree">
-             <property name="columnCount">
-              <number>2</number>
-             </property>
-             <column>
-              <property name="text">
-               <string>DLL</string>
-              </property>
-             </column>
-             <column>
-              <property name="text">
-               <string>Hàm</string>
-              </property>
-             </column>
-            </widget>
-           </item>
-          </layout>
-         </widget>
-         <widget class="QWidget" name="tabRawData">
-          <attribute name="title">
-           <string>Dữ liệu thô</string>
-          </attribute>
-          <layout class="QVBoxLayout" name="rawDataLayout">
+          <layout class="QVBoxLayout" name="rawLayout">
            <item>
             <widget class="QPlainTextEdit" name="rawTextEdit">
              <property name="font">
               <font>
                <family>Consolas</family>
-               <pointsize>10</pointsize>
+               <pointsize>9</pointsize>
               </font>
              </property>
              <property name="readOnly">
@@ -899,7 +386,7 @@
            </item>
           </layout>
          </widget>
-         <widget class="QWidget" name="tabHexView">
+         <widget class="QWidget" name="tabHex">
           <attribute name="title">
            <string>Hex View</string>
           </attribute>
@@ -909,7 +396,7 @@
              <property name="font">
               <font>
                <family>Consolas</family>
-               <pointsize>10</pointsize>
+               <pointsize>9</pointsize>
               </font>
              </property>
              <property name="readOnly">
@@ -929,7 +416,7 @@
              <property name="font">
               <font>
                <family>Consolas</family>
-               <pointsize>10</pointsize>
+               <pointsize>9</pointsize>
               </font>
              </property>
              <property name="readOnly">
@@ -939,31 +426,89 @@
            </item>
           </layout>
          </widget>
-         <widget class="QWidget" name="tabCompare">
+         <widget class="QWidget" name="tabMap">
           <attribute name="title">
-           <string>So sánh</string>
+           <string>GPS Map</string>
           </attribute>
-          <layout class="QVBoxLayout" name="compareLayout">
+          <layout class="QVBoxLayout" name="mapLayout" stretch="1,0">
            <item>
-            <widget class="QTableWidget" name="compareTable">
-             <property name="columnCount">
-              <number>3</number>
+            <widget class="QWebEngineView" name="mapView" native="true">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+               <horstretch>1</horstretch>
+               <verstretch>1</verstretch>
+              </sizepolicy>
              </property>
-             <column>
-              <property name="text">
-               <string>Trường</string>
+             <property name="minimumSize">
+              <size>
+               <width>400</width>
+               <height>300</height>
+              </size>
+             </property>
+             <property name="url" stdset="0">
+              <url>
+               <string>https://maps.google.com</string>
+              </url>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QWidget" name="mapControlsContainer" native="true">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>16777215</width>
+               <height>36</height>
+              </size>
+             </property>
+             <layout class="QHBoxLayout" name="mapControlsLayout">
+              <property name="sizeConstraint">
+               <enum>QLayout::SetFixedSize</enum>
               </property>
-             </column>
-             <column>
-              <property name="text">
-               <string>Đã ghim</string>
-              </property>
-             </column>
-             <column>
-              <property name="text">
-               <string>Hiện tại</string>
-              </property>
-             </column>
+              <item>
+               <widget class="QLabel" name="currentLocationLabel">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>126</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true">font-style: italic; color: #6c757d;</string>
+                </property>
+                <property name="text">
+                 <string>No GPS data available</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="btnRefreshMap">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="toolTip">
+                 <string>Refresh GPS location on map</string>
+                </property>
+                <property name="text">
+                 <string>Refresh Map</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
             </widget>
            </item>
           </layout>
@@ -976,6 +521,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QWebEngineView</class>
+   <extends>QWidget</extends>
+   <header>qwebengineview.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

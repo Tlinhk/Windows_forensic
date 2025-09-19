@@ -23,9 +23,9 @@ except ImportError:
     Document = None
     WD_PARAGRAPH_ALIGNMENT = None
     DOCX_AVAILABLE = False
-    print("Cảnh báo: Chưa cài đặt thư viện python-docx. Cài đặt bằng: pip install python-docx")
+    print("Warning: python-docx library not installed. Install with: pip install python-docx")
 
-# Sửa import statement này
+# Fix import statement
 from views.pages.report_ui.report_ui import Ui_Form
 
 class ReportGenerator(QThread):
@@ -515,7 +515,7 @@ class ReportGenerator(QThread):
         conclusion.add_run(f"Vụ án đã được điều tra với {len(artifacts)} bằng chứng số và {len(results)} kết quả phân tích.").bold = True
 
         doc.add_paragraph("")
-        doc.add_paragraph("Chuỗi bảo quản bằng chứng đã được duy trì theo đúng quy trình pháp y số.")
+        doc.add_paragraph("Chuỗi bảo quản bằng chứng đã được duy trì theo đúng quy trình điều tra số.")
 
         return doc
 
@@ -733,8 +733,7 @@ class ReportGenerator(QThread):
                 "include_evidence": True,
                 "include_analysis": True,
                 "include_activity": True,
-                "include_coc": True,
-                "include_summary": True
+                "include_coc": True
             }
         
         
@@ -828,9 +827,9 @@ class ReportGenerator(QThread):
             # Row 2: Receiving activity and Location
             row2_cells = case_info_table.rows[1].cells
             row2_cells[0].text = "HOẠT ĐỘNG TIẾP NHẬN"
-            row2_cells[1].text = "Điều tra pháp y số"
+            row2_cells[1].text = "Điều tra số"
             row2_cells[2].text = "ĐỊA ĐIỂM"
-            row2_cells[3].text = "Phòng lab pháp y số"
+            row2_cells[3].text = "Phòng lab số"
             
             # Row 3: Name/address and other info
             row3_cells = case_info_table.rows[2].cells
@@ -854,7 +853,7 @@ class ReportGenerator(QThread):
             data_row = location_table.add_row()
             data_cells = data_row.cells
             data_cells[0].text = case_info.get('archive_path', 'Không xác định')
-            data_cells[1].text = "Điều tra pháp y số"
+            data_cells[1].text = "Điều tra số"
             data_cells[2].text = case_info.get('created_at', 'Không xác định')
             
             doc.add_paragraph("")
@@ -916,7 +915,7 @@ class ReportGenerator(QThread):
             coc_cells1[0].text = "TẤT CẢ"
             coc_cells1[1].text = case_info.get('created_at', datetime.now().strftime('%Y-%m-%d'))
             coc_cells1[2].text = "THU THẬP BAN ĐẦU"
-            coc_cells1[3].text = case_info.get('full_name', 'Chuyên viên pháp y số')
+            coc_cells1[3].text = case_info.get('full_name', 'Chuyên viên điều tra số')
             coc_cells1[4].text = "Thu thập bằng chứng"
             coc_cells1[5].text = case_info.get('full_name', 'Không xác định')
             
@@ -926,8 +925,8 @@ class ReportGenerator(QThread):
             coc_cells2[0].text = "TẤT CẢ"
             coc_cells2[1].text = datetime.now().strftime('%Y-%m-%d')
             coc_cells2[2].text = case_info.get('full_name', 'Không xác định')
-            coc_cells2[3].text = "Hệ thống pháp y số"
-            coc_cells2[4].text = "Phân tích pháp y số"
+            coc_cells2[3].text = "Hệ thống điều tra số"
+            coc_cells2[4].text = "Phân tích điều tra số"
             coc_cells2[5].text = "Phân tích toàn diện"
             
             # Add empty rows for future custody transfers
@@ -966,34 +965,10 @@ class ReportGenerator(QThread):
             
             doc.add_paragraph(cert_text)
             doc.add_paragraph("")
-        
-        # Summary and recommendations section
-        if options.get("include_summary", True):
-            doc.add_paragraph("TÓM TẮT VÀ KHUYẾN NGHỊ", style='Heading 2')
-            
-            # Statistics
-            doc.add_paragraph("Thống kê tổng quan:")
-            doc.add_paragraph(f"- Tổng số bằng chứng số: {len(artifacts) if artifacts else 0} mục")
-            doc.add_paragraph(f"- Tổng số kết quả phân tích: {len(results) if results else 0} kết quả")
-            doc.add_paragraph(f"- Tổng số hoạt động ghi nhận: {len(activity_logs) if activity_logs else 0} hoạt động")
-            doc.add_paragraph("")
-            
-            # Recommendations
-            doc.add_paragraph("Khuyến nghị:")
-            if len(artifacts) == 0:
-                doc.add_paragraph("- Cần thu thập thêm bằng chứng số để hỗ trợ quá trình điều tra")
-            if len(results) == 0:
-                doc.add_paragraph("- Cần thực hiện phân tích với các công cụ pháp y số chuyên dụng")
-            
-            doc.add_paragraph("- Hoàn thiện và duy trì chuỗi bảo quản bằng chứng theo quy định")
-            doc.add_paragraph("- Chuẩn bị báo cáo chi tiết để trình cơ quan có thẩm quyền")
-            doc.add_paragraph("- Lưu trữ an toàn và bảo mật tất cả bằng chứng số thu thập được")
-            doc.add_paragraph("")
-        
         # Footer (always included)
         doc.add_paragraph("─" * 60)
         footer_text = f"Báo cáo được tạo vào: {datetime.now().strftime('%d/%m/%Y %H:%M:%S')}"
-        footer_text += f"\nHệ thống pháp y số - Windows Forensic System"
+        footer_text += f"\nHệ thống điều tra số - Windows Forensic System"
         footer_text += f"\nĐiều tra viên phụ trách: {case_info.get('full_name', 'Không xác định')}"
         doc.add_paragraph(footer_text)
         
@@ -1045,10 +1020,10 @@ class Report(QWidget):
         """Refresh case list from database"""
         try:
             if not self.db.connect():
-                QMessageBox.warning(self, "Lỗi", "Không thể kết nối database!")
+                QMessageBox.warning(self, "Error", "Cannot connect to database!")
                 return
                 
-            # Sửa method name từ get_all_cases thành get_cases
+            # Fix method name from get_all_cases to get_cases
             cases = self.db.get_cases()
             self.ui.caseCombo.clear()
             self.ui.caseCombo.addItem("-- Chọn vụ án --", None)
@@ -1057,22 +1032,22 @@ class Report(QWidget):
                 display_text = f"{case['case_id']} - {case['title']}"
                 self.ui.caseCombo.addItem(display_text, case['case_id'])
                 
-            # Nếu có main_window, lấy case đang được chọn
+            # If main_window exists, get currently selected case
             if self.main_window and hasattr(self.main_window, 'current_case_id'):
                 self.select_current_working_case()
                 
         except Exception as e:
             print(f"Error refreshing cases: {e}")
-            QMessageBox.warning(self, "Lỗi", f"Không thể tải danh sách vụ án: {str(e)}")
+            QMessageBox.warning(self, "Error", f"Cannot load case list: {str(e)}")
         finally:
             self.db.disconnect()
             
     def select_current_working_case(self):
-        """Tự động chọn case đang được làm việc từ main window"""
+        """Automatically select currently working case from main window"""
         if self.main_window and hasattr(self.main_window, 'current_case_id'):
             current_case_id = self.main_window.current_case_id
             if current_case_id:
-                # Tìm và chọn case trong combo box
+                # Find and select case in combo box
                 for i in range(self.ui.caseCombo.count()):
                     if self.ui.caseCombo.itemData(i) == current_case_id:
                         self.ui.caseCombo.setCurrentIndex(i)
@@ -1091,7 +1066,7 @@ class Report(QWidget):
             self.load_case_reports(case_id)
             self.ui.generateButton.setEnabled(True)
             
-            # Cập nhật current_case_id trong main window nếu có
+            # Update current_case_id in main window if exists
             if self.main_window and hasattr(self.main_window, 'current_case_id'):
                 self.main_window.current_case_id = case_id
                 print(f"Updated main window current_case_id to: {case_id}")
@@ -1103,59 +1078,59 @@ class Report(QWidget):
         """Kiểm tra xem case có dữ liệu để tạo báo cáo không"""
         try:
             if not self.db.connect():
-                QMessageBox.warning(self, "Lỗi", "Không thể kết nối database!")
+                QMessageBox.warning(self, "Error", "Cannot connect to database!")
                 return False
             
-            # Lấy thông tin case
+            # Get case information
             case_info = self.db.get_case_with_investigator(self.current_case_id)
             if not case_info:
-                QMessageBox.warning(self, "Lỗi", f"Không tìm thấy thông tin case ID: {self.current_case_id}")
+                QMessageBox.warning(self, "Error", f"Case information not found for ID: {self.current_case_id}")
                 return False
-            
-            # Lấy số lượng artifacts và results
+
+            # Get count of artifacts and results
             artifacts = self.db.get_artifacts_by_case(self.current_case_id)
             results = self.db.get_results_by_case(self.current_case_id)
             
             artifact_count = len(artifacts) if artifacts else 0
             result_count = len(results) if results else 0
             
-            # Hiển thị thông tin case
+            # Display case information
             info_msg = (
-                f"📋 Thông tin Case:\n\n"
-                f"🆔 ID: {case_info['case_id']}\n"
-                f"📝 Tên: {case_info['title']}\n"
-                f"👨‍💼 Điều tra viên: {case_info.get('full_name', 'N/A')}\n"
-                f"📅 Ngày tạo: {case_info.get('created_at', 'N/A')}\n"
-                f"📊 Trạng thái: {case_info.get('status', 'N/A')}\n\n"
-                f"📁 Bằng chứng số: {artifact_count}\n"
-                f"🔬 Kết quả phân tích: {result_count}\n\n"
+                f"Case Information:\n\n"
+                f"ID: {case_info['case_id']}\n"
+                f"Title: {case_info['title']}\n"
+                f"Investigator: {case_info.get('full_name', 'N/A')}\n"
+                f"Created: {case_info.get('created_at', 'N/A')}\n"
+                f"Status: {case_info.get('status', 'N/A')}\n\n"
+                f"Digital Evidence: {artifact_count}\n"
+                f"Analysis Results: {result_count}\n\n"
             )
             
             if artifact_count == 0 and result_count == 0:
                 info_msg += (
-                    "⚠️ Case này chưa có dữ liệu!\n\n"
-                    "Để tạo báo cáo có ý nghĩa, bạn cần:\n"
-                    "1. Thu thập bằng chứng số (artifacts)\n"
-                    "2. Chạy phân tích với các công cụ forensics\n"
-                    "3. Sau đó mới xuất báo cáo\n\n"
-                    "Bạn có muốn tiếp tục tạo báo cáo trống không?"
+                    "This case has no data!\n\n"
+                    "To create a meaningful report, you need to:\n"
+                    "1. Collect digital evidence (artifacts)\n"
+                    "2. Run analysis with forensics tools\n"
+                    "3. Then export the report\n\n"
+                    "Do you want to continue creating an empty report?"
                 )
                 
                 reply = QMessageBox.question(
-                    self, 
-                    "⚠️ Case chưa có dữ liệu", 
+                    self,
+                    "Case has no data",
                     info_msg,
                     QMessageBox.Yes | QMessageBox.No,
                     QMessageBox.No
                 )
                 return reply == QMessageBox.Yes
             else:
-                info_msg += "✅ Case có đủ dữ liệu để tạo báo cáo!"
+                info_msg += "Case has sufficient data to create report!"
                 
                 reply = QMessageBox.information(
                     self,
-                    "📋 Xác nhận tạo báo cáo",
-                    info_msg + "\n\nTiếp tục tạo báo cáo?",
+                    "Confirm report creation",
+                    info_msg + "\n\nContinue creating report?",
                     QMessageBox.Yes | QMessageBox.No,
                     QMessageBox.Yes
                 )
@@ -1163,7 +1138,7 @@ class Report(QWidget):
                 
         except Exception as e:
             print(f"Error validating case data: {e}")
-            QMessageBox.warning(self, "Lỗi", f"Không thể kiểm tra dữ liệu case: {str(e)}")
+            QMessageBox.warning(self, "Error", f"Cannot validate case data: {str(e)}")
             return False
         finally:
             self.db.disconnect()
@@ -1217,17 +1192,17 @@ class Report(QWidget):
         menu = QMenu(self)
         
         # Add actions
-        refresh_action = QAction("🔄 Làm mới", self)
+        refresh_action = QAction("Refresh", self)
         refresh_action.triggered.connect(self.refresh_reports_table)
         menu.addAction(refresh_action)
-        
-        delete_action = QAction("🗑️ Xóa báo cáo", self)
+
+        delete_action = QAction("Delete report", self)
         delete_action.triggered.connect(self.delete_selected_report)
         menu.addAction(delete_action)
-        
+
         menu.addSeparator()
-        
-        open_action = QAction("📂 Mở file", self)
+
+        open_action = QAction("Open file", self)
         open_action.triggered.connect(self.open_selected_report)
         menu.addAction(open_action)
         
@@ -1247,7 +1222,7 @@ class Report(QWidget):
         """Delete selected report"""
         current_row = self.ui.reportsTable.currentRow()
         if current_row < 0:
-            QMessageBox.warning(self, "Cảnh báo", "Vui lòng chọn báo cáo cần xóa!")
+            QMessageBox.warning(self, "Warning", "Please select a report to delete!")
             return
             
         # Get report ID
@@ -1261,8 +1236,8 @@ class Report(QWidget):
         # Confirm deletion
         reply = QMessageBox.question(
             self,
-            "❓ Xác nhận xóa",
-            f"Bạn có chắc chắn muốn xóa báo cáo ID {report_name}?\n\nHành động này không thể hoàn tác!",
+            "Confirm deletion",
+            f"Are you sure you want to delete report ID {report_name}?\n\nThis action cannot be undone!",
             QMessageBox.Yes | QMessageBox.No,
             QMessageBox.No
         )
@@ -1270,7 +1245,7 @@ class Report(QWidget):
         if reply == QMessageBox.Yes:
             try:
                 if not self.db.connect():
-                    QMessageBox.warning(self, "Lỗi", "Không thể kết nối database!")
+                    QMessageBox.warning(self, "Error", "Cannot connect to database!")
                     return
                     
                 # Delete from database
@@ -1278,14 +1253,14 @@ class Report(QWidget):
                 cursor.execute("DELETE FROM reports WHERE report_id = ?", (report_id,))
                 self.db.connection.commit()
                 
-                QMessageBox.information(self, "✅ Thành công", f"Đã xóa báo cáo ID {report_name}")
+                QMessageBox.information(self, "Success", f"Report ID {report_name} has been deleted")
                 
                 # Refresh table
                 self.refresh_reports_table()
                 
             except Exception as e:
                 print(f"Error deleting report: {e}")
-                QMessageBox.critical(self, "❌ Lỗi", f"Không thể xóa báo cáo: {str(e)}")
+                QMessageBox.critical(self, "Error", f"Cannot delete report: {str(e)}")
             finally:
                 self.db.disconnect()
                 
@@ -1293,7 +1268,7 @@ class Report(QWidget):
         """Open selected report file"""
         current_row = self.ui.reportsTable.currentRow()
         if current_row < 0:
-            QMessageBox.warning(self, "Cảnh báo", "Vui lòng chọn báo cáo cần mở!")
+            QMessageBox.warning(self, "Warning", "Please select a report to open!")
             return
             
         # Get report ID and find file path
@@ -1305,39 +1280,39 @@ class Report(QWidget):
         
         try:
             if not self.db.connect():
-                QMessageBox.warning(self, "Lỗi", "Không thể kết nối database!")
+                QMessageBox.warning(self, "Error", "Cannot connect to database!")
                 return
-                
+
             # Get file path from database
             cursor = self.db.connection.cursor()
             cursor.execute("SELECT file_path FROM reports WHERE report_id = ?", (report_id,))
             result = cursor.fetchone()
-            
+
             if result and result[0]:
                 file_path = result[0]
                 if os.path.exists(file_path):
                     try:
                         os.startfile(file_path)  # Windows
                     except:
-                        QMessageBox.warning(self, "Lỗi", f"Không thể mở file: {file_path}")
+                        QMessageBox.warning(self, "Error", f"Cannot open file: {file_path}")
                 else:
-                    QMessageBox.warning(self, "Lỗi", f"File không tồn tại: {file_path}")
+                    QMessageBox.warning(self, "Error", f"File does not exist: {file_path}")
             else:
-                QMessageBox.warning(self, "Lỗi", "Không tìm thấy đường dẫn file!")
+                QMessageBox.warning(self, "Error", "File path not found!")
                 
         except Exception as e:
             print(f"Error opening report: {e}")
-            QMessageBox.critical(self, "❌ Lỗi", f"Không thể mở báo cáo: {str(e)}")
+            QMessageBox.critical(self, "Error", f"Cannot open report: {str(e)}")
         finally:
             self.db.disconnect()
             
     def generate_report(self):
         """Generate comprehensive report with selected sections"""
         if not self.current_case_id:
-            QMessageBox.warning(self, "Cảnh báo", "Vui lòng chọn vụ án trước!")
+            QMessageBox.warning(self, "Warning", "Please select a case first!")
             return
             
-        # Kiểm tra xem case có dữ liệu không
+        # Check if case has data
         if not self.validate_case_data():
             return
             
@@ -1351,7 +1326,6 @@ class Report(QWidget):
             "include_analysis": self.ui.analysisCheckbox.isChecked(),
             "include_activity": self.ui.activityCheckbox.isChecked(),
             "include_coc": self.ui.cocCheckbox.isChecked(),
-            "include_summary": self.ui.summaryCheckbox.isChecked()
         }
         
         # Start report generation
@@ -1365,7 +1339,7 @@ class Report(QWidget):
         self.report_generator.report_generated.connect(self.on_report_generated)
         self.report_generator.start()
         
-        print(f"🚀 Bắt đầu tạo báo cáo {report_type} cho Case ID: {self.current_case_id}")
+        print(f"Starting report generation {report_type} for Case ID: {self.current_case_id}")
         
         # Simulate progress updates
         self.progress_timer = QTimer()
@@ -1389,36 +1363,36 @@ class Report(QWidget):
         self.ui.generateButton.setEnabled(True)
         
         if file_path and report_type != "error":
-            # Lấy thông tin file
+            # Get file information
             import os
             file_size = os.path.getsize(file_path) if os.path.exists(file_path) else 0
             file_name = os.path.basename(file_path)
             folder_path = os.path.dirname(file_path)
             
             success_msg = (
-                f"✅ Báo cáo Word đã được tạo thành công!\n\n"
-                f"📄 Tên file: {file_name}\n"
-                f"📊 Loại báo cáo: {report_type}\n"
-                f"📏 Kích thước: {file_size:,} bytes\n"
-                f"📂 Thư mục: {folder_path}\n\n"
-                f"🔐 Báo cáo đã được lưu vào database với hash SHA-256 để đảm bảo tính toàn vẹn.\n\n"
-                f"💡 Bạn có thể:\n"
-                f"• Mở file Word để xem nội dung\n"
-                f"• Tạo thêm các loại báo cáo khác\n"
-                f"• Xem lịch sử báo cáo trong bảng bên dưới"
+                f"Word report has been successfully created!\n\n"
+                f"File name: {file_name}\n"
+                f"Report type: {report_type}\n"
+                f"Size: {file_size:,} bytes\n"
+                f"Folder: {folder_path}\n\n"
+                f"Report has been saved to database with SHA-256 hash to ensure integrity.\n\n"
+                f"You can:\n"
+                f"• Open Word file to view content\n"
+                f"• Create additional report types\n"
+                f"• View report history in the table below"
             )
             
-            QMessageBox.information(self, "🎉 Tạo báo cáo thành công", success_msg)
+            QMessageBox.information(self, "Report created successfully", success_msg)
             
             # Refresh reports table
             if self.current_case_id:
                 self.load_case_reports(self.current_case_id)
                 
-            # Hỏi xem có muốn mở file không
+            # Ask if user wants to open the file
             reply = QMessageBox.question(
                 self,
-                "📂 Mở file báo cáo",
-                f"Bạn có muốn mở file báo cáo vừa tạo không?\n\n{file_name}",
+                "Open report file",
+                f"Do you want to open the newly created report file?\n\n{file_name}",
                 QMessageBox.Yes | QMessageBox.No,
                 QMessageBox.Yes
             )
@@ -1434,23 +1408,13 @@ class Report(QWidget):
                         try:
                             subprocess.run(['open', file_path])  # macOS
                         except:
-                            print(f"Không thể mở file: {file_path}")
+                            print(f"Cannot open file: {file_path}")
         else:
             error_msg = (
-                "❌ Không thể tạo báo cáo Word!\n\n"
-                "Có thể do các nguyên nhân sau:\n"
-                "• Thiếu thư viện python-docx\n"
-                "• Không có quyền ghi file\n"
-                "• Lỗi database\n"
-                "• Dữ liệu case không hợp lệ\n\n"
-                "💡 Hướng dẫn khắc phục:\n"
-                "1. Cài đặt: pip install python-docx\n"
-                "2. Kiểm tra quyền ghi thư mục\n"
-                "3. Đảm bảo case có dữ liệu\n"
-                "4. Kiểm tra log console để biết chi tiết"
+                "Cannot create Word report!\n\n"
             )
-            
-            QMessageBox.critical(self, "❌ Lỗi tạo báo cáo", error_msg)
+
+            QMessageBox.critical(self, "Report creation error", error_msg)
             
     def set_case_id(self, case_id):
         """Set current case ID from external source"""

@@ -80,7 +80,7 @@ class MainController(QObject):
             self.view.registry_btn: ("Registry Analysis", lambda: RegistryAnalysis(main_window=self)),
             self.view.browser_btn: ("Browser Analysis", lambda: BrowserAnalysis(main_window=self)),
             self.view.file_btn: ("File Analysis", lambda: FileAnalysis(main_window=self)),
-            self.view.metadata_btn: ("Metadata Analysis", lambda: MetadataAnalysis()),
+            self.view.metadata_btn: ("Metadata Analysis", lambda: MetadataAnalysis(main_window=self)),
             self.view.eventlog_btn: ("Event Log Analysis", lambda: EventlogAnalysis()),
             self.view.report_btn: ("Report", lambda: Report(main_window=self)),
         }
@@ -253,8 +253,16 @@ class MainController(QObject):
                 self.view.tabWidget.setCurrentIndex(curIndex)
                 self.view.tabWidget.setVisible(True)
 
-        # Special handling for browser analysis
+        # Special handling for analysis modules that need case data
         if sender_btn == self.view.browser_btn and self.current_case_id:
+            current_tab_index = self.view.tabWidget.currentIndex()
+            if current_tab_index >= 0:
+                current_widget = self.view.tabWidget.widget(current_tab_index)
+                if current_widget and hasattr(current_widget, "load_case_data"):
+                    current_widget.load_case_data(self.current_case_id)
+        
+        # Special handling for metadata analysis
+        if sender_btn == self.view.metadata_btn and self.current_case_id:
             current_tab_index = self.view.tabWidget.currentIndex()
             if current_tab_index >= 0:
                 current_widget = self.view.tabWidget.widget(current_tab_index)
@@ -391,6 +399,26 @@ class MainController(QObject):
                             pass
 
         QTimer.singleShot(150, set_data)
+    
+    def switch_to_metadata_analysis_tab(self, case_id=None):
+        """Switch to metadata analysis tab and set case_id"""
+        if case_id:
+            self.current_case_id = case_id
+
+        self.view.metadata_btn.click()
+
+        def set_case_data():
+            current_tab_index = self.view.tabWidget.currentIndex()
+            if current_tab_index >= 0:
+                current_widget = self.view.tabWidget.widget(current_tab_index)
+                if current_widget and isinstance(current_widget, MetadataAnalysis):
+                    if case_id and hasattr(current_widget, "load_case_data"):
+                        try:
+                            current_widget.load_case_data(case_id)
+                        except Exception:
+                            pass
+
+        QTimer.singleShot(150, set_case_data)
 
     def close_tab(self, index):
         """Close tab"""

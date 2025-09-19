@@ -382,35 +382,19 @@ class FileAnalysis(QWidget):
             progress.setValue(100)
             progress.close()
 
-            # Log activity for evidence loading (without saving to database)
-            if self.current_case_id:
-                self.log_evidence_analysis_activity(file_path, image_size, len(self.file_list), len([f for f in self.file_list if f.get('deleted', False)]))
-
-            # Ask user if they want to save this evidence to the case
-            saved_to_db = False
-            if self.current_case_id:
-                saved_to_db = self.ask_user_to_save_evidence(file_path, image_size, len(self.file_list), deleted_count)
-
-            # Show success message
-            deleted_count = len([f for f in self.file_list if f.get('deleted', False)])  # Đếm số tệp đã xóa
+            # Count deleted files
+            deleted_count = len([f for f in self.file_list if f.get('deleted', False)])
+            
+            # Show success message - simple and focused on analysis
             success_msg = (
-                f"✅ Successfully loaded evidence file!\n\n"
-                f"📁 File: {file_name}\n"
-                f"💾 Size: {self.format_file_size(image_size)}\n"
-                f"🗂️ Partitions: {len(partitions) if partitions[0] else 1}\n"
-                f"📋 Files Found: {len(self.file_list):,}\n"
-                f"🗑️ Deleted Files: {deleted_count:,}\n\n"
-                f"Use the tree view to navigate and explore the evidence."
+                f"✅ Evidence loaded for analysis!\n\n"
+                f"📁 {file_name}\n"
+                f"💾 {self.format_file_size(image_size)}\n"
+                f"📋 {len(self.file_list):,} files ({deleted_count:,} deleted)\n\n"
+                f"Use the navigation tree to explore files."
             )
 
-            if saved_to_db:
-                success_msg += f"\n\n💾 Evidence saved to database as artifact"
-            elif self.current_case_id:
-                success_msg += f"\n\n💡 Evidence loaded for analysis only (not saved to case)"
-            else:
-                success_msg += f"\n\n💡 Select a case to save evidence to database"
-
-            QMessageBox.information(self, "Evidence Loaded Successfully", success_msg)
+            QMessageBox.information(self, "Evidence Loaded", success_msg)
             
         except Exception as e:
             if 'progress' in locals():
@@ -419,156 +403,7 @@ class FileAnalysis(QWidget):
             error_msg = f"Failed to load evidence file:\n\n{str(e)}"
             QMessageBox.critical(self, "Error Loading Evidence", error_msg)
     
-    def save_evidence_to_database(self, file_path, file_size):
-        """Save evidence file information to database as artifact"""
-        try:
-            if not self.db_manager:
-                from models.db_manager import DatabaseManager
-                self.db_manager = DatabaseManager()
-            
-            if not self.db_manager.connect():
-                pass
-                return None
-            
-            # Calculate file hash for integrity
-            file_hash = self.calculate_file_hash(file_path)
-            file_name = os.path.basename(file_path)
-            
-            # Determine evidence type based on file extension
-            ext = os.path.splitext(file_name)[1].lower()
-            evidence_types = {
-                '.dd': 'DISK_IMAGE_DD',
-                '.img': 'DISK_IMAGE_IMG', 
-                '.raw': 'DISK_IMAGE_RAW',
-                '.e01': 'DISK_IMAGE_E01',
-                '.001': 'DISK_IMAGE_001'
-            }
-            evidence_type = evidence_types.get(ext, 'DISK_IMAGE')
-            
-            # Add artifact to database
-            artifact_id = self.db_manager.add_artifact(
-                case_id=self.current_case_id,
-                name=f"Disk Image - {file_name}",
-                source_path=file_path,
-                evidence_type=evidence_type,
-                size=file_size,
-                mime_type="application/octet-stream"
-            )
-            
-            if artifact_id and file_hash:
-                # Add hash for integrity verification
-                self.db_manager.add_hash(artifact_id, "SHA256", file_hash)
-                
-                # Log the activity
-                self.db_manager.log_activity(
-                    case_id=self.current_case_id,
-                    artefact_id=artifact_id,
-                    action=f"EVIDENCE_LOADED: {file_name}",
-                    tool_used="File Analysis",
-                    details=f"Loaded disk image: {file_name}, Size: {file_size:,} bytes, SHA256: {file_hash}"
-                )
-                
-                pass
-            
-            self.db_manager.disconnect()
-            return artifact_id
-            
-        except Exception as e:
-            pass
-            if self.db_manager:
-                self.db_manager.disconnect()
-            return None
     
-    def calculate_file_hash(self, file_path):
-        """Calculate SHA256 hash of file"""
-        try:
-            hash_sha256 = hashlib.sha256()
-            with open(file_path, "rb") as f:
-                # Read file in chunks to handle large files
-                for chunk in iter(lambda: f.read(4096), b""):
-                    hash_sha256.update(chunk)
-            return hash_sha256.hexdigest()
-        except Exception as e:
-            pass
-            return None
-    
-    def save_search_results_to_database(self, keyword, search_results):
-        """Save search analysis results to database (simplified)"""
-        try:
-            if not self.current_case_id or not self.db_manager:
-                return None
-        except Exception as e:
-            pass
-        return None
-    
-    def save_deleted_files_analysis(self, deleted_files_count):
-        """Save deleted files analysis results (simplified)"""
-        return None
-    
-    def log_file_recovery(self, file_info, save_path, recovered_size):
-        """Log file recovery activity (simplified)"""
-        pass
-
-    def log_evidence_analysis_activity(self, file_path, image_size, file_count, deleted_count):
-        """Log evidence analysis activity to database without creating artifact"""
-        try:
-            if not self.current_case_id or not self.db_manager:
-                from models.db_manager import DatabaseManager
-                self.db_manager = DatabaseManager()
-                
-            if not self.db_manager.connect():
-                return
-                
-            file_name = os.path.basename(file_path)
-            activity_details = (
-                f"Loaded evidence file for analysis: {file_name}\n"
-                f"Size: {self.format_file_size(image_size)}\n"
-                f"Files found: {file_count:,}\n"
-                f"Deleted files: {deleted_count:,}\n"
-                f"Path: {file_path}"
-            )
-            
-            self.db_manager.log_activity(
-                case_id=self.current_case_id,
-                action=f"EVIDENCE_ANALYZED: {file_name}",
-                tool_used="File Analysis",
-                details=activity_details
-            )
-            
-            self.db_manager.disconnect()
-            
-        except Exception as e:
-            print(f"Error logging analysis activity: {e}")
-            if self.db_manager:
-                self.db_manager.disconnect()
-
-    def ask_user_to_save_evidence(self, file_path, image_size, file_count, deleted_count):
-        """Ask user if they want to save evidence to case database"""
-        try:
-            file_name = os.path.basename(file_path)
-            
-            reply = QMessageBox.question(
-                self,
-                "💾 Save Evidence to Case?",
-                f"📁 File: {file_name}\n"
-                f"💾 Size: {self.format_file_size(image_size)}\n"
-                f"📋 Files: {file_count:,} (🗑️ {deleted_count:,} deleted)\n\n"
-                f"Do you want to save this evidence file as an artifact in the current case?\n\n"
-                f"✅ Yes: Save to database for future reference\n"
-                f"❌ No: Load for analysis only (temporary)",
-                QMessageBox.Yes | QMessageBox.No,
-                QMessageBox.No  # Default to No
-            )
-            
-            if reply == QMessageBox.Yes:
-                artifact_id = self.save_evidence_to_database(file_path, image_size)
-                return artifact_id is not None
-            else:
-                return False
-                
-        except Exception as e:
-            print(f"Error asking user to save evidence: {e}")
-            return False
     
     def build_evidence_tree(self, evidence_name, partitions):
         """Xây dựng cây dữ liệu chứng cứ (giống Autopsy) gồm ảnh đĩa, phân vùng và hệ thống tệp."""
@@ -647,75 +482,14 @@ class FileAnalysis(QWidget):
             except Exception as fs_error:
                 pass  # Không mở được hệ thống tệp đơn từ ảnh -> bỏ qua
         
-        # Add Views section (like Autopsy)
-        views_item = QTreeWidgetItem(self.ui.tree, ["Views"])
+        # Add simple Views section - only Deleted Files
+        views_item = QTreeWidgetItem(self.ui.treeInvestigation, ["Views"])
         views_item.setExpanded(True)
         
-        # Count files by type (including deleted) for display
-        file_type_counts = self.count_files_by_type(partitions)
+        # Count deleted files
+        deleted_count = len([f for f in self.file_list if f.get('deleted', False)])
         
-        # File Types view
-        file_types_item = QTreeWidgetItem(views_item, ["File Types"])
-        file_types_item.setExpanded(True)
-        
-        # Main file type categories with subcategories
-        file_categories = [
-            ("By Extension", None, [
-                ("Images", file_type_counts.get('images', 0), 'images'),
-                ("Videos", file_type_counts.get('videos', 0), 'videos'),
-                ("Audio", file_type_counts.get('audio', 0), 'audio'),
-                ("Archives", file_type_counts.get('archives', 0), 'archives'),
-                ("Databases", file_type_counts.get('databases', 0), 'databases')
-            ]),
-            ("Documents", None, [
-                ("HTML", file_type_counts.get('html', 0), 'html'),
-                ("Office", file_type_counts.get('office', 0), 'office'),
-                ("PDF", file_type_counts.get('pdf', 0), 'pdf'),
-                ("Plain Text", file_type_counts.get('plaintext', 0), 'plaintext'),
-                ("Rich Text", file_type_counts.get('richtext', 0), 'richtext')
-            ]),
-            ("Executable", None, [
-                (".exe", file_type_counts.get('exe', 0), 'exe'),
-                (".dll", file_type_counts.get('dll', 0), 'dll'),
-                (".bat", file_type_counts.get('bat', 0), 'bat'),
-                (".cmd", file_type_counts.get('cmd', 0), 'cmd'),
-                (".com", file_type_counts.get('com', 0), 'com')
-            ])
-        ]
-        
-        # Create tree structure for file types
-        for main_category, main_count, subcategories in file_categories:
-            if main_category == "By Extension":
-                # By Extension is a folder containing direct file types
-                by_ext_item = QTreeWidgetItem(file_types_item, [main_category])
-                by_ext_item.setIcon(0, self.style().standardIcon(QStyle.SP_DirIcon))
-                
-                for subcat_name, subcat_count, subcat_type in subcategories:
-                    label = f"{subcat_name} ({subcat_count})"
-                    subcat_item = QTreeWidgetItem(by_ext_item, [label])
-                    subcat_item.setData(0, Qt.UserRole, {
-                        'type': 'file_type_filter',
-                        'file_type': subcat_type,
-                        'include_deleted': True
-                    })
-                    subcat_item.setIcon(0, self.style().standardIcon(QStyle.SP_FileIcon))
-            else:
-                # Documents and Executable are expandable categories
-                main_item = QTreeWidgetItem(file_types_item, [main_category])
-                main_item.setIcon(0, self.style().standardIcon(QStyle.SP_DirIcon))
-                
-                for subcat_name, subcat_count, subcat_type in subcategories:
-                    label = f"{subcat_name} ({subcat_count})"
-                    subcat_item = QTreeWidgetItem(main_item, [label])
-                    subcat_item.setData(0, Qt.UserRole, {
-                        'type': 'file_type_filter',
-                        'file_type': subcat_type,
-                        'include_deleted': True
-                    })
-                    subcat_item.setIcon(0, self.style().standardIcon(QStyle.SP_FileIcon))
-        
-        # Deleted Files view with count
-        deleted_count = file_type_counts.get('deleted', 0)
+        # Deleted Files view only
         deleted_label = f"Deleted Files ({deleted_count})"
         deleted_item = QTreeWidgetItem(views_item, [deleted_label])
         deleted_item.setData(0, Qt.UserRole, {'type': 'deleted_files'})
@@ -837,12 +611,6 @@ class FileAnalysis(QWidget):
                 fs_info = self.find_filesystem_info()
                 if fs_info:
                     self.load_deleted_files(fs_info)
-                    
-            elif item_type == 'file_type_filter':  # Lọc theo loại tệp -> duyệt và nạp theo phần mở rộng
-                file_type = data.get('file_type')
-                fs_info = self.find_filesystem_info()
-                if fs_info and file_type:
-                    self.load_files_by_type(fs_info, file_type)
                     
             elif item_type == 'partition':  # Click vào phân vùng -> nạp thư mục gốc của phân vùng
                 partition = data.get('partition')
@@ -973,9 +741,7 @@ class FileAnalysis(QWidget):
             if len(self.file_list) > 0:
                 self.update_file_table()
                 
-                # Save deleted files analysis to database
-                if self.current_case_id:
-                    self.save_deleted_files_analysis(len(self.file_list))
+                # Note: Deleted files analysis is for investigation only
                 
                 QMessageBox.information(
                     self,
@@ -995,46 +761,6 @@ class FileAnalysis(QWidget):
                 progress.close()  # Đảm bảo đóng tiến trình khi lỗi
             QMessageBox.warning(self, "Error", f"Error loading deleted files: {str(e)}")
     
-    def load_files_by_type(self, fs_info, file_type):
-        """Simple file loading by type"""
-        try:
-            self.file_list = []
-            type_extensions = {
-                'images': ['.jpg', '.jpeg', '.png', '.gif', '.bmp'],
-                'videos': ['.mp4', '.avi', '.mov', '.mkv'],
-                'audio': ['.mp3', '.wav', '.flac'],
-                'archives': ['.zip', '.rar', '.7z'],
-                'exe': ['.exe', '.dll'],
-                'other': []
-            }
-            
-            target_extensions = type_extensions.get(file_type, [])
-            
-            # Simple search in root directory only
-            try:
-                root_dir = fs_info.open_dir(path="/")
-                for entry in list(root_dir)[:100]:  # Limit entries
-                    try:
-                        if entry.info.name.name in [b'.', b'..']:
-                            continue
-                        if not hasattr(entry.info, 'meta') or entry.info.meta is None:
-                            continue
-                        
-                        name = entry.info.name.name.decode('utf-8', errors='ignore')
-                        ext = os.path.splitext(name)[1].lower()
-                        
-                        if ext in target_extensions:
-                            file_info = self.extract_file_info_safe(entry, fs_info, "/")
-                            if file_info:
-                                self.file_list.append(file_info)
-                    except:
-                        continue
-            except:
-                pass
-            
-            self.update_file_table()
-        except Exception as e:
-            QMessageBox.warning(self, "Error", f"Error loading files by type: {str(e)}")
     
     def extract_file_info_safe(self, entry, fs_info, current_path):
         """Trích xuất an toàn thông tin tệp từ entry của TSK (tên, kích thước, loại, thời gian, inode...)."""
@@ -1503,9 +1229,7 @@ class FileAnalysis(QWidget):
         if hasattr(self.ui, 'tabWorkArea'):
             self.ui.tabWorkArea.setCurrentIndex(2)  # Search tab is index 2
         
-        # Save search results to database if case is selected
-        if self.current_case_id and len(self.search_results) > 0:
-            self.save_search_results_to_database(keyword, self.search_results)
+        # Note: Search results are for analysis only - not saved to database
         
         QMessageBox.information(
             self, 
@@ -1646,58 +1370,460 @@ class FileAnalysis(QWidget):
             return None
     
     def scan_unallocated_inodes(self, fs_info, show_progress=None):
-        """Simple unallocated inode scan (limited scope)"""
+        """Scan unallocated inodes using pytsk3 to find deleted files"""
         try:
+            # Get inode range from filesystem info
             first_inum = fs_info.info.first_inum if hasattr(fs_info.info, 'first_inum') else 0
-            last_inum = min(fs_info.info.last_inum if hasattr(fs_info.info, 'last_inum') else 1000, 1000)
+            last_inum = fs_info.info.last_inum if hasattr(fs_info.info, 'last_inum') else 10000
+            
+            # Limit scan for performance (can be made configurable)
+            scan_limit = min(last_inum, first_inum + 5000)
             
             deleted_count = 0
-            for inode_num in range(first_inum, last_inum):
+            for inode_num in range(first_inum, scan_limit):
                 try:
-                    f = fs_info.open_meta(inode=inode_num)
-                    if f and hasattr(f.info, 'meta') and f.info.meta:
-                        meta = f.info.meta
-                        if hasattr(meta, 'flags') and (meta.flags & pytsk3.TSK_FS_META_FLAG_UNALLOC):
-                            name = f"deleted_file_{inode_num}"
-                            file_info = {
-                                'name': name,
-                                'size': meta.size if hasattr(meta, 'size') else 0,
-                                'type': 'Deleted File',
-                                'path': f"/$OrphanFiles/{name}",
-                                'created': self.format_timestamp(meta.crtime if hasattr(meta, 'crtime') else 0),
-                                'modified': self.format_timestamp(meta.mtime if hasattr(meta, 'mtime') else 0),
-                                'accessed': self.format_timestamp(meta.atime if hasattr(meta, 'atime') else 0),
-                                'changed': self.format_timestamp(meta.ctime if hasattr(meta, 'ctime') else 0),
-                                'deleted': True,
-                                'inode': inode_num,
-                                'entry': f,
-                                'fs_info': fs_info
-                            }
-                            self.file_list.append(file_info)
-                            deleted_count += 1
+                    # Use pytsk3 to open inode directly
+                    meta_obj = fs_info.open_meta(inode=inode_num)
+                    if not meta_obj or not hasattr(meta_obj.info, 'meta'):
+                        continue
+                        
+                    meta = meta_obj.info.meta
+                    # Check if inode is unallocated (deleted)
+                    if hasattr(meta, 'flags') and (meta.flags & pytsk3.TSK_FS_META_FLAG_UNALLOC):
+                        # Advanced filename and type recovery
+                        recovered_name = self.recover_filename_advanced(fs_info, inode_num, meta_obj)
+                        file_type = self.determine_file_type_advanced(meta_obj, recovered_name)
+                        
+                        file_info = {
+                            'name': recovered_name,
+                            'size': meta.size if hasattr(meta, 'size') else 0,
+                            'type': file_type,
+                            'path': f"/$OrphanFiles/{recovered_name}",
+                            'created': self.format_timestamp(meta.crtime if hasattr(meta, 'crtime') else 0),
+                            'modified': self.format_timestamp(meta.mtime if hasattr(meta, 'mtime') else 0),
+                            'accessed': self.format_timestamp(meta.atime if hasattr(meta, 'atime') else 0),
+                            'changed': self.format_timestamp(meta.ctime if hasattr(meta, 'ctime') else 0),
+                            'deleted': True,
+                            'inode': inode_num,
+                            'entry': meta_obj,
+                            'fs_info': fs_info
+                        }
+                        self.file_list.append(file_info)
+                        deleted_count += 1
+                        
+                        # Update progress if provided
+                        if show_progress and deleted_count % 10 == 0:
+                            progress = int((inode_num - first_inum) / (scan_limit - first_inum) * 100)
+                            show_progress.setValue(progress)
+                            
+                except Exception:
+                    continue  # Skip problematic inodes
+                    
+        except Exception as e:
+            print(f"Error scanning unallocated inodes: {e}")
+
+    def recover_filename_advanced(self, fs_info, inode_num, meta_obj):
+        """Advanced filename recovery using multiple techniques"""
+        try:
+            # Method 1: Try to find filename in directory entries
+            recovered_name = self.scan_directory_entries_for_inode(fs_info, inode_num)
+            if recovered_name:
+                return recovered_name
+            
+            # Method 2: Check for alternate data streams (NTFS) or extended attributes
+            recovered_name = self.check_alternate_data_streams(meta_obj)
+            if recovered_name:
+                return recovered_name
+            
+            # Method 3: Analyze file signature to guess extension
+            file_extension = self.analyze_file_signature(meta_obj)
+            
+            # Method 4: Generate intelligent name based on content and size
+            base_name = self.generate_intelligent_filename(meta_obj, file_extension)
+            
+            return f"{base_name}{file_extension}"
+            
+        except Exception as e:
+            # Fallback to basic naming
+            return f"deleted_file_{inode_num}"
+    
+    def scan_directory_entries_for_inode(self, fs_info, target_inode):
+        """Scan directory entries to find filename associated with inode"""
+        try:
+            # Scan root directory and some subdirectories for deleted entries
+            directories_to_scan = ["/"]
+            
+            # Add some common directories
+            common_dirs = ["/Users", "/Documents", "/Desktop", "/Downloads", "/Pictures", "/Videos"]
+            for dir_path in common_dirs:
+                try:
+                    test_dir = fs_info.open_dir(path=dir_path)
+                    directories_to_scan.append(dir_path)
+                except:
+                    continue
+            
+            for dir_path in directories_to_scan[:5]:  # Limit to 5 directories for performance
+                try:
+                    directory = fs_info.open_dir(path=dir_path)
+                    for entry in directory:
+                        try:
+                            if (hasattr(entry.info, 'meta') and entry.info.meta and 
+                                hasattr(entry.info.meta, 'addr') and entry.info.meta.addr == target_inode):
+                                # Found the entry! Extract name
+                                if hasattr(entry.info, 'name') and entry.info.name.name:
+                                    name = entry.info.name.name.decode('utf-8', errors='ignore')
+                                    if name and name not in ['.', '..']:
+                                        return name
+                        except:
+                            continue
+                except:
+                    continue
+            return None
+        except:
+            return None
+    
+    def check_alternate_data_streams(self, meta_obj):
+        """Check for alternate data streams (NTFS) that might contain filename info"""
+        try:
+            # Check if this is NTFS and has attributes
+            if hasattr(meta_obj, '__iter__'):
+                for attr in meta_obj:
+                    try:
+                        # Look for filename attributes (type 48 in NTFS)
+                        if hasattr(attr.info, 'type') and attr.info.type == 48:  # $FILE_NAME
+                            # Try to extract filename from attribute
+                            if hasattr(attr.info, 'name') and attr.info.name:
+                                name = attr.info.name.decode('utf-8', errors='ignore')
+                                if name and len(name) > 0:
+                                    return name
+                    except:
+                        continue
+            return None
+        except:
+            return None
+    
+    def analyze_file_signature(self, meta_obj):
+        """Analyze file signature (magic bytes) to determine file type"""
+        try:
+            # Try to read first few bytes of file content
+            content = b''
+            
+            # Method 1: Try read_random if available
+            if hasattr(meta_obj, 'read_random'):
+                try:
+                    content = meta_obj.read_random(0, 32)  # Read first 32 bytes
                 except:
                     pass
+            
+            # Method 2: Try attribute-based reading
+            if not content and hasattr(meta_obj, '__iter__'):
+                try:
+                    for attr in meta_obj:
+                        if hasattr(attr.info, 'type') and attr.info.type == 128:  # $DATA
+                            content = attr.read_random(0, 32)
+                            if content:
+                                break
+                except:
+                    pass
+            
+            if content:
+                return self.get_extension_from_signature(content)
+            
+            return ""
+        except:
+            return ""
+    
+    def get_extension_from_signature(self, content):
+        """Get file extension based on file signature (magic bytes)"""
+        if len(content) < 4:
+            return ""
+        
+        # Common file signatures
+        signatures = {
+            # Images
+            b'\xff\xd8\xff': '.jpg',
+            b'\x89PNG': '.png', 
+            b'GIF8': '.gif',
+            b'BM': '.bmp',
+            b'RIFF': '.avi',  # Could also be WAV
+            b'\x00\x00\x01\x00': '.ico',
+            
+            # Documents
+            b'%PDF': '.pdf',
+            b'\xd0\xcf\x11\xe0': '.doc',  # MS Office
+            b'PK\x03\x04': '.zip',  # Could also be docx, xlsx, etc.
+            b'PK\x05\x06': '.zip',
+            b'PK\x07\x08': '.zip',
+            
+            # Videos
+            b'ftyp': '.mp4',
+            b'\x00\x00\x00\x18ftypmp4': '.mp4',
+            b'\x00\x00\x00 ftypM4V': '.m4v',
+            
+            # Audio
+            b'ID3': '.mp3',
+            b'\xff\xfb': '.mp3',
+            b'RIFF': '.wav',  # Check further for WAV vs AVI
+            b'fLaC': '.flac',
+            
+            # Executables
+            b'MZ': '.exe',
+            b'\x7fELF': '',  # Linux executable
+            b'\xca\xfe\xba\xbe': '',  # Mac executable
+            
+            # Archives
+            b'Rar!': '.rar',
+            b'7z\xbc\xaf\x27\x1c': '.7z',
+            
+            # Others
+            b'\x89HDF': '.hdf',
+            b'SQLite format 3': '.db',
+        }
+        
+        # Check signatures
+        for sig, ext in signatures.items():
+            if content.startswith(sig):
+                # Special case for RIFF - could be AVI or WAV
+                if sig == b'RIFF' and len(content) >= 12:
+                    if content[8:12] == b'WAVE':
+                        return '.wav'
+                    elif content[8:12] == b'AVI ':
+                        return '.avi'
+                return ext
+        
+        # Check for text files (high ratio of printable characters)
+        try:
+            text_content = content.decode('utf-8', errors='ignore')
+            printable_ratio = sum(1 for c in text_content if c.isprintable() or c.isspace()) / len(text_content)
+            if printable_ratio > 0.8:
+                # Check for specific text formats
+                if '<html' in text_content.lower() or '<!doctype' in text_content.lower():
+                    return '.html'
+                elif '<?xml' in text_content.lower():
+                    return '.xml'
+                elif '#include' in text_content or 'int main' in text_content:
+                    return '.c'
+                else:
+                    return '.txt'
         except:
             pass
+        
+        return ""  # Unknown format
+    
+    def generate_intelligent_filename(self, meta_obj, file_extension):
+        """Generate intelligent filename based on file characteristics"""
+        try:
+            # Get file size for categorization
+            size = 0
+            if hasattr(meta_obj.info, 'meta') and hasattr(meta_obj.info.meta, 'size'):
+                size = meta_obj.info.meta.size
+            
+            # Get timestamps
+            mtime = 0
+            if hasattr(meta_obj.info, 'meta') and hasattr(meta_obj.info.meta, 'mtime'):
+                mtime = meta_obj.info.meta.mtime
+            
+            # Generate base name based on file type and characteristics
+            if file_extension in ['.jpg', '.jpeg', '.png', '.gif', '.bmp']:
+                if size > 5 * 1024 * 1024:  # > 5MB
+                    base = "large_image"
+                elif size > 100 * 1024:  # > 100KB
+                    base = "photo"
+                else:
+                    base = "thumbnail"
+            elif file_extension in ['.mp4', '.avi', '.mov', '.mkv']:
+                if size > 100 * 1024 * 1024:  # > 100MB
+                    base = "video_file"
+                else:
+                    base = "short_video"
+            elif file_extension in ['.mp3', '.wav', '.flac']:
+                if size > 10 * 1024 * 1024:  # > 10MB
+                    base = "audio_track"
+                else:
+                    base = "sound_clip"
+            elif file_extension in ['.pdf']:
+                if size > 10 * 1024 * 1024:  # > 10MB
+                    base = "large_document"
+                else:
+                    base = "document"
+            elif file_extension in ['.doc', '.docx']:
+                base = "word_document"
+            elif file_extension in ['.zip', '.rar', '.7z']:
+                base = "archive"
+            elif file_extension in ['.exe']:
+                if size > 50 * 1024 * 1024:  # > 50MB
+                    base = "large_program"
+                else:
+                    base = "executable"
+            elif file_extension in ['.txt']:
+                base = "text_file"
+            else:
+                base = "unknown_file"
+            
+            # Add timestamp info if available
+            if mtime > 0:
+                try:
+                    date_str = datetime.fromtimestamp(mtime).strftime('%Y%m%d')
+                    return f"{base}_{date_str}"
+                except:
+                    pass
+            
+            return base
+            
+        except:
+            return "deleted_file"
+    
+    def determine_file_type_advanced(self, meta_obj, filename):
+        """Advanced file type determination combining multiple sources"""
+        try:
+            # Method 1: Use metadata type
+            meta_type = self.get_file_type_from_meta(meta_obj.info.meta if hasattr(meta_obj.info, 'meta') else None)
+            if meta_type != "Unknown":
+                return meta_type
+            
+            # Method 2: Use filename extension
+            if filename and '.' in filename:
+                file_type = self.determine_file_type(filename)
+                if file_type != "Unknown File":
+                    return file_type
+            
+            # Method 3: Analyze file signature
+            try:
+                content = b''
+                if hasattr(meta_obj, 'read_random'):
+                    content = meta_obj.read_random(0, 64)
+                elif hasattr(meta_obj, '__iter__'):
+                    for attr in meta_obj:
+                        if hasattr(attr.info, 'type') and attr.info.type == 128:  # $DATA
+                            content = attr.read_random(0, 64)
+                            break
+                
+                if content:
+                    signature_type = self.determine_type_from_signature(content)
+                    if signature_type:
+                        return signature_type
+            except:
+                pass
+            
+            # Method 4: Use file size hints
+            size = 0
+            if hasattr(meta_obj.info, 'meta') and hasattr(meta_obj.info.meta, 'size'):
+                size = meta_obj.info.meta.size
+            
+            if size == 0:
+                return "Empty File"
+            elif size > 100 * 1024 * 1024:  # > 100MB
+                return "Large Binary File"
+            elif size < 1024:  # < 1KB
+                return "Small File"
+            
+            return "Unknown File"
+            
+        except:
+            return "Unknown File"
+    
+    def determine_type_from_signature(self, content):
+        """Determine file type from signature content"""
+        if len(content) < 4:
+            return None
+        
+        # Map signatures to descriptive types
+        if content.startswith(b'\xff\xd8\xff'):
+            return "JPEG Image"
+        elif content.startswith(b'\x89PNG'):
+            return "PNG Image"
+        elif content.startswith(b'GIF8'):
+            return "GIF Image"
+        elif content.startswith(b'BM'):
+            return "Bitmap Image"
+        elif content.startswith(b'%PDF'):
+            return "PDF Document"
+        elif content.startswith(b'MZ'):
+            return "Windows Executable"
+        elif content.startswith(b'PK\x03\x04'):
+            return "ZIP Archive"
+        elif content.startswith(b'Rar!'):
+            return "RAR Archive"
+        elif content.startswith(b'7z\xbc\xaf\x27\x1c'):
+            return "7-Zip Archive"
+        elif content.startswith(b'\xd0\xcf\x11\xe0'):
+            return "Microsoft Office Document"
+        elif content.startswith(b'ID3') or content.startswith(b'\xff\xfb'):
+            return "MP3 Audio"
+        elif content.startswith(b'RIFF'):
+            if len(content) >= 12 and content[8:12] == b'WAVE':
+                return "WAV Audio"
+            elif len(content) >= 12 and content[8:12] == b'AVI ':
+                return "AVI Video"
+            return "RIFF Media File"
+        elif content.startswith(b'ftyp') or b'ftypmp4' in content[:20]:
+            return "MP4 Video"
+        elif content.startswith(b'fLaC'):
+            return "FLAC Audio"
+        
+        # Check for text content
+        try:
+            text_content = content.decode('utf-8', errors='ignore')
+            printable_ratio = sum(1 for c in text_content if c.isprintable() or c.isspace()) / len(text_content)
+            if printable_ratio > 0.8:
+                if '<html' in text_content.lower():
+                    return "HTML Document"
+                elif '<?xml' in text_content.lower():
+                    return "XML Document"
+                elif '{' in text_content and '}' in text_content:
+                    return "JSON/Config File"
+                else:
+                    return "Text File"
+        except:
+            pass
+        
+        return None
     
     def walk_deleted_entries(self, fs_info, progress=None):
-        """Simple deleted entries walk"""
+        """Walk filesystem directories to find deleted entries using pytsk3"""
         try:
-            root_dir = fs_info.open_dir(path="/")
-            for entry in list(root_dir)[:100]:  # Limit to first 100 entries
+            # Recursively walk directory tree looking for deleted entries
+            self._walk_directory_for_deleted(fs_info, "/", max_depth=3)
+        except Exception as e:
+            print(f"Error walking deleted entries: {e}")
+
+    def _walk_directory_for_deleted(self, fs_info, path, current_depth=0, max_depth=3):
+        """Recursively walk directory tree to find deleted entries"""
+        if current_depth >= max_depth:
+            return
+            
+        try:
+            directory = fs_info.open_dir(path=path)
+            for entry in directory:
                 try:
+                    if entry.info.name.name in [b'.', b'..']:
+                        continue
+                        
+                    # Check if entry is deleted (unallocated)
                     if (hasattr(entry.info, 'meta') and entry.info.meta and 
                         hasattr(entry.info.meta, 'flags') and 
                         (entry.info.meta.flags & pytsk3.TSK_FS_META_FLAG_UNALLOC)):
                         
-                        file_info = self.extract_file_info_safe(entry, fs_info, "/")
+                        file_info = self.extract_file_info_safe(entry, fs_info, path)
                         if file_info:
                             file_info['deleted'] = True
                             self.file_list.append(file_info)
-                except:
-                    continue
-        except:
-            pass
+                    
+                    # If it's a directory, recurse into it
+                    elif (hasattr(entry.info, 'meta') and entry.info.meta and 
+                          hasattr(entry.info.meta, 'type') and 
+                          entry.info.meta.type == pytsk3.TSK_FS_META_TYPE_DIR):
+                        
+                        name = entry.info.name.name.decode('utf-8', errors='ignore')
+                        if name not in ['.', '..']:
+                            subdir_path = f"{path.rstrip('/')}/{name}" if path != "/" else f"/{name}"
+                            self._walk_directory_for_deleted(fs_info, subdir_path, current_depth + 1, max_depth)
+                            
+                except Exception:
+                    continue  # Skip problematic entries
+                    
+        except Exception:
+            pass  # Skip problematic directories
     
     def get_file_type_from_meta(self, meta):
         """Suy ra loại tệp từ metadata (DIR/REG/LNK), dùng khi tên tệp không đáng tin cậy."""
@@ -1747,14 +1873,35 @@ class FileAnalysis(QWidget):
             return ""
     
     def count_files_by_type(self, partitions):
-        """Simple file type counting"""
-        return {
+        """Count files by type from loaded file_list"""
+        counts = {
             'images': 0, 'videos': 0, 'audio': 0, 'archives': 0,
             'databases': 0, 'html': 0, 'office': 0, 'pdf': 0,
             'plaintext': 0, 'richtext': 0, 'exe': 0, 'dll': 0,
             'bat': 0, 'cmd': 0, 'com': 0, 'other': 0,
-            'deleted': 0, 'total': 0
+            'deleted': 0, 'total': len(self.file_list)
         }
+        
+        # Count from actual loaded files
+        for file_info in self.file_list:
+            if file_info.get('deleted', False):
+                counts['deleted'] += 1
+                
+            name = file_info.get('name', '').lower()
+            if any(ext in name for ext in ['.jpg', '.jpeg', '.png', '.gif', '.bmp']):
+                counts['images'] += 1
+            elif any(ext in name for ext in ['.mp4', '.avi', '.mov', '.mkv']):
+                counts['videos'] += 1
+            elif any(ext in name for ext in ['.mp3', '.wav', '.flac']):
+                counts['audio'] += 1
+            elif any(ext in name for ext in ['.zip', '.rar', '.7z']):
+                counts['archives'] += 1
+            elif name.endswith('.exe'):
+                counts['exe'] += 1
+            elif name.endswith('.dll'):
+                counts['dll'] += 1
+                
+        return counts
     
     def recover_file(self, file_info):
         """Khôi phục tệp đã xóa (nếu còn dữ liệu), cho phép người dùng chọn nơi lưu ra đĩa."""
@@ -1781,9 +1928,7 @@ class FileAnalysis(QWidget):
                 with open(save_path, 'wb') as f:
                     f.write(content)
                 
-                # Log recovery activity to database
-                if self.current_case_id:
-                    self.log_file_recovery(file_info, save_path, len(content))
+                # Note: File recovery completed - for investigation purposes
                 
                 QMessageBox.information(
                     self,

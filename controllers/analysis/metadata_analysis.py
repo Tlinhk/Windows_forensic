@@ -1,6 +1,7 @@
-from PyQt5.QtWidgets import QWidget, QFileDialog, QMessageBox, QTreeWidgetItem, QTableWidgetItem, QAbstractItemView, QListView, QTreeView
-from PyQt5.QtCore import Qt, QLoggingCategory
-from PyQt5.QtGui import QPixmap, QColor
+from PyQt5.QtWidgets import QWidget, QFileDialog, QMessageBox, QTreeWidgetItem, QTableWidgetItem, QAbstractItemView, QListView, QTreeView, QListWidgetItem
+from PyQt5 import QtWidgets
+from PyQt5.QtCore import Qt, QLoggingCategory, QUrl, QTimer
+from PyQt5.QtGui import QPixmap
 
 import os
 import mimetypes
@@ -32,72 +33,35 @@ class MetadataAnalysis(QWidget):
 
         # Wire interactions
         try:
-            self.ui.searchExifLineEdit.textChanged.connect(self.filter_exif_tree)
+            self.ui.searchMetadataLineEdit.textChanged.connect(self.filter_metadata_tree)
         except Exception:
             pass
 
         try:
-            self.ui.btnLoadSources.clicked.connect(self.handle_load_sources)
+            self.ui.btnRefreshEvidence.clicked.connect(self.refresh_evidence_list)
         except Exception:
             pass
 
         try:
-            self.ui.sourcesTree.itemClicked.connect(self.on_source_item_clicked)
+            self.ui.evidenceListWidget.itemClicked.connect(self.on_evidence_item_clicked)
         except Exception:
             pass
 
         try:
-            self.ui.btnPin.toggled.connect(self.on_pin_toggled)
+            self.ui.btnExportMetadata.clicked.connect(self.export_metadata)
         except Exception:
             pass
 
-        # Toolbar actions
         try:
-            self.ui.btnExportCSV.clicked.connect(self.export_csv)
+            self.ui.btnRefreshMap.clicked.connect(self.refresh_map_location)
         except Exception:
             pass
-        try:
-            self.ui.btnExportXML.clicked.connect(self.export_xml)
-        except Exception:
-            pass
-        try:
-            self.ui.btnExtractPreviews.clicked.connect(self.extract_previews)
-        except Exception:
-            pass
-        try:
-            # Export quick HTML report for investigator in Vietnamese
-            self.ui.btnExportReport.clicked.connect(self.export_quick_report)
-        except Exception:
-            pass
-        try:
-            self.ui.btnCopyHashes.clicked.connect(self.copy_hashes_to_clipboard)
-        except Exception:
-            pass
-        try:
-            self.ui.btnOpenFileLocation.clicked.connect(self.open_file_location)
-        except Exception:
-            pass
-        try:
-            self.ui.btnOpenMap.clicked.connect(self.open_gps_in_maps)
-        except Exception:
-            pass
-        # No custom args/run button in simplified UI
 
         # State
         self.current_file_path = None
-        self.current_metadata_map = {}
-        self.pinned_metadata_map = None
-        self.pinned_file_path = None
         self.exiftool_path = self._find_exiftool()
         self._last_exiftool_tags = None
 
-        # Disable Compare tab initially
-        try:
-            idx_compare = self.ui.tabWidget.indexOf(self.ui.tabCompare)
-            if idx_compare != -1:
-                self.ui.tabWidget.setTabEnabled(idx_compare, False)
-        except Exception:
-            pass
 
         # Splitter sizing
         try:
@@ -110,8 +74,32 @@ class MetadataAnalysis(QWidget):
         # Load case data if available
         if main_window and hasattr(main_window, 'current_case_id'):
             self.load_case_data(main_window.current_case_id)
+    
+    def showEvent(self, event):
+        """Override showEvent để refresh case data khi widget được hiển thị (tương tự file_analysis)."""
+        super().showEvent(event)
+        
+        # Kiểm tra và cập nhật case_id từ main_window
+        if self.main_window and hasattr(self.main_window, 'current_case_id'):
+            main_case_id = self.main_window.current_case_id
+            # Nếu case đã thay đổi, load case mới
+            if main_case_id != self.current_case_id:
+                if main_case_id:
+                    QTimer.singleShot(100, lambda: self.load_case_data(main_case_id))
+                else:
+                    # Nếu không có case, reset về trạng thái rỗng
+                    self.current_case_id = None
+                    # Clear evidence list
+                    self.ui.evidenceListWidget.clear()
+                    self.ui.evidenceCountLabel.setText("0")
 
     # ===== Case Management =====
+    def set_current_case(self, case_id):
+        """Set current case and reload data - called from main window"""
+        if case_id != self.current_case_id:
+            self.current_case_id = case_id
+            self.load_case_data(case_id)
+    
     def load_case_data(self, case_id):
         """Load case information for database integration"""
         self.current_case_id = case_id
@@ -124,6 +112,11 @@ class MetadataAnalysis(QWidget):
             case_info = self.db_manager.get_case_with_investigator(case_id)
             if case_info:
                 print(f"Metadata Analysis loaded case: {case_info['title']} (ID: {case_id})")
+                # Update case info in UI
+                self.ui.caseTitleLabel.setText(case_info['title'])
+            
+            # Load evidence artifacts real-time
+            self.load_evidence_artifacts_from_case()
             
             self.db_manager.disconnect()
                     
@@ -132,62 +125,170 @@ class MetadataAnalysis(QWidget):
             if self.db_manager:
                 self.db_manager.disconnect()
     
-    def save_file_as_artifact(self, file_path):
-        """Save file as artifact for evidence tracking"""
+    def load_evidence_artifacts_from_case(self):
+        """Load evidence artifacts từ case hiện tại - real-time approach like file_analysis"""
+        if not self.current_case_id:
+            return
+            
         try:
             if not self.db_manager:
                 from models.db_manager import DatabaseManager
                 self.db_manager = DatabaseManager()
+                self.db_manager.connect()
             
-            if not self.db_manager.connect():
-                return None
+            # Get all artifacts for this case using correct method name
+            artifacts = self.db_manager.get_artifacts_by_case(self.current_case_id)
             
-            file_name = os.path.basename(file_path)
-            file_size = os.path.getsize(file_path)
+            self.ui.evidenceListWidget.clear()
+            evidence_count = 0
             
-            # Calculate file hash for integrity
-            try:
-                md5, sha1, sha256 = self._compute_hashes(file_path)
-            except:
-                md5 = sha1 = sha256 = None
-            
-            # Determine evidence type based on file extension
-            ext = os.path.splitext(file_name)[1].lower()
-            evidence_types = {
-                '.jpg': 'IMAGE_JPEG', '.jpeg': 'IMAGE_JPEG', '.png': 'IMAGE_PNG',
-                '.pdf': 'DOCUMENT_PDF', '.docx': 'DOCUMENT_WORD', '.xlsx': 'DOCUMENT_EXCEL',
-                '.exe': 'EXECUTABLE', '.dll': 'LIBRARY'
-            }
-            evidence_type = evidence_types.get(ext, 'FILE_OTHER')
-            
-            # Add artifact to database
-            artifact_id = self.db_manager.add_artifact(
-                case_id=self.current_case_id,
-                name=f"Metadata Analysis - {file_name}",
-                source_path=file_path,
-                evidence_type=evidence_type,
-                size=file_size,
-                mime_type=self._guess_mime_type(file_name)
-            )
-            
-            if artifact_id and sha256:
-                # Add hash for integrity verification
-                self.db_manager.add_hash(artifact_id, "SHA256", sha256)
-                if md5:
-                    self.db_manager.add_hash(artifact_id, "MD5", md5)
-                if sha1:
-                    self.db_manager.add_hash(artifact_id, "SHA1", sha1)
+            # Filter for analyzable file artifacts (not just disk images)
+            analyzable_artifacts = []
+            for artifact in artifacts:
+                evidence_type = artifact.get('evidence_type', '').upper()
+                name = artifact.get('name', '').upper()
+                source_path = artifact.get('source_path', '')
                 
-                print(f"File saved as artifact: Artifact ID {artifact_id}")
+                # Check if it's a file that can be analyzed for metadata
+                is_analyzable = False
+                
+                # Check by evidence_type
+                analyzable_types = ['IMAGE_JPEG', 'IMAGE_PNG', 'IMAGE_TIFF', 'DOCUMENT_PDF', 
+                                   'DOCUMENT_WORD', 'DOCUMENT_EXCEL', 'EXECUTABLE', 'FILE_OTHER']
+                if any(file_type in evidence_type for file_type in analyzable_types):
+                    is_analyzable = True
+                
+                # Check by file extension
+                if source_path:
+                    ext = os.path.splitext(source_path)[1].lower()
+                    analyzable_exts = ['.jpg', '.jpeg', '.png', '.tiff', '.tif', '.bmp', '.gif', 
+                                      '.pdf', '.docx', '.xlsx', '.pptx', '.exe', '.dll']
+                    if ext in analyzable_exts:
+                        is_analyzable = True
+                
+                if is_analyzable and source_path and os.path.exists(source_path):
+                    analyzable_artifacts.append(artifact)
             
-            self.db_manager.disconnect()
-            return artifact_id
+            # Add to list widget
+            for artifact in analyzable_artifacts:
+                # Create display text with file size
+                display_name = artifact.get('name', 'Unknown')
+                evidence_type = artifact.get('evidence_type', 'Unknown')
+                
+                # Get file size if available
+                source_path = artifact.get('source_path', '')
+                size_info = ""
+                if source_path and os.path.exists(source_path):
+                    try:
+                        size_bytes = os.path.getsize(source_path)
+                        size_info = f" - {self._format_size(size_bytes)}"
+                    except:
+                        pass
+                
+                item_text = f"{display_name} ({evidence_type}){size_info}"
+                item = QListWidgetItem(item_text)
+                item.setData(Qt.UserRole, artifact)
+                self.ui.evidenceListWidget.addItem(item)
+                evidence_count += 1
+            
+            self.ui.evidenceCountLabel.setText(str(evidence_count))
+            
+            if evidence_count == 0:
+                no_files_item = QListWidgetItem("No analyzable files found in this case")
+                no_files_item.setData(Qt.UserRole, None)
+                self.ui.evidenceListWidget.addItem(no_files_item)
             
         except Exception as e:
-            print(f"Error saving file as artifact: {e}")
+            print(f"Error loading evidence artifacts: {e}")
+    
+    def refresh_evidence_list(self):
+        """Refresh the evidence list"""
+        self.load_evidence_artifacts_from_case()
+        
+    def on_evidence_item_clicked(self, item):
+        """Handle clicking on evidence item"""
+        try:
+            artifact_data = item.data(Qt.UserRole)
+            if artifact_data and artifact_data.get('source_path'):
+                source_path = artifact_data['source_path']
+                if os.path.exists(source_path):
+                    print(f"Analyzing file: {source_path}")
+                    self.analyze_file(source_path)
+                    
+                    # Save activity log
+                    self.log_analysis_activity(artifact_data)
+                else:
+                    QMessageBox.warning(self, "File Not Found", f"Source file not found: {source_path}")
+            else:
+                # Handle no data case
+                print("No artifact data or no analyzable files")
+        except Exception as e:
+            QMessageBox.warning(self, "Error", f"Error loading evidence: {str(e)}")
+    
+    def log_analysis_activity(self, artifact_data):
+        """Log analysis activity to database"""
+        try:
+            if not self.db_manager:
+                from models.db_manager import DatabaseManager
+                self.db_manager = DatabaseManager()
+                self.db_manager.connect()
+            
+            file_name = artifact_data.get('name', 'Unknown')
+            self.db_manager.log_activity(
+                case_id=self.current_case_id,
+                action=f"METADATA_ANALYSIS_START: {file_name}",
+                tool_used="Metadata Analysis",
+                details=f"Started metadata analysis for {file_name}"
+            )
+            
+            self.db_manager.disconnect()
+            
+        except Exception as e:
+            print(f"Error logging activity: {e}")
             if self.db_manager:
                 self.db_manager.disconnect()
-            return None
+    
+    def export_metadata(self):
+        """Export current metadata to JSON"""
+        if not self.current_file_path:
+            QMessageBox.information(self, "Export Metadata", "Please select a file first")
+            return
+            
+        try:
+            file_path, _ = QFileDialog.getSaveFileName(
+                self, "Export Metadata", 
+                f"{os.path.basename(self.current_file_path)}_metadata.json",
+                "JSON Files (*.json)"
+            )
+            
+            if not file_path:
+                return
+                
+            # Export metadata from tree widget
+            metadata = {}
+            tree = self.ui.metadataTreeWidget
+            
+            for i in range(tree.topLevelItemCount()):
+                group_item = tree.topLevelItem(i)
+                group_name = group_item.text(0)
+                group_data = {}
+                
+                for j in range(group_item.childCount()):
+                    child_item = group_item.child(j)
+                    property_name = child_item.text(0)
+                    property_value = child_item.text(1)
+                    group_data[property_name] = property_value
+                
+                metadata[group_name] = group_data
+            
+            with open(file_path, 'w', encoding='utf-8') as f:
+                json.dump(metadata, f, indent=2, ensure_ascii=False)
+                
+            QMessageBox.information(self, "Export Complete", f"Metadata exported to:\n{file_path}")
+            
+        except Exception as e:
+            QMessageBox.warning(self, "Export Error", f"Failed to export metadata: {str(e)}")
+    
     
     def _guess_mime_type(self, filename):
         """Guess MIME type from filename"""
@@ -285,33 +386,6 @@ class MetadataAnalysis(QWidget):
                 self.db_manager.disconnect()
             return None
     
-    def log_report_export(self, report_path):
-        """Log metadata report export activity"""
-        try:
-            if not self.db_manager:
-                from models.db_manager import DatabaseManager
-                self.db_manager = DatabaseManager()
-            
-            if not self.db_manager.connect():
-                return
-            
-            file_name = os.path.basename(report_path) if report_path else "metadata_report.html"
-            
-            # Log the activity
-            self.db_manager.log_activity(
-                case_id=self.current_case_id,
-                action=f"METADATA_REPORT_EXPORTED: {file_name}",
-                tool_used="Metadata Analysis",
-                details=f"Exported metadata analysis report to: {report_path}"
-            )
-            
-            print(f"Metadata report export logged: {file_name}")
-            self.db_manager.disconnect()
-            
-        except Exception as e:
-            print(f"Error logging metadata report export: {e}")
-            if self.db_manager:
-                self.db_manager.disconnect()
 
     # ===== Public API =====
     def analyze_file(self, file_path: str) -> None:
@@ -336,7 +410,7 @@ class MetadataAnalysis(QWidget):
         # Thumbnail/icon
         self._populate_thumbnail(file_path)
 
-        # File-system timestamps
+        # File-system timestamps (store for internal use but don't display as they're not in new UI)
         try:
             stat = os.stat(file_path)
             created = self._format_ts(stat.st_ctime)
@@ -346,11 +420,6 @@ class MetadataAnalysis(QWidget):
         except Exception:
             created = modified = accessed = changed = "Unknown"
 
-        self.ui.fileCreateTimeValueLabel.setText(created)
-        self.ui.fileModifyTimeValueLabel.setText(modified)
-        self.ui.fileAccessTimeValueLabel.setText(accessed)
-        self.ui.fileChangeTimeValueLabel.setText(changed)
-
         # Determine type
         ext = os.path.splitext(file_name.lower())[1]
         is_image = ext in {".jpg", ".jpeg", ".png", ".tif", ".tiff", ".bmp", ".gif", ".webp", ".heic"}
@@ -358,8 +427,7 @@ class MetadataAnalysis(QWidget):
         is_office = ext in {".docx", ".pptx", ".xlsx"}
         is_exe = ext in {".exe", ".dll", ".sys", ".msi"}
 
-        # Tabs availability
-        self._enable_tabs(exif_tab=is_image, doc_tab=(is_pdf or is_office), pe_tab=is_exe)
+        # All tabs are always enabled in new UI - no conditional enabling needed
 
         # Collect metadata per type (prefer ExifTool if available)
         embedded_times = {"create": "-", "modify": "-", "original": "-"}
@@ -381,22 +449,24 @@ class MetadataAnalysis(QWidget):
                 if is_image:
                     meta, gps, embedded_times = self._extract_image_metadata(file_path)
                     author_text = self._compose_author_device(meta)
-                    self._populate_exif_tree(meta)
+                    self._populate_metadata_tree(meta)
                     self._update_gps(gps)
                 elif is_pdf:
                     props = self._extract_pdf_properties(file_path)
                     author_text = props.get("Author") or props.get("Creator") or "-"
-                    self._populate_document_table(props)
+                    self._populate_metadata_tree_from_dict(props, "PDF Properties")
                     self._update_gps(None)
                 elif is_office:
                     props = self._extract_office_properties(file_path)
                     author_text = props.get("author") or props.get("last_modified_by") or "-"
-                    self._populate_document_table(props)
+                    self._populate_metadata_tree_from_dict(props, "Office Properties")
                     self._update_gps(None)
                 elif is_exe:
                     pe_info = self._extract_pe_info(file_path)
                     author_text = pe_info.get("Signature", "-")
-                    self._populate_pe_tables(pe_info)
+                    # Convert PE info to tree format
+                    pe_tree_data = {k: v for k, v in pe_info.items() if k != "Imports"}
+                    self._populate_metadata_tree_from_dict(pe_tree_data, "PE Header")
                     self._update_gps(None)
                 else:
                     self._update_gps(None)
@@ -406,13 +476,8 @@ class MetadataAnalysis(QWidget):
         # Author/device
         self.ui.authorDeviceValueLabel.setText(author_text if author_text else "-")
 
-        # Embedded timeline
-        self.ui.embeddedCreateTimeValueLabel.setText(embedded_times.get("create", "-"))
-        self.ui.embeddedModifyTimeValueLabel.setText(embedded_times.get("modify", "-"))
-        self.ui.embeddedTimeValueLabel.setText(embedded_times.get("original", "-"))
-
-        # Discrepancy warning
-        self._update_discrepancy_warning(created, embedded_times.get("original", "-"))
+        # Update current file label
+        self.ui.currentFileLabel.setText(f"Analyzing: {os.path.basename(file_path)}")
 
         # Investigator insights + Raw text
         try:
@@ -427,16 +492,7 @@ class MetadataAnalysis(QWidget):
             if raw_dump_text:
                 combined = combined + "\n\n" + raw_dump_text
             self.ui.rawTextEdit.setPlainText(combined)
-            # Enable/disable Open Map helper based on GPS presence
-            try:
-                has_gps = False
-                if self._last_exiftool_tags:
-                    lat = self._last_exiftool_tags.get("GPS:GPSLatitude")
-                    lon = self._last_exiftool_tags.get("GPS:GPSLongitude")
-                    has_gps = isinstance(lat, (int, float)) and isinstance(lon, (int, float))
-                self.ui.btnOpenMap.setEnabled(bool(has_gps))
-            except Exception:
-                pass
+            # GPS handling is now done via embedded map
         except Exception:
             if raw_dump_text is not None:
                 self.ui.rawTextEdit.setPlainText(raw_dump_text)
@@ -447,20 +503,19 @@ class MetadataAnalysis(QWidget):
         # Hex and strings
         self._populate_hex_and_strings(file_path)
 
-        # Compare
-        try:
-            self.current_metadata_map = self._build_current_metadata_map(file_path, author_text, embedded_times)
-            if self.pinned_metadata_map is not None:
-                self._update_compare_table()
-        except Exception:
-            pass
         
         # Save analysis results to database if case is selected
         if self.current_case_id:
-            # Save file as artifact if not already saved
-            artifact_id = self.save_file_as_artifact(file_path)
-            # Save metadata analysis results
-            self.save_metadata_analysis_to_database(file_path, author_text, embedded_times, artifact_id)
+            # Get artifact_id from the current selected item
+            try:
+                current_item = self.ui.evidenceListWidget.currentItem()
+                if current_item:
+                    artifact_data = current_item.data(Qt.UserRole)
+                    artifact_id = artifact_data.get('id')
+                    # Save metadata analysis results with the existing artifact ID
+                    self.save_metadata_analysis_to_database(file_path, author_text, embedded_times, artifact_id)
+            except Exception as e:
+                print(f"Error saving metadata analysis: {e}")
 
     # ===== ExifTool integration =====
     def _find_exiftool(self) -> str:
@@ -564,9 +619,7 @@ class MetadataAnalysis(QWidget):
             "create": self._normalize_exif_datetime(str(emb_create)) if emb_create else "-",
             "modify": self._normalize_exif_datetime(str(emb_modify)) if emb_modify else "-",
         }
-        self.ui.embeddedTimeValueLabel.setText(embedded_times["original"])
-        self.ui.embeddedCreateTimeValueLabel.setText(embedded_times["create"])
-        self.ui.embeddedModifyTimeValueLabel.setText(embedded_times["modify"])
+        # Embedded times are now handled within the metadata tree structure
 
         # Author/Device
         creator = self._first_present(tags, [
@@ -585,29 +638,16 @@ class MetadataAnalysis(QWidget):
             author_text = f"{make} {model}".strip()
         self.ui.authorDeviceValueLabel.setText(author_text if author_text else "-")
 
-        # EXIF tree grouped by families
-        self._populate_exif_tree_exiftool(tags)
+        # Metadata tree grouped by families
+        self._populate_metadata_tree_exiftool(tags)
 
-        # Document props
-        doc_groups = ("PDF:", "XMP:", "XMP-", "DOC:", "DOCX:")
-        doc_props = {k: v for k, v in tags.items() if any(k.startswith(g) for g in doc_groups)}
-        if doc_props:
-            items = []
-            for k, v in doc_props.items():
-                items.append((k, v))
-            table = self.ui.documentPropsTable
-            table.setRowCount(0)
-            table.setRowCount(len(items))
-            for row, (k, v) in enumerate(items):
-                table.setItem(row, 0, self._new_table_item(str(k)))
-                table.setItem(row, 1, self._new_table_item(str(v)))
-            table.resizeColumnsToContents()
+        # Document props are now included in the main metadata tree
 
         return author_text, embedded_times
 
-    def _populate_exif_tree_exiftool(self, tags: dict) -> None:
+    def _populate_metadata_tree_exiftool(self, tags: dict) -> None:
         try:
-            tree = self.ui.exifTreeWidget
+            tree = self.ui.metadataTreeWidget
             tree.clear()
             group_to_node = {}
             for k, v in tags.items():
@@ -618,12 +658,12 @@ class MetadataAnalysis(QWidget):
                 # Skip some very noisy groups if desired
                 # if group in {"File"}: continue
                 if group not in group_to_node:
-                    node = QTreeWidgetItem([group])
+                    node = QTreeWidgetItem([group, "", ""])
                     group_to_node[group] = node
                     tree.addTopLevelItem(node)
                 else:
                     node = group_to_node[group]
-                child = QTreeWidgetItem([tag, self._stringify_exiftool_value(v)])
+                child = QTreeWidgetItem(["", tag, self._stringify_exiftool_value(v)])
                 node.addChild(child)
             tree.expandAll()
         except Exception:
@@ -642,6 +682,87 @@ class MetadataAnalysis(QWidget):
             if key in d and d[key] not in (None, ""):
                 return d[key]
         return None
+    
+    def _populate_metadata_tree_from_dict(self, data: dict, group_name: str) -> None:
+        """Populate metadata tree from a dictionary of properties"""
+        try:
+            tree = self.ui.metadataTreeWidget
+            
+            # Create or find the group node
+            group_node = None
+            for i in range(tree.topLevelItemCount()):
+                item = tree.topLevelItem(i)
+                if item.text(0) == group_name:
+                    group_node = item
+                    break
+            
+            if group_node is None:
+                group_node = QTreeWidgetItem([group_name, "", ""])
+                tree.addTopLevelItem(group_node)
+            
+            # Add properties to the group
+            for key, value in data.items():
+                if value not in (None, "", "-"):
+                    child = QTreeWidgetItem(["", str(key), str(value)])
+                    group_node.addChild(child)
+            
+            tree.expandAll()
+        except Exception:
+            pass
+    
+    def _populate_metadata_tree(self, meta: dict) -> None:
+        """Populate metadata tree from image metadata"""
+        try:
+            tree = self.ui.metadataTreeWidget
+            tree.clear()
+            
+            # Group metadata by categories
+            groups = {
+                "Image": [
+                    "Image Make", "Image Model", "Image Orientation", "Image XResolution", "Image YResolution",
+                    "Composite ImageSize", "EXIF ExifImageWidth", "EXIF ExifImageHeight",
+                ],
+                "Camera Settings": [
+                    "EXIF FNumber", "EXIF ExposureTime", "EXIF ISOSpeedRatings", "EXIF ExposureProgram",
+                    "EXIF FocalLength", "EXIF Flash", "EXIF MeteringMode", "EXIF LightSource",
+                ],
+                "GPS": [
+                    "GPS GPSLatitude", "GPS GPSLongitude", "GPS GPSAltitude", "GPS GPSMapDatum", "GPS GPSTimeStamp",
+                ],
+                "File Information": [
+                    "Image Software", "EXIF ModifyDate", "EXIF CreateDate", "EXIF DateTimeOriginal", "File Name",
+                ],
+            }
+            
+            group_nodes = {}
+            for group_name in groups.keys():
+                node = QTreeWidgetItem([group_name, "", ""])
+                group_nodes[group_name] = node
+                tree.addTopLevelItem(node)
+
+            added_keys = set()
+            for group_name, keys in groups.items():
+                group_item = group_nodes[group_name]
+                for key in keys:
+                    if key in meta:
+                        value = str(meta.get(key, ""))
+                        group_item.addChild(QTreeWidgetItem(["", key, value]))
+                        added_keys.add(key)
+
+            # Add remaining metadata to "Others" group
+            others = QTreeWidgetItem(["Others", "", ""])
+            has_others = False
+            for k, v in meta.items():
+                if k not in added_keys:
+                    others.addChild(QTreeWidgetItem(["", k, str(v)]))
+                    has_others = True
+            
+            if has_others:
+                tree.addTopLevelItem(others)
+
+            tree.expandAll()
+        except Exception:
+            pass
 
     # ===== Investigator insights =====
     def _generate_investigator_insights(self, file_path: str, fs_created: str, embedded_original: str, author_text: str, tags: dict | None) -> str:
@@ -717,27 +838,7 @@ class MetadataAnalysis(QWidget):
         except Exception:
             pass
 
-        # Update insights panel (badge + list)
-        try:
-            # Badge color by score
-            color = "#28a745"  # green
-            if score >= 3:
-                color = "#dc3545"  # red
-            elif score == 2:
-                color = "#ffc107"  # amber
-            self.ui.riskScoreBadgeLabel.setText(str(score))
-            self.ui.riskScoreBadgeLabel.setStyleSheet(
-                f"QLabel {{ padding: 3px 10px; border-radius: 10px; color: white; background-color: {color}; font-weight: bold; }}"
-            )
-            # Fill alerts list
-            try:
-                self.ui.alertsListWidget.clear()
-                for h in hints:
-                    self.ui.alertsListWidget.addItem(h)
-            except Exception:
-                pass
-        except Exception:
-            pass
+        # Risk analysis is simplified in new UI - just include in raw text
 
         # Summary score in text
         hints_text = [f"Risk Score (heuristic): {score}"] + hints
@@ -764,388 +865,32 @@ class MetadataAnalysis(QWidget):
         # Simplified: always deep and inclusive, no UI toggles
         return list(base_flags) + ["-a", "-u", "-U", "-ee3", "-api", "RequestAll=3"]
 
-    # ===== Toolbar actions =====
-    def export_csv(self) -> None:
-        try:
-            if not self.exiftool_path:
-                QMessageBox.warning(self, "Xuất CSV", "Thiếu thành phần cần thiết để xuất")
-                return
-            if not self.current_file_path:
-                QMessageBox.information(self, "Export CSV", "Vui lòng chọn tệp trước")
-                return
-            save_path, _ = QFileDialog.getSaveFileName(self, "Lưu CSV", os.path.splitext(self.current_file_path)[0] + ".csv", "CSV (*.csv)")
-            if not save_path:
-                return
-            base = ["-G1", "-n", f"-csv={save_path}"]
-            args = self._build_exiftool_flags(base)
-            cmd = [self.exiftool_path] + args + [self.current_file_path]
-            proc = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8", errors="replace")
-            if proc.returncode != 0:
-                raise RuntimeError(proc.stderr.strip() or "Xuất CSV thất bại")
-            QMessageBox.information(self, "Export CSV", f"Đã lưu:\n{save_path}")
-        except Exception as e:
-            QMessageBox.warning(self, "Export CSV", str(e))
-
-    def export_xml(self) -> None:
-        try:
-            if not self.exiftool_path:
-                QMessageBox.warning(self, "Xuất XML", "Thiếu thành phần cần thiết để xuất")
-                return
-            if not self.current_file_path:
-                QMessageBox.information(self, "Export XML", "Vui lòng chọn tệp trước")
-                return
-            save_path, _ = QFileDialog.getSaveFileName(self, "Lưu XML", os.path.splitext(self.current_file_path)[0] + ".xml", "XML (*.xml)")
-            if not save_path:
-                return
-            base = ["-X", "-struct", "-G1", "-n"]
-            args = self._build_exiftool_flags(base)
-            cmd = [self.exiftool_path] + args + [self.current_file_path]
-            proc = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8", errors="replace")
-            if proc.returncode != 0:
-                raise RuntimeError(proc.stderr.strip() or "Xuất XML thất bại")
-            with open(save_path, "w", encoding="utf-8") as f:
-                f.write(proc.stdout)
-            QMessageBox.information(self, "Export XML", f"Đã lưu:\n{save_path}")
-        except Exception as e:
-            QMessageBox.warning(self, "Export XML", str(e))
-
-    def extract_previews(self) -> None:
-        try:
-            if not self.exiftool_path:
-                QMessageBox.warning(self, "Trích xuất", "Thiếu thành phần cần thiết để trích xuất")
-                return
-            if not self.current_file_path:
-                QMessageBox.information(self, "Extract Previews", "Vui lòng chọn tệp trước")
-                return
-            out_dir = QFileDialog.getExistingDirectory(self, "Chọn thư mục lưu previews")
-            if not out_dir:
-                return
-            fmt = os.path.join(out_dir, "%f_%t%-c.%s")
-            base = ["-b", "-W", fmt]
-            args = self._build_exiftool_flags(base)
-            tags = ["-PreviewImage", "-JpgFromRaw", "-ThumbnailImage", "-ICC_Profile"]
-            cmd = [self.exiftool_path] + args + tags + [self.current_file_path]
-            proc = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8", errors="replace")
-            if proc.returncode != 0:
-                raise RuntimeError(proc.stderr.strip() or "Trích xuất thất bại")
-            QMessageBox.information(self, "Trích xuất", f"Đã lưu vào:\n{out_dir}")
-        except Exception as e:
-            QMessageBox.warning(self, "Extract Previews", str(e))
-
-    def export_quick_report(self) -> None:
-        try:
-            if not self.current_file_path:
-                QMessageBox.information(self, "Xuất báo cáo", "Vui lòng chọn tệp trước")
-                return
-            save_path, _ = QFileDialog.getSaveFileName(
-                self,
-                "Lưu báo cáo",
-                os.path.splitext(self.current_file_path)[0] + "_report.html",
-                "HTML (*.html)"
-            )
-            if not save_path:
-                return
-            # Thu thập dữ liệu đang hiển thị
-            fields = {
-                "Tên tệp": os.path.basename(self.current_file_path),
-                "Loại tệp": self.ui.fileTypeValueLabel.text(),
-                "Kích thước": self.ui.fileSizeValueLabel.text(),
-                "Tác giả/Thiết bị": self.ui.authorDeviceValueLabel.text(),
-                "Embedded Original": self.ui.embeddedTimeValueLabel.text(),
-                "Embedded Created": self.ui.embeddedCreateTimeValueLabel.text(),
-                "Embedded Modified": self.ui.embeddedModifyTimeValueLabel.text(),
-                "FS Created": self.ui.fileCreateTimeValueLabel.text(),
-                "FS Modified": self.ui.fileModifyTimeValueLabel.text(),
-                "FS Accessed": self.ui.fileAccessTimeValueLabel.text(),
-                "FS Changed": self.ui.fileChangeTimeValueLabel.text(),
-                "Điểm rủi ro": getattr(self.ui, 'riskScoreBadgeLabel', None).text() if getattr(self.ui, 'riskScoreBadgeLabel', None) else "-",
-            }
-            alerts = []
-            try:
-                for i in range(self.ui.alertsListWidget.count()):
-                    alerts.append(self.ui.alertsListWidget.item(i).text())
-            except Exception:
-                pass
-            # Tạo HTML đơn giản, tiếng Việt
-            html = [
-                "<html><head><meta charset='utf-8'><title>Báo cáo Metadata</title>",
-                "<style>body{font-family:Arial,Helvetica,sans-serif;font-size:14px} table{border-collapse:collapse;width:100%} td,th{border:1px solid #ddd;padding:8px} th{background:#f5f5f5;text-align:left}</style>",
-                "</head><body>",
-                f"<h2>Báo cáo Metadata - {fields['Tên tệp']}</h2>",
-                "<h3>Tóm tắt</h3>",
-                "<table>",
-            ]
-            for k, v in fields.items():
-                html.append(f"<tr><th>{k}</th><td>{v}</td></tr>")
-            html.extend(["</table>", "<h3>Cảnh báo &amp; Gợi ý</h3>", "<ul>"])
-            for a in alerts:
-                html.append(f"<li>{a}</li>")
-            html.extend(["</ul>", "<h3>Dữ liệu thô</h3>", "<pre>",
-                         self.ui.rawTextEdit.toPlainText().replace("<", "&lt;").replace(">", "&gt;"),
-                         "</pre>", "</body></html>"])
-            with open(save_path, "w", encoding="utf-8") as f:
-                f.write("\n".join(html))
-            
-            # Log report export activity
-            if self.current_case_id:
-                self.log_report_export(save_path)
-                
-            QMessageBox.information(self, "Xuất báo cáo", f"Đã lưu:\n{save_path}")
-        except Exception as e:
-            QMessageBox.warning(self, "Xuất báo cáo", str(e))
-
-    # ===== Investigator helpers =====
-    def copy_hashes_to_clipboard(self) -> None:
-        try:
-            if not self.current_file_path:
-                QMessageBox.information(self, "Sao chép băm", "Vui lòng chọn tệp trước")
-                return
-            md5, sha1, sha256 = self._compute_hashes(self.current_file_path)
-            text = f"MD5: {md5}\nSHA1: {sha1}\nSHA256: {sha256}"
-            from PyQt5.QtWidgets import QApplication
-            QApplication.clipboard().setText(text)
-            QMessageBox.information(self, "Sao chép băm", "Đã sao chép vào clipboard")
-        except Exception as e:
-            QMessageBox.warning(self, "Sao chép băm", str(e))
-
-    def open_file_location(self) -> None:
-        try:
-            if not self.current_file_path:
-                QMessageBox.information(self, "Mở thư mục tệp", "Vui lòng chọn tệp trước")
-                return
-            path = os.path.abspath(self.current_file_path)
-            folder = os.path.dirname(path)
-            # Open Explorer and select file if possible
-            try:
-                subprocess.run(["explorer", "/select,", path])
-            except Exception:
-                os.startfile(folder)
-        except Exception as e:
-            QMessageBox.warning(self, "Mở thư mục tệp", str(e))
-
-    def open_gps_in_maps(self) -> None:
-        try:
-            if not self._last_exiftool_tags:
-                return
-            lat = self._last_exiftool_tags.get("GPS:GPSLatitude")
-            lon = self._last_exiftool_tags.get("GPS:GPSLongitude")
-            if isinstance(lat, (int, float)) and isinstance(lon, (int, float)):
-                url = f"https://maps.google.com/?q={lat},{lon}"
-                os.startfile(url)
-        except Exception:
-            pass
-
-    # No run_custom_args in simplified UI
-
-    def open_file_dialog_and_analyze(self) -> None:
-        file_path, _ = QFileDialog.getOpenFileName(self, "Chọn tệp cần phân tích", "", "All Files (*.*)")
-        if file_path:
-            self.analyze_file(file_path)
-
-    # ===== UI helpers =====
-    def _enable_tabs(self, exif_tab: bool, doc_tab: bool, pe_tab: bool) -> None:
-        try:
-            idx_key = self.ui.tabWidget.indexOf(self.ui.tabKeyProperties)
-            idx_exif = self.ui.tabWidget.indexOf(self.ui.tabAllExif)
-            idx_doc = self.ui.tabWidget.indexOf(self.ui.tabDocumentProps)
-            idx_pe = self.ui.tabWidget.indexOf(self.ui.tabPEHeader)
-            idx_raw = self.ui.tabWidget.indexOf(self.ui.tabRawData)
-            if idx_key != -1:
-                self.ui.tabWidget.setTabEnabled(idx_key, True)
-            if idx_raw != -1:
-                self.ui.tabWidget.setTabEnabled(idx_raw, True)
-            if idx_exif != -1:
-                self.ui.tabWidget.setTabEnabled(idx_exif, exif_tab)
-            if idx_doc != -1:
-                self.ui.tabWidget.setTabEnabled(idx_doc, doc_tab)
-            if idx_pe != -1:
-                self.ui.tabWidget.setTabEnabled(idx_pe, pe_tab)
-        except Exception:
-            pass
-
-    # ===== Sources loading (left panel) =====
-    def handle_load_sources(self) -> None:
-        """Open a single dialog that allows selecting files and/or folders together."""
-        paths = self._select_files_and_folders()
-        if not paths:
-            return
-
-        # Reset tree, then add all selected sources
-        try:
-            tree = self.ui.sourcesTree
-            tree.clear()
-        except Exception:
-            pass
-
-        first_file_for_analysis = None
-        for p in paths:
-            try:
-                if os.path.isdir(p):
-                    self._add_folder_to_tree(p)
-                elif os.path.isfile(p):
-                    self._add_file_to_tree(p)
-                    if first_file_for_analysis is None:
-                        first_file_for_analysis = p
-            except Exception:
-                continue
-
-        if first_file_for_analysis:
-            self.analyze_file(first_file_for_analysis)
-
-    def _select_files_and_folders(self) -> list:
-        """Return a list of selected file and folder paths using a non-native dialog.
-
-        Note: Using DontUseNativeDialog to allow multi-select of both files and directories.
-        """
-        try:
-            dialog = QFileDialog(self, "Chọn nguồn (có thể chọn nhiều tệp và thư mục)")
-            dialog.setOption(QFileDialog.DontUseNativeDialog, True)
-            dialog.setOption(QFileDialog.ShowDirsOnly, False)
-            dialog.setFileMode(QFileDialog.ExistingFiles)
-            dialog.setNameFilter("All Files (*.*)")
-
-            # Ensure multiple selection in internal views
-            try:
-                for view in dialog.findChildren(QListView) + dialog.findChildren(QTreeView):
-                    view.setSelectionMode(QAbstractItemView.ExtendedSelection)
-            except Exception:
-                pass
-
-            if dialog.exec_() == QFileDialog.Accepted:
-                return dialog.selectedFiles() or []
-        except Exception:
-            pass
-        return []
-
-    def _add_file_to_tree(self, file_path: str) -> None:
-        """Add a single file as a top-level item without clearing the tree."""
-        try:
-            tree = self.ui.sourcesTree
-            item = QTreeWidgetItem([os.path.basename(file_path)])
-            item.setData(0, Qt.UserRole, {"path": file_path, "is_file": True})
-            item.setToolTip(0, file_path)
-            tree.addTopLevelItem(item)
-            tree.setCurrentItem(item)
-        except Exception:
-            pass
-
-    def _add_folder_to_tree(self, folder_path: str) -> None:
-        """Add a folder and populate its descendants without clearing the tree."""
-        try:
-            tree = self.ui.sourcesTree
-            root = QTreeWidgetItem([os.path.basename(folder_path.rstrip(os.sep)) or folder_path])
-            root.setData(0, Qt.UserRole, {"path": folder_path, "is_file": False})
-            tree.addTopLevelItem(root)
-            self._populate_folder_tree(root, folder_path, depth=0, max_depth=10, max_entries=2000)
-            root.setExpanded(True)
-        except Exception:
-            pass
-
-    def load_sources_file(self, file_path: str) -> None:
-        try:
-            tree = self.ui.sourcesTree
-            tree.clear()
-            item = QTreeWidgetItem([os.path.basename(file_path)])
-            item.setData(0, Qt.UserRole, {"path": file_path, "is_file": True})
-            item.setToolTip(0, file_path)
-            tree.addTopLevelItem(item)
-            tree.setCurrentItem(item)
-            self.analyze_file(file_path)
-        except Exception:
-            pass
-
-    def load_sources_folder(self, folder_path: str) -> None:
-        try:
-            tree = self.ui.sourcesTree
-            tree.clear()
-            root = QTreeWidgetItem([os.path.basename(folder_path.rstrip(os.sep)) or folder_path])
-            root.setData(0, Qt.UserRole, {"path": folder_path, "is_file": False})
-            tree.addTopLevelItem(root)
-            self._populate_folder_tree(root, folder_path, depth=0, max_depth=10, max_entries=2000)
-            root.setExpanded(True)
-        except Exception:
-            pass
-
-    def _populate_folder_tree(self, parent_item: QTreeWidgetItem, dir_path: str, depth: int, max_depth: int, max_entries: int, counter: list = None) -> None:
-        try:
-            if counter is None:
-                counter = [0]
-            if depth > max_depth or counter[0] > max_entries:
-                return
-            try:
-                entries = sorted(os.listdir(dir_path))
-            except Exception:
-                return
-            for name in entries:
-                if counter[0] > max_entries:
-                    break
-                path = os.path.join(dir_path, name)
-                if os.path.isdir(path):
-                    dir_item = QTreeWidgetItem([name])
-                    dir_item.setData(0, Qt.UserRole, {"path": path, "is_file": False})
-                    parent_item.addChild(dir_item)
-                    counter[0] += 1
-                    self._populate_folder_tree(dir_item, path, depth + 1, max_depth, max_entries, counter)
-                else:
-                    file_item = QTreeWidgetItem([name])
-                    file_item.setData(0, Qt.UserRole, {"path": path, "is_file": True})
-                    file_item.setToolTip(0, path)
-                    parent_item.addChild(file_item)
-                    counter[0] += 1
-        except Exception:
-            pass
-
-    def on_source_item_clicked(self, item: QTreeWidgetItem, column: int) -> None:
-        try:
-            data = item.data(0, Qt.UserRole) or {}
-            if data.get("is_file") and data.get("path"):
-                self.analyze_file(data.get("path"))
-        except Exception:
-            pass
+    # ===== UI helpers - simplified for new interface =====
 
     # ===== Reset UI =====
     def _clear_all(self) -> None:
         try:
             self.ui.thumbnailLabel.setPixmap(QPixmap())
-            self.ui.thumbnailLabel.setText("Thumbnail / Biểu tượng")
+            self.ui.thumbnailLabel.setText("Thumbnail / Preview")
             self.ui.fileNameValueLabel.setText("-")
             self.ui.fileTypeValueLabel.setText("-")
             self.ui.fileSizeValueLabel.setText("-")
             self.ui.authorDeviceValueLabel.setText("-")
-            # Location UI removed in .ui; ignore gracefully
-            self.ui.embeddedTimeValueLabel.setText("-")
-            self.ui.fileCreateTimeValueLabel.setText("-")
-            self.ui.fileModifyTimeValueLabel.setText("-")
-            self.ui.fileAccessTimeValueLabel.setText("-")
-            self.ui.fileChangeTimeValueLabel.setText("-")
-            self.ui.embeddedCreateTimeValueLabel.setText("-")
-            self.ui.embeddedModifyTimeValueLabel.setText("-")
-            self.ui.discrepancyWarningLabel.setVisible(False)
-            # Hide the large empty timeline canvas to save space
+            self.ui.currentFileLabel.setText("No file selected")
+            
             try:
-                # Collapse unused timeline canvas
-                self.ui.timelineView.setVisible(False)
-                self.ui.timelineView.setMinimumHeight(0)
-                self.ui.timelineView.setMaximumHeight(0)
-            except Exception:
-                pass
-            try:
-                self.ui.exifTreeWidget.clear()
-            except Exception:
-                pass
-            try:
-                self.ui.documentPropsTable.setRowCount(0)
-            except Exception:
-                pass
-            try:
-                self.ui.peHeaderTable.setRowCount(0)
-                self.ui.peImportsTree.clear()
+                self.ui.metadataTreeWidget.clear()
             except Exception:
                 pass
             try:
                 self.ui.rawTextEdit.clear()
                 self.ui.hexTextEdit.clear()
                 self.ui.stringsTextEdit.clear()
+            except Exception:
+                pass
+            try:
+                self.ui.currentLocationLabel.setText("No GPS data available")
+                self.ui.currentLocationLabel.setStyleSheet("font-style: italic; color: #6c757d;")
             except Exception:
                 pass
         except Exception:
@@ -1160,38 +905,30 @@ class MetadataAnalysis(QWidget):
                 self.ui.thumbnailLabel.setPixmap(scaled)
                 self.ui.thumbnailLabel.setText("")
             else:
-                self.ui.thumbnailLabel.setText("Thumbnail / Biểu tượng")
+                self.ui.thumbnailLabel.setText("Thumbnail / Preview")
         except Exception:
-            self.ui.thumbnailLabel.setText("Thumbnail / Biểu tượng")
+            self.ui.thumbnailLabel.setText("Thumbnail / Preview")
 
     def _update_gps(self, gps: dict) -> None:
         try:
-            # Location section removed; just no-op
-            return
+            if gps and isinstance(gps, dict) and 'lat' in gps and 'lng' in gps:
+                lat, lng = gps['lat'], gps['lng']
+                # Update embedded map
+                self._update_embedded_map(lat, lng)
+                # Update location label
+                self.ui.currentLocationLabel.setText(f"{lat:.6f}, {lng:.6f}")
+                self.ui.currentLocationLabel.setStyleSheet("QLabel { color: #28a745; font-weight: bold; }")
+                # GPS data available - enable refresh map functionality
+            else:
+                # No GPS data
+                self.ui.currentLocationLabel.setText("No GPS data available")
+                self.ui.currentLocationLabel.setStyleSheet("QLabel { color: #6c757d; font-style: italic; }")
+                # Reset map to default
+                self._reset_embedded_map()
         except Exception:
             pass
 
-    def _update_discrepancy_warning(self, fs_created: str, embedded_original: str) -> None:
-        try:
-            if not fs_created or not embedded_original:
-                self.ui.discrepancyWarningLabel.setVisible(False)
-                return
-
-            def parse(dt_str: str):
-                try:
-                    return datetime.strptime(dt_str, "%Y-%m-%d %H:%M:%S")
-                except Exception:
-                    return None
-
-            t_fs = parse(fs_created)
-            t_emb = parse(embedded_original)
-            if t_fs and t_emb:
-                delta = (t_fs - t_emb).total_seconds()
-                self.ui.discrepancyWarningLabel.setVisible(abs(delta) > 86400)
-            else:
-                self.ui.discrepancyWarningLabel.setVisible(False)
-        except Exception:
-            self.ui.discrepancyWarningLabel.setVisible(False)
+    # Discrepancy warning is no longer in new UI - handled in insights text
 
     # ===== Data extraction =====
     def _extract_image_metadata(self, file_path: str):
@@ -1333,86 +1070,7 @@ class MetadataAnalysis(QWidget):
             pass
         return info
 
-    # ===== Populate widgets =====
-    def _populate_exif_tree(self, meta: dict) -> None:
-        try:
-            self.ui.exifTreeWidget.clear()
-            groups = {
-                "Image": [
-                    "Image Make", "Image Model", "Image Orientation", "Image XResolution", "Image YResolution",
-                    "Composite ImageSize", "EXIF ExifImageWidth", "EXIF ExifImageHeight",
-                ],
-                "Camera Settings": [
-                    "EXIF FNumber", "EXIF ExposureTime", "EXIF ISOSpeedRatings", "EXIF ExposureProgram",
-                    "EXIF FocalLength", "EXIF Flash", "EXIF MeteringMode", "EXIF LightSource",
-                ],
-                "GPS": [
-                    "GPS GPSLatitude", "GPS GPSLongitude", "GPS GPSAltitude", "GPS GPSMapDatum", "GPS GPSTimeStamp",
-                ],
-                "File Information": [
-                    "Image Software", "EXIF ModifyDate", "EXIF CreateDate", "EXIF DateTimeOriginal", "File Name",
-                ],
-            }
-            group_nodes = {name: QTreeWidgetItem([name]) for name in groups.keys()}
-            for node in group_nodes.values():
-                self.ui.exifTreeWidget.addTopLevelItem(node)
-
-            added_keys = set()
-            for group_name, keys in groups.items():
-                group_item = group_nodes[group_name]
-                for key in keys:
-                    if key in meta:
-                        value = str(meta.get(key, ""))
-                        group_item.addChild(QTreeWidgetItem([key, value]))
-                        added_keys.add(key)
-
-            others = QTreeWidgetItem(["Others"])
-            for k, v in meta.items():
-                if k not in added_keys:
-                    others.addChild(QTreeWidgetItem([k, str(v)]))
-            if others.childCount() > 0:
-                self.ui.exifTreeWidget.addTopLevelItem(others)
-
-            self.ui.exifTreeWidget.expandAll()
-        except Exception:
-            pass
-
-    def _populate_document_table(self, props: dict) -> None:
-        try:
-            table = self.ui.documentPropsTable
-            table.setRowCount(0)
-            items = list(props.items())
-            table.setRowCount(len(items))
-            for row, (k, v) in enumerate(items):
-                table.setItem(row, 0, self._new_table_item(str(k)))
-                table.setItem(row, 1, self._new_table_item(str(v)))
-            table.resizeColumnsToContents()
-        except Exception:
-            pass
-
-    def _populate_pe_tables(self, pe_info: dict) -> None:
-        try:
-            table = self.ui.peHeaderTable
-            table.setRowCount(0)
-            header_pairs = [(k, v) for k, v in pe_info.items() if k != "Imports"]
-            table.setRowCount(len(header_pairs))
-            for row, (k, v) in enumerate(header_pairs):
-                table.setItem(row, 0, self._new_table_item(str(k)))
-                table.setItem(row, 1, self._new_table_item(str(v)))
-            table.resizeColumnsToContents()
-
-            self.ui.peImportsTree.clear()
-            dll_to_funcs = {}
-            for dll, func in pe_info.get("Imports", []):
-                dll_to_funcs.setdefault(dll, []).append(func)
-            for dll, funcs in dll_to_funcs.items():
-                parent = QTreeWidgetItem([dll, str(len(funcs))])
-                for f in funcs:
-                    parent.addChild(QTreeWidgetItem(["", f]))
-                self.ui.peImportsTree.addTopLevelItem(parent)
-            self.ui.peImportsTree.expandAll()
-        except Exception:
-            pass
+    # ===== Populate widgets - removed old table methods, using tree now =====
 
     def _populate_hex_and_strings(self, file_path: str, max_bytes: int = 1024 * 1024) -> None:
         try:
@@ -1432,10 +1090,10 @@ class MetadataAnalysis(QWidget):
             pass
 
     # ===== Search/filter =====
-    def filter_exif_tree(self, text: str) -> None:
+    def filter_metadata_tree(self, text: str) -> None:
         try:
             pattern = (text or "").strip().lower()
-            tree = self.ui.exifTreeWidget
+            tree = self.ui.metadataTreeWidget
             for i in range(tree.topLevelItemCount()):
                 top = tree.topLevelItem(i)
                 self._filter_tree_item(top, pattern)
@@ -1448,7 +1106,7 @@ class MetadataAnalysis(QWidget):
             for i in range(item.childCount()):
                 self._filter_tree_item(item.child(i), pattern)
             return True
-        text = (item.text(0) + " " + item.text(1)).lower()
+        text = (item.text(0) + " " + item.text(1) + " " + item.text(2)).lower()
         matched = pattern in text
         child_match = False
         for i in range(item.childCount()):
@@ -1580,63 +1238,6 @@ class MetadataAnalysis(QWidget):
             return None
 
     # ===== Compare/pin =====
-    def on_pin_toggled(self, checked: bool) -> None:
-        try:
-            if checked:
-                self.pinned_metadata_map = dict(self.current_metadata_map) if self.current_metadata_map else None
-                self.pinned_file_path = self.current_file_path
-            else:
-                self.pinned_metadata_map = None
-                self.pinned_file_path = None
-            self._update_compare_table()
-        except Exception:
-            pass
-
-    def _build_current_metadata_map(self, file_path: str, author_text: str, embedded_times: dict) -> dict:
-        return {
-            "File Name": os.path.basename(file_path) if file_path else "",
-            "File Type": self.ui.fileTypeValueLabel.text(),
-            "File Size": self.ui.fileSizeValueLabel.text(),
-            "Author/Device": author_text or "-",
-            "FS Created": self.ui.fileCreateTimeValueLabel.text(),
-            "FS Modified": self.ui.fileModifyTimeValueLabel.text(),
-            "FS Accessed": self.ui.fileAccessTimeValueLabel.text(),
-            "FS Changed": self.ui.fileChangeTimeValueLabel.text(),
-            "Embedded Original": embedded_times.get("original", "-"),
-            "Embedded Created": embedded_times.get("create", "-"),
-            "Embedded Modified": embedded_times.get("modify", "-"),
-        }
-
-    def _update_compare_table(self) -> None:
-        try:
-            idx_compare = self.ui.tabWidget.indexOf(self.ui.tabCompare)
-            if idx_compare == -1:
-                return
-            has_pin = self.pinned_metadata_map is not None
-            self.ui.tabWidget.setTabEnabled(idx_compare, has_pin)
-            if not has_pin:
-                return
-
-            table = self.ui.compareTable
-            table.setRowCount(0)
-            keys = set(self.pinned_metadata_map.keys()) | set(self.current_metadata_map.keys())
-            keys = sorted(keys)
-            table.setRowCount(len(keys))
-            for row, key in enumerate(keys):
-                pinned_val = self.pinned_metadata_map.get(key, "")
-                current_val = self.current_metadata_map.get(key, "")
-                table.setItem(row, 0, self._new_table_item(key))
-                item_pin = self._new_table_item(str(pinned_val))
-                item_cur = self._new_table_item(str(current_val))
-                table.setItem(row, 1, item_pin)
-                table.setItem(row, 2, item_cur)
-                if str(pinned_val) != str(current_val):
-                    diff_color = QColor(255, 240, 200)
-                    item_pin.setBackground(diff_color)
-                    item_cur.setBackground(diff_color)
-            table.resizeColumnsToContents()
-        except Exception:
-            pass
 
     def _generate_hex_view(self, data: bytes, width: int = 16) -> str:
         try:
@@ -1658,5 +1259,41 @@ class MetadataAnalysis(QWidget):
             return strings[:10000]
         except Exception:
             return []
+
+    # ===== Embedded Map Methods =====
+    def _update_embedded_map(self, lat: float, lng: float) -> None:
+        """Update embedded Google Maps to show GPS location"""
+        try:
+            # Create Google Maps URL with marker and better zoom
+            maps_url = f"https://maps.google.com/maps?q={lat},{lng}&ll={lat},{lng}&z=16&t=h"
+            self.ui.mapView.setUrl(QUrl(maps_url))
+            print(f"Map updated with coordinates: {lat}, {lng}")
+        except Exception as e:
+            print(f"Error updating map: {e}")
+            pass
+
+    def _reset_embedded_map(self) -> None:
+        """Reset embedded map to default view"""
+        try:
+            self.ui.mapView.setUrl(QUrl("https://maps.google.com"))
+        except Exception:
+            pass
+
+
+    def refresh_map_location(self) -> None:
+        """Refresh map with current GPS data"""
+        try:
+            if hasattr(self, '_last_exiftool_tags') and self._last_exiftool_tags:
+                lat = self._last_exiftool_tags.get("GPS:GPSLatitude")
+                lon = self._last_exiftool_tags.get("GPS:GPSLongitude")
+                if isinstance(lat, (int, float)) and isinstance(lon, (int, float)):
+                    self._update_embedded_map(lat, lon)
+                    QMessageBox.information(self, "Map", "GPS location updated on map!")
+                else:
+                    QMessageBox.information(self, "Map", "No GPS data found in current file.")
+            else:
+                QMessageBox.information(self, "Map", "Please analyze a file with GPS data first.")
+        except Exception:
+            QMessageBox.warning(self, "Map", "Error refreshing map.")
 
 
