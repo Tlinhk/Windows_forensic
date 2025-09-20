@@ -1,37 +1,123 @@
-from PyQt5.QtWidgets import QWidget, QFileDialog, QMessageBox, QTreeWidgetItem, QTableWidgetItem, QAbstractItemView, QListView, QTreeView, QListWidgetItem
+from PyQt5.QtWidgets import QWidget, QFileDialog, QMessageBox, QTreeWidgetItem, QAbstractItemView, QListView, QTreeView, QListWidgetItem
 from PyQt5 import QtWidgets
-from PyQt5.QtCore import Qt, QLoggingCategory, QUrl, QTimer
+from PyQt5.QtCore import Qt, QLoggingCategory, QUrl, QTimer, QThread, pyqtSignal
 from PyQt5.QtGui import QPixmap
 
 import os
 import mimetypes
 import subprocess
 import json
-import shlex
 from datetime import datetime
 
 from views.pages.analysis_ui.metadata_analysis_ui import Ui_Form
 
 
+class SearchWorker(QThread):
+    """Thread riêng để tìm kiếm text mà không làm freeze UI"""
+
+    finished = pyqtSignal()
+    error = pyqtSignal(str)
+    highlights_ready = pyqtSignal(list, object)  # list of (start_pos, length), format
+
+    def __init__(self, text_edit, search_text: str):
+        super().__init__()
+        self.text_edit = text_edit
+        self.search_text = search_text
+        self.is_running = True
+
+    def stop(self):
+        """Dừng thread"""
+        self.is_running = False
+
+    def run(self):
+        """Chạy tìm kiếm trong background thread"""
+        if not self.is_running:
+            return
+
+        content = self.text_edit.toPlainText()
+        if not content or not self.search_text:
+            return
+
+        # Tìm kiếm trong visible area để tăng tốc độ
+        scrollbar = self.text_edit.verticalScrollBar()
+        if scrollbar and self.is_running:
+            total_lines = content.count('\n') + 1
+            visible_lines = 100
+            start_line = max(0, scrollbar.value() - visible_lines)
+            end_line = min(total_lines, scrollbar.value() + visible_lines * 2)
+
+            lines = content.split('\n')
+            if start_line < len(lines):
+                search_area = '\n'.join(lines[start_line:end_line])
+                # Tính offset trong toàn bộ document
+                local_offset = sum(len(line) + 1 for line in lines[:start_line])
+            else:
+                search_area = content
+                local_offset = 0
+        else:
+            search_area = content
+            local_offset = 0
+
+        if not self.is_running:
+            return
+
+        # Tìm và highlight
+        from PyQt5.QtGui import QTextCharFormat, QBrush, QColor
+        from PyQt5.QtCore import Qt
+
+        format = QTextCharFormat()
+        format.setBackground(QBrush(QColor("#ffff00")))
+        format.setForeground(QBrush(QColor("#000000")))
+
+        search_lower = self.search_text.lower()
+        area_lower = search_area.lower()
+
+        # Tìm trong search area
+        index = area_lower.find(search_lower)
+        highlight_count = 0
+        max_highlights = 500
+
+        highlights = []
+
+        while index != -1 and highlight_count < max_highlights and self.is_running:
+            global_index = local_offset + index
+            highlights.append((global_index, len(self.search_text)))
+            index = area_lower.find(search_lower, index + 1)
+            highlight_count += 1
+
+        if not self.is_running:
+            return
+
+        # Emit highlights để main thread xử lý
+        if highlights:
+            self.highlights_ready.emit(highlights, format)
+        else:
+            # Nếu không có highlights, chỉ cần clear highlighting cũ
+            self.highlights_ready.emit([], format)
+
+        self.finished.emit()
+
+
+
 class MetadataAnalysis(QWidget):
-    """Single-page workbench for file/folder metadata analysis."""
+    """Công cụ phân tích metadata cho file/thư mục trong một trang duy nhất."""
 
     def __init__(self, main_window=None):
         super(MetadataAnalysis, self).__init__()
         self.ui = Ui_Form()
         self.ui.setupUi(self)
         
-        # Database integration for reporting
+        # Tích hợp cơ sở dữ liệu để báo cáo
         self.main_window = main_window
         self.current_case_id = None
         self.db_manager = None
         try:
-            # Suppress noisy ICC profile warnings from Qt image loader
+            # Loại bỏ cảnh báo ồn ào từ Qt image loader về ICC profile
             QLoggingCategory.setFilterRules("qt.gui.icc=false")
         except Exception:
             pass
 
-        # Wire interactions
+        # Kết nối tương tác
         try:
             self.ui.searchMetadataLineEdit.textChanged.connect(self.filter_metadata_tree)
         except Exception:
@@ -57,10 +143,29 @@ class MetadataAnalysis(QWidget):
         except Exception:
             pass
 
+        # New search boxes for enhanced tabs - sử dụng tìm kiếm tối ưu hiệu suất
+        try:
+            self.ui.rawSearchLineEdit.textChanged.connect(lambda: self.filter_text_content_immediate(self.ui.rawTextEdit, self.ui.rawSearchLineEdit.text()))
+        except Exception:
+            pass
+
+        try:
+            self.ui.hexSearchLineEdit.textChanged.connect(lambda: self.filter_text_content_immediate(self.ui.hexTextEdit, self.ui.hexSearchLineEdit.text()))
+        except Exception:
+            pass
+
+        try:
+            self.ui.stringsSearchLineEdit.textChanged.connect(lambda: self.filter_text_content_immediate(self.ui.stringsTextEdit, self.ui.stringsSearchLineEdit.text()))
+        except Exception:
+            pass
+
         # State
         self.current_file_path = None
         self.exiftool_path = self._find_exiftool()
         self._last_exiftool_tags = None
+        self.current_metadata_dict = {}
+        self._search_workers = {}
+        self._current_search_edit = None  # Track current search text edit
 
 
         # Splitter sizing
@@ -74,6 +179,45 @@ class MetadataAnalysis(QWidget):
         # Load case data if available
         if main_window and hasattr(main_window, 'current_case_id'):
             self.load_case_data(main_window.current_case_id)
+
+        # Kết nối signal cho search highlighting
+        self._setup_search_highlighting()
+
+    def _setup_search_highlighting(self):
+        """Thiết lập highlighting cho tìm kiếm"""
+        # Tạo signal handler để xử lý highlights từ background thread
+        def handle_highlights(highlights, format_obj):
+            try:
+                if not hasattr(self, 'ui') or not self._current_search_edit:
+                    return
+
+                # Sử dụng text_edit đã lưu từ search request
+                self.apply_highlights_to_edit(self._current_search_edit, highlights, format_obj)
+
+            except Exception as e:
+                print(f"Error handling highlights: {e}")
+
+        # Kết nối với SearchWorker signal
+        if not hasattr(self, '_highlights_handler'):
+            self._highlights_handler = handle_highlights
+
+    def closeEvent(self, event):
+        """Cleanup khi widget bị đóng"""
+        # Dừng tất cả search workers
+        if hasattr(self, '_search_workers'):
+            for worker in self._search_workers.values():
+                worker.stop()
+                worker.wait()
+            self._search_workers.clear()
+
+        # Dừng search timer
+        if hasattr(self, '_search_timer'):
+            self._search_timer.stop()
+
+        # Reset current search edit
+        self._current_search_edit = None
+
+        super().closeEvent(event)
     
     def showEvent(self, event):
         """Override showEvent để refresh case data khi widget được hiển thị (tương tự file_analysis)."""
@@ -237,8 +381,7 @@ class MetadataAnalysis(QWidget):
             self.db_manager.log_activity(
                 case_id=self.current_case_id,
                 action=f"METADATA_ANALYSIS_START: {file_name}",
-                tool_used="Metadata Analysis",
-                details=f"Started metadata analysis for {file_name}"
+                tool_used="Metadata Analysis"
             )
             
             self.db_manager.disconnect()
@@ -323,21 +466,22 @@ class MetadataAnalysis(QWidget):
             if embedded_times.get('modify') != '-':
                 summary += f"Modified Date: {embedded_times.get('modify')}\n"
             
-            # Add risk analysis
+            # Add risk analysis - UI element removed in new interface
             try:
-                risk_score = self.ui.riskScoreBadgeLabel.text() if hasattr(self.ui, 'riskScoreBadgeLabel') else "0"
-                summary += f"Risk Score: {risk_score}\n"
+                # risk_score = self.ui.riskScoreBadgeLabel.text() if hasattr(self.ui, 'riskScoreBadgeLabel') else "0"
+                # summary += f"Risk Score: {risk_score}\n"
+                summary += "Risk Score: N/A (UI element removed)\n"
                 
-                # Add alerts
-                alerts = []
-                try:
-                    for i in range(self.ui.alertsListWidget.count()):
-                        alerts.append(self.ui.alertsListWidget.item(i).text())
-                except:
-                    pass
-                
-                if alerts:
-                    summary += f"Alerts: {'; '.join(alerts[:3])}...\n"  # First 3 alerts
+                # Add alerts - UI element removed in new interface
+                # alerts = []
+                # try:
+                #     for i in range(self.ui.alertsListWidget.count()):
+                #         alerts.append(self.ui.alertsListWidget.item(i).text())
+                # except:
+                #     pass
+                #
+                # if alerts:
+                #     summary += f"Alerts: {'; '.join(alerts[:3])}...\n"  # First 3 alerts
             except:
                 pass
             
@@ -358,21 +502,24 @@ class MetadataAnalysis(QWidget):
             except:
                 pass
             
-            # Save analysis result
-            result_id = self.db_manager.add_analysis_result(
-                artifact_id=artifact_id,  # Link to artifact if available
-                tool_used="Metadata Analysis",
-                summary=summary,
-                result_path=None
-            )
+            # Save analysis result only if we have a valid artifact_id
+            if artifact_id:
+                result_id = self.db_manager.add_analysis_result(
+                    artifact_id=artifact_id,  # Link to artifact if available
+                    tool_used="Metadata Analysis",
+                    summary=summary,
+                    result_path=None
+                )
+            else:
+                print("No artifact_id available, skipping database save")
+                result_id = None
             
             if result_id:
                 # Log the activity
                 self.db_manager.log_activity(
                     case_id=self.current_case_id,
                     action=f"METADATA_ANALYSIS: {file_name}",
-                    tool_used="Metadata Analysis",
-                    details=f"Analyzed metadata for {file_name}, Risk Score: {risk_score if 'risk_score' in locals() else '0'}"
+                    tool_used="Metadata Analysis"
                 )
                 
                 print(f"Metadata analysis saved to database: Result ID {result_id}")
@@ -410,7 +557,7 @@ class MetadataAnalysis(QWidget):
         # Thumbnail/icon
         self._populate_thumbnail(file_path)
 
-        # File-system timestamps (store for internal use but don't display as they're not in new UI)
+        # Dấu thời gian hệ thống file (lưu để sử dụng nội bộ nhưng không hiển thị vì không có trong UI mới)
         try:
             stat = os.stat(file_path)
             created = self._format_ts(stat.st_ctime)
@@ -427,59 +574,133 @@ class MetadataAnalysis(QWidget):
         is_office = ext in {".docx", ".pptx", ".xlsx"}
         is_exe = ext in {".exe", ".dll", ".sys", ".msi"}
 
-        # All tabs are always enabled in new UI - no conditional enabling needed
+        # Tất cả các tab luôn được bật trong UI mới - không cần điều kiện bật/tắt
 
-        # Collect metadata per type (prefer ExifTool if available)
+        # Thu thập metadata kết hợp ExifTool và các thư viện chuyên biệt
         embedded_times = {"create": "-", "modify": "-", "original": "-"}
         author_text = "-"
         raw_dump_text = None
+        exif_author = "-"
 
+        # Bước 1: Luôn thử ExifTool trước để lấy metadata tổng quát
         used_exiftool = False
         if self.exiftool_path:
             try:
-                author_text, embedded_times = self._populate_from_exiftool(file_path)
-                # Raw: full exiftool textual dump
+                exif_author, embedded_times = self._populate_from_exiftool(file_path)
+                # Raw: toàn bộ dump văn bản exiftool
                 raw_dump_text = self._run_exiftool_raw_text(file_path)
                 used_exiftool = True
             except Exception:
                 used_exiftool = False
 
-        if not used_exiftool:
-            try:
-                if is_image:
+        # Bước 2: Luôn thêm metadata chuyên biệt dựa trên loại file
+        try:
+            if is_office:
+                # LUÔN trích xuất thuộc tính Office bằng python-docx
+                office_props = self._extract_office_properties(file_path)
+                if office_props:
+                    self._populate_metadata_tree_from_dict(office_props, "Office Properties")
+                    # Ưu tiên author từ thuộc tính Office
+                    author_text = office_props.get("author") or office_props.get("last_modified_by") or "-"
+                self._update_gps(None)
+                
+            elif is_pdf:
+                # LUÔN trích xuất thuộc tính PDF bằng pypdf
+                pdf_props = self._extract_pdf_properties(file_path)
+                if pdf_props:
+                    self._populate_metadata_tree_from_dict(pdf_props, "PDF Properties")
+                    # Ưu tiên author từ thuộc tính PDF
+                    author_text = pdf_props.get("Author") or pdf_props.get("Creator") or "-"
+                self._update_gps(None)
+                
+            elif is_exe:
+                # LUÔN trích xuất thông tin PE bằng pefile
+                pe_info = self._extract_pe_info(file_path)
+                if pe_info:
+                    # Chuyển đổi thông tin PE sang định dạng tree
+                    pe_tree_data = {k: v for k, v in pe_info.items() if k != "Imports"}
+                    self._populate_metadata_tree_from_dict(pe_tree_data, "PE Header")
+                    author_text = pe_info.get("Signature", "-")
+                self._update_gps(None)
+                
+            elif is_image:
+                # Đối với hình ảnh, ưu tiên thư viện chuyên biệt khi ExifTool không khả dụng
+                if not used_exiftool:
                     meta, gps, embedded_times = self._extract_image_metadata(file_path)
                     author_text = self._compose_author_device(meta)
                     self._populate_metadata_tree(meta)
                     self._update_gps(gps)
-                elif is_pdf:
-                    props = self._extract_pdf_properties(file_path)
-                    author_text = props.get("Author") or props.get("Creator") or "-"
-                    self._populate_metadata_tree_from_dict(props, "PDF Properties")
-                    self._update_gps(None)
-                elif is_office:
-                    props = self._extract_office_properties(file_path)
-                    author_text = props.get("author") or props.get("last_modified_by") or "-"
-                    self._populate_metadata_tree_from_dict(props, "Office Properties")
-                    self._update_gps(None)
-                elif is_exe:
-                    pe_info = self._extract_pe_info(file_path)
-                    author_text = pe_info.get("Signature", "-")
-                    # Convert PE info to tree format
-                    pe_tree_data = {k: v for k, v in pe_info.items() if k != "Imports"}
-                    self._populate_metadata_tree_from_dict(pe_tree_data, "PE Header")
-                    self._update_gps(None)
                 else:
-                    self._update_gps(None)
-            except Exception as e:
-                QMessageBox.warning(self, "Metadata", f"Lỗi phân tích: {str(e)}")
+                    # ExifTool đã xử lý metadata hình ảnh và GPS
+                    pass  # GPS already handled by _populate_from_exiftool
+                    
+            else:
+                # Đối với các loại file khác, chỉ dựa vào ExifTool
+                self._update_gps(None)
+                
+        except Exception as e:
+            QMessageBox.warning(self, "Metadata", f"Lỗi phân tích file chuyên biệt: {str(e)}")
 
-        # Author/device
+        # Bước 3: Fallback về author từ ExifTool nếu không tìm thấy author chuyên biệt
+        if not author_text or author_text == "-":
+            author_text = exif_author
+
+        # Tác giả/thiết bị
         self.ui.authorDeviceValueLabel.setText(author_text if author_text else "-")
 
-        # Update current file label
+        # Cập nhật ngày tạo/sửa đổi trong panel bên phải nếu có
+        try:
+            if hasattr(self.ui, 'createdValueLabel') and hasattr(self.ui, 'modifiedValueLabel'):
+                if 'created' in locals() and created != 'Unknown':
+                    self.ui.createdValueLabel.setText(created)
+                if 'modified' in locals() and modified != 'Unknown':
+                    self.ui.modifiedValueLabel.setText(modified)
+        except Exception:
+            pass
+
+        # Cập nhật widget cảnh báo với phân tích bảo mật trong quá trình xử lý
+        try:
+            if hasattr(self.ui, 'alertText') and hasattr(self.ui, 'alertTitle'):
+                self.ui.alertTitle.setText("🔍 Analyzing Security...")
+                self.ui.alertTitle.setStyleSheet("font-weight: bold; font-size: 12px; color: #ffc107;")
+                self.ui.alertText.setText("Scanning metadata for security issues...")
+                self.ui.alertText.setStyleSheet("font-size: 11px; color: #6c757d;")
+        except Exception:
+            pass
+
+        # Cập nhật nhãn file hiện tại
         self.ui.currentFileLabel.setText(f"Analyzing: {os.path.basename(file_path)}")
 
-        # Investigator insights + Raw text
+        # Xóa cảnh báo bảo mật trước đó
+        try:
+            if hasattr(self.ui, 'alertText') and hasattr(self.ui, 'alertTitle'):
+                self.ui.alertTitle.setText("🔍 Analyzing Security...")
+                self.ui.alertTitle.setStyleSheet("font-weight: bold; font-size: 12px; color: #ffc107;")
+                self.ui.alertText.setText("Scanning metadata for security issues...")
+                self.ui.alertText.setStyleSheet("font-size: 11px; color: #6c757d;")
+        except Exception:
+            pass
+
+        # Lưu metadata_dict để phân tích bảo mật sau này
+        # Thu thập metadata từ tất cả nguồn để phân tích bảo mật
+        self.current_metadata_dict = {}
+        try:
+            # Lấy metadata từ tree widget nếu có
+            if hasattr(self.ui, 'metadataTreeWidget'):
+                tree = self.ui.metadataTreeWidget
+                for i in range(tree.topLevelItemCount()):
+                    group_item = tree.topLevelItem(i)
+                    group_name = group_item.text(0)
+                    for j in range(group_item.childCount()):
+                        child_item = group_item.child(j)
+                        tag = child_item.text(1)
+                        value = child_item.text(2)
+                        if tag and value and value not in ('', '-'):
+                            self.current_metadata_dict[tag] = value  # Lưu không có prefix nhóm để phân tích bảo mật
+        except Exception:
+            self.current_metadata_dict = {}
+
+        # Thông tin chi tiết cho điều tra viên + Văn bản thô
         try:
             insights = self._generate_investigator_insights(
                 file_path=file_path,
@@ -492,7 +713,7 @@ class MetadataAnalysis(QWidget):
             if raw_dump_text:
                 combined = combined + "\n\n" + raw_dump_text
             self.ui.rawTextEdit.setPlainText(combined)
-            # GPS handling is now done via embedded map
+            # Xử lý GPS giờ được thực hiện qua bản đồ nhúng
         except Exception:
             if raw_dump_text is not None:
                 self.ui.rawTextEdit.setPlainText(raw_dump_text)
@@ -500,31 +721,50 @@ class MetadataAnalysis(QWidget):
                 if not self.ui.rawTextEdit.toPlainText():
                     self.ui.rawTextEdit.setPlainText("")
 
-        # Hex and strings
+        # Hex và strings
         self._populate_hex_and_strings(file_path)
 
         
-        # Save analysis results to database if case is selected
+        # Lưu kết quả phân tích vào cơ sở dữ liệu nếu case được chọn
         if self.current_case_id:
-            # Get artifact_id from the current selected item
+            # Lấy artifact_id từ item hiện được chọn
             try:
                 current_item = self.ui.evidenceListWidget.currentItem()
                 if current_item:
                     artifact_data = current_item.data(Qt.UserRole)
                     artifact_id = artifact_data.get('id')
-                    # Save metadata analysis results with the existing artifact ID
+                    # Lưu kết quả phân tích metadata với artifact ID hiện có
                     self.save_metadata_analysis_to_database(file_path, author_text, embedded_times, artifact_id)
             except Exception as e:
                 print(f"Error saving metadata analysis: {e}")
 
-    # ===== ExifTool integration =====
+        # Cập nhật cảnh báo bảo mật sau khi phân tích hoàn tất
+        try:
+            if hasattr(self.ui, 'alertText') and hasattr(self.ui, 'alertTitle'):
+                # Sử dụng metadata_dict đã lưu để phân tích bảo mật
+                security_issues = self._analyze_security_issues(file_path, getattr(self, 'current_metadata_dict', {}))
+
+                if security_issues:
+                    self.ui.alertTitle.setText("Security Alerts")
+                    self.ui.alertTitle.setStyleSheet("font-weight: bold; font-size: 12px; color: #dc3545;")
+                    self.ui.alertText.setText("\n".join([f"{issue}" for issue in security_issues]))
+                    self.ui.alertText.setStyleSheet("font-size: 11px; color: #dc3545; font-weight: bold;")
+                else:
+                    self.ui.alertTitle.setText("No Security Issues")
+                    self.ui.alertTitle.setStyleSheet("font-weight: bold; font-size: 12px; color: #28a745;")
+                    self.ui.alertText.setText("No suspicious metadata patterns detected")
+                    self.ui.alertText.setStyleSheet("font-size: 11px; color: #6c757d;")
+        except Exception as e:
+            print(f"Error updating security alerts: {e}")
+
+    # ===== Tích hợp ExifTool =====
     def _find_exiftool(self) -> str:
         try:
-            # 1) Environment override
+            # 1) Ghi đè từ biến môi trường
             env_path = os.environ.get("EXIFTOOL_PATH")
             if env_path and os.path.exists(env_path):
                 return env_path
-            # 2) Look under Windows_forensic/tools/exiftool (two-level up)
+            # 2) Tìm trong Windows_forensic/tools/exiftool (lên hai cấp)
             here = os.path.dirname(__file__)  # .../Windows_forensic/pages_functions/analysis
             base_ws = os.path.abspath(os.path.join(here, "..", ".."))  # .../Windows_forensic
             tools_dir_ws = os.path.join(base_ws, "tools", "exiftool")
@@ -539,7 +779,7 @@ class MetadataAnalysis(QWidget):
                 for name in os.listdir(tools_dir_ws):
                     if name.lower().startswith("exiftool") and name.lower().endswith(".exe"):
                         return os.path.join(tools_dir_ws, name)
-            # 3) Fallback: DoAn/tools/exiftool (three-level up)
+            # 3) Fallback: DoAn/tools/exiftool (lên ba cấp)
             base_doan = os.path.abspath(os.path.join(here, "..", "..", ".."))  # .../DoAn
             tools_dir_doan = os.path.join(base_doan, "tools", "exiftool")
             candidates = [
@@ -560,7 +800,7 @@ class MetadataAnalysis(QWidget):
     def _run_exiftool_json(self, file_path: str) -> dict:
         if not self.exiftool_path:
             raise RuntimeError("ExifTool not found")
-        # Default deep but silent config
+        # Cấu hình mặc định sâu nhưng im lặng
         args = ["-j", "-G1", "-n", "-a", "-u", "-U", "-ee3", "-api", "RequestAll=3"]
         cmd = [self.exiftool_path] + args + [file_path]
         proc = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8", errors="replace")
@@ -579,7 +819,7 @@ class MetadataAnalysis(QWidget):
         proc = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8", errors="replace")
         if proc.returncode != 0:
             return proc.stderr.strip()
-        # Remove explicit tool name hints to keep engine transparent
+        # Loại bỏ gợi ý tên công cụ rõ ràng để giữ engine trong suốt
         out = proc.stdout
         try:
             out = out.replace("exiftool", "engine").replace("ExifTool", "Engine")
@@ -592,8 +832,8 @@ class MetadataAnalysis(QWidget):
         self._last_exiftool_tags = dict(tags) if isinstance(tags, dict) else None
 
         # GPS
-        gps_lat = self._first_present(tags, ["GPS:GPSLatitude", "Composite:GPSLatitude"])  # numeric with -n
-        gps_lon = self._first_present(tags, ["GPS:GPSLongitude", "Composite:GPSLongitude"])  # numeric with -n
+        gps_lat = self._first_present(tags, ["GPS:GPSLatitude", "Composite:GPSLatitude"])  # số với -n
+        gps_lon = self._first_present(tags, ["GPS:GPSLongitude", "Composite:GPSLongitude"])  # số với -n
         gps = None
         try:
             if gps_lat is not None and gps_lon is not None:
@@ -604,7 +844,7 @@ class MetadataAnalysis(QWidget):
             gps = None
         self._update_gps(gps)
 
-        # Embedded times (prefer EXIF, else QuickTime, else XMP/PDF)
+        # Thời gian nhúng (ưu tiên EXIF, sau đó QuickTime, XMP/PDF)
         emb_original = self._first_present(tags, [
             "EXIF:DateTimeOriginal", "QuickTime:CreateDate", "XMP:DateTimeOriginal", "XMP:CreateDate", "PDF:CreateDate"
         ])
@@ -619,9 +859,9 @@ class MetadataAnalysis(QWidget):
             "create": self._normalize_exif_datetime(str(emb_create)) if emb_create else "-",
             "modify": self._normalize_exif_datetime(str(emb_modify)) if emb_modify else "-",
         }
-        # Embedded times are now handled within the metadata tree structure
+        # Thời gian nhúng giờ được xử lý trong cấu trúc cây metadata
 
-        # Author/Device
+        # Tác giả/Thiết bị
         creator = self._first_present(tags, [
             "XMP-dc:Creator", "XMP:Creator", "EXIF:Artist", "IFD0:Artist", "XMP:Author"
         ])
@@ -638,10 +878,10 @@ class MetadataAnalysis(QWidget):
             author_text = f"{make} {model}".strip()
         self.ui.authorDeviceValueLabel.setText(author_text if author_text else "-")
 
-        # Metadata tree grouped by families
+        # Cây metadata được nhóm theo gia đình
         self._populate_metadata_tree_exiftool(tags)
 
-        # Document props are now included in the main metadata tree
+        # Thuộc tính tài liệu giờ được bao gồm trong cây metadata chính
 
         return author_text, embedded_times
 
@@ -655,7 +895,7 @@ class MetadataAnalysis(QWidget):
                     group, tag = "Other", k
                 else:
                     group, tag = k.split(":", 1)
-                # Skip some very noisy groups if desired
+                # Bỏ qua một số nhóm ồn ào nếu muốn
                 # if group in {"File"}: continue
                 if group not in group_to_node:
                     node = QTreeWidgetItem([group, "", ""])
@@ -684,39 +924,41 @@ class MetadataAnalysis(QWidget):
         return None
     
     def _populate_metadata_tree_from_dict(self, data: dict, group_name: str) -> None:
-        """Populate metadata tree from a dictionary of properties"""
+        """Điền cây metadata từ dictionary thuộc tính"""
         try:
             tree = self.ui.metadataTreeWidget
-            
-            # Create or find the group node
+
+            # Tạo hoặc tìm node nhóm
             group_node = None
             for i in range(tree.topLevelItemCount()):
                 item = tree.topLevelItem(i)
                 if item.text(0) == group_name:
                     group_node = item
                     break
-            
+
             if group_node is None:
                 group_node = QTreeWidgetItem([group_name, "", ""])
                 tree.addTopLevelItem(group_node)
-            
-            # Add properties to the group
+
+            # Thêm thuộc tính vào nhóm
             for key, value in data.items():
                 if value not in (None, "", "-"):
                     child = QTreeWidgetItem(["", str(key), str(value)])
                     group_node.addChild(child)
-            
+
             tree.expandAll()
-        except Exception:
-            pass
+        except Exception as e:
+            print(f"Error in _populate_metadata_tree_from_dict: {e}")
+            import traceback
+            traceback.print_exc()
     
     def _populate_metadata_tree(self, meta: dict) -> None:
-        """Populate metadata tree from image metadata"""
+        """Điền cây metadata từ metadata hình ảnh"""
         try:
             tree = self.ui.metadataTreeWidget
             tree.clear()
             
-            # Group metadata by categories
+            # Nhóm metadata theo danh mục
             groups = {
                 "Image": [
                     "Image Make", "Image Model", "Image Orientation", "Image XResolution", "Image YResolution",
@@ -749,7 +991,7 @@ class MetadataAnalysis(QWidget):
                         group_item.addChild(QTreeWidgetItem(["", key, value]))
                         added_keys.add(key)
 
-            # Add remaining metadata to "Others" group
+            # Thêm metadata còn lại vào nhóm "Others"
             others = QTreeWidgetItem(["Others", "", ""])
             has_others = False
             for k, v in meta.items():
@@ -764,19 +1006,19 @@ class MetadataAnalysis(QWidget):
         except Exception:
             pass
 
-    # ===== Investigator insights =====
+    # ===== Thông tin chi tiết cho điều tra viên =====
     def _generate_investigator_insights(self, file_path: str, fs_created: str, embedded_original: str, author_text: str, tags: dict | None) -> str:
         hints = []
         score = 0
 
-        # Hashes
+        # Mã băm
         try:
             md5, sha1, sha256 = self._compute_hashes(file_path)
             hints.append(f"Hashes: MD5={md5} | SHA1={sha1} | SHA256={sha256}")
         except Exception:
             pass
 
-        # Time discrepancy (already flagged visually)
+        # Sự khác biệt thời gian (đã được đánh dấu trực quan)
         try:
             def parse(dt):
                 try:
@@ -793,7 +1035,7 @@ class MetadataAnalysis(QWidget):
         except Exception:
             pass
 
-        # Editing software indicator
+        # Chỉ báo phần mềm chỉnh sửa
         try:
             software = None
             if tags:
@@ -810,11 +1052,11 @@ class MetadataAnalysis(QWidget):
         except Exception:
             pass
 
-        # Missing metadata in images (possible stripping)
+        # Metadata thiếu trong hình ảnh (có thể bị xóa)
         try:
             ext = os.path.splitext(file_path.lower())[1]
             if ext in (".jpg", ".jpeg", ".png", ".tif", ".tiff", ".webp") and tags is not None:
-                # Count EXIF groups
+                # Đếm nhóm EXIF
                 exif_keys = [k for k in tags.keys() if k.startswith("EXIF:") or k.startswith("IFD0:")]
                 if len(exif_keys) < 3:
                     score += 1
@@ -822,11 +1064,11 @@ class MetadataAnalysis(QWidget):
         except Exception:
             pass
 
-        # Author/Device context
+        # Ngữ cảnh tác giả/thiết bị
         if author_text and author_text != "-":
             hints.append(f"Author/Device: {author_text}")
 
-        # GPS context + map link
+        # Ngữ cảnh GPS + liên kết bản đồ
         try:
             lat = lon = None
             if tags and "GPS:GPSLatitude" in tags and "GPS:GPSLongitude" in tags:
@@ -838,9 +1080,9 @@ class MetadataAnalysis(QWidget):
         except Exception:
             pass
 
-        # Risk analysis is simplified in new UI - just include in raw text
+        # Phân tích rủi ro được đơn giản hóa trong UI mới - chỉ bao gồm trong văn bản thô
 
-        # Summary score in text
+        # Điểm tổng kết trong văn bản
         hints_text = [f"Risk Score (heuristic): {score}"] + hints
         preface = "=== Investigator Insights ===\n" + "\n".join(f"- {h}" for h in hints_text)
         return preface
@@ -860,14 +1102,11 @@ class MetadataAnalysis(QWidget):
                 sha256.update(chunk)
         return md5.hexdigest(), sha1.hexdigest(), sha256.hexdigest()
 
-    # ===== Build ExifTool flags from UI toggles =====
-    def _build_exiftool_flags(self, base_flags: list) -> list:
-        # Simplified: always deep and inclusive, no UI toggles
-        return list(base_flags) + ["-a", "-u", "-U", "-ee3", "-api", "RequestAll=3"]
+    # _build_exiftool_flags function removed - flags are now hardcoded in individual methods
 
-    # ===== UI helpers - simplified for new interface =====
+    # ===== Trợ giúp UI - đơn giản hóa cho giao diện mới =====
 
-    # ===== Reset UI =====
+    # ===== Đặt lại UI =====
     def _clear_all(self) -> None:
         try:
             self.ui.thumbnailLabel.setPixmap(QPixmap())
@@ -896,8 +1135,9 @@ class MetadataAnalysis(QWidget):
         except Exception:
             pass
 
-    # ===== Quick summary helpers =====
+    # ===== Trợ giúp tóm tắt nhanh =====
     def _populate_thumbnail(self, file_path: str) -> None:
+        """Điền thumbnail từ hình ảnh"""
         try:
             pix = QPixmap(file_path)
             if not pix.isNull():
@@ -910,27 +1150,28 @@ class MetadataAnalysis(QWidget):
             self.ui.thumbnailLabel.setText("Thumbnail / Preview")
 
     def _update_gps(self, gps: dict) -> None:
+        """Cập nhật thông tin GPS"""
         try:
             if gps and isinstance(gps, dict) and 'lat' in gps and 'lng' in gps:
                 lat, lng = gps['lat'], gps['lng']
-                # Update embedded map
+                # Cập nhật bản đồ nhúng
                 self._update_embedded_map(lat, lng)
-                # Update location label
+                # Cập nhật nhãn vị trí
                 self.ui.currentLocationLabel.setText(f"{lat:.6f}, {lng:.6f}")
                 self.ui.currentLocationLabel.setStyleSheet("QLabel { color: #28a745; font-weight: bold; }")
-                # GPS data available - enable refresh map functionality
+                # Dữ liệu GPS có sẵn - bật chức năng làm mới bản đồ
             else:
-                # No GPS data
-                self.ui.currentLocationLabel.setText("No GPS data available")
+                # Không có dữ liệu GPS
+                self.ui.currentLocationLabel.setText("Không có dữ liệu GPS")
                 self.ui.currentLocationLabel.setStyleSheet("QLabel { color: #6c757d; font-style: italic; }")
-                # Reset map to default
+                # Đặt lại bản đồ về mặc định
                 self._reset_embedded_map()
         except Exception:
             pass
 
-    # Discrepancy warning is no longer in new UI - handled in insights text
+    # Cảnh báo khác biệt không còn trong UI mới - được xử lý trong văn bản thông tin chi tiết
 
-    # ===== Data extraction =====
+    # ===== Trích xuất dữ liệu =====
     def _extract_image_metadata(self, file_path: str):
         meta = {}
         gps = None
@@ -954,7 +1195,7 @@ class MetadataAnalysis(QWidget):
         except Exception:
             pass
 
-        # Pillow fallback
+        # Dự phòng Pillow
         try:
             from PIL import Image  # type: ignore
             from PIL.ExifTags import TAGS, GPSTAGS  # type: ignore
@@ -999,14 +1240,112 @@ class MetadataAnalysis(QWidget):
             pass
         return props
 
+    def _analyze_security_issues(self, file_path: str, metadata_dict: dict) -> list:
+        """Phân tích metadata để tìm các vấn đề bảo mật có thể chỉ ra hoạt động độc hại"""
+        issues = []
+
+        try:
+            # Kiểm tra phần mở rộng file đáng ngờ trong metadata
+            file_name = os.path.basename(file_path).lower()
+
+            # Kiểm tra phần mở rộng kép (có thể là malware)
+            if file_name.count('.') > 1:
+                parts = file_name.split('.')
+                if len(parts) >= 3 and parts[-2] + '.' + parts[-1] != 'docx':  # Cho phép phần mở rộng kép bình thường như .tar.gz, .docx
+                    issues.append(f"Double file extension detected: {'.'.join(parts[-2:])}")
+
+            # Kiểm tra tên tác giả đáng ngờ
+            author_keys = ['Author', 'Creator', 'LastModifiedBy', 'LastSavedBy', 'Company', 'Manager']
+            for key in author_keys:
+                if key in metadata_dict and metadata_dict[key]:
+                    author = str(metadata_dict[key]).lower()
+                    suspicious_authors = ['unknown', 'user', 'admin', 'administrator', 'system', 'root', 'test']
+                    if author in suspicious_authors:
+                        issues.append(f"Suspicious author name: {metadata_dict[key]}")
+
+            # Kiểm tra sửa đổi gần đây nhưng ngày tạo cũ (có thể bị giả mạo)
+            created_keys = ['CreateDate', 'CreationDate', 'DateCreated']
+            modified_keys = ['ModifyDate', 'LastModified', 'DateModified']
+            created_val = None
+            modified_val = None
+
+            for key in created_keys:
+                if key in metadata_dict and metadata_dict[key] and metadata_dict[key] != '-':
+                    created_val = metadata_dict[key]
+                    break
+
+            for key in modified_keys:
+                if key in metadata_dict and metadata_dict[key] and metadata_dict[key] != '-':
+                    modified_val = metadata_dict[key]
+                    break
+
+            if created_val and modified_val:
+                try:
+                    # Simple check if modified is much newer than created
+                    if '2025' in modified_val and '2010' in created_val:
+                        issues.append("File recently modified but claims old creation date")
+                except:
+                    pass
+
+            # Kiểm tra script hoặc macro nhúng trong file Office
+            if file_path.lower().endswith(('.docx', '.xlsx', '.pptx', '.doc', '.xls', '.ppt')):
+                macro_keys = ['Macro', 'VBA', 'EmbeddedScript', 'Script']
+                for key in macro_keys:
+                    if key in metadata_dict and metadata_dict[key]:
+                        issues.append("Embedded macros/VBA detected in Office document")
+                        break
+
+            # Kiểm tra kích thước file đáng ngờ
+            try:
+                file_size = os.path.getsize(file_path)
+                if file_size == 0:
+                    issues.append("Empty file detected")
+                elif file_size > 100 * 1024 * 1024:  # 100MB
+                    issues.append(f"Large file size: {file_size / (1024*1024):.1f} MB")
+            except:
+                pass
+
+            # Kiểm tra công cụ tạo file đáng ngờ    
+            software_keys = ['Software', 'Producer', 'CreatorTool', 'Generator']
+            for key in software_keys:
+                if key in metadata_dict and metadata_dict[key]:
+                    software = str(metadata_dict[key]).lower()
+                    suspicious_software = ['malware', 'virus', 'trojan', 'hack', 'exploit', 'suspicious']
+                    for sw in suspicious_software:
+                        if sw in software:
+                            issues.append(f"Suspicious software detected: {metadata_dict[key]}")
+                            break
+
+            # Kiểm tra file ẩn
+            if os.path.basename(file_path).startswith('.'):
+                issues.append("Hidden file detected (starts with '.')")
+
+            # Kiểm tra nội dung thực thi trong file không phải thực thi
+            if not file_path.lower().endswith(('.exe', '.dll', '.com', '.bat', '.cmd', '.scr', '.msi')):
+                try:
+                    with open(file_path, 'rb') as f:
+                        content = f.read(1024)  # Đọc 1KB đầu tiên
+                        if b'MZ' in content or b'PK\x03\x04' in content:  # Header MZ hoặc ZIP
+                            issues.append("Executable or archive content detected in non-executable file")
+                except:
+                    pass
+
+        except Exception as e:
+            issues.append(f"Error during security analysis: {str(e)}")
+
+        return issues
+
     def _extract_office_properties(self, file_path: str) -> dict:
+        """Trích xuất thuộc tính Office từ file"""
         props = {}
         try:
             from docx import Document  # type: ignore
 
             doc = Document(file_path)
             core = doc.core_properties
-            props.update({
+
+            # Danh sách thuộc tính có sẵn trong python-docx
+            available_props = {
                 "title": core.title,
                 "subject": core.subject,
                 "author": core.author,
@@ -1021,14 +1360,18 @@ class MetadataAnalysis(QWidget):
                 "identifier": core.identifier,
                 "language": core.language,
                 "version": core.version,
-                "description": core.description,
-                "company": getattr(core, "company", ""),
-            })
-        except Exception:
-            pass
-        return {k: v for k, v in props.items() if v not in (None, "")}
+            }
+
+            # Lọc bỏ các giá trị None và rỗng
+            props = {k: v for k, v in available_props.items() if v not in (None, "")}
+
+        except Exception as e:
+            print(f"Error extracting Office properties: {e}")
+
+        return props
 
     def _extract_pe_info(self, file_path: str) -> dict:
+        """Trích xuất thông tin PE từ file thực thi"""
         info = {}
         try:
             import pefile  # type: ignore
@@ -1070,7 +1413,7 @@ class MetadataAnalysis(QWidget):
             pass
         return info
 
-    # ===== Populate widgets - removed old table methods, using tree now =====
+    # ===== Điền widget - loại bỏ các phương thức bảng cũ, sử dụng cây =====
 
     def _populate_hex_and_strings(self, file_path: str, max_bytes: int = 1024 * 1024) -> None:
         try:
@@ -1089,37 +1432,182 @@ class MetadataAnalysis(QWidget):
         except Exception:
             pass
 
-    # ===== Search/filter =====
+    # ===== Tìm kiếm/lọc =====
     def filter_metadata_tree(self, text: str) -> None:
         try:
             pattern = (text or "").strip().lower()
             tree = self.ui.metadataTreeWidget
             for i in range(tree.topLevelItemCount()):
                 top = tree.topLevelItem(i)
-                self._filter_tree_item(top, pattern)
+                self._filter_tree_item(top, pattern, text)
         except Exception:
             pass
 
-    def _filter_tree_item(self, item: QTreeWidgetItem, pattern: str) -> bool:
+    def _filter_tree_item(self, item: QTreeWidgetItem, pattern: str, search_text: str = "") -> bool:
         if not pattern:
             item.setHidden(False)
             for i in range(item.childCount()):
-                self._filter_tree_item(item.child(i), pattern)
+                self._filter_tree_item(item.child(i), pattern, search_text)
             return True
+
         text = (item.text(0) + " " + item.text(1) + " " + item.text(2)).lower()
         matched = pattern in text
         child_match = False
         for i in range(item.childCount()):
-            if self._filter_tree_item(item.child(i), pattern):
+            if self._filter_tree_item(item.child(i), pattern, search_text):
                 child_match = True
+
         item.setHidden(not (matched or child_match))
+
+        # Làm nổi bật văn bản khớp
+        if search_text and matched:
+            # Điều này sẽ yêu cầu implementation phức tạp hơn với QTextDocument
+            # Hiện tại, chỉ đánh dấu item
+            pass
+
         return matched or child_match
 
-    # ===== Utilities =====
-    def _new_table_item(self, text: str) -> QTableWidgetItem:
-        item = QTableWidgetItem(text)
-        item.setFlags(item.flags() ^ Qt.ItemIsEditable)
-        return item
+    def filter_text_content(self, text_edit, search_text: str) -> None:
+        """Lọc và làm nổi bật nội dung văn bản trong QPlainTextEdit - tối ưu hiệu suất"""
+        try:
+            if not search_text:
+                # Xóa highlighting khi không có search text
+                self._clear_text_highlighting(text_edit)
+                return
+
+            # Sử dụng QTimer để tìm kiếm bất đồng bộ để tránh UI freeze
+            if not hasattr(self, '_search_timer'):
+                self._search_timer = QTimer()
+                self._search_timer.setSingleShot(True)
+                self._search_timer.timeout.connect(lambda: self._perform_text_search(text_edit, search_text))
+
+            # Delay search để tránh spam khi user typing
+            self._search_timer.start(100)  # 100ms delay
+
+        except Exception as e:
+            print(f"Error filtering text content: {e}")
+
+    def filter_text_content_immediate(self, text_edit, search_text: str) -> None:
+        """Tìm kiếm ngay lập tức trong visible area - cho hiệu suất cao nhất"""
+        try:
+            if not search_text:
+                self._clear_text_highlighting(text_edit)
+                return
+
+            # Sử dụng thread riêng để tìm kiếm không đồng bộ
+            if not hasattr(self, '_search_workers'):
+                self._search_workers = {}
+
+            # Tạo unique key cho text_edit
+            edit_key = id(text_edit)
+
+            # Dừng thread cũ nếu đang chạy
+            if edit_key in self._search_workers:
+                self._search_workers[edit_key].stop()
+                self._search_workers[edit_key].wait()
+
+            # Lưu text_edit hiện tại đang search
+            self._current_search_edit = text_edit
+
+            # Tạo thread mới
+            worker = SearchWorker(text_edit, search_text)
+            worker.finished.connect(lambda: self._on_search_finished(edit_key))
+            worker.error.connect(lambda msg: print(f"Search error: {msg}"))
+            worker.highlights_ready.connect(self._highlights_handler)
+            self._search_workers[edit_key] = worker
+            worker.start()
+
+        except Exception as e:
+            print(f"Error in immediate text search: {e}")
+
+    def _on_search_finished(self, edit_key: int) -> None:
+        """Callback khi tìm kiếm hoàn thành"""
+        if edit_key in self._search_workers:
+            del self._search_workers[edit_key]
+
+    def _clear_text_highlighting(self, text_edit) -> None:
+        """Xóa tất cả highlighting trong text edit"""
+        try:
+            cursor = text_edit.textCursor()
+            cursor.select(cursor.Document)
+            # Chỉ reset format mà không thay đổi text
+            normal_format = cursor.charFormat()
+            cursor.setCharFormat(normal_format)
+            cursor.clearSelection()
+            text_edit.setTextCursor(cursor)
+
+            # Reset current search edit nếu là text_edit này
+            if hasattr(self, '_current_search_edit') and self._current_search_edit == text_edit:
+                self._current_search_edit = None
+        except Exception:
+            pass
+
+    def apply_highlights_to_edit(self, text_edit, highlights, format_obj):
+        """Apply highlights to specific text edit - chạy trong main thread"""
+        try:
+            self._clear_text_highlighting(text_edit)
+
+            if highlights:
+                cursor = text_edit.textCursor()
+                for start_pos, length in highlights:
+                    cursor.setPosition(start_pos)
+                    cursor.setPosition(start_pos + length, cursor.KeepAnchor)
+                    cursor.setCharFormat(format_obj)
+
+        except Exception as e:
+            print(f"Error applying highlights to {text_edit.objectName() if hasattr(text_edit, 'objectName') else 'text_edit'}: {e}")
+
+    def _perform_text_search(self, text_edit, search_text: str) -> None:
+        """Thực hiện tìm kiếm và highlight - tối ưu hiệu suất"""
+        try:
+            # Kiểm tra search text vẫn còn hợp lệ
+            if not search_text or not hasattr(self, 'ui'):
+                return
+
+            content = text_edit.toPlainText()
+            if not content:
+                return
+
+            # Xóa highlighting trước đó một cách hiệu quả
+            self._clear_text_highlighting(text_edit)
+
+            # Tối ưu hóa: giới hạn số lượng highlights để tránh lag
+            max_highlights = 1000
+            highlight_count = 0
+
+            # Tìm và làm nổi bật văn bản tìm kiếm
+            from PyQt5.QtGui import QTextCharFormat, QBrush, QColor
+            from PyQt5.QtCore import Qt
+
+            format = QTextCharFormat()
+            format.setBackground(QBrush(QColor("#ffff00")))  # Làm nổi bật màu vàng
+            format.setForeground(QBrush(QColor("#000000")))  # Văn bản màu đen
+
+            # Tìm tất cả các lần xuất hiện với giới hạn
+            search_lower = search_text.lower()
+            content_lower = content.lower()
+            index = content_lower.find(search_lower)
+
+            cursor = text_edit.textCursor()
+            while index != -1 and highlight_count < max_highlights:
+                # Set format cho occurrence này
+                cursor.setPosition(index)
+                cursor.setPosition(index + len(search_text), cursor.KeepAnchor)
+                cursor.setCharFormat(format)
+
+                # Tìm occurrence tiếp theo
+                index = content_lower.find(search_lower, index + 1)
+                highlight_count += 1
+
+            # Hiển thị thông tin về số lượng highlights
+            if highlight_count >= max_highlights:
+                print(f"Đã đạt giới hạn {max_highlights} highlights, có thể có thêm kết quả")
+
+        except Exception as e:
+            print(f"Error performing text search: {e}")
+
+    # ===== Tiện ích =====
+    # Hàm _new_table_item đã bị xóa - các phương thức bảng cũ không còn sử dụng trong UI dựa trên cây
 
     def _format_size(self, size_bytes: int) -> str:
         units = ["B", "KB", "MB", "GB", "TB"]
@@ -1237,7 +1725,7 @@ class MetadataAnalysis(QWidget):
         except Exception:
             return None
 
-    # ===== Compare/pin =====
+    # ===== So sánh/ghim =====
 
     def _generate_hex_view(self, data: bytes, width: int = 16) -> str:
         try:
@@ -1260,11 +1748,11 @@ class MetadataAnalysis(QWidget):
         except Exception:
             return []
 
-    # ===== Embedded Map Methods =====
+    # ===== Phương thức bản đồ nhúng =====
     def _update_embedded_map(self, lat: float, lng: float) -> None:
-        """Update embedded Google Maps to show GPS location"""
+        """Cập nhật bản đồ Google Maps nhúng để hiển thị vị trí GPS"""
         try:
-            # Create Google Maps URL with marker and better zoom
+            # Tạo URL Google Maps với marker và zoom tốt hơn
             maps_url = f"https://maps.google.com/maps?q={lat},{lng}&ll={lat},{lng}&z=16&t=h"
             self.ui.mapView.setUrl(QUrl(maps_url))
             print(f"Map updated with coordinates: {lat}, {lng}")
@@ -1273,7 +1761,7 @@ class MetadataAnalysis(QWidget):
             pass
 
     def _reset_embedded_map(self) -> None:
-        """Reset embedded map to default view"""
+        """Đặt lại bản đồ nhúng về chế độ xem mặc định"""
         try:
             self.ui.mapView.setUrl(QUrl("https://maps.google.com"))
         except Exception:
@@ -1281,7 +1769,7 @@ class MetadataAnalysis(QWidget):
 
 
     def refresh_map_location(self) -> None:
-        """Refresh map with current GPS data"""
+        """Làm mới bản đồ với dữ liệu GPS hiện tại"""
         try:
             if hasattr(self, '_last_exiftool_tags') and self._last_exiftool_tags:
                 lat = self._last_exiftool_tags.get("GPS:GPSLatitude")
@@ -1295,5 +1783,3 @@ class MetadataAnalysis(QWidget):
                 QMessageBox.information(self, "Map", "Please analyze a file with GPS data first.")
         except Exception:
             QMessageBox.warning(self, "Map", "Error refreshing map.")
-
-

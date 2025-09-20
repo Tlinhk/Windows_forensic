@@ -205,6 +205,45 @@
            </property>
           </widget>
          </item>
+         <item>
+          <layout class="QVBoxLayout" name="alertLayout">
+           <property name="leftMargin">
+            <number>15</number>
+           </property>
+           <property name="topMargin">
+            <number>15</number>
+           </property>
+           <property name="rightMargin">
+            <number>15</number>
+           </property>
+           <property name="bottomMargin">
+            <number>15</number>
+           </property>
+           <item>
+            <widget class="QLabel" name="alertTitle">
+             <property name="styleSheet">
+              <string>font-weight: bold; font-size: 12px; color: #dc3545;</string>
+             </property>
+             <property name="text">
+              <string>🚨 Security Alerts</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="alertText">
+             <property name="styleSheet">
+              <string>font-size: 11px; color: #6c757d;</string>
+             </property>
+             <property name="text">
+              <string>No security issues detected</string>
+             </property>
+             <property name="wordWrap">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
         </layout>
        </item>
        <item>
@@ -212,78 +251,134 @@
          <property name="title">
           <string>Basic Information</string>
          </property>
-         <layout class="QVBoxLayout" name="basicInfoLayout">
+         <layout class="QHBoxLayout" name="basicInfoSplitterLayout">
           <item>
-           <layout class="QFormLayout" name="basicInfoFormLayout">
-            <item row="0" column="0">
-             <widget class="QLabel" name="labelFileName">
-              <property name="text">
-               <string>File Name:</string>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="1">
-             <widget class="QLabel" name="fileNameValueLabel">
-              <property name="text">
-               <string>-</string>
-              </property>
-              <property name="textInteractionFlags">
-               <set>Qt::TextSelectableByMouse</set>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="0">
-             <widget class="QLabel" name="labelFileSize">
-              <property name="text">
-               <string>File Size:</string>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="1">
-             <widget class="QLabel" name="fileSizeValueLabel">
-              <property name="text">
-               <string>-</string>
-              </property>
-              <property name="textInteractionFlags">
-               <set>Qt::TextSelectableByMouse</set>
-              </property>
-             </widget>
-            </item>
-            <item row="2" column="0">
-             <widget class="QLabel" name="labelFileType">
-              <property name="text">
-               <string>File Type:</string>
-              </property>
-             </widget>
-            </item>
-            <item row="2" column="1">
-             <widget class="QLabel" name="fileTypeValueLabel">
-              <property name="text">
-               <string>-</string>
-              </property>
-              <property name="textInteractionFlags">
-               <set>Qt::TextSelectableByMouse</set>
-              </property>
-             </widget>
-            </item>
-            <item row="3" column="0">
-             <widget class="QLabel" name="labelAuthorDevice">
-              <property name="text">
-               <string>Author/Device:</string>
-              </property>
-             </widget>
-            </item>
-            <item row="3" column="1">
-             <widget class="QLabel" name="authorDeviceValueLabel">
-              <property name="text">
-               <string>-</string>
-              </property>
-              <property name="textInteractionFlags">
-               <set>Qt::TextSelectableByMouse</set>
-              </property>
-             </widget>
-            </item>
-           </layout>
+           <widget class="QGroupBox" name="basicInfoLeftGroup">
+            <property name="title">
+             <string>File Details</string>
+            </property>
+            <layout class="QVBoxLayout" name="basicInfoLeftLayout">
+             <item>
+              <layout class="QFormLayout" name="basicInfoLeftFormLayout">
+               <item row="0" column="0">
+                <widget class="QLabel" name="labelFileName">
+                 <property name="text">
+                  <string>File Name:</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="1">
+                <widget class="QLabel" name="fileNameValueLabel">
+                 <property name="text">
+                  <string>-</string>
+                 </property>
+                 <property name="textInteractionFlags">
+                  <set>Qt::TextSelectableByMouse</set>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="0">
+                <widget class="QLabel" name="labelFileSize">
+                 <property name="text">
+                  <string>File Size:</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="1">
+                <widget class="QLabel" name="fileSizeValueLabel">
+                 <property name="text">
+                  <string>-</string>
+                 </property>
+                 <property name="textInteractionFlags">
+                  <set>Qt::TextSelectableByMouse</set>
+                 </property>
+                </widget>
+               </item>
+               <item row="2" column="0">
+                <widget class="QLabel" name="labelFileType">
+                 <property name="text">
+                  <string>File Type:</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="2" column="1">
+                <widget class="QLabel" name="fileTypeValueLabel">
+                 <property name="text">
+                  <string>-</string>
+                 </property>
+                 <property name="textInteractionFlags">
+                  <set>Qt::TextSelectableByMouse</set>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item>
+           <widget class="QGroupBox" name="basicInfoRightGroup">
+            <property name="title">
+             <string>Metadata Info</string>
+            </property>
+            <layout class="QVBoxLayout" name="basicInfoRightLayout">
+             <item>
+              <layout class="QFormLayout" name="basicInfoRightFormLayout">
+               <item row="0" column="0">
+                <widget class="QLabel" name="labelAuthorDevice">
+                 <property name="text">
+                  <string>Author/Device:</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="1">
+                <widget class="QLabel" name="authorDeviceValueLabel">
+                 <property name="text">
+                  <string>-</string>
+                 </property>
+                 <property name="textInteractionFlags">
+                  <set>Qt::TextSelectableByMouse</set>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="0">
+                <widget class="QLabel" name="labelCreated">
+                 <property name="text">
+                  <string>Created:</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="1">
+                <widget class="QLabel" name="createdValueLabel">
+                 <property name="text">
+                  <string>-</string>
+                 </property>
+                 <property name="textInteractionFlags">
+                  <set>Qt::TextSelectableByMouse</set>
+                 </property>
+                </widget>
+               </item>
+               <item row="2" column="0">
+                <widget class="QLabel" name="labelModified">
+                 <property name="text">
+                  <string>Modified:</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="2" column="1">
+                <widget class="QLabel" name="modifiedValueLabel">
+                 <property name="text">
+                  <string>-</string>
+                 </property>
+                 <property name="textInteractionFlags">
+                  <set>Qt::TextSelectableByMouse</set>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+            </layout>
+           </widget>
           </item>
          </layout>
         </widget>
@@ -372,6 +467,37 @@
           </attribute>
           <layout class="QVBoxLayout" name="rawLayout">
            <item>
+            <layout class="QHBoxLayout" name="rawSearchLayout">
+             <item>
+              <widget class="QLabel" name="rawSearchLabel">
+               <property name="text">
+                <string>Search Raw:</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLineEdit" name="rawSearchLineEdit">
+               <property name="placeholderText">
+                <string>Search in raw data...</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <spacer name="rawSearchSpacer">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>20</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
+           </item>
+           <item>
             <widget class="QPlainTextEdit" name="rawTextEdit">
              <property name="font">
               <font>
@@ -392,6 +518,37 @@
           </attribute>
           <layout class="QVBoxLayout" name="hexLayout">
            <item>
+            <layout class="QHBoxLayout" name="hexSearchLayout">
+             <item>
+              <widget class="QLabel" name="hexSearchLabel">
+               <property name="text">
+                <string>Search Hex:</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLineEdit" name="hexSearchLineEdit">
+               <property name="placeholderText">
+                <string>Search in hex data...</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <spacer name="hexSearchSpacer">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>20</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
+           </item>
+           <item>
             <widget class="QPlainTextEdit" name="hexTextEdit">
              <property name="font">
               <font>
@@ -411,6 +568,37 @@
            <string>Strings</string>
           </attribute>
           <layout class="QVBoxLayout" name="stringsLayout">
+           <item>
+            <layout class="QHBoxLayout" name="stringsSearchLayout">
+             <item>
+              <widget class="QLabel" name="stringsSearchLabel">
+               <property name="text">
+                <string>Search Strings:</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLineEdit" name="stringsSearchLineEdit">
+               <property name="placeholderText">
+                <string>Search in strings...</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <spacer name="stringsSearchSpacer">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>20</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
+           </item>
            <item>
             <widget class="QPlainTextEdit" name="stringsTextEdit">
              <property name="font">
