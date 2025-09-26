@@ -1055,17 +1055,21 @@ class FileAnalysis(QWidget):
             if hasattr(self.ui, 'textHexView'):
                 self.ui.textHexView.setText("Empty file")
         else:
+            # File has content - extract and display
             try:
-                content = self.extract_file_content_safe(file_info)
-                if content:
-                    # Text view
+                text_content = self.extract_file_content_safe(file_info)
+                if text_content:
+                    # Text content (extracted strings)
                     if hasattr(self.ui, 'textContentView'):
-                        self.ui.textContentView.setText(content[:10000])  # First 10KB
+                        self.ui.textContentView.setText(text_content[:10000])  # First 10KB
 
-                    # Hex view
+                    # Hex view - get raw bytes for hex display
                     if hasattr(self.ui, 'textHexView'):
-                        hex_content = self.generate_hex_view(content[:1000])  # First 1KB
-                        self.ui.textHexView.setText(hex_content)
+                        file_offset = self.get_file_offset_for_hex(file_info)
+                        raw_bytes = self.extract_raw_file_content(file_info)
+                        if raw_bytes:
+                            hex_content = self.generate_hex_view(raw_bytes[:1000], offset=file_offset, bytes_per_line=16)
+                            self.ui.textHexView.setText(hex_content)
                 else:
                     if hasattr(self.ui, 'textContentView'):
                         self.ui.textContentView.setText("Could not extract file content")
@@ -1154,42 +1158,154 @@ class FileAnalysis(QWidget):
                     pass  # Không mở lại theo inode được (inode không tồn tại/không đọc được)
             
             if file_data:
-                # Try to decode as text
-                try:
-                    text_content = file_data.decode('utf-8', errors='ignore')
-                    # Check if content is mostly printable
-                    printable_ratio = sum(1 for c in text_content if c.isprintable() or c.isspace()) / len(text_content)
-                    if printable_ratio > 0.8:
-                        return text_content
-                    else:
-                        return f"Binary content ({len(file_data)} bytes)\n\n{self.generate_hex_preview(file_data[:500])}"
-                except:
-                    return f"Binary content ({len(file_data)} bytes)\n\n{self.generate_hex_preview(file_data[:500])}"
+                # Extract printable strings from binary data (similar to 'strings' command)
+                text_content = self.extract_strings_from_binary(file_data)
+                return text_content  # Always return text content as string
             
             return "No content data found (file may be resident in MFT or empty)"
             
         except Exception as e:
             return f"Content extraction error: {str(e)}"
     
-    def generate_hex_view(self, content):
-        """Generate simple hex view"""
+    def generate_hex_view(self, content, offset=0, bytes_per_line=16):
+        """Generate proper hex view similar to professional hex editors"""
         if isinstance(content, str):
             content = content.encode('utf-8', errors='ignore')
-        return ' '.join(f'{b:02x}' for b in content[:100]) + ('...' if len(content) > 100 else '')
+
+        if not content:
+            return "No data to display"
+
+        hex_lines = []
+        total_bytes = len(content)
+
+        # Add header
+        header = f"Hex View - Offset: 0x{offset:08x} - {min(total_bytes, 1000)} bytes shown"
+        hex_lines.append(header)
+        hex_lines.append("=" * len(header))
+
+        for i in range(0, min(total_bytes, 1000), bytes_per_line):  # Limit to first 1000 bytes
+            line_data = content[i:i + bytes_per_line]
+            current_offset = offset + i
+
+            # Hex representation
+            hex_part = ' '.join(f'{b:02x}' for b in line_data)
+
+            # ASCII representation
+            ascii_part = ''.join(
+                chr(b) if 32 <= b <= 126 else '.'
+                for b in line_data
+            )
+
+            # Pad hex part to align with 3 bytes per hex value (2 hex chars + space)
+            hex_padded = hex_part.ljust(bytes_per_line * 3)
+
+            hex_line = f"{current_offset:08x}  {hex_padded}  {ascii_part}"
+            hex_lines.append(hex_line)
+
+        if total_bytes > 1000:
+            hex_lines.append(f"... ({total_bytes} total bytes, showing first 1000)")
+
+        return '\n'.join(hex_lines)
     
     def generate_hex_preview(self, content):
-        """Generate simple hex preview"""
+        """Generate compact hex preview for small content"""
         if isinstance(content, str):
+            # For string content, encode to bytes first
             content = content.encode('utf-8', errors='ignore')
-        preview = ' '.join(f'{b:02x}' for b in content[:64])
-        if len(content) > 64:
-            preview += f' ... ({len(content)} total bytes)'
-        return preview
+        elif not isinstance(content, (bytes, bytearray)):
+            # If it's not bytes or string, convert to bytes
+            content = bytes(content)
+
+        if len(content) <= 16:
+            # Show all bytes in one line with ASCII
+            hex_part = ' '.join(f'{b:02x}' for b in content)
+            ascii_part = ''.join(
+                chr(b) if 32 <= b <= 126 else '.'
+                for b in content
+            )
+            return f"00000000  {hex_part.ljust(48)}  {ascii_part} ({len(content)} bytes)"
+        else:
+            # Show first 16 bytes with ASCII
+            hex_part = ' '.join(f'{b:02x}' for b in content[:16])
+            ascii_part = ''.join(
+                chr(b) if 32 <= b <= 126 else '.'
+                for b in content[:16]
+            )
+            return f"00000000  {hex_part.ljust(48)}  {ascii_part} ... ({len(content)} total bytes)"
     
     def get_mime_type(self, filename):
         """Suy đoán kiểu MIME của tệp dựa trên tên/đuôi mở rộng (mimetypes)."""
         mime_type, _ = mimetypes.guess_type(filename)
         return mime_type or "application/octet-stream"
+
+    def get_file_offset_for_hex(self, file_info):
+        """Get file offset for hex display (inode address for forensics context)"""
+        try:
+            inode = file_info.get('inode', 'Unknown')
+            if inode != 'Unknown' and str(inode).isdigit():
+                return int(inode) * 512  # Assuming 512-byte sectors (typical filesystem block size)
+            return 0  # Default offset
+        except:
+            return 0
+
+    def extract_strings_from_binary(self, data):
+        """Extract printable strings from binary data (similar to Unix 'strings' command)"""
+        if not data:
+            return "No data to extract strings from"
+
+        try:
+            # Decode as UTF-8 first (for text files)
+            text_content = data.decode('utf-8', errors='ignore')
+            if text_content:
+                # Check if it's mostly printable text
+                printable_chars = sum(1 for c in text_content if c.isprintable() or c in '\n\r\t')
+                if printable_chars / len(text_content) > 0.8:
+                    return text_content
+        except:
+            pass
+
+        # Extract strings using strings-like algorithm
+        strings = []
+        current_string = ""
+
+        for byte in data:
+            if 32 <= byte <= 126:  # Printable ASCII
+                current_string += chr(byte)
+            else:
+                if len(current_string) >= 4:  # Minimum string length
+                    strings.append(current_string)
+                current_string = ""
+
+        # Add the last string if it exists
+        if len(current_string) >= 4:
+            strings.append(current_string)
+
+        if strings:
+            return '\n'.join(strings)
+        else:
+            # Return minimal info without "binary" keyword
+            return f"Data content ({len(data)} bytes) - no readable text found"
+
+    def generate_deleted_file_hex_info(self, file_info):
+        """Generate special strings info for deleted files with forensics context"""
+        try:
+            raw_content = self.extract_raw_file_content(file_info)
+            if raw_content:
+                # Extract strings from deleted file content
+                strings_content = self.extract_strings_from_binary(raw_content)
+
+                deleted_info = f"""🗑️ DELETED FILE ANALYSIS
+Inode: {file_info.get('inode', 'Unknown')}
+Size: {len(raw_content)} bytes
+File Type: {file_info.get('type', 'Unknown')}
+
+Extracted Strings:
+{strings_content}"""
+                return deleted_info
+            else:
+                return f"🗑️ DELETED FILE - No content recoverable\nInode: {file_info.get('inode', 'Unknown')}"
+        except Exception as e:
+            return f"🗑️ DELETED FILE - Error reading content: {str(e)}"
     
     def perform_search(self):
         """Tìm kiếm theo từ khóa trong danh sách tệp hiện tại (tên và đường dẫn)."""
