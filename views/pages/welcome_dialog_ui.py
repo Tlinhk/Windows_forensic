@@ -110,7 +110,7 @@ class Ui_WelcomeDialog(object):
         _translate = QtCore.QCoreApplication.translate
         WelcomeDialog.setWindowTitle(_translate("WelcomeDialog", "Welcome"))
         self.headerLabel.setText(_translate("WelcomeDialog", "Windows Forensic System"))
-        self.newCaseBtn.setText(_translate("WelcomeDialog", "📁 Tạo Case Mới"))
-        self.openRecentBtn.setText(_translate("WelcomeDialog", "📂 Mở Case Gần Đây"))
-        self.openCaseBtn.setText(_translate("WelcomeDialog", "📋 Quản Lý Tất Cả Case"))
-        self.closeBtn.setText(_translate("WelcomeDialog", "Đóng"))
+        self.newCaseBtn.setText(_translate("WelcomeDialog", "📁 Create New Case"))
+        self.openRecentBtn.setText(_translate("WelcomeDialog", "📂 Open Recent Case"))
+        self.openCaseBtn.setText(_translate("WelcomeDialog", "📋 Manage All Cases"))
+        self.closeBtn.setText(_translate("WelcomeDialog", "Close"))

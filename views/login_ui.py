@@ -234,13 +234,13 @@ class Ui_LoginWindow(object):
 
     def retranslateUi(self, LoginWindow):
         _translate = QtCore.QCoreApplication.translate
-        LoginWindow.setWindowTitle(_translate("LoginWindow", "Hệ thống điều tra Windows - Đăng nhập"))
-        self.title_label.setText(_translate("LoginWindow", "🔒 HỆ THỐNG ĐIỀU TRA MÁY TÍNH"))
-        self.subtitle_label.setText(_translate("LoginWindow", "Nền tảng điều tra số"))
-        self.username_label.setText(_translate("LoginWindow", "TÊN ĐĂNG NHẬP:"))
-        self.username_input.setPlaceholderText(_translate("LoginWindow", "Nhập tên đăng nhập"))
-        self.password_label.setText(_translate("LoginWindow", "MẬT KHẨU:"))
-        self.password_input.setPlaceholderText(_translate("LoginWindow", "Nhập mật khẩu"))
+        LoginWindow.setWindowTitle(_translate("LoginWindow", "Windows Forensic System - Login"))
+        self.title_label.setText(_translate("LoginWindow", "🔒 COMPUTER INVESTIGATION SYSTEM"))
+        self.subtitle_label.setText(_translate("LoginWindow", "Digital Investigation Platform"))
+        self.username_label.setText(_translate("LoginWindow", "USERNAME:"))
+        self.username_input.setPlaceholderText(_translate("LoginWindow", "Enter username"))
+        self.password_label.setText(_translate("LoginWindow", "PASSWORD:"))
+        self.password_input.setPlaceholderText(_translate("LoginWindow", "Enter password"))
         self.show_password_btn.setText(_translate("LoginWindow", "🔒"))
-        self.forgot_password_label.setText(_translate("LoginWindow", "Quên mật khẩu?"))
-        self.login_button.setText(_translate("LoginWindow", "ĐĂNG NHẬP"))
+        self.forgot_password_label.setText(_translate("LoginWindow", "Forgot password?"))
+        self.login_button.setText(_translate("LoginWindow", "LOGIN"))

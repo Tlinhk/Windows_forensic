@@ -75,38 +75,101 @@ font-weight: bold;</string>
        </widget>
       </item>
       <item>
-       <widget class="QToolButton" name="btnLoadHive">
+       <widget class="QLabel" name="lblHiveArtifact">
+        <property name="text">
+         <string>Registry Hive:</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QComboBox" name="cmbHiveArtifacts">
+        <property name="minimumSize">
+         <size>
+          <width>200</width>
+          <height>30</height>
+         </size>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QComboBox {
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    padding: 5px;
+    background-color: white;
+}
+QComboBox:hover {
+    border-color: #adb5bd;
+}
+QComboBox::drop-down {
+    border: none;
+}
+QComboBox::down-arrow {
+    width: 12px;
+    height: 12px;
+}</string>
+        </property>
+        <item>
+         <property name="text">
+          <string>-- Chọn Registry Hive --</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item>
+       <widget class="QToolButton" name="btnLoadSelectedHive">
         <property name="minimumSize">
          <size>
           <width>80</width>
-          <height>35</height>
+          <height>30</height>
          </size>
         </property>
         <property name="styleSheet">
          <string notr="true">QToolButton {
-    border: 1px solid #ced4da;
+    border: 1px solid #007bff;
     border-radius: 4px;
     padding: 5px 10px;
-    background-color: white;
+    background-color: #007bff;
+    color: white;
 }
 QToolButton:hover {
-    background-color: #e9ecef;
-    border-color: #adb5bd;
+    background-color: #0056b3;
 }
 QToolButton:pressed {
-    background-color: #dee2e6;
+    background-color: #004085;
 }</string>
         </property>
         <property name="text">
-         <string>Load Hive</string>
+         <string>Load</string>
         </property>
-        <property name="icon">
-         <iconset>
-          <normaloff>:/icons/folder-open.png</normaloff>:/icons/folder-open.png
-         </iconset>
+       </widget>
+      </item>
+      <item>
+       <widget class="QToolButton" name="btnRefreshHives">
+        <property name="minimumSize">
+         <size>
+          <width>30</width>
+          <height>30</height>
+         </size>
         </property>
-        <property name="toolButtonStyle">
-         <enum>Qt::ToolButtonTextBesideIcon</enum>
+        <property name="styleSheet">
+         <string notr="true">QToolButton {
+    border: 1px solid #6c757d;
+    border-radius: 4px;
+    padding: 5px;
+    background-color: #6c757d;
+    color: white;
+}
+QToolButton:hover {
+    background-color: #545b62;
+}
+QToolButton:pressed {
+    background-color: #495057;
+}</string>
+        </property>
+        <property name="text">
+         <string>🔄</string>
+        </property>
+        <property name="toolTip">
+         <string>Refresh danh sách Registry Hives</string>
         </property>
        </widget>
       </item>
@@ -204,7 +267,7 @@ QToolButton:pressed {
 }</string>
         </property>
         <property name="text">
-         <string>Export</string>
+         <string>Xuất dữ liệu</string>
         </property>
         <property name="popupMode">
          <enum>QToolButton::InstantPopup</enum>

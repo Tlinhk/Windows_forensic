@@ -16,7 +16,7 @@
    </font>
   </property>
   <property name="windowTitle">
-   <string>Quản lý Case</string>
+    <string>Case Management</string>
   </property>
   <property name="styleSheet">
    <string notr="true">QWidget {
@@ -183,7 +183,7 @@ QLabel#noSelectionLabel {
       </font>
      </property>
      <property name="title">
-      <string>Danh sách Case</string>
+      <string>Case List</string>
      </property>
      <layout class="QGridLayout" name="gridLayout_3">
       <property name="verticalSpacing">
@@ -218,7 +218,7 @@ QLabel#noSelectionLabel {
              <string notr="true">font-size: 16px;</string>
             </property>
             <property name="text">
-             <string>Tạo mới</string>
+             <string>Create New</string>
             </property>
             <property name="icon">
              <iconset resource="../../static/resource.qrc">
@@ -243,7 +243,7 @@ QLabel#noSelectionLabel {
              <string notr="true">font-size: 16px;</string>
             </property>
             <property name="placeholderText">
-             <string>🔍 Tìm kiếm case...</string>
+             <string>🔍 Search cases...</string>
             </property>
            </widget>
           </item>
@@ -403,17 +403,17 @@ QLabel#noSelectionLabel {
           </property>
           <column>
            <property name="text">
-            <string>Tên Case</string>
+            <string>Case Name</string>
            </property>
           </column>
           <column>
            <property name="text">
-            <string>Điều tra viên</string>
+            <string>Investigator</string>
            </property>
           </column>
           <column>
            <property name="text">
-            <string>Ngày tạo</string>
+            <string>Created Date</string>
            </property>
           </column>
           <column>
@@ -423,12 +423,12 @@ QLabel#noSelectionLabel {
           </column>
           <column>
            <property name="text">
-            <string>Trạng thái</string>
+            <string>Status</string>
            </property>
           </column>
           <column>
            <property name="text">
-            <string>Đường dẫn</string>
+            <string>Path</string>
            </property>
           </column>
          </widget>
@@ -449,7 +449,7 @@ QLabel#noSelectionLabel {
       </font>
      </property>
      <property name="title">
-      <string>Evidence của Case</string>
+      <string>Case Evidence</string>
      </property>
      <layout class="QGridLayout" name="gridLayout_5">
       <item row="0" column="0">
@@ -599,7 +599,7 @@ color: rgb(255, 255, 255);</string>
              <string notr="true">background-color: #28a745;</string>
             </property>
             <property name="text">
-             <string> Phân tích</string>
+             <string> Analyze</string>
             </property>
             <property name="icon">
              <iconset resource="../../static/resource.qrc">
@@ -625,22 +625,22 @@ color: rgb(255, 255, 255);</string>
           </property>
           <column>
            <property name="text">
-            <string>Tên Evidence</string>
+            <string>Evidence Name</string>
            </property>
           </column>
           <column>
            <property name="text">
-            <string>Loại</string>
+            <string>Type</string>
            </property>
           </column>
           <column>
            <property name="text">
-            <string>Đường dẫn</string>
+            <string>Path</string>
            </property>
           </column>
           <column>
            <property name="text">
-            <string>Kích thước</string>
+            <string>Size</string>
            </property>
           </column>
           <column>
@@ -666,7 +666,7 @@ color: rgb(255, 255, 255);</string>
          </font>
         </property>
         <property name="text">
-         <string>💡 Chọn một case từ danh sách để xem và quản lý evidence</string>
+         <string>💡 Select a case from the list to view and manage evidence</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignCenter</set>

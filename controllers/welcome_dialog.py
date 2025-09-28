@@ -15,7 +15,7 @@ class RecentCaseDialog(QDialog):
         self.recent_cases = recent_cases
         self.selected_case = None
 
-        self.setWindowTitle("Mở Case Gần Đây")
+        self.setWindowTitle("Open Recent Case")
         self.setFixedSize(600, 400)
         self.setup_ui()
         self.setup_connections()
@@ -188,8 +188,8 @@ class WelcomeDialog(QDialog):
         if not self.recent_cases:
             QMessageBox.information(
                 self,
-                "Thông báo",
-                "Chưa có case nào được tạo.\nVui lòng tạo case mới hoặc quản lý case.",
+                "Information",
+                "No cases have been created yet.\nPlease create a new case or manage cases.",
             )
             return
 

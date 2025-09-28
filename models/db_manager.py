@@ -283,16 +283,17 @@ class DatabaseManager:
                     return False
 
             # Kiểm tra nếu user đang được assign vào case
-            case_assignments = self.fetch_one(
-                "SELECT COUNT(*) as count FROM Case_Assignees WHERE user_id = ?",
-                (user_id,),
-            )
-            if case_assignments["count"] > 0:
-                print(
-                    f"⚠️ User '{user['username']}' đang được gán vào {case_assignments['count']} case(s)!"
-                )
-                print("Cần remove khỏi tất cả cases trước khi hard delete!")
-                return False
+            # Note: Database hiện tại không có bảng Case_Assignees
+            # case_assignments = self.fetch_one(
+            #     "SELECT COUNT(*) as count FROM Case_Assignees WHERE user_id = ?",
+            #     (user_id,),
+            # )
+            # if case_assignments["count"] > 0:
+            #     print(
+            #         f"⚠️ User '{user['username']}' đang được gán vào {case_assignments['count']} case(s)!"
+            #     )
+            #     print("Cần remove khỏi tất cả cases trước khi hard delete!")
+            #     return False
 
             # Kiểm tra activity logs trước khi xóa
             activity_count = self.fetch_one(
@@ -308,11 +309,11 @@ class DatabaseManager:
                 print("Logs sẽ bị mất vĩnh viễn sau khi hard delete!")
 
             # Log trước khi xóa (để ghi lại việc hard delete)
-            self.log_activity(
-                action="HARD_DELETE_USER",
-                user_id=user_id,
-                details=f"Hard delete user '{user['username']}' with role '{user['role']}'",
-            )
+            # self.log_activity(
+            #     action="HARD_DELETE_USER",
+            #     user_id=user_id,
+            #     details=f"Hard delete user '{user['username']}' with role '{user['role']}'",
+            # )
 
             # Bắt đầu transaction để đảm bảo tính toàn vẹn
             self.connection.execute("BEGIN TRANSACTION")
@@ -326,13 +327,13 @@ class DatabaseManager:
                 logs_deleted = delete_logs_cursor.rowcount
                 print(f"✅ Đã xóa {logs_deleted} activity logs")
 
-                # 2. Xóa case assignments (nếu có)
-                print("🔄 Đang xóa case assignments...")
-                delete_assignments_cursor = self.connection.execute(
-                    "DELETE FROM Case_Assignees WHERE user_id = ?", (user_id,)
+                # 2. Unassign cases từ user này (set user_id = NULL)
+                print("🔄 Đang unassign cases từ user...")
+                unassign_cursor = self.connection.execute(
+                    "UPDATE Cases SET user_id = NULL WHERE user_id = ?", (user_id,)
                 )
-                assignments_deleted = delete_assignments_cursor.rowcount
-                print(f"✅ Đã xóa {assignments_deleted} case assignments")
+                assignments_deleted = unassign_cursor.rowcount
+                print(f"✅ Đã unassign {assignments_deleted} case(s) từ user")
 
                 # 3. Xóa user khỏi bảng Users
                 print("🔄 Đang xóa user khỏi Users table...")

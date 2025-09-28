@@ -37,27 +37,64 @@ class Ui_RegistryAnalysisWidget(object):
 "font-weight: bold;")
         self.caseInfoLabel.setObjectName("caseInfoLabel")
         self.toolbarLayout.addWidget(self.caseInfoLabel)
-        self.btnLoadHive = QtWidgets.QToolButton(self.toolbarFrame)
-        self.btnLoadHive.setMinimumSize(QtCore.QSize(80, 35))
-        self.btnLoadHive.setStyleSheet("QToolButton {\n"
+        self.lblHiveArtifact = QtWidgets.QLabel(self.toolbarFrame)
+        self.lblHiveArtifact.setObjectName("lblHiveArtifact")
+        self.toolbarLayout.addWidget(self.lblHiveArtifact)
+        self.cmbHiveArtifacts = QtWidgets.QComboBox(self.toolbarFrame)
+        self.cmbHiveArtifacts.setMinimumSize(QtCore.QSize(200, 30))
+        self.cmbHiveArtifacts.setStyleSheet("QComboBox {\n"
 "    border: 1px solid #ced4da;\n"
 "    border-radius: 4px;\n"
-"    padding: 5px 10px;\n"
+"    padding: 5px;\n"
 "    background-color: white;\n"
 "}\n"
-"QToolButton:hover {\n"
-"    background-color: #e9ecef;\n"
+"QComboBox:hover {\n"
 "    border-color: #adb5bd;\n"
 "}\n"
-"QToolButton:pressed {\n"
-"    background-color: #dee2e6;\n"
+"QComboBox::drop-down {\n"
+"    border: none;\n"
+"}\n"
+"QComboBox::down-arrow {\n"
+"    width: 12px;\n"
+"    height: 12px;\n"
 "}")
-        icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap(":/icons/folder-open.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.btnLoadHive.setIcon(icon)
-        self.btnLoadHive.setToolButtonStyle(QtCore.Qt.ToolButtonTextBesideIcon)
-        self.btnLoadHive.setObjectName("btnLoadHive")
-        self.toolbarLayout.addWidget(self.btnLoadHive)
+        self.cmbHiveArtifacts.setObjectName("cmbHiveArtifacts")
+        self.cmbHiveArtifacts.addItem("")
+        self.toolbarLayout.addWidget(self.cmbHiveArtifacts)
+        self.btnLoadSelectedHive = QtWidgets.QToolButton(self.toolbarFrame)
+        self.btnLoadSelectedHive.setMinimumSize(QtCore.QSize(80, 30))
+        self.btnLoadSelectedHive.setStyleSheet("QToolButton {\n"
+"    border: 1px solid #007bff;\n"
+"    border-radius: 4px;\n"
+"    padding: 5px 10px;\n"
+"    background-color: #007bff;\n"
+"    color: white;\n"
+"}\n"
+"QToolButton:hover {\n"
+"    background-color: #0056b3;\n"
+"}\n"
+"QToolButton:pressed {\n"
+"    background-color: #004085;\n"
+"}")
+        self.btnLoadSelectedHive.setObjectName("btnLoadSelectedHive")
+        self.toolbarLayout.addWidget(self.btnLoadSelectedHive)
+        self.btnRefreshHives = QtWidgets.QToolButton(self.toolbarFrame)
+        self.btnRefreshHives.setMinimumSize(QtCore.QSize(30, 30))
+        self.btnRefreshHives.setStyleSheet("QToolButton {\n"
+"    border: 1px solid #6c757d;\n"
+"    border-radius: 4px;\n"
+"    padding: 5px;\n"
+"    background-color: #6c757d;\n"
+"    color: white;\n"
+"}\n"
+"QToolButton:hover {\n"
+"    background-color: #545b62;\n"
+"}\n"
+"QToolButton:pressed {\n"
+"    background-color: #495057;\n"
+"}")
+        self.btnRefreshHives.setObjectName("btnRefreshHives")
+        self.toolbarLayout.addWidget(self.btnRefreshHives)
         self.line2 = QtWidgets.QFrame(self.toolbarFrame)
         self.line2.setFrameShape(QtWidgets.QFrame.VLine)
         self.line2.setFrameShadow(QtWidgets.QFrame.Sunken)
@@ -336,12 +373,16 @@ class Ui_RegistryAnalysisWidget(object):
         _translate = QtCore.QCoreApplication.translate
         RegistryAnalysisWidget.setWindowTitle(_translate("RegistryAnalysisWidget", "Registry Analysis"))
         self.caseInfoLabel.setText(_translate("RegistryAnalysisWidget", "Case: Not Selected"))
-        self.btnLoadHive.setText(_translate("RegistryAnalysisWidget", "Load Hive"))
+        self.lblHiveArtifact.setText(_translate("RegistryAnalysisWidget", "Registry Hive:"))
+        self.cmbHiveArtifacts.setItemText(0, _translate("RegistryAnalysisWidget", "-- Chọn Registry Hive --"))
+        self.btnLoadSelectedHive.setText(_translate("RegistryAnalysisWidget", "Load"))
+        self.btnRefreshHives.setText(_translate("RegistryAnalysisWidget", "🔄"))
+        self.btnRefreshHives.setToolTip(_translate("RegistryAnalysisWidget", "Refresh danh sách Registry Hives"))
         self.lblSearch.setText(_translate("RegistryAnalysisWidget", "Search:"))
         self.txtSearch.setPlaceholderText(_translate("RegistryAnalysisWidget", "Search keys, values, data..."))
         self.btnSearchOptions.setText(_translate("RegistryAnalysisWidget", "▼"))
         self.statusIndicator.setText(_translate("RegistryAnalysisWidget", "● Ready"))
-        self.btnExport.setText(_translate("RegistryAnalysisWidget", "Export"))
+        self.btnExport.setText(_translate("RegistryAnalysisWidget", "Xuất dữ liệu"))
         self.btnExpandAll.setText(_translate("RegistryAnalysisWidget", "+"))
         self.btnExpandAll.setToolTip(_translate("RegistryAnalysisWidget", "Expand All"))
         self.btnCollapseAll.setText(_translate("RegistryAnalysisWidget", "-"))
@@ -384,3 +425,13 @@ class Ui_RegistryAnalysisWidget(object):
         self.notesEdit.setPlaceholderText(_translate("RegistryAnalysisWidget", "Add your investigation notes here..."))
         self.btnSaveNotes.setText(_translate("RegistryAnalysisWidget", "Save Notes"))
         self.detailTabs.setTabText(self.detailTabs.indexOf(self.tabNotes), _translate("RegistryAnalysisWidget", "Notes"))
+
+
+if __name__ == "__main__":
+    import sys
+    app = QtWidgets.QApplication(sys.argv)
+    RegistryAnalysisWidget = QtWidgets.QWidget()
+    ui = Ui_RegistryAnalysisWidget()
+    ui.setupUi(RegistryAnalysisWidget)
+    RegistryAnalysisWidget.show()
+    sys.exit(app.exec_())

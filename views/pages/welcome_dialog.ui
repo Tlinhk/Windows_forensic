@@ -133,7 +133,7 @@ QPushButton#closeBtn:hover {
          </size>
         </property>
         <property name="text">
-         <string>📁 Tạo Case Mới</string>
+         <string>📁 Create New Case</string>
         </property>
        </widget>
       </item>
@@ -146,7 +146,7 @@ QPushButton#closeBtn:hover {
          </size>
         </property>
         <property name="text">
-         <string>📂 Mở Case Gần Đây</string>
+         <string>📂 Open Recent Case</string>
         </property>
        </widget>
       </item>
@@ -159,7 +159,7 @@ QPushButton#closeBtn:hover {
          </size>
         </property>
         <property name="text">
-         <string>📋 Quản Lý Tất Cả Case</string>
+         <string>📋 Manage All Cases</string>
         </property>
        </widget>
       </item>
@@ -203,7 +203,7 @@ QPushButton#closeBtn:hover {
      <item>
       <widget class="QPushButton" name="closeBtn">
        <property name="text">
-        <string>Đóng</string>
+        <string>Close</string>
        </property>
       </widget>
      </item>
