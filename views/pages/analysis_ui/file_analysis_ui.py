@@ -22,7 +22,6 @@ class Ui_EvidenceAnalysisWidget(object):
         self.caseTitleBar = QtWidgets.QFrame(EvidenceAnalysisWidget)
         self.caseTitleBar.setMinimumSize(QtCore.QSize(0, 40))
         self.caseTitleBar.setMaximumSize(QtCore.QSize(16777215, 40))
-        self.caseTitleBar.setStyleSheet("")
         self.caseTitleBar.setFrameShape(QtWidgets.QFrame.NoFrame)
         self.caseTitleBar.setObjectName("caseTitleBar")
         self.horizontalLayout_title = QtWidgets.QHBoxLayout(self.caseTitleBar)
@@ -174,46 +173,6 @@ class Ui_EvidenceAnalysisWidget(object):
 "}")
         self.treeInvestigation.setHeaderHidden(True)
         self.treeInvestigation.setObjectName("treeInvestigation")
-        self.treeInvestigation.headerItem().setText(0, "1")
-        item_0 = QtWidgets.QTreeWidgetItem(self.treeInvestigation)
-        font = QtGui.QFont()
-        font.setBold(True)
-        font.setWeight(75)
-        item_0.setFont(0, font)
-        item_1 = QtWidgets.QTreeWidgetItem(item_0)
-        item_2 = QtWidgets.QTreeWidgetItem(item_1)
-        item_2 = QtWidgets.QTreeWidgetItem(item_1)
-        item_0 = QtWidgets.QTreeWidgetItem(self.treeInvestigation)
-        font = QtGui.QFont()
-        font.setBold(True)
-        font.setWeight(75)
-        item_0.setFont(0, font)
-        item_1 = QtWidgets.QTreeWidgetItem(item_0)
-        item_2 = QtWidgets.QTreeWidgetItem(item_1)
-        item_2 = QtWidgets.QTreeWidgetItem(item_1)
-        item_2 = QtWidgets.QTreeWidgetItem(item_1)
-        item_1 = QtWidgets.QTreeWidgetItem(item_0)
-        item_1 = QtWidgets.QTreeWidgetItem(item_0)
-        item_0 = QtWidgets.QTreeWidgetItem(self.treeInvestigation)
-        font = QtGui.QFont()
-        font.setBold(True)
-        font.setWeight(75)
-        item_0.setFont(0, font)
-        item_1 = QtWidgets.QTreeWidgetItem(item_0)
-        item_2 = QtWidgets.QTreeWidgetItem(item_1)
-        item_2 = QtWidgets.QTreeWidgetItem(item_1)
-        item_2 = QtWidgets.QTreeWidgetItem(item_1)
-        item_2 = QtWidgets.QTreeWidgetItem(item_1)
-        item_2 = QtWidgets.QTreeWidgetItem(item_1)
-        item_1 = QtWidgets.QTreeWidgetItem(item_0)
-        item_0 = QtWidgets.QTreeWidgetItem(self.treeInvestigation)
-        font = QtGui.QFont()
-        font.setBold(True)
-        font.setWeight(75)
-        item_0.setFont(0, font)
-        item_1 = QtWidgets.QTreeWidgetItem(item_0)
-        item_1 = QtWidgets.QTreeWidgetItem(item_0)
-        item_1 = QtWidgets.QTreeWidgetItem(item_0)
         self.verticalLayout_left.addWidget(self.treeInvestigation)
         self.rightSplitter = QtWidgets.QSplitter(self.mainSplitter)
         self.rightSplitter.setOrientation(QtCore.Qt.Vertical)
@@ -260,6 +219,8 @@ class Ui_EvidenceAnalysisWidget(object):
 "    border: none;\n"
 "    border-right: 1px solid #ddd;\n"
 "    font-weight: bold;\n"
+"    font-size: 10pt;\n"
+"    color: #000;\n"
 "}")
         self.tableFiles.setAlternatingRowColors(True)
         self.tableFiles.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
@@ -282,6 +243,8 @@ class Ui_EvidenceAnalysisWidget(object):
         self.tableFiles.setHorizontalHeaderItem(6, item)
         item = QtWidgets.QTableWidgetItem()
         self.tableFiles.setHorizontalHeaderItem(7, item)
+        self.tableFiles.horizontalHeader().setDefaultSectionSize(120)
+        self.tableFiles.horizontalHeader().setStretchLastSection(False)
         self.verticalLayout_browser.addWidget(self.tableFiles)
         self.tabWorkArea.addTab(self.tabFileBrowser, "")
         self.tabTimeline = QtWidgets.QWidget()
@@ -307,6 +270,8 @@ class Ui_EvidenceAnalysisWidget(object):
 "    border: none;\n"
 "    border-right: 1px solid #ddd;\n"
 "    font-weight: bold;\n"
+"    font-size: 10pt;\n"
+"    color: #000;\n"
 "}")
         self.tableTimeline.setAlternatingRowColors(True)
         self.tableTimeline.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
@@ -375,6 +340,8 @@ class Ui_EvidenceAnalysisWidget(object):
 "    border: none;\n"
 "    border-right: 1px solid #ddd;\n"
 "    font-weight: bold;\n"
+"    font-size: 10pt;\n"
+"    color: #000;\n"
 "}")
         self.tableSearchResults.setAlternatingRowColors(True)
         self.tableSearchResults.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
@@ -464,6 +431,7 @@ class Ui_EvidenceAnalysisWidget(object):
         self.tabMetadata = QtWidgets.QWidget()
         self.tabMetadata.setObjectName("tabMetadata")
         self.verticalLayout_metadata = QtWidgets.QVBoxLayout(self.tabMetadata)
+        self.verticalLayout_metadata.setContentsMargins(0, 0, 0, 0)
         self.verticalLayout_metadata.setObjectName("verticalLayout_metadata")
         self.tableMetadata = QtWidgets.QTableWidget(self.tabMetadata)
         self.tableMetadata.setStyleSheet("QTableWidget {\n"
@@ -477,6 +445,8 @@ class Ui_EvidenceAnalysisWidget(object):
 "    border: none;\n"
 "    border-right: 1px solid #ddd;\n"
 "    font-weight: bold;\n"
+"    font-size: 10pt;\n"
+"    color: #000;\n"
 "}")
         self.tableMetadata.setAlternatingRowColors(True)
         self.tableMetadata.setObjectName("tableMetadata")
@@ -491,6 +461,7 @@ class Ui_EvidenceAnalysisWidget(object):
         self.tabFileProperties = QtWidgets.QWidget()
         self.tabFileProperties.setObjectName("tabFileProperties")
         self.verticalLayout_properties = QtWidgets.QVBoxLayout(self.tabFileProperties)
+        self.verticalLayout_properties.setContentsMargins(0, 0, 0, 0)
         self.verticalLayout_properties.setObjectName("verticalLayout_properties")
         self.tableProperties = QtWidgets.QTableWidget(self.tabFileProperties)
         self.tableProperties.setStyleSheet("QTableWidget {\n"
@@ -504,6 +475,8 @@ class Ui_EvidenceAnalysisWidget(object):
 "    border: none;\n"
 "    border-right: 1px solid #ddd;\n"
 "    font-weight: bold;\n"
+"    font-size: 10pt;\n"
+"    color: #000;\n"
 "}")
         self.tableProperties.setAlternatingRowColors(True)
         self.tableProperties.setObjectName("tableProperties")
@@ -518,6 +491,7 @@ class Ui_EvidenceAnalysisWidget(object):
         self.tabAnalysisResults = QtWidgets.QWidget()
         self.tabAnalysisResults.setObjectName("tabAnalysisResults")
         self.verticalLayout_analysis = QtWidgets.QVBoxLayout(self.tabAnalysisResults)
+        self.verticalLayout_analysis.setContentsMargins(0, 0, 0, 0)
         self.verticalLayout_analysis.setObjectName("verticalLayout_analysis")
         self.textAnalysisResults = QtWidgets.QTextEdit(self.tabAnalysisResults)
         self.textAnalysisResults.setStyleSheet("QTextEdit {\n"
@@ -533,7 +507,7 @@ class Ui_EvidenceAnalysisWidget(object):
 
         self.retranslateUi(EvidenceAnalysisWidget)
         self.tabWorkArea.setCurrentIndex(0)
-        self.tabDetails.setCurrentIndex(1)
+        self.tabDetails.setCurrentIndex(0)
         self.tabContentView.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(EvidenceAnalysisWidget)
 
@@ -546,34 +520,9 @@ class Ui_EvidenceAnalysisWidget(object):
         self.btnLoadSelectedEvidence.setText(_translate("EvidenceAnalysisWidget", "Load"))
         self.btnRefreshEvidence.setToolTip(_translate("EvidenceAnalysisWidget", "Refresh danh sách evidence"))
         self.btnRefreshEvidence.setText(_translate("EvidenceAnalysisWidget", "🔄"))
-        self.labelCaseInfo.setText(_translate("EvidenceAnalysisWidget", "Case: SRL IP Theft (Fred Rocba) | Evidence: Surface_Laptop.dd"))
-        __sortingEnabled = self.treeInvestigation.isSortingEnabled()
-        self.treeInvestigation.setSortingEnabled(False)
-        self.treeInvestigation.topLevelItem(0).setText(0, _translate("EvidenceAnalysisWidget", "Data Sources"))
-        self.treeInvestigation.topLevelItem(0).child(0).setText(0, _translate("EvidenceAnalysisWidget", "Surface_Laptop.dd"))
-        self.treeInvestigation.topLevelItem(0).child(0).child(0).setText(0, _translate("EvidenceAnalysisWidget", "./"))
-        self.treeInvestigation.topLevelItem(0).child(0).child(1).setText(0, _translate("EvidenceAnalysisWidget", "$OrphanFiles"))
-        self.treeInvestigation.topLevelItem(1).setText(0, _translate("EvidenceAnalysisWidget", "Views"))
-        self.treeInvestigation.topLevelItem(1).child(0).setText(0, _translate("EvidenceAnalysisWidget", "By File Type"))
-        self.treeInvestigation.topLevelItem(1).child(0).child(0).setText(0, _translate("EvidenceAnalysisWidget", "Images"))
-        self.treeInvestigation.topLevelItem(1).child(0).child(1).setText(0, _translate("EvidenceAnalysisWidget", "Videos"))
-        self.treeInvestigation.topLevelItem(1).child(0).child(2).setText(0, _translate("EvidenceAnalysisWidget", "Documents"))
-        self.treeInvestigation.topLevelItem(1).child(1).setText(0, _translate("EvidenceAnalysisWidget", "By File Size"))
-        self.treeInvestigation.topLevelItem(1).child(2).setText(0, _translate("EvidenceAnalysisWidget", "Deleted Files"))
-        self.treeInvestigation.topLevelItem(2).setText(0, _translate("EvidenceAnalysisWidget", "Data Artifacts"))
-        self.treeInvestigation.topLevelItem(2).child(0).setText(0, _translate("EvidenceAnalysisWidget", "Operating System"))
-        self.treeInvestigation.topLevelItem(2).child(0).child(0).setText(0, _translate("EvidenceAnalysisWidget", "Prefetch Files"))
-        self.treeInvestigation.topLevelItem(2).child(0).child(1).setText(0, _translate("EvidenceAnalysisWidget", "LNK Files"))
-        self.treeInvestigation.topLevelItem(2).child(0).child(2).setText(0, _translate("EvidenceAnalysisWidget", "Jump Lists"))
-        self.treeInvestigation.topLevelItem(2).child(0).child(3).setText(0, _translate("EvidenceAnalysisWidget", "USB History"))
-        self.treeInvestigation.topLevelItem(2).child(0).child(4).setText(0, _translate("EvidenceAnalysisWidget", "User Accounts"))
-        self.treeInvestigation.topLevelItem(2).child(1).setText(0, _translate("EvidenceAnalysisWidget", "Event Log Data"))
-        self.treeInvestigation.topLevelItem(3).setText(0, _translate("EvidenceAnalysisWidget", "Analysis Results"))
-        self.treeInvestigation.topLevelItem(3).child(0).setText(0, _translate("EvidenceAnalysisWidget", "Keyword Hits"))
-        self.treeInvestigation.topLevelItem(3).child(1).setText(0, _translate("EvidenceAnalysisWidget", "Tagged Items"))
-        self.treeInvestigation.topLevelItem(3).child(2).setText(0, _translate("EvidenceAnalysisWidget", "Hashset Hits"))
-        self.treeInvestigation.setSortingEnabled(__sortingEnabled)
-        self.tableFiles.setSortingEnabled(True)
+        self.labelCaseInfo.setText(_translate("EvidenceAnalysisWidget", "File Analysis - No evidence loaded"))
+        self.treeInvestigation.headerItem().setText(0, _translate("EvidenceAnalysisWidget", "Data Sources"))
+        self.tableFiles.setSortingEnabled(False)
         item = self.tableFiles.horizontalHeaderItem(0)
         item.setText(_translate("EvidenceAnalysisWidget", "Name"))
         item = self.tableFiles.horizontalHeaderItem(1)
@@ -591,7 +540,7 @@ class Ui_EvidenceAnalysisWidget(object):
         item = self.tableFiles.horizontalHeaderItem(7)
         item.setText(_translate("EvidenceAnalysisWidget", "Path"))
         self.tabWorkArea.setTabText(self.tabWorkArea.indexOf(self.tabFileBrowser), _translate("EvidenceAnalysisWidget", "File Browser"))
-        self.tableTimeline.setSortingEnabled(True)
+        self.tableTimeline.setSortingEnabled(False)
         item = self.tableTimeline.horizontalHeaderItem(0)
         item.setText(_translate("EvidenceAnalysisWidget", "Date/Time"))
         item = self.tableTimeline.horizontalHeaderItem(1)
@@ -606,6 +555,7 @@ class Ui_EvidenceAnalysisWidget(object):
         self.labelSearch.setText(_translate("EvidenceAnalysisWidget", "Keywords:"))
         self.lineEditSearch.setPlaceholderText(_translate("EvidenceAnalysisWidget", "Enter search keywords..."))
         self.btnSearch.setText(_translate("EvidenceAnalysisWidget", "Search"))
+        self.tableSearchResults.setSortingEnabled(False)
         item = self.tableSearchResults.horizontalHeaderItem(0)
         item.setText(_translate("EvidenceAnalysisWidget", "File Name"))
         item = self.tableSearchResults.horizontalHeaderItem(1)
@@ -629,9 +579,4 @@ class Ui_EvidenceAnalysisWidget(object):
         item = self.tableProperties.horizontalHeaderItem(1)
         item.setText(_translate("EvidenceAnalysisWidget", "Value"))
         self.tabDetails.setTabText(self.tabDetails.indexOf(self.tabFileProperties), _translate("EvidenceAnalysisWidget", "File Properties"))
-        self.textAnalysisResults.setHtml(_translate("EvidenceAnalysisWidget", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
-"<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
-"p, li { white-space: pre-wrap; }\n"
-"</style></head><body style=\" font-family:\'MS Shell Dlg 2\'; font-size:12px; font-weight:400; font-style:normal;\">\n"
-"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p></body></html>"))
         self.tabDetails.setTabText(self.tabDetails.indexOf(self.tabAnalysisResults), _translate("EvidenceAnalysisWidget", "Analysis Results"))
