@@ -188,12 +188,12 @@ class AddUserDialog(QDialog):
     def setup_dialog(self):
         """Thiết lập dialog properties"""
         if self.user_data:
-            self.setWindowTitle("Sửa người dùng")
+            self.setWindowTitle("Edit user")
             # Ẩn password fields khi sửa user
             self.ui.passwordLabel.setVisible(False)
             self.ui.passwordEdit.setVisible(False)
         else:
-            self.setWindowTitle("Thêm người dùng mới")
+            self.setWindowTitle("Add new user")
     
     def connect_signals(self):
         """Connect UI signals"""
