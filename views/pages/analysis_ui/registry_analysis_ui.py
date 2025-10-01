@@ -20,130 +20,75 @@ class Ui_RegistryAnalysisWidget(object):
         self.mainLayout.setSpacing(0)
         self.mainLayout.setObjectName("mainLayout")
         self.toolbarFrame = QtWidgets.QFrame(RegistryAnalysisWidget)
-        self.toolbarFrame.setMaximumSize(QtCore.QSize(16777215, 50))
+        self.toolbarFrame.setMaximumSize(QtCore.QSize(16777215, 45))
         self.toolbarFrame.setStyleSheet("QFrame#toolbarFrame {\n"
 "    background-color: #f8f9fa;\n"
 "    border-bottom: 1px solid #dee2e6;\n"
 "}")
-        self.toolbarFrame.setFrameShape(QtWidgets.QFrame.NoFrame)
         self.toolbarFrame.setObjectName("toolbarFrame")
         self.toolbarLayout = QtWidgets.QHBoxLayout(self.toolbarFrame)
-        self.toolbarLayout.setContentsMargins(10, 5, 10, 5)
-        self.toolbarLayout.setSpacing(5)
+        self.toolbarLayout.setContentsMargins(8, 8, 8, 8)
         self.toolbarLayout.setObjectName("toolbarLayout")
         self.caseInfoLabel = QtWidgets.QLabel(self.toolbarFrame)
-        self.caseInfoLabel.setStyleSheet("color: #495057;\n"
-"font-size: 12px;\n"
-"font-weight: bold;")
+        self.caseInfoLabel.setStyleSheet("font-weight: bold; color: #495057;")
         self.caseInfoLabel.setObjectName("caseInfoLabel")
         self.toolbarLayout.addWidget(self.caseInfoLabel)
-        self.lblHiveArtifact = QtWidgets.QLabel(self.toolbarFrame)
-        self.lblHiveArtifact.setObjectName("lblHiveArtifact")
-        self.toolbarLayout.addWidget(self.lblHiveArtifact)
+        self.line1 = QtWidgets.QFrame(self.toolbarFrame)
+        self.line1.setFrameShape(QtWidgets.QFrame.VLine)
+        self.line1.setFrameShadow(QtWidgets.QFrame.Sunken)
+        self.line1.setObjectName("line1")
+        self.toolbarLayout.addWidget(self.line1)
         self.cmbHiveArtifacts = QtWidgets.QComboBox(self.toolbarFrame)
-        self.cmbHiveArtifacts.setMinimumSize(QtCore.QSize(200, 30))
+        self.cmbHiveArtifacts.setMinimumSize(QtCore.QSize(250, 30))
         self.cmbHiveArtifacts.setStyleSheet("QComboBox {\n"
 "    border: 1px solid #ced4da;\n"
 "    border-radius: 4px;\n"
 "    padding: 5px;\n"
-"    background-color: white;\n"
 "}\n"
 "QComboBox:hover {\n"
-"    border-color: #adb5bd;\n"
-"}\n"
-"QComboBox::drop-down {\n"
-"    border: none;\n"
-"}\n"
-"QComboBox::down-arrow {\n"
-"    width: 12px;\n"
-"    height: 12px;\n"
+"    border-color: #80bdff;\n"
 "}")
         self.cmbHiveArtifacts.setObjectName("cmbHiveArtifacts")
-        self.cmbHiveArtifacts.addItem("")
         self.toolbarLayout.addWidget(self.cmbHiveArtifacts)
-        self.btnLoadSelectedHive = QtWidgets.QToolButton(self.toolbarFrame)
-        self.btnLoadSelectedHive.setMinimumSize(QtCore.QSize(80, 30))
-        self.btnLoadSelectedHive.setStyleSheet("QToolButton {\n"
-"    border: 1px solid #007bff;\n"
-"    border-radius: 4px;\n"
-"    padding: 5px 10px;\n"
+        self.btnLoadSelectedHive = QtWidgets.QPushButton(self.toolbarFrame)
+        self.btnLoadSelectedHive.setStyleSheet("QPushButton {\n"
 "    background-color: #007bff;\n"
 "    color: white;\n"
+"    border: none;\n"
+"    border-radius: 4px;\n"
+"    padding: 6px 12px;\n"
+"    font-weight: bold;\n"
 "}\n"
-"QToolButton:hover {\n"
+"QPushButton:hover {\n"
 "    background-color: #0056b3;\n"
 "}\n"
-"QToolButton:pressed {\n"
-"    background-color: #004085;\n"
+"QPushButton:disabled {\n"
+"    background-color: #6c757d;\n"
 "}")
         self.btnLoadSelectedHive.setObjectName("btnLoadSelectedHive")
         self.toolbarLayout.addWidget(self.btnLoadSelectedHive)
-        self.btnRefreshHives = QtWidgets.QToolButton(self.toolbarFrame)
-        self.btnRefreshHives.setMinimumSize(QtCore.QSize(30, 30))
-        self.btnRefreshHives.setStyleSheet("QToolButton {\n"
-"    border: 1px solid #6c757d;\n"
-"    border-radius: 4px;\n"
-"    padding: 5px;\n"
-"    background-color: #6c757d;\n"
-"    color: white;\n"
-"}\n"
-"QToolButton:hover {\n"
-"    background-color: #545b62;\n"
-"}\n"
-"QToolButton:pressed {\n"
-"    background-color: #495057;\n"
-"}")
+        self.btnRefreshHives = QtWidgets.QPushButton(self.toolbarFrame)
+        self.btnRefreshHives.setMaximumSize(QtCore.QSize(30, 30))
         self.btnRefreshHives.setObjectName("btnRefreshHives")
         self.toolbarLayout.addWidget(self.btnRefreshHives)
-        self.line2 = QtWidgets.QFrame(self.toolbarFrame)
-        self.line2.setFrameShape(QtWidgets.QFrame.VLine)
-        self.line2.setFrameShadow(QtWidgets.QFrame.Sunken)
-        self.line2.setObjectName("line2")
-        self.toolbarLayout.addWidget(self.line2)
-        self.lblSearch = QtWidgets.QLabel(self.toolbarFrame)
-        self.lblSearch.setObjectName("lblSearch")
-        self.toolbarLayout.addWidget(self.lblSearch)
-        self.txtSearch = QtWidgets.QLineEdit(self.toolbarFrame)
-        self.txtSearch.setMinimumSize(QtCore.QSize(250, 30))
-        self.txtSearch.setStyleSheet("QLineEdit {\n"
-"    border: 1px solid #ced4da;\n"
-"    border-radius: 4px;\n"
-"    padding: 5px;\n"
-"    background-color: white;\n"
-"}\n"
-"QLineEdit:focus {\n"
-"    border-color: #4a90e2;\n"
-"}")
-        self.txtSearch.setClearButtonEnabled(True)
-        self.txtSearch.setObjectName("txtSearch")
-        self.toolbarLayout.addWidget(self.txtSearch)
-        self.btnSearchOptions = QtWidgets.QToolButton(self.toolbarFrame)
-        self.btnSearchOptions.setPopupMode(QtWidgets.QToolButton.InstantPopup)
-        self.btnSearchOptions.setObjectName("btnSearchOptions")
-        self.toolbarLayout.addWidget(self.btnSearchOptions)
-        spacerItem = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        spacerItem = QtWidgets.QSpacerItem(0, 0, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.toolbarLayout.addItem(spacerItem)
         self.statusIndicator = QtWidgets.QLabel(self.toolbarFrame)
-        self.statusIndicator.setStyleSheet("color: #28a745;\n"
-"font-size: 12px;\n"
-"font-weight: bold;")
+        self.statusIndicator.setStyleSheet("color: #28a745; font-weight: bold;")
         self.statusIndicator.setObjectName("statusIndicator")
         self.toolbarLayout.addWidget(self.statusIndicator)
-        self.btnExport = QtWidgets.QToolButton(self.toolbarFrame)
-        self.btnExport.setStyleSheet("QToolButton {\n"
-"    border: 1px solid #28a745;\n"
-"    border-radius: 4px;\n"
-"    padding: 5px 10px;\n"
+        self.btnExport = QtWidgets.QPushButton(self.toolbarFrame)
+        self.btnExport.setStyleSheet("QPushButton {\n"
 "    background-color: #28a745;\n"
 "    color: white;\n"
+"    border: none;\n"
+"    border-radius: 4px;\n"
+"    padding: 6px 12px;\n"
+"    font-weight: bold;\n"
 "}\n"
-"QToolButton:hover {\n"
+"QPushButton:hover {\n"
 "    background-color: #218838;\n"
-"}\n"
-"QToolButton:pressed {\n"
-"    background-color: #1e7e34;\n"
 "}")
-        self.btnExport.setPopupMode(QtWidgets.QToolButton.InstantPopup)
         self.btnExport.setObjectName("btnExport")
         self.toolbarLayout.addWidget(self.btnExport)
         self.mainLayout.addWidget(self.toolbarFrame)
@@ -153,109 +98,66 @@ class Ui_RegistryAnalysisWidget(object):
         self.leftPanel = QtWidgets.QFrame(self.mainSplitter)
         self.leftPanel.setMinimumSize(QtCore.QSize(300, 0))
         self.leftPanel.setMaximumSize(QtCore.QSize(400, 16777215))
-        self.leftPanel.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.leftPanel.setObjectName("leftPanel")
-        self.leftPanelLayout = QtWidgets.QVBoxLayout(self.leftPanel)
-        self.leftPanelLayout.setContentsMargins(0, 0, 0, 0)
-        self.leftPanelLayout.setSpacing(0)
-        self.leftPanelLayout.setObjectName("leftPanelLayout")
-        self.navigationTabs = QtWidgets.QTabWidget(self.leftPanel)
-        self.navigationTabs.setDocumentMode(True)
-        self.navigationTabs.setObjectName("navigationTabs")
-        self.tabTree = QtWidgets.QWidget()
-        self.tabTree.setObjectName("tabTree")
-        self.treeLayout = QtWidgets.QVBoxLayout(self.tabTree)
-        self.treeLayout.setContentsMargins(2, 2, 2, 2)
-        self.treeLayout.setSpacing(2)
-        self.treeLayout.setObjectName("treeLayout")
-        self.treeToolbar = QtWidgets.QFrame(self.tabTree)
-        self.treeToolbar.setMaximumSize(QtCore.QSize(16777215, 30))
-        self.treeToolbar.setFrameShape(QtWidgets.QFrame.NoFrame)
+        self.leftLayout = QtWidgets.QVBoxLayout(self.leftPanel)
+        self.leftLayout.setContentsMargins(0, 0, 0, 0)
+        self.leftLayout.setObjectName("leftLayout")
+        self.treeToolbar = QtWidgets.QFrame(self.leftPanel)
+        self.treeToolbar.setMaximumSize(QtCore.QSize(16777215, 35))
+        self.treeToolbar.setStyleSheet("background-color: #f8f9fa;")
         self.treeToolbar.setObjectName("treeToolbar")
-        self.treeToolbarLayout = QtWidgets.QHBoxLayout(self.treeToolbar)
-        self.treeToolbarLayout.setContentsMargins(2, 2, 2, 2)
-        self.treeToolbarLayout.setSpacing(2)
-        self.treeToolbarLayout.setObjectName("treeToolbarLayout")
-        self.btnExpandAll = QtWidgets.QToolButton(self.treeToolbar)
+        self.hboxlayout = QtWidgets.QHBoxLayout(self.treeToolbar)
+        self.hboxlayout.setContentsMargins(5, 5, 5, 5)
+        self.hboxlayout.setObjectName("hboxlayout")
+        self.btnExpandAll = QtWidgets.QPushButton(self.treeToolbar)
+        self.btnExpandAll.setMaximumSize(QtCore.QSize(25, 25))
         self.btnExpandAll.setObjectName("btnExpandAll")
-        self.treeToolbarLayout.addWidget(self.btnExpandAll)
-        self.btnCollapseAll = QtWidgets.QToolButton(self.treeToolbar)
+        self.hboxlayout.addWidget(self.btnExpandAll)
+        self.btnCollapseAll = QtWidgets.QPushButton(self.treeToolbar)
+        self.btnCollapseAll.setMaximumSize(QtCore.QSize(25, 25))
         self.btnCollapseAll.setObjectName("btnCollapseAll")
-        self.treeToolbarLayout.addWidget(self.btnCollapseAll)
+        self.hboxlayout.addWidget(self.btnCollapseAll)
         self.txtTreeFilter = QtWidgets.QLineEdit(self.treeToolbar)
         self.txtTreeFilter.setClearButtonEnabled(True)
         self.txtTreeFilter.setObjectName("txtTreeFilter")
-        self.treeToolbarLayout.addWidget(self.txtTreeFilter)
-        self.treeLayout.addWidget(self.treeToolbar)
-        self.registryTree = QtWidgets.QTreeView(self.tabTree)
+        self.hboxlayout.addWidget(self.txtTreeFilter)
+        self.leftLayout.addWidget(self.treeToolbar)
+        self.registryTree = QtWidgets.QTreeView(self.leftPanel)
         self.registryTree.setAlternatingRowColors(True)
-        self.registryTree.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
         self.registryTree.setAnimated(True)
         self.registryTree.setObjectName("registryTree")
-        self.treeLayout.addWidget(self.registryTree)
-        self.navigationTabs.addTab(self.tabTree, "")
-        self.tabBookmarks = QtWidgets.QWidget()
-        self.tabBookmarks.setObjectName("tabBookmarks")
-        self.bookmarksLayout = QtWidgets.QVBoxLayout(self.tabBookmarks)
-        self.bookmarksLayout.setObjectName("bookmarksLayout")
-        self.bookmarksList = QtWidgets.QListWidget(self.tabBookmarks)
-        self.bookmarksList.setAlternatingRowColors(True)
-        self.bookmarksList.setObjectName("bookmarksList")
-        self.bookmarksLayout.addWidget(self.bookmarksList)
-        self.bookmarkButtons = QtWidgets.QFrame(self.tabBookmarks)
-        self.bookmarkButtons.setMaximumSize(QtCore.QSize(16777215, 35))
-        self.bookmarkButtons.setFrameShape(QtWidgets.QFrame.NoFrame)
-        self.bookmarkButtons.setObjectName("bookmarkButtons")
-        self.bookmarkButtonsLayout = QtWidgets.QHBoxLayout(self.bookmarkButtons)
-        self.bookmarkButtonsLayout.setObjectName("bookmarkButtonsLayout")
-        self.btnAddBookmark = QtWidgets.QPushButton(self.bookmarkButtons)
-        self.btnAddBookmark.setObjectName("btnAddBookmark")
-        self.bookmarkButtonsLayout.addWidget(self.btnAddBookmark)
-        self.btnRemoveBookmark = QtWidgets.QPushButton(self.bookmarkButtons)
-        self.btnRemoveBookmark.setObjectName("btnRemoveBookmark")
-        self.bookmarkButtonsLayout.addWidget(self.btnRemoveBookmark)
-        self.btnGoToBookmark = QtWidgets.QPushButton(self.bookmarkButtons)
-        self.btnGoToBookmark.setObjectName("btnGoToBookmark")
-        self.bookmarkButtonsLayout.addWidget(self.btnGoToBookmark)
-        self.bookmarksLayout.addWidget(self.bookmarkButtons)
-        self.navigationTabs.addTab(self.tabBookmarks, "")
-        self.leftPanelLayout.addWidget(self.navigationTabs)
+        self.leftLayout.addWidget(self.registryTree)
         self.centerPanel = QtWidgets.QFrame(self.mainSplitter)
-        self.centerPanel.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.centerPanel.setObjectName("centerPanel")
-        self.centerPanelLayout = QtWidgets.QVBoxLayout(self.centerPanel)
-        self.centerPanelLayout.setContentsMargins(0, 0, 0, 0)
-        self.centerPanelLayout.setSpacing(0)
-        self.centerPanelLayout.setObjectName("centerPanelLayout")
+        self.centerLayout = QtWidgets.QVBoxLayout(self.centerPanel)
+        self.centerLayout.setContentsMargins(0, 0, 0, 0)
+        self.centerLayout.setObjectName("centerLayout")
         self.pathBar = QtWidgets.QFrame(self.centerPanel)
         self.pathBar.setMaximumSize(QtCore.QSize(16777215, 35))
-        self.pathBar.setStyleSheet("QFrame#pathBar {\n"
-"    background-color: #f8f9fa;\n"
-"    border-bottom: 1px solid #dee2e6;\n"
-"}")
-        self.pathBar.setFrameShape(QtWidgets.QFrame.NoFrame)
+        self.pathBar.setStyleSheet("background-color: #f8f9fa; border-bottom: 1px solid #dee2e6;")
         self.pathBar.setObjectName("pathBar")
-        self.pathBarLayout = QtWidgets.QHBoxLayout(self.pathBar)
-        self.pathBarLayout.setContentsMargins(10, 5, 10, 5)
-        self.pathBarLayout.setObjectName("pathBarLayout")
+        self.hboxlayout1 = QtWidgets.QHBoxLayout(self.pathBar)
+        self.hboxlayout1.setContentsMargins(8, 8, 8, 8)
+        self.hboxlayout1.setObjectName("hboxlayout1")
         self.lblPath = QtWidgets.QLabel(self.pathBar)
         self.lblPath.setStyleSheet("font-weight: bold;")
         self.lblPath.setObjectName("lblPath")
-        self.pathBarLayout.addWidget(self.lblPath)
+        self.hboxlayout1.addWidget(self.lblPath)
         self.txtCurrentPath = QtWidgets.QLineEdit(self.pathBar)
         self.txtCurrentPath.setStyleSheet("QLineEdit {\n"
 "    border: 1px solid #ced4da;\n"
 "    border-radius: 3px;\n"
-"        padding: 3px;\n"
+"    padding: 3px;\n"
 "    background-color: white;\n"
 "}")
         self.txtCurrentPath.setReadOnly(True)
         self.txtCurrentPath.setObjectName("txtCurrentPath")
-        self.pathBarLayout.addWidget(self.txtCurrentPath)
-        self.btnCopyPath = QtWidgets.QToolButton(self.pathBar)
+        self.hboxlayout1.addWidget(self.txtCurrentPath)
+        self.btnCopyPath = QtWidgets.QPushButton(self.pathBar)
+        self.btnCopyPath.setMaximumSize(QtCore.QSize(30, 25))
         self.btnCopyPath.setObjectName("btnCopyPath")
-        self.pathBarLayout.addWidget(self.btnCopyPath)
-        self.centerPanelLayout.addWidget(self.pathBar)
+        self.hboxlayout1.addWidget(self.btnCopyPath)
+        self.centerLayout.addWidget(self.pathBar)
         self.verticalSplitter = QtWidgets.QSplitter(self.centerPanel)
         self.verticalSplitter.setOrientation(QtCore.Qt.Vertical)
         self.verticalSplitter.setObjectName("verticalSplitter")
@@ -267,12 +169,11 @@ class Ui_RegistryAnalysisWidget(object):
         self.valuesTable.horizontalHeader().setStretchLastSection(True)
         self.detailTabs = QtWidgets.QTabWidget(self.verticalSplitter)
         self.detailTabs.setMaximumSize(QtCore.QSize(16777215, 300))
-        self.detailTabs.setDocumentMode(True)
         self.detailTabs.setObjectName("detailTabs")
         self.tabHex = QtWidgets.QWidget()
         self.tabHex.setObjectName("tabHex")
-        self.hexLayout = QtWidgets.QVBoxLayout(self.tabHex)
-        self.hexLayout.setObjectName("hexLayout")
+        self.vboxlayout = QtWidgets.QVBoxLayout(self.tabHex)
+        self.vboxlayout.setObjectName("vboxlayout")
         self.hexView = QtWidgets.QTextEdit(self.tabHex)
         font = QtGui.QFont()
         font.setFamily("Consolas")
@@ -280,22 +181,22 @@ class Ui_RegistryAnalysisWidget(object):
         self.hexView.setFont(font)
         self.hexView.setReadOnly(True)
         self.hexView.setObjectName("hexView")
-        self.hexLayout.addWidget(self.hexView)
+        self.vboxlayout.addWidget(self.hexView)
         self.detailTabs.addTab(self.tabHex, "")
         self.tabDecoded = QtWidgets.QWidget()
         self.tabDecoded.setObjectName("tabDecoded")
-        self.decodedLayout = QtWidgets.QVBoxLayout(self.tabDecoded)
-        self.decodedLayout.setObjectName("decodedLayout")
-        self.decodingOptions = QtWidgets.QFrame(self.tabDecoded)
-        self.decodingOptions.setMaximumSize(QtCore.QSize(16777215, 35))
-        self.decodingOptions.setFrameShape(QtWidgets.QFrame.NoFrame)
-        self.decodingOptions.setObjectName("decodingOptions")
-        self.decodingOptionsLayout = QtWidgets.QHBoxLayout(self.decodingOptions)
-        self.decodingOptionsLayout.setObjectName("decodingOptionsLayout")
-        self.lblFormat = QtWidgets.QLabel(self.decodingOptions)
+        self.vboxlayout1 = QtWidgets.QVBoxLayout(self.tabDecoded)
+        self.vboxlayout1.setObjectName("vboxlayout1")
+        self.formatFrame = QtWidgets.QFrame(self.tabDecoded)
+        self.formatFrame.setMaximumSize(QtCore.QSize(16777215, 35))
+        self.formatFrame.setObjectName("formatFrame")
+        self.hboxlayout2 = QtWidgets.QHBoxLayout(self.formatFrame)
+        self.hboxlayout2.setObjectName("hboxlayout2")
+        self.lblFormat = QtWidgets.QLabel(self.formatFrame)
         self.lblFormat.setObjectName("lblFormat")
-        self.decodingOptionsLayout.addWidget(self.lblFormat)
-        self.cmbFormat = QtWidgets.QComboBox(self.decodingOptions)
+        self.hboxlayout2.addWidget(self.lblFormat)
+        self.cmbFormat = QtWidgets.QComboBox(self.formatFrame)
+        self.cmbFormat.setMinimumSize(QtCore.QSize(150, 0))
         self.cmbFormat.setObjectName("cmbFormat")
         self.cmbFormat.addItem("")
         self.cmbFormat.addItem("")
@@ -304,20 +205,28 @@ class Ui_RegistryAnalysisWidget(object):
         self.cmbFormat.addItem("")
         self.cmbFormat.addItem("")
         self.cmbFormat.addItem("")
-        self.cmbFormat.addItem("")
-        self.decodingOptionsLayout.addWidget(self.cmbFormat)
-        spacerItem1 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.decodingOptionsLayout.addItem(spacerItem1)
-        self.decodedLayout.addWidget(self.decodingOptions)
+        self.hboxlayout2.addWidget(self.cmbFormat)
+        spacerItem1 = QtWidgets.QSpacerItem(0, 0, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.hboxlayout2.addItem(spacerItem1)
+        self.vboxlayout1.addWidget(self.formatFrame)
         self.decodedView = QtWidgets.QTextEdit(self.tabDecoded)
         self.decodedView.setReadOnly(True)
         self.decodedView.setObjectName("decodedView")
-        self.decodedLayout.addWidget(self.decodedView)
+        self.vboxlayout1.addWidget(self.decodedView)
         self.detailTabs.addTab(self.tabDecoded, "")
+        self.tabAnalysis = QtWidgets.QWidget()
+        self.tabAnalysis.setObjectName("tabAnalysis")
+        self.vboxlayout2 = QtWidgets.QVBoxLayout(self.tabAnalysis)
+        self.vboxlayout2.setObjectName("vboxlayout2")
+        self.analysisView = QtWidgets.QTextEdit(self.tabAnalysis)
+        self.analysisView.setReadOnly(True)
+        self.analysisView.setObjectName("analysisView")
+        self.vboxlayout2.addWidget(self.analysisView)
+        self.detailTabs.addTab(self.tabAnalysis, "")
         self.tabTimeline = QtWidgets.QWidget()
         self.tabTimeline.setObjectName("tabTimeline")
-        self.timelineLayout = QtWidgets.QVBoxLayout(self.tabTimeline)
-        self.timelineLayout.setObjectName("timelineLayout")
+        self.vboxlayout3 = QtWidgets.QVBoxLayout(self.tabTimeline)
+        self.vboxlayout3.setObjectName("vboxlayout3")
         self.timelineTable = QtWidgets.QTableWidget(self.tabTimeline)
         self.timelineTable.setAlternatingRowColors(True)
         self.timelineTable.setObjectName("timelineTable")
@@ -331,71 +240,36 @@ class Ui_RegistryAnalysisWidget(object):
         self.timelineTable.setHorizontalHeaderItem(2, item)
         item = QtWidgets.QTableWidgetItem()
         self.timelineTable.setHorizontalHeaderItem(3, item)
-        self.timelineLayout.addWidget(self.timelineTable)
+        self.vboxlayout3.addWidget(self.timelineTable)
         self.detailTabs.addTab(self.tabTimeline, "")
-        self.tabAnalysis = QtWidgets.QWidget()
-        self.tabAnalysis.setObjectName("tabAnalysis")
-        self.analysisLayout = QtWidgets.QVBoxLayout(self.tabAnalysis)
-        self.analysisLayout.setObjectName("analysisLayout")
-        self.analysisView = QtWidgets.QTextEdit(self.tabAnalysis)
-        self.analysisView.setReadOnly(True)
-        self.analysisView.setObjectName("analysisView")
-        self.analysisLayout.addWidget(self.analysisView)
-        self.detailTabs.addTab(self.tabAnalysis, "")
-        self.tabNotes = QtWidgets.QWidget()
-        self.tabNotes.setObjectName("tabNotes")
-        self.notesLayout = QtWidgets.QVBoxLayout(self.tabNotes)
-        self.notesLayout.setObjectName("notesLayout")
-        self.notesEdit = QtWidgets.QTextEdit(self.tabNotes)
-        self.notesEdit.setObjectName("notesEdit")
-        self.notesLayout.addWidget(self.notesEdit)
-        self.btnSaveNotes = QtWidgets.QPushButton(self.tabNotes)
-        self.btnSaveNotes.setObjectName("btnSaveNotes")
-        self.notesLayout.addWidget(self.btnSaveNotes)
-        self.detailTabs.addTab(self.tabNotes, "")
-        self.centerPanelLayout.addWidget(self.verticalSplitter)
+        self.centerLayout.addWidget(self.verticalSplitter)
         self.mainLayout.addWidget(self.mainSplitter)
         self.statusBar = QtWidgets.QStatusBar(RegistryAnalysisWidget)
-        self.statusBar.setMaximumSize(QtCore.QSize(16777215, 25))
-        self.statusBar.setStyleSheet("QStatusBar {\n"
-"    background-color: #f8f9fa;\n"
-"    border-top: 1px solid #dee2e6;\n"
-"}")
+        self.statusBar.setMaximumSize(QtCore.QSize(16777215, 20))
         self.statusBar.setObjectName("statusBar")
         self.mainLayout.addWidget(self.statusBar)
 
         self.retranslateUi(RegistryAnalysisWidget)
-        self.navigationTabs.setCurrentIndex(0)
-        self.detailTabs.setCurrentIndex(0)
+        self.detailTabs.setCurrentIndex(3)
         QtCore.QMetaObject.connectSlotsByName(RegistryAnalysisWidget)
 
     def retranslateUi(self, RegistryAnalysisWidget):
         _translate = QtCore.QCoreApplication.translate
         RegistryAnalysisWidget.setWindowTitle(_translate("RegistryAnalysisWidget", "Registry Analysis"))
         self.caseInfoLabel.setText(_translate("RegistryAnalysisWidget", "Case: Not Selected"))
-        self.lblHiveArtifact.setText(_translate("RegistryAnalysisWidget", "Registry Hive:"))
-        self.cmbHiveArtifacts.setItemText(0, _translate("RegistryAnalysisWidget", "-- Chọn Registry Hive --"))
-        self.btnLoadSelectedHive.setText(_translate("RegistryAnalysisWidget", "Load"))
-        self.btnRefreshHives.setText(_translate("RegistryAnalysisWidget", "🔄"))
-        self.btnRefreshHives.setToolTip(_translate("RegistryAnalysisWidget", "Refresh danh sách Registry Hives"))
-        self.lblSearch.setText(_translate("RegistryAnalysisWidget", "Search:"))
-        self.txtSearch.setPlaceholderText(_translate("RegistryAnalysisWidget", "Search keys, values, data..."))
-        self.btnSearchOptions.setText(_translate("RegistryAnalysisWidget", "▼"))
+        self.btnLoadSelectedHive.setText(_translate("RegistryAnalysisWidget", "Load Hive"))
+        self.btnRefreshHives.setToolTip(_translate("RegistryAnalysisWidget", "Refresh hive list"))
+        self.btnRefreshHives.setText(_translate("RegistryAnalysisWidget", "↻"))
         self.statusIndicator.setText(_translate("RegistryAnalysisWidget", "● Ready"))
-        self.btnExport.setText(_translate("RegistryAnalysisWidget", "Xuất dữ liệu"))
-        self.btnExpandAll.setText(_translate("RegistryAnalysisWidget", "+"))
+        self.btnExport.setText(_translate("RegistryAnalysisWidget", "Export ▼"))
         self.btnExpandAll.setToolTip(_translate("RegistryAnalysisWidget", "Expand All"))
-        self.btnCollapseAll.setText(_translate("RegistryAnalysisWidget", "-"))
+        self.btnExpandAll.setText(_translate("RegistryAnalysisWidget", "⊞"))
         self.btnCollapseAll.setToolTip(_translate("RegistryAnalysisWidget", "Collapse All"))
-        self.txtTreeFilter.setPlaceholderText(_translate("RegistryAnalysisWidget", "Filter tree..."))
-        self.navigationTabs.setTabText(self.navigationTabs.indexOf(self.tabTree), _translate("RegistryAnalysisWidget", "Registry Tree"))
-        self.btnAddBookmark.setText(_translate("RegistryAnalysisWidget", "Add Current"))
-        self.btnRemoveBookmark.setText(_translate("RegistryAnalysisWidget", "Remove"))
-        self.btnGoToBookmark.setText(_translate("RegistryAnalysisWidget", "Go To"))
-        self.navigationTabs.setTabText(self.navigationTabs.indexOf(self.tabBookmarks), _translate("RegistryAnalysisWidget", "Bookmarks"))
+        self.btnCollapseAll.setText(_translate("RegistryAnalysisWidget", "⊟"))
+        self.txtTreeFilter.setPlaceholderText(_translate("RegistryAnalysisWidget", "Filter keys..."))
         self.lblPath.setText(_translate("RegistryAnalysisWidget", "Path:"))
-        self.btnCopyPath.setText(_translate("RegistryAnalysisWidget", "📋"))
         self.btnCopyPath.setToolTip(_translate("RegistryAnalysisWidget", "Copy Path"))
+        self.btnCopyPath.setText(_translate("RegistryAnalysisWidget", "📋"))
         self.detailTabs.setTabText(self.detailTabs.indexOf(self.tabHex), _translate("RegistryAnalysisWidget", "Hex View"))
         self.lblFormat.setText(_translate("RegistryAnalysisWidget", "Format:"))
         self.cmbFormat.setItemText(0, _translate("RegistryAnalysisWidget", "Auto-detect"))
@@ -404,11 +278,17 @@ class Ui_RegistryAnalysisWidget(object):
         self.cmbFormat.setItemText(3, _translate("RegistryAnalysisWidget", "DWORD (32-bit)"))
         self.cmbFormat.setItemText(4, _translate("RegistryAnalysisWidget", "QWORD (64-bit)"))
         self.cmbFormat.setItemText(5, _translate("RegistryAnalysisWidget", "Windows FILETIME"))
-        self.cmbFormat.setItemText(6, _translate("RegistryAnalysisWidget", "SID"))
-        self.cmbFormat.setItemText(7, _translate("RegistryAnalysisWidget", "GUID"))
-        self.detailTabs.setTabText(self.detailTabs.indexOf(self.tabDecoded), _translate("RegistryAnalysisWidget", "Decoded Value"))
+        self.cmbFormat.setItemText(6, _translate("RegistryAnalysisWidget", "Hex Dump"))
+        self.detailTabs.setTabText(self.detailTabs.indexOf(self.tabDecoded), _translate("RegistryAnalysisWidget", "Decoded"))
+        self.analysisView.setHtml(_translate("RegistryAnalysisWidget", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+"<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
+"p, li { white-space: pre-wrap; }\n"
+"</style></head><body style=\" font-family:\'MS Shell Dlg 2\'; font-size:8.25pt; font-weight:400; font-style:normal;\">\n"
+"<p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Select a registry key to see forensic analysis...</p></body></html>"))
+        self.detailTabs.setTabText(self.detailTabs.indexOf(self.tabAnalysis), _translate("RegistryAnalysisWidget", "Analysis"))
+        self.timelineTable.setSortingEnabled(True)
         item = self.timelineTable.horizontalHeaderItem(0)
-        item.setText(_translate("RegistryAnalysisWidget", "Timestamp"))
+        item.setText(_translate("RegistryAnalysisWidget", "Time"))
         item = self.timelineTable.horizontalHeaderItem(1)
         item.setText(_translate("RegistryAnalysisWidget", "Key"))
         item = self.timelineTable.horizontalHeaderItem(2)
@@ -416,22 +296,3 @@ class Ui_RegistryAnalysisWidget(object):
         item = self.timelineTable.horizontalHeaderItem(3)
         item.setText(_translate("RegistryAnalysisWidget", "Details"))
         self.detailTabs.setTabText(self.detailTabs.indexOf(self.tabTimeline), _translate("RegistryAnalysisWidget", "Timeline"))
-        self.analysisView.setHtml(_translate("RegistryAnalysisWidget", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
-"<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
-"p, li { white-space: pre-wrap; }\n"
-"</style></head><body style=\" font-family:\'MS Shell Dlg 2\'; font-size:8.25pt; font-weight:400; font-style:normal;\">\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Select a registry key or value to see automated analysis results...</p></body></html>"))
-        self.detailTabs.setTabText(self.detailTabs.indexOf(self.tabAnalysis), _translate("RegistryAnalysisWidget", "Analysis"))
-        self.notesEdit.setPlaceholderText(_translate("RegistryAnalysisWidget", "Add your investigation notes here..."))
-        self.btnSaveNotes.setText(_translate("RegistryAnalysisWidget", "Save Notes"))
-        self.detailTabs.setTabText(self.detailTabs.indexOf(self.tabNotes), _translate("RegistryAnalysisWidget", "Notes"))
-
-
-if __name__ == "__main__":
-    import sys
-    app = QtWidgets.QApplication(sys.argv)
-    RegistryAnalysisWidget = QtWidgets.QWidget()
-    ui = Ui_RegistryAnalysisWidget()
-    ui.setupUi(RegistryAnalysisWidget)
-    RegistryAnalysisWidget.show()
-    sys.exit(app.exec_())

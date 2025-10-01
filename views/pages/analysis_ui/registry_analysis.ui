@@ -34,7 +34,7 @@
      <property name="maximumSize">
       <size>
        <width>16777215</width>
-       <height>50</height>
+       <height>45</height>
       </size>
      </property>
      <property name="styleSheet">
@@ -43,31 +43,23 @@
     border-bottom: 1px solid #dee2e6;
 }</string>
      </property>
-     <property name="frameShape">
-      <enum>QFrame::NoFrame</enum>
-     </property>
      <layout class="QHBoxLayout" name="toolbarLayout">
-      <property name="spacing">
-       <number>5</number>
-      </property>
       <property name="leftMargin">
-       <number>10</number>
+       <number>8</number>
       </property>
       <property name="topMargin">
-       <number>5</number>
+       <number>8</number>
       </property>
       <property name="rightMargin">
-       <number>10</number>
+       <number>8</number>
       </property>
       <property name="bottomMargin">
-       <number>5</number>
+       <number>8</number>
       </property>
       <item>
        <widget class="QLabel" name="caseInfoLabel">
         <property name="styleSheet">
-         <string notr="true">color: #495057;
-font-size: 12px;
-font-weight: bold;</string>
+         <string notr="true">font-weight: bold; color: #495057;</string>
         </property>
         <property name="text">
          <string>Case: Not Selected</string>
@@ -75,9 +67,9 @@ font-weight: bold;</string>
        </widget>
       </item>
       <item>
-       <widget class="QLabel" name="lblHiveArtifact">
-        <property name="text">
-         <string>Registry Hive:</string>
+       <widget class="Line" name="line1">
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
         </property>
        </widget>
       </item>
@@ -85,7 +77,7 @@ font-weight: bold;</string>
        <widget class="QComboBox" name="cmbHiveArtifacts">
         <property name="minimumSize">
          <size>
-          <width>200</width>
+          <width>250</width>
           <height>30</height>
          </size>
         </property>
@@ -94,145 +86,61 @@ font-weight: bold;</string>
     border: 1px solid #ced4da;
     border-radius: 4px;
     padding: 5px;
-    background-color: white;
 }
 QComboBox:hover {
-    border-color: #adb5bd;
-}
-QComboBox::drop-down {
-    border: none;
-}
-QComboBox::down-arrow {
-    width: 12px;
-    height: 12px;
+    border-color: #80bdff;
 }</string>
         </property>
-        <item>
-         <property name="text">
-          <string>-- Chọn Registry Hive --</string>
-         </property>
-        </item>
        </widget>
       </item>
       <item>
-       <widget class="QToolButton" name="btnLoadSelectedHive">
-        <property name="minimumSize">
-         <size>
-          <width>80</width>
-          <height>30</height>
-         </size>
-        </property>
+       <widget class="QPushButton" name="btnLoadSelectedHive">
         <property name="styleSheet">
-         <string notr="true">QToolButton {
-    border: 1px solid #007bff;
-    border-radius: 4px;
-    padding: 5px 10px;
+         <string notr="true">QPushButton {
     background-color: #007bff;
     color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 6px 12px;
+    font-weight: bold;
 }
-QToolButton:hover {
+QPushButton:hover {
     background-color: #0056b3;
 }
-QToolButton:pressed {
-    background-color: #004085;
+QPushButton:disabled {
+    background-color: #6c757d;
 }</string>
         </property>
         <property name="text">
-         <string>Load</string>
+         <string>Load Hive</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QToolButton" name="btnRefreshHives">
-        <property name="minimumSize">
+       <widget class="QPushButton" name="btnRefreshHives">
+        <property name="maximumSize">
          <size>
           <width>30</width>
           <height>30</height>
          </size>
         </property>
-        <property name="styleSheet">
-         <string notr="true">QToolButton {
-    border: 1px solid #6c757d;
-    border-radius: 4px;
-    padding: 5px;
-    background-color: #6c757d;
-    color: white;
-}
-QToolButton:hover {
-    background-color: #545b62;
-}
-QToolButton:pressed {
-    background-color: #495057;
-}</string>
-        </property>
-        <property name="text">
-         <string>🔄</string>
-        </property>
         <property name="toolTip">
-         <string>Refresh danh sách Registry Hives</string>
+         <string>Refresh hive list</string>
         </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="Line" name="line2">
-        <property name="orientation">
-         <enum>Qt::Vertical</enum>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLabel" name="lblSearch">
         <property name="text">
-         <string>Search:</string>
+         <string>↻</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QLineEdit" name="txtSearch">
-        <property name="minimumSize">
-         <size>
-          <width>250</width>
-          <height>30</height>
-         </size>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">QLineEdit {
-    border: 1px solid #ced4da;
-    border-radius: 4px;
-    padding: 5px;
-    background-color: white;
-}
-QLineEdit:focus {
-    border-color: #4a90e2;
-}</string>
-        </property>
-        <property name="placeholderText">
-         <string>Search keys, values, data...</string>
-        </property>
-        <property name="clearButtonEnabled">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QToolButton" name="btnSearchOptions">
-        <property name="text">
-         <string>▼</string>
-        </property>
-        <property name="popupMode">
-         <enum>QToolButton::InstantPopup</enum>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <spacer name="toolbarSpacer">
+       <spacer name="spacer1">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
         <property name="sizeHint" stdset="0">
          <size>
-          <width>40</width>
-          <height>20</height>
+          <width>0</width>
+          <height>0</height>
          </size>
         </property>
        </spacer>
@@ -240,9 +148,7 @@ QLineEdit:focus {
       <item>
        <widget class="QLabel" name="statusIndicator">
         <property name="styleSheet">
-         <string notr="true">color: #28a745;
-font-size: 12px;
-font-weight: bold;</string>
+         <string notr="true">color: #28a745; font-weight: bold;</string>
         </property>
         <property name="text">
          <string>● Ready</string>
@@ -250,27 +156,22 @@ font-weight: bold;</string>
        </widget>
       </item>
       <item>
-       <widget class="QToolButton" name="btnExport">
+       <widget class="QPushButton" name="btnExport">
         <property name="styleSheet">
-         <string notr="true">QToolButton {
-    border: 1px solid #28a745;
-    border-radius: 4px;
-    padding: 5px 10px;
+         <string notr="true">QPushButton {
     background-color: #28a745;
     color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 6px 12px;
+    font-weight: bold;
 }
-QToolButton:hover {
+QPushButton:hover {
     background-color: #218838;
-}
-QToolButton:pressed {
-    background-color: #1e7e34;
 }</string>
         </property>
         <property name="text">
-         <string>Xuất dữ liệu</string>
-        </property>
-        <property name="popupMode">
-         <enum>QToolButton::InstantPopup</enum>
+         <string>Export ▼</string>
         </property>
        </widget>
       </item>
@@ -295,13 +196,7 @@ QToolButton:pressed {
         <height>16777215</height>
        </size>
       </property>
-      <property name="frameShape">
-       <enum>QFrame::StyledPanel</enum>
-      </property>
-      <layout class="QVBoxLayout" name="leftPanelLayout">
-       <property name="spacing">
-        <number>0</number>
-       </property>
+      <layout class="QVBoxLayout" name="leftLayout">
        <property name="leftMargin">
         <number>0</number>
        </property>
@@ -315,170 +210,88 @@ QToolButton:pressed {
         <number>0</number>
        </property>
        <item>
-        <widget class="QTabWidget" name="navigationTabs">
-         <property name="currentIndex">
-          <number>0</number>
+        <widget class="QFrame" name="treeToolbar">
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>35</height>
+          </size>
          </property>
-         <property name="documentMode">
+         <property name="styleSheet">
+          <string notr="true">background-color: #f8f9fa;</string>
+         </property>
+         <layout class="QHBoxLayout">
+          <property name="leftMargin">
+           <number>5</number>
+          </property>
+          <property name="topMargin">
+           <number>5</number>
+          </property>
+          <property name="rightMargin">
+           <number>5</number>
+          </property>
+          <property name="bottomMargin">
+           <number>5</number>
+          </property>
+          <item>
+           <widget class="QPushButton" name="btnExpandAll">
+            <property name="maximumSize">
+             <size>
+              <width>25</width>
+              <height>25</height>
+             </size>
+            </property>
+            <property name="toolTip">
+             <string>Expand All</string>
+            </property>
+            <property name="text">
+             <string>⊞</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="btnCollapseAll">
+            <property name="maximumSize">
+             <size>
+              <width>25</width>
+              <height>25</height>
+             </size>
+            </property>
+            <property name="toolTip">
+             <string>Collapse All</string>
+            </property>
+            <property name="text">
+             <string>⊟</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="txtTreeFilter">
+            <property name="placeholderText">
+             <string>Filter keys...</string>
+            </property>
+            <property name="clearButtonEnabled">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QTreeView" name="registryTree">
+         <property name="alternatingRowColors">
           <bool>true</bool>
          </property>
-         <widget class="QWidget" name="tabTree">
-          <attribute name="title">
-           <string>Registry Tree</string>
-          </attribute>
-          <layout class="QVBoxLayout" name="treeLayout">
-           <property name="spacing">
-            <number>2</number>
-           </property>
-           <property name="leftMargin">
-            <number>2</number>
-           </property>
-           <property name="topMargin">
-            <number>2</number>
-           </property>
-           <property name="rightMargin">
-            <number>2</number>
-           </property>
-           <property name="bottomMargin">
-            <number>2</number>
-           </property>
-           <item>
-            <widget class="QFrame" name="treeToolbar">
-             <property name="maximumSize">
-              <size>
-               <width>16777215</width>
-               <height>30</height>
-              </size>
-             </property>
-             <property name="frameShape">
-              <enum>QFrame::NoFrame</enum>
-             </property>
-             <layout class="QHBoxLayout" name="treeToolbarLayout">
-              <property name="spacing">
-               <number>2</number>
-              </property>
-              <property name="leftMargin">
-               <number>2</number>
-              </property>
-              <property name="topMargin">
-               <number>2</number>
-              </property>
-              <property name="rightMargin">
-               <number>2</number>
-              </property>
-              <property name="bottomMargin">
-               <number>2</number>
-              </property>
-              <item>
-               <widget class="QToolButton" name="btnExpandAll">
-                <property name="text">
-                 <string>+</string>
-                </property>
-                <property name="toolTip">
-                 <string>Expand All</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QToolButton" name="btnCollapseAll">
-                <property name="text">
-                 <string>-</string>
-                </property>
-                <property name="toolTip">
-                 <string>Collapse All</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QLineEdit" name="txtTreeFilter">
-                <property name="placeholderText">
-                 <string>Filter tree...</string>
-                </property>
-                <property name="clearButtonEnabled">
-                 <bool>true</bool>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </widget>
-           </item>
-           <item>
-            <widget class="QTreeView" name="registryTree">
-             <property name="alternatingRowColors">
-              <bool>true</bool>
-             </property>
-             <property name="selectionMode">
-              <enum>QAbstractItemView::SingleSelection</enum>
-             </property>
-             <property name="animated">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </widget>
-         <widget class="QWidget" name="tabBookmarks">
-          <attribute name="title">
-           <string>Bookmarks</string>
-          </attribute>
-          <layout class="QVBoxLayout" name="bookmarksLayout">
-           <item>
-            <widget class="QListWidget" name="bookmarksList">
-             <property name="alternatingRowColors">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QFrame" name="bookmarkButtons">
-             <property name="maximumSize">
-              <size>
-               <width>16777215</width>
-               <height>35</height>
-              </size>
-             </property>
-             <property name="frameShape">
-              <enum>QFrame::NoFrame</enum>
-             </property>
-             <layout class="QHBoxLayout" name="bookmarkButtonsLayout">
-              <item>
-               <widget class="QPushButton" name="btnAddBookmark">
-                <property name="text">
-                 <string>Add Current</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QPushButton" name="btnRemoveBookmark">
-                <property name="text">
-                 <string>Remove</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QPushButton" name="btnGoToBookmark">
-                <property name="text">
-                 <string>Go To</string>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </widget>
-           </item>
-          </layout>
-         </widget>
+         <property name="animated">
+          <bool>true</bool>
+         </property>
         </widget>
        </item>
       </layout>
      </widget>
      <widget class="QFrame" name="centerPanel">
-      <property name="frameShape">
-       <enum>QFrame::StyledPanel</enum>
-      </property>
-      <layout class="QVBoxLayout" name="centerPanelLayout">
-       <property name="spacing">
-        <number>0</number>
-       </property>
+      <layout class="QVBoxLayout" name="centerLayout">
        <property name="leftMargin">
         <number>0</number>
        </property>
@@ -500,26 +313,20 @@ QToolButton:pressed {
           </size>
          </property>
          <property name="styleSheet">
-          <string notr="true">QFrame#pathBar {
-    background-color: #f8f9fa;
-    border-bottom: 1px solid #dee2e6;
-}</string>
+          <string notr="true">background-color: #f8f9fa; border-bottom: 1px solid #dee2e6;</string>
          </property>
-         <property name="frameShape">
-          <enum>QFrame::NoFrame</enum>
-         </property>
-         <layout class="QHBoxLayout" name="pathBarLayout">
+         <layout class="QHBoxLayout">
           <property name="leftMargin">
-           <number>10</number>
+           <number>8</number>
           </property>
           <property name="topMargin">
-           <number>5</number>
+           <number>8</number>
           </property>
           <property name="rightMargin">
-           <number>10</number>
+           <number>8</number>
           </property>
           <property name="bottomMargin">
-           <number>5</number>
+           <number>8</number>
           </property>
           <item>
            <widget class="QLabel" name="lblPath">
@@ -537,7 +344,7 @@ QToolButton:pressed {
              <string notr="true">QLineEdit {
     border: 1px solid #ced4da;
     border-radius: 3px;
-        padding: 3px;
+    padding: 3px;
     background-color: white;
 }</string>
             </property>
@@ -547,12 +354,18 @@ QToolButton:pressed {
            </widget>
           </item>
           <item>
-           <widget class="QToolButton" name="btnCopyPath">
-            <property name="text">
-             <string>📋</string>
+           <widget class="QPushButton" name="btnCopyPath">
+            <property name="maximumSize">
+             <size>
+              <width>30</width>
+              <height>25</height>
+             </size>
             </property>
             <property name="toolTip">
              <string>Copy Path</string>
+            </property>
+            <property name="text">
+             <string>📋</string>
             </property>
            </widget>
           </item>
@@ -586,16 +399,13 @@ QToolButton:pressed {
            </size>
           </property>
           <property name="currentIndex">
-           <number>0</number>
-          </property>
-          <property name="documentMode">
-           <bool>true</bool>
+           <number>3</number>
           </property>
           <widget class="QWidget" name="tabHex">
            <attribute name="title">
             <string>Hex View</string>
            </attribute>
-           <layout class="QVBoxLayout" name="hexLayout">
+           <layout class="QVBoxLayout">
             <item>
              <widget class="QTextEdit" name="hexView">
               <property name="font">
@@ -613,21 +423,18 @@ QToolButton:pressed {
           </widget>
           <widget class="QWidget" name="tabDecoded">
            <attribute name="title">
-            <string>Decoded Value</string>
+            <string>Decoded</string>
            </attribute>
-           <layout class="QVBoxLayout" name="decodedLayout">
+           <layout class="QVBoxLayout">
             <item>
-             <widget class="QFrame" name="decodingOptions">
+             <widget class="QFrame" name="formatFrame">
               <property name="maximumSize">
                <size>
                 <width>16777215</width>
                 <height>35</height>
                </size>
               </property>
-              <property name="frameShape">
-               <enum>QFrame::NoFrame</enum>
-              </property>
-              <layout class="QHBoxLayout" name="decodingOptionsLayout">
+              <layout class="QHBoxLayout">
                <item>
                 <widget class="QLabel" name="lblFormat">
                  <property name="text">
@@ -637,6 +444,12 @@ QToolButton:pressed {
                </item>
                <item>
                 <widget class="QComboBox" name="cmbFormat">
+                 <property name="minimumSize">
+                  <size>
+                   <width>150</width>
+                   <height>0</height>
+                  </size>
+                 </property>
                  <item>
                   <property name="text">
                    <string>Auto-detect</string>
@@ -669,25 +482,20 @@ QToolButton:pressed {
                  </item>
                  <item>
                   <property name="text">
-                   <string>SID</string>
-                  </property>
-                 </item>
-                 <item>
-                  <property name="text">
-                   <string>GUID</string>
+                   <string>Hex Dump</string>
                   </property>
                  </item>
                 </widget>
                </item>
                <item>
-                <spacer name="formatSpacer">
+                <spacer name="spacer2">
                  <property name="orientation">
                   <enum>Qt::Horizontal</enum>
                  </property>
                  <property name="sizeHint" stdset="0">
                   <size>
-                   <width>40</width>
-                   <height>20</height>
+                   <width>0</width>
+                   <height>0</height>
                   </size>
                  </property>
                 </spacer>
@@ -704,19 +512,43 @@ QToolButton:pressed {
             </item>
            </layout>
           </widget>
+          <widget class="QWidget" name="tabAnalysis">
+           <attribute name="title">
+            <string>Analysis</string>
+           </attribute>
+           <layout class="QVBoxLayout">
+            <item>
+             <widget class="QTextEdit" name="analysisView">
+              <property name="readOnly">
+               <bool>true</bool>
+              </property>
+              <property name="html">
+               <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Select a registry key to see forensic analysis...&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
           <widget class="QWidget" name="tabTimeline">
            <attribute name="title">
             <string>Timeline</string>
            </attribute>
-           <layout class="QVBoxLayout" name="timelineLayout">
+           <layout class="QVBoxLayout">
             <item>
              <widget class="QTableWidget" name="timelineTable">
               <property name="alternatingRowColors">
                <bool>true</bool>
               </property>
+              <property name="sortingEnabled">
+               <bool>true</bool>
+              </property>
               <column>
                <property name="text">
-                <string>Timestamp</string>
+                <string>Time</string>
                </property>
               </column>
               <column>
@@ -738,48 +570,6 @@ QToolButton:pressed {
             </item>
            </layout>
           </widget>
-          <widget class="QWidget" name="tabAnalysis">
-           <attribute name="title">
-            <string>Analysis</string>
-           </attribute>
-           <layout class="QVBoxLayout" name="analysisLayout">
-            <item>
-             <widget class="QTextEdit" name="analysisView">
-              <property name="readOnly">
-               <bool>true</bool>
-              </property>
-              <property name="html">
-               <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Select a registry key or value to see automated analysis results...&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </widget>
-          <widget class="QWidget" name="tabNotes">
-           <attribute name="title">
-            <string>Notes</string>
-           </attribute>
-           <layout class="QVBoxLayout" name="notesLayout">
-            <item>
-             <widget class="QTextEdit" name="notesEdit">
-              <property name="placeholderText">
-               <string>Add your investigation notes here...</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QPushButton" name="btnSaveNotes">
-              <property name="text">
-               <string>Save Notes</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </widget>
          </widget>
         </widget>
        </item>
@@ -792,14 +582,8 @@ p, li { white-space: pre-wrap; }
      <property name="maximumSize">
       <size>
        <width>16777215</width>
-       <height>25</height>
+       <height>20</height>
       </size>
-     </property>
-     <property name="styleSheet">
-      <string notr="true">QStatusBar {
-    background-color: #f8f9fa;
-    border-top: 1px solid #dee2e6;
-}</string>
      </property>
     </widget>
    </item>
