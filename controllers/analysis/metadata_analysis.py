@@ -103,13 +103,40 @@ class MetadataAnalysis(QWidget):
             print(f"Error loading evidence: {e}")
 
     def _is_analyzable(self, artifact):
-        """Kiểm tra xem hiện vật có thể phân tích được không - đơn giản hóa"""
+        """Kiểm tra xem hiện vật có thể phân tích được không - dựa trên ExifTool support"""
         source_path = artifact.get('source_path', '')
         if not source_path or not os.path.exists(source_path):
             return False
             
-        analyzable_extensions = {'.jpg', '.jpeg', '.png', '.tiff', '.tif', '.bmp', '.gif', 
-                               '.pdf', '.docx', '.xlsx', '.pptx', '.exe', '.dll'}
+        # Danh sách các phần mở rộng được ExifTool hỗ trợ (từ documentation)
+        analyzable_extensions = {
+            # Image formats
+            '.jpg', '.jpeg', '.png', '.tiff', '.tif', '.bmp', '.gif', '.webp', '.heic', '.heif',
+            '.cr2', '.cr3', '.nef', '.arw', '.dng', '.raw', '.orf', '.pef', '.srw', '.rw2',
+            '.3fr', '.fff', '.mef', '.raf', '.x3f', '.iiq', '.erf', '.mrw', '.nrw', '.rwl',
+            '.rwz', '.sr2', '.srf', '.crw', '.dcr', '.kdc', '.mdc', '.mos', '.ptx', '.pxn',
+            '.r3d', '.rdc', '.sr2', '.srf', '.sti',
+            
+            # Document formats  
+            '.pdf', '.docx', '.doc', '.xlsx', '.xls', '.pptx', '.ppt', '.odt', '.ods', '.odp',
+            '.rtf', '.pages', '.numbers', '.key', '.epub', '.mobi', '.azw',
+            
+            # Video formats
+            '.mp4', '.mov', '.avi', '.mkv', '.m4v', '.3gp', '.3g2', '.flv', '.wmv', '.asf',
+            '.m2ts', '.mts', '.webm', '.ogv', '.divx', '.f4v', '.m4a', '.mp3', '.wav',
+            '.aac', '.ogg', '.flac', '.ape', '.wma', '.aiff',
+            
+            # Archive formats
+            '.zip', '.rar', '.7z', '.gz', '.bz2', '.tar',
+            
+            # Executable formats
+            '.exe', '.dll', '.so', '.dylib',
+            
+            # Other formats
+            '.xmp', '.icc', '.icm', '.psd', '.psb', '.ai', '.eps', '.svg', '.html', '.xml',
+            '.json', '.csv', '.txt', '.torrent', '.lnk', '.chm', '.djvu', '.fits'
+        }
+        
         ext = os.path.splitext(source_path)[1].lower()
         return ext in analyzable_extensions
 
@@ -211,14 +238,21 @@ class MetadataAnalysis(QWidget):
         # Dự phòng cho việc trích xuất theo loại file cụ thể
         if not metadata['tags']:
             ext = os.path.splitext(file_path)[1].lower()
-            if ext in {'.docx', '.xlsx', '.pptx'}:
+            # Microsoft Office và OpenDocument formats
+            if ext in {'.docx', '.xlsx', '.pptx', '.doc', '.xls', '.ppt'}:
                 metadata.update(self._extract_office_metadata(file_path))
+            elif ext in {'.odt', '.ods', '.odp'}:
+                metadata.update(self._extract_opendocument_metadata(file_path))
             elif ext == '.pdf':
                 metadata.update(self._extract_pdf_metadata(file_path))
-            elif ext in {'.exe', '.dll'}:
+            elif ext in {'.exe', '.dll', '.so', '.dylib'}:
                 metadata.update(self._extract_pe_metadata(file_path))
-            elif ext in {'.jpg', '.jpeg', '.png', '.tiff', '.tif'}:
+            elif ext in {'.jpg', '.jpeg', '.png', '.tiff', '.tif', '.bmp', '.gif', '.webp', '.heic', '.heif'}:
                 metadata.update(self._extract_image_metadata(file_path))
+            elif ext in {'.mp4', '.mov', '.avi', '.mkv', '.m4v', '.3gp', '.3g2'}:
+                metadata.update(self._extract_video_metadata(file_path))
+            elif ext in {'.mp3', '.wav', '.aac', '.ogg', '.flac', '.m4a'}:
+                metadata.update(self._extract_audio_metadata(file_path))
         
         return metadata
 
@@ -580,12 +614,49 @@ class MetadataAnalysis(QWidget):
         return f"{size_bytes:.1f} TB"
 
     def _guess_file_type(self, filename):
-        """Đoán loại file từ phần mở rộng"""
+        """Đoán loại file từ phần mở rộng - dựa trên ExifTool support"""
         ext = os.path.splitext(filename)[1].lower()
         types = {
-            '.jpg': 'JPEG Image', '.jpeg': 'JPEG Image', '.png': 'PNG Image',
-            '.pdf': 'PDF Document', '.docx': 'Word Document', '.xlsx': 'Excel Spreadsheet',
-            '.exe': 'Executable File', '.dll': 'Dynamic Library'
+            # Image formats
+            '.jpg': 'JPEG Image', '.jpeg': 'JPEG Image', '.png': 'PNG Image', '.tiff': 'TIFF Image', '.tif': 'TIFF Image',
+            '.bmp': 'Bitmap Image', '.gif': 'GIF Image', '.webp': 'WebP Image', '.heic': 'HEIC Image', '.heif': 'HEIF Image',
+            '.cr2': 'Canon RAW v2', '.cr3': 'Canon RAW v3', '.nef': 'Nikon RAW', '.arw': 'Sony RAW', '.dng': 'Adobe DNG',
+            '.raw': 'RAW Image', '.orf': 'Olympus RAW', '.pef': 'Pentax RAW', '.srw': 'Samsung RAW', '.rw2': 'Panasonic RAW',
+            
+            # Document formats
+            '.pdf': 'PDF Document', '.docx': 'Word Document', '.doc': 'Word Document (Legacy)', 
+            '.xlsx': 'Excel Spreadsheet', '.xls': 'Excel Spreadsheet (Legacy)', 
+            '.pptx': 'PowerPoint Presentation', '.ppt': 'PowerPoint Presentation (Legacy)',
+            '.odt': 'OpenDocument Text', '.ods': 'OpenDocument Spreadsheet', '.odp': 'OpenDocument Presentation',
+            '.rtf': 'Rich Text Format', '.pages': 'Apple Pages', '.numbers': 'Apple Numbers', '.key': 'Apple Keynote',
+            '.epub': 'EPUB eBook', '.mobi': 'Mobipocket eBook', '.azw': 'Amazon Kindle eBook',
+            
+            # Video formats
+            '.mp4': 'MP4 Video', '.mov': 'QuickTime Video', '.avi': 'AVI Video', '.mkv': 'Matroska Video',
+            '.m4v': 'iTunes Video', '.3gp': '3GP Video', '.3g2': '3G2 Video', '.flv': 'Flash Video',
+            '.wmv': 'Windows Media Video', '.asf': 'Advanced Systems Format', '.webm': 'WebM Video',
+            '.ogv': 'Ogg Video', '.divx': 'DivX Video', '.f4v': 'Flash MP4 Video',
+            
+            # Audio formats
+            '.mp3': 'MP3 Audio', '.wav': 'WAV Audio', '.aac': 'AAC Audio', '.ogg': 'Ogg Audio',
+            '.flac': 'FLAC Audio', '.m4a': 'M4A Audio', '.ape': 'APE Audio', '.wma': 'Windows Media Audio',
+            '.aiff': 'AIFF Audio',
+            
+            # Archive formats
+            '.zip': 'ZIP Archive', '.rar': 'RAR Archive', '.7z': '7-Zip Archive', 
+            '.gz': 'Gzip Archive', '.bz2': 'Bzip2 Archive', '.tar': 'TAR Archive',
+            
+            # Executable formats
+            '.exe': 'Windows Executable', '.dll': 'Dynamic Link Library', '.so': 'Shared Object Library', 
+            '.dylib': 'Dynamic Library',
+            
+            # Other formats
+            '.xmp': 'XMP Metadata', '.icc': 'ICC Color Profile', '.icm': 'ICM Color Profile',
+            '.psd': 'Photoshop Document', '.psb': 'Photoshop Large Document', '.ai': 'Adobe Illustrator',
+            '.eps': 'Encapsulated PostScript', '.svg': 'Scalable Vector Graphics', '.html': 'HTML Document',
+            '.xml': 'XML Document', '.json': 'JSON Data', '.csv': 'CSV Data', '.txt': 'Text File',
+            '.torrent': 'BitTorrent File', '.lnk': 'Windows Shortcut', '.chm': 'Compiled HTML Help',
+            '.djvu': 'DjVu Document', '.fits': 'FITS Image'
         }
         return types.get(ext, 'Unknown File')
 
@@ -721,6 +792,90 @@ class MetadataAnalysis(QWidget):
             }
             
             return {'tags': tags, 'author': 'PE File'}
+        except:
+            return {'tags': {}, 'author': '-'}
+
+    def _extract_opendocument_metadata(self, file_path):
+        """Trích xuất metadata OpenDocument (ODT, ODS, ODP) - đơn giản hóa"""
+        try:
+            import zipfile
+            import xml.etree.ElementTree as ET
+            
+            tags = {}
+            with zipfile.ZipFile(file_path, 'r') as zf:
+                # Đọc meta.xml
+                try:
+                    meta_content = zf.read('meta.xml').decode('utf-8')
+                    root = ET.fromstring(meta_content)
+                    
+                    # Namespace cho OpenDocument
+                    namespaces = {
+                        'meta': 'urn:oasis:names:tc:opendocument:xmlns:meta:1.0',
+                        'dc': 'http://purl.org/dc/elements/1.1/',
+                        'office': 'urn:oasis:names:tc:opendocument:xmlns:office:1.0'
+                    }
+                    
+                    # Trích xuất các thẻ metadata phổ biến
+                    meta_tags = {
+                        'dc:title': 'Title',
+                        'dc:creator': 'Creator', 
+                        'dc:subject': 'Subject',
+                        'dc:description': 'Description',
+                        'meta:creation-date': 'Creation Date',
+                        'dc:date': 'Modified Date',
+                        'meta:editing-cycles': 'Editing Cycles',
+                        'meta:editing-duration': 'Editing Duration',
+                        'meta:generator': 'Generator'
+                    }
+                    
+                    for xpath, tag_name in meta_tags.items():
+                        elements = root.findall(f'.//{xpath}', namespaces)
+                        if elements and elements[0].text:
+                            tags[tag_name] = elements[0].text
+                            
+                except:
+                    pass
+            
+            author = tags.get('Creator', '-')
+            return {'tags': tags, 'author': author}
+        except:
+            return {'tags': {}, 'author': '-'}
+
+    def _extract_video_metadata(self, file_path):
+        """Trích xuất metadata video - đơn giản hóa"""
+        try:
+            # Sử dụng thông tin file cơ bản
+            import os
+            from datetime import datetime
+            
+            stat = os.stat(file_path)
+            tags = {
+                'File Size': f"{stat.st_size} bytes",
+                'Created': datetime.fromtimestamp(stat.st_ctime).strftime("%Y-%m-%d %H:%M:%S"),
+                'Modified': datetime.fromtimestamp(stat.st_mtime).strftime("%Y-%m-%d %H:%M:%S"),
+                'File Type': 'Video File'
+            }
+            
+            return {'tags': tags, 'author': 'Video File'}
+        except:
+            return {'tags': {}, 'author': '-'}
+
+    def _extract_audio_metadata(self, file_path):
+        """Trích xuất metadata audio - đơn giản hóa"""
+        try:
+            # Sử dụng thông tin file cơ bản
+            import os
+            from datetime import datetime
+            
+            stat = os.stat(file_path)
+            tags = {
+                'File Size': f"{stat.st_size} bytes",
+                'Created': datetime.fromtimestamp(stat.st_ctime).strftime("%Y-%m-%d %H:%M:%S"),
+                'Modified': datetime.fromtimestamp(stat.st_mtime).strftime("%Y-%m-%d %H:%M:%S"),
+                'File Type': 'Audio File'
+            }
+            
+            return {'tags': tags, 'author': 'Audio File'}
         except:
             return {'tags': {}, 'author': '-'}
 
