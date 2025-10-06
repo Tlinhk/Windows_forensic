@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Thu thập Dữ liệu Bất biến (Non-Volatile)</string>
+   <string>Non-Volatile Data Collection</string>
   </property>
   <layout class="QVBoxLayout" name="mainLayout">
    <item>
@@ -35,7 +35,7 @@
          <string notr="true">background-color: #2196F3; color: white; border-radius: 5px; padding: 5px; font-weight: bold;</string>
         </property>
         <property name="text">
-         <string>1. Thiết lập &amp; Nguồn</string>
+         <string>1. Setup &amp; Source</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignCenter</set>
@@ -54,7 +54,7 @@
          <string notr="true">background-color: #E0E0E0; color: #333; border-radius: 5px; padding: 5px; font-weight: bold;</string>
         </property>
         <property name="text">
-         <string>2. Phương pháp thu thập</string>
+         <string>2. Collection Method</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignCenter</set>
@@ -73,7 +73,7 @@
          <string notr="true">background-color: #E0E0E0; color: #333; border-radius: 5px; padding: 5px; font-weight: bold;</string>
         </property>
         <property name="text">
-         <string>3. Cấu hình</string>
+         <string>3. Configuration</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignCenter</set>
@@ -92,7 +92,7 @@
          <string notr="true">background-color: #E0E0E0; color: #333; border-radius: 5px; padding: 5px; font-weight: bold;</string>
         </property>
         <property name="text">
-         <string>4. Tổng quan</string>
+         <string>4. Overview</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignCenter</set>
@@ -111,7 +111,7 @@
          <string notr="true">background-color: #E0E0E0; color: #333; border-radius: 5px; padding: 5px; font-weight: bold;</string>
         </property>
         <property name="text">
-         <string>5. Tiến trình</string>
+         <string>5. Progress</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignCenter</set>
@@ -131,48 +131,48 @@
        <item>
         <widget class="QGroupBox" name="groupBox_case_info">
          <property name="title">
-          <string>Thông tin Vụ việc</string>
+          <string>Case Information</string>
          </property>
          <layout class="QGridLayout" name="gridLayout_case_info">
           <item row="0" column="0">
            <widget class="QLabel" name="label_case_id">
             <property name="text">
-             <string>Mã vụ việc:</string>
+             <string>Case ID:</string>
             </property>
            </widget>
           </item>
           <item row="0" column="1">
            <widget class="QLineEdit" name="lineEdit_case_id">
             <property name="placeholderText">
-             <string>VD: Case-2025-001</string>
+             <string>e.g., Case-2025-001</string>
             </property>
            </widget>
           </item>
           <item row="0" column="2">
            <widget class="QLabel" name="label_investigator">
             <property name="text">
-             <string>Tên Điều tra viên:</string>
+             <string>Investigator Name:</string>
             </property>
            </widget>
           </item>
           <item row="0" column="3">
            <widget class="QLineEdit" name="lineEdit_investigator">
             <property name="placeholderText">
-             <string>VD: Nguyen Van A</string>
+             <string>e.g., John Doe</string>
             </property>
            </widget>
           </item>
           <item row="1" column="0">
            <widget class="QLabel" name="label_case_description">
             <property name="text">
-             <string>Mô tả:</string>
+             <string>Description:</string>
             </property>
            </widget>
           </item>
           <item row="1" column="1" colspan="3">
            <widget class="QLineEdit" name="lineEdit_case_description">
             <property name="placeholderText">
-             <string>Mô tả ngắn về vụ việc...</string>
+             <string>Brief description of the case...</string>
             </property>
            </widget>
           </item>
@@ -182,7 +182,7 @@
        <item>
         <widget class="QGroupBox" name="groupBox_source_device">
          <property name="title">
-          <string>Thiết bị Nguồn</string>
+          <string>Source Device</string>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_source">
           <item>
@@ -200,22 +200,22 @@
             </column>
             <column>
              <property name="text">
-              <string>Hệ thống file</string>
+              <string>Filesystem</string>
              </property>
             </column>
             <column>
              <property name="text">
-              <string>Dung lượng ổ cứng</string>
+              <string>Capacity</string>
              </property>
             </column>
             <column>
              <property name="text">
-              <string>Phân vùng ổ cứng</string>
+              <string>Partitions</string>
              </property>
             </column>
             <column>
              <property name="text">
-              <string>Trạng thái mã hóa</string>
+              <string>Encryption Status</string>
              </property>
             </column>
            </widget>
@@ -225,7 +225,7 @@
             <item>
              <widget class="QPushButton" name="pushButton_refresh_devices">
               <property name="text">
-               <string>🔄 Làm mới</string>
+               <string>🔄 Refresh</string>
               </property>
              </widget>
             </item>
@@ -251,7 +251,7 @@
                <string notr="true">color: red; font-weight: bold;</string>
               </property>
               <property name="text">
-               <string>⚠️ Tôi chấp nhận rủi ro khi thu thập trên hệ thống không có chống ghi</string>
+               <string>⚠️ I accept the risk of collecting from a live system without write protection</string>
               </property>
              </widget>
             </item>
@@ -292,14 +292,14 @@
              <string notr="true">font-size: 14pt; font-weight: bold;</string>
             </property>
             <property name="text">
-             <string>🔍 Thu thập Triage (Nhanh &amp; có Mục tiêu)</string>
+             <string>🔍 Triage Collection (Fast &amp; Targeted)</string>
             </property>
            </widget>
           </item>
           <item>
            <widget class="QLabel" name="label_triage_description">
             <property name="text">
-             <string>Trích xuất nhanh các dấu vết quan trọng nhất để đánh giá ban đầu. Lý tưởng cho ứng cứu sự cố và khi thời gian có hạn. Không thu thập toàn bộ dữ liệu.</string>
+             <string>Quick extraction of most critical artifacts for initial assessment. Ideal for incident response and time-constrained situations. Does not collect everything.</string>
             </property>
             <property name="wordWrap">
              <bool>true</bool>
@@ -324,7 +324,7 @@
              <string notr="true">font-size: 14pt; font-weight: bold;</string>
             </property>
             <property name="text">
-             <string>💿 Tạo ảnh Toàn bộ (Toàn diện &amp; An toàn)</string>
+             <string>💿 Full Disk Imaging (Comprehensive &amp; Forensically Sound)</string>
             </property>
             <property name="checked">
              <bool>true</bool>
@@ -334,7 +334,7 @@
           <item>
            <widget class="QLabel" name="label_full_image_description">
             <property name="text">
-             <string>Tạo một bản sao pháp lý chính xác bit-for-bit. Thu thập tất cả mọi thứ, bao gồm cả dữ liệu đã xóa. Đây là tiêu chuẩn vàng cho phân tích sâu.</string>
+             <string>Creates a forensically sound bit-for-bit copy. Captures everything, including deleted data. Gold standard for in-depth analysis.</string>
             </property>
             <property name="wordWrap">
              <bool>true</bool>
@@ -364,7 +364,7 @@
        <item>
         <widget class="QStackedWidget" name="stackedWidget_config">
          <property name="currentIndex">
-          <number>0</number>
+          <number>1</number>
          </property>
          <widget class="QWidget" name="page_triage_config">
           <layout class="QHBoxLayout" name="horizontalLayout_triage_page">
@@ -392,7 +392,7 @@
               <item>
                <widget class="QCheckBox" name="checkBox_use_targets">
                 <property name="text">
-                 <string>Sử dụng Tùy chọn Mục tiêu (Use Target options)</string>
+                 <string>Use Target Options</string>
                 </property>
                 <property name="checked">
                  <bool>true</bool>
@@ -446,7 +446,7 @@
                 <item row="1" column="3">
                  <widget class="QCheckBox" name="checkBox_flush">
                   <property name="toolTip">
-                   <string>Xóa toàn bộ nội dung thư mục đích trước khi chạy</string>
+                   <string>Clear destination folder before running</string>
                   </property>
                   <property name="text">
                    <string>Flush</string>
@@ -456,7 +456,7 @@
                 <item row="1" column="4">
                  <widget class="QCheckBox" name="checkBox_add_date">
                   <property name="toolTip">
-                   <string>Tự động thêm ngày (YYYYMMDD) vào thư mục đích</string>
+                   <string>Automatically add date (YYYYMMDD) to destination folder</string>
                   </property>
                   <property name="text">
                    <string>Add %d</string>
@@ -466,7 +466,7 @@
                 <item row="1" column="5">
                  <widget class="QCheckBox" name="checkBox_add_machine">
                   <property name="toolTip">
-                   <string>Thêm tên máy (hostname) vào thư mục đích</string>
+                   <string>Add hostname to destination folder</string>
                   </property>
                   <property name="text">
                    <string>Add %m</string>
@@ -490,7 +490,7 @@
                 <item>
                  <widget class="QLineEdit" name="lineEdit_targets_search">
                   <property name="placeholderText">
-                   <string>🔍 Tìm kiếm mục tiêu...</string>
+                   <string>🔍 Search targets...</string>
                   </property>
                  </widget>
                 </item>
@@ -526,22 +526,22 @@
                <widget class="QTableWidget" name="tableWidget_targets">
                 <column>
                  <property name="text">
-                  <string>Chọn</string>
+                  <string>Select</string>
                  </property>
                 </column>
                 <column>
                  <property name="text">
-                  <string>Tên</string>
+                  <string>Name</string>
                  </property>
                 </column>
                 <column>
                  <property name="text">
-                  <string>Thư mục</string>
+                  <string>Category</string>
                  </property>
                 </column>
                 <column>
                  <property name="text">
-                  <string>Mô tả</string>
+                  <string>Description</string>
                  </property>
                 </column>
                </widget>
@@ -551,14 +551,14 @@
                 <item>
                  <widget class="QLabel" name="label_predefined">
                   <property name="text">
-                   <string>Gói định sẵn:</string>
+                   <string>Presets:</string>
                   </property>
                  </widget>
                 </item>
                 <item>
                  <widget class="QToolButton" name="toolButton_sans">
                   <property name="toolTip">
-                   <string>Gói thu thập SANS Triage - bao gồm các artifact cơ bản nhất</string>
+                   <string>SANS Triage collection - most essential artifacts</string>
                   </property>
                   <property name="styleSheet">
                    <string notr="true">QToolButton { background-color: #E3F2FD; border: 1px solid #2196F3; padding: 5px; }</string>
@@ -571,7 +571,7 @@
                 <item>
                  <widget class="QToolButton" name="toolButton_quick">
                   <property name="toolTip">
-                   <string>Thu thập thông tin hệ thống cơ bản nhanh chóng</string>
+                   <string>Quick system information collection</string>
                   </property>
                   <property name="styleSheet">
                    <string notr="true">QToolButton { background-color: #E8F5E8; border: 1px solid #4CAF50; padding: 5px; }</string>
@@ -584,7 +584,7 @@
                 <item>
                  <widget class="QToolButton" name="toolButton_browser">
                   <property name="toolTip">
-                   <string>Thu thập dữ liệu từ trình duyệt web và email client</string>
+                   <string>Collect data from web browsers and email clients</string>
                   </property>
                   <property name="styleSheet">
                    <string notr="true">QToolButton { background-color: #FFF3E0; border: 1px solid #FF9800; padding: 5px; }</string>
@@ -597,7 +597,7 @@
                 <item>
                  <widget class="QToolButton" name="toolButton_registry">
                   <property name="toolTip">
-                   <string>Thu thập tất cả các registry hives quan trọng</string>
+                   <string>Collect all important registry hives</string>
                   </property>
                   <property name="styleSheet">
                    <string notr="true">QToolButton { background-color: #FCE4EC; border: 1px solid #E91E63; padding: 5px; }</string>
@@ -610,7 +610,7 @@
                 <item>
                  <widget class="QToolButton" name="toolButton_logs">
                   <property name="toolTip">
-                   <string>Thu thập Windows Event Logs và Application logs</string>
+                   <string>Collect Windows Event Logs and Application logs</string>
                   </property>
                   <property name="styleSheet">
                    <string notr="true">QToolButton { background-color: #F3E5F5; border: 1px solid #9C27B0; padding: 5px; }</string>
@@ -623,7 +623,7 @@
                 <item>
                  <widget class="QToolButton" name="toolButton_memory">
                   <property name="toolTip">
-                   <string>Thu thập các artifact liên quan đến memory analysis</string>
+                   <string>Collect artifacts related to memory analysis</string>
                   </property>
                   <property name="styleSheet">
                    <string notr="true">QToolButton { background-color: #E0F2F1; border: 1px solid #009688; padding: 5px; }</string>
@@ -636,7 +636,7 @@
                 <item>
                  <widget class="QToolButton" name="toolButton_persistence">
                   <property name="toolTip">
-                   <string>Thu thập các artifact liên quan đến persistence mechanisms</string>
+                   <string>Collect artifacts related to persistence mechanisms</string>
                   </property>
                   <property name="styleSheet">
                    <string notr="true">QToolButton { background-color: #FFEBEE; border: 1px solid #F44336; padding: 5px; }</string>
@@ -666,7 +666,7 @@
                 <item>
                  <widget class="QCheckBox" name="checkBox_process_vscs">
                   <property name="toolTip">
-                   <string>Tự động mount và áp dụng lại Targets trên Volume Shadow Copies</string>
+                   <string>Automatically mount and reapply Targets on Volume Shadow Copies</string>
                   </property>
                   <property name="text">
                    <string>Process VSCs</string>
@@ -676,7 +676,7 @@
                 <item>
                  <widget class="QCheckBox" name="checkBox_deduplicate">
                   <property name="toolTip">
-                   <string>Sử dụng SHA-1 để tránh sao chép file trùng</string>
+                   <string>Use SHA-1 to avoid copying duplicate files</string>
                   </property>
                   <property name="text">
                    <string>Deduplicate</string>
@@ -867,7 +867,7 @@
               <item>
                <widget class="QCheckBox" name="checkBox_use_modules">
                 <property name="text">
-                 <string>Sử dụng Tùy chọn Module (Use Module options)</string>
+                 <string>Use Module Options</string>
                 </property>
                 <property name="checked">
                  <bool>true</bool>
@@ -877,13 +877,13 @@
               <item>
                <widget class="QGroupBox" name="groupBox_module_options">
                 <property name="title">
-                 <string>Tùy chọn Module</string>
+                 <string>Module Options</string>
                 </property>
                 <layout class="QGridLayout" name="gridLayout_module_options">
                  <item row="0" column="0">
                   <widget class="QLabel" name="label_module_source">
                    <property name="text">
-                    <string>Nguồn module:</string>
+                    <string>Module source:</string>
                    </property>
                   </widget>
                  </item>
@@ -900,14 +900,14 @@
                  <item row="1" column="0">
                   <widget class="QLabel" name="label_module_destination">
                    <property name="text">
-                    <string>Đích module:</string>
+                    <string>Module destination:</string>
                    </property>
                   </widget>
                  </item>
                  <item row="1" column="1">
                   <widget class="QLineEdit" name="lineEdit_module_destination">
                    <property name="placeholderText">
-                    <string>Thư mục để lưu kết quả xử lý của module</string>
+                    <string>Folder to save module processing results</string>
                    </property>
                   </widget>
                  </item>
@@ -930,7 +930,7 @@
                  <item>
                   <widget class="QLineEdit" name="lineEdit_modules_search">
                    <property name="placeholderText">
-                    <string>🔍 Tìm kiếm module...</string>
+                    <string>🔍 Search modules...</string>
                    </property>
                   </widget>
                  </item>
@@ -938,22 +938,22 @@
                   <widget class="QTableWidget" name="tableWidget_modules">
                    <column>
                     <property name="text">
-                     <string>Chọn</string>
+                     <string>Select</string>
                     </property>
                    </column>
                    <column>
                     <property name="text">
-                     <string>Tên</string>
+                     <string>Name</string>
                     </property>
                    </column>
                    <column>
                     <property name="text">
-                     <string>Thể loại</string>
+                     <string>Category</string>
                     </property>
                    </column>
                    <column>
                     <property name="text">
-                     <string>Mô tả</string>
+                     <string>Description</string>
                     </property>
                    </column>
                   </widget>
@@ -964,7 +964,7 @@
               <item>
                <widget class="QGroupBox" name="groupBox_export_options">
                 <property name="title">
-                 <string>Định dạng Xuất (Export Format)</string>
+                 <string>Export Format</string>
                 </property>
                 <layout class="QHBoxLayout" name="horizontalLayout_export">
                  <item>
@@ -994,7 +994,7 @@
                  <item>
                   <widget class="QRadioButton" name="radioButton_export_default">
                    <property name="text">
-                    <string>Mặc định</string>
+                    <string>Default</string>
                    </property>
                   </widget>
                  </item>
@@ -1011,13 +1011,13 @@
            <item>
             <widget class="QGroupBox" name="groupBox_image_source">
              <property name="title">
-              <string>Nguồn Ảnh (Image Source)</string>
+              <string>Image Source</string>
              </property>
              <layout class="QGridLayout" name="gridLayout_image_source">
               <item row="0" column="0">
                <widget class="QLabel" name="label_image_source">
                 <property name="text">
-                 <string>Thiết bị nguồn:</string>
+                 <string>Source device:</string>
                 </property>
                </widget>
               </item>
@@ -1034,7 +1034,7 @@
            <item>
             <widget class="QGroupBox" name="groupBox_image_destination">
              <property name="title">
-              <string>Đích Ảnh (Image Destination)</string>
+              <string>Image Destination</string>
              </property>
              <layout class="QVBoxLayout" name="verticalLayout_image_destination">
               <item>
@@ -1042,35 +1042,35 @@
                 <item row="0" column="0">
                  <widget class="QLabel" name="label_destination_folder">
                   <property name="text">
-                   <string>Thư mục đích:</string>
+                   <string>Destination folder:</string>
                   </property>
                  </widget>
                 </item>
                 <item row="0" column="1">
                  <widget class="QLineEdit" name="lineEdit_destination_folder">
                   <property name="placeholderText">
-                   <string>Chọn thư mục để lưu tệp ảnh</string>
+                   <string>Select folder to save image file</string>
                   </property>
                  </widget>
                 </item>
                 <item row="0" column="2">
                  <widget class="QPushButton" name="pushButton_browse_folder">
                   <property name="text">
-                   <string>Duyệt...</string>
+                   <string>Browse...</string>
                   </property>
                  </widget>
                 </item>
                 <item row="1" column="0">
                  <widget class="QLabel" name="label_image_filename">
                   <property name="text">
-                   <string>Tên tệp ảnh:</string>
+                   <string>Image filename:</string>
                   </property>
                  </widget>
                 </item>
                 <item row="1" column="1" colspan="2">
                  <widget class="QLineEdit" name="lineEdit_image_filename">
                   <property name="placeholderText">
-                   <string>Tên tệp (không bao gồm phần mở rộng)</string>
+                   <string>Filename (without extension)</string>
                   </property>
                  </widget>
                 </item>
@@ -1082,7 +1082,7 @@
            <item>
             <widget class="QGroupBox" name="groupBox_image_format">
              <property name="title">
-              <string>Định dạng Ảnh (Image Format)</string>
+              <string>Image Format</string>
              </property>
              <layout class="QVBoxLayout" name="verticalLayout_image_format">
               <item>
@@ -1104,13 +1104,6 @@
                   </property>
                  </widget>
                 </item>
-                <item row="2" column="0">
-                 <widget class="QRadioButton" name="radioButton_aff">
-                  <property name="text">
-                   <string>AFF (Advanced Forensic Format)</string>
-                  </property>
-                 </widget>
-                </item>
                </layout>
               </item>
              </layout>
@@ -1119,7 +1112,7 @@
            <item>
             <widget class="QGroupBox" name="groupBox_image_settings">
              <property name="title">
-              <string>Cài đặt Ảnh (Image Settings)</string>
+              <string>Image Settings</string>
              </property>
              <layout class="QVBoxLayout" name="verticalLayout_image_settings">
               <item>
@@ -1127,14 +1120,17 @@
                 <item row="0" column="0">
                  <widget class="QLabel" name="label_fragment_size">
                   <property name="text">
-                   <string>Kích thước phân mảnh (MB):</string>
+                   <string>Segment size (MB):</string>
                   </property>
                  </widget>
                 </item>
                 <item row="0" column="1">
                  <widget class="QSpinBox" name="spinBox_fragment_size">
+                  <property name="toolTip">
+                   <string>Only applies to E01. Minimum 1 MB</string>
+                  </property>
                   <property name="specialValueText">
-                   <string>Không phân mảnh</string>
+                   <string>No segmentation</string>
                   </property>
                   <property name="minimum">
                    <number>0</number>
@@ -1150,39 +1146,35 @@
                 <item row="1" column="0">
                  <widget class="QLabel" name="label_compression">
                   <property name="text">
-                   <string>Mức độ nén (0=Không, 1=Nhanh, ..., 9=Tối đa):</string>
+                   <string>Compression level:</string>
                   </property>
                  </widget>
                 </item>
                 <item row="1" column="1">
                  <widget class="QComboBox" name="comboBox_compression">
-                  <item>
-                   <property name="text">
-                    <string>0 - Không nén</string>
-                   </property>
-                  </item>
-                  <item>
-                   <property name="text">
-                    <string>1 - Nhanh nhất</string>
-                   </property>
-                  </item>
-                  <item>
-                   <property name="text">
-                    <string>5 - Bình thường</string>
-                   </property>
-                  </item>
-                  <item>
-                   <property name="text">
-                    <string>9 - Tối đa</string>
-                   </property>
-                  </item>
-                 </widget>
-                </item>
-                <item row="2" column="0" colspan="2">
-                 <widget class="QCheckBox" name="checkBox_ad_encryption">
-                  <property name="text">
-                   <string>Sử dụng mã hóa AD</string>
+                  <property name="toolTip">
+                   <string>Only applies to E01</string>
                   </property>
+                  <item>
+                   <property name="text">
+                    <string>None - No compression</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>Empty Block - Compress empty blocks only</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>Fast - Fast compression</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>Best - Maximum compression</string>
+                   </property>
+                  </item>
                  </widget>
                 </item>
                </layout>
@@ -1191,48 +1183,24 @@
             </widget>
            </item>
            <item>
-            <widget class="QGroupBox" name="groupBox_verification">
-             <property name="title">
-              <string>Tùy chọn Xác minh (Verification Options)</string>
-             </property>
-             <layout class="QVBoxLayout" name="verticalLayout_verification">
-              <item>
-               <widget class="QCheckBox" name="checkBox_verify_after_creation">
-                <property name="text">
-                 <string>Xác minh ảnh sau khi tạo</string>
-                </property>
-                <property name="checked">
-                 <bool>true</bool>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QCheckBox" name="checkBox_precalculate_progress">
-                <property name="text">
-                 <string>Tính toán trước thống kê tiến trình</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QCheckBox" name="checkBox_create_directory_listing">
-                <property name="text">
-                 <string>Tạo danh sách thư mục của tất cả các tệp trong ảnh sau khi tạo</string>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </widget>
-           </item>
-           <item>
             <widget class="QGroupBox" name="groupBox_hashing">
              <property name="title">
-              <string>Tùy chọn Băm (Hash Options)</string>
+              <string>Hash Options</string>
              </property>
-             <layout class="QHBoxLayout" name="horizontalLayout_hashing">
+             <layout class="QVBoxLayout" name="verticalLayout_hashing">
               <item>
                <widget class="QCheckBox" name="checkBox_md5">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+                <property name="toolTip">
+                 <string>MD5 is always calculated automatically, cannot be disabled</string>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true">color: gray;</string>
+                </property>
                 <property name="text">
-                 <string>MD5</string>
+                 <string>MD5 (Always calculated)</string>
                 </property>
                 <property name="checked">
                  <bool>true</bool>
@@ -1240,24 +1208,52 @@
                </widget>
               </item>
               <item>
-               <widget class="QCheckBox" name="checkBox_sha1">
+               <widget class="QLabel" name="label_additional_hash">
                 <property name="text">
-                 <string>SHA-1</string>
-                </property>
-                <property name="checked">
-                 <bool>true</bool>
+                 <string>Additional hash (select one):</string>
                 </property>
                </widget>
               </item>
               <item>
-               <widget class="QCheckBox" name="checkBox_sha256">
-                <property name="text">
-                 <string>SHA-256</string>
-                </property>
-                <property name="checked">
-                 <bool>true</bool>
-                </property>
-               </widget>
+               <layout class="QHBoxLayout" name="horizontalLayout_additional_hash">
+                <item>
+                 <widget class="QRadioButton" name="radioButton_no_hash">
+                  <property name="text">
+                   <string>None</string>
+                  </property>
+                  <property name="checked">
+                   <bool>true</bool>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QRadioButton" name="radioButton_sha1">
+                  <property name="text">
+                   <string>SHA-1</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QRadioButton" name="radioButton_sha256">
+                  <property name="text">
+                   <string>SHA-256</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <spacer name="horizontalSpacer_hash">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>40</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+               </layout>
               </item>
              </layout>
             </widget>
@@ -1286,7 +1282,7 @@
        <item>
         <widget class="QGroupBox" name="groupBox_summary">
          <property name="title">
-          <string>Bảng Tóm tắt Cấu hình</string>
+          <string>Configuration Summary</string>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_summary">
           <item>
@@ -1298,7 +1294,7 @@
        <item>
         <widget class="QGroupBox" name="groupBox_command_line">
          <property name="title">
-          <string>Dòng lệnh Tương đương</string>
+          <string>Equivalent Command Line</string>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_command_line">
           <item>
@@ -1318,7 +1314,7 @@
        <item>
         <widget class="QGroupBox" name="groupBox_progress">
          <property name="title">
-          <string>Tiến trình và Thống kê</string>
+          <string>Progress and Statistics</string>
          </property>
          <layout class="QGridLayout" name="gridLayout_progress">
           <item row="0" column="0" colspan="4">
@@ -1331,7 +1327,7 @@
           <item row="1" column="0">
            <widget class="QLabel" name="label_source_progress">
             <property name="text">
-             <string>Nguồn:</string>
+             <string>Source:</string>
             </property>
            </widget>
           </item>
@@ -1345,7 +1341,7 @@
           <item row="1" column="2">
            <widget class="QLabel" name="label_speed">
             <property name="text">
-             <string>Tốc độ:</string>
+             <string>Speed:</string>
             </property>
            </widget>
           </item>
@@ -1359,7 +1355,7 @@
           <item row="2" column="0">
            <widget class="QLabel" name="label_time_elapsed">
             <property name="text">
-             <string>Đã trôi qua:</string>
+             <string>Elapsed:</string>
             </property>
            </widget>
           </item>
@@ -1373,7 +1369,7 @@
           <item row="2" column="2">
            <widget class="QLabel" name="label_eta">
             <property name="text">
-             <string>Ước tính (ETA):</string>
+             <string>ETA:</string>
             </property>
            </widget>
           </item>
@@ -1387,7 +1383,7 @@
           <item row="3" column="0">
            <widget class="QLabel" name="label_errors">
             <property name="text">
-             <string>Lỗi đọc:</string>
+             <string>Read errors:</string>
             </property>
            </widget>
           </item>
@@ -1407,7 +1403,7 @@
        <item>
         <widget class="QGroupBox" name="groupBox_log">
          <property name="title">
-          <string>Nhật ký Trực tiếp</string>
+          <string>Live Log</string>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_log">
           <item>
@@ -1418,14 +1414,14 @@
             <item>
              <widget class="QPushButton" name="pushButton_pause">
               <property name="text">
-               <string>⏸️ Tạm dừng</string>
+               <string>⏸️ Pause</string>
               </property>
              </widget>
             </item>
             <item>
              <widget class="QPushButton" name="pushButton_stop">
               <property name="text">
-               <string>⏹️ Dừng</string>
+               <string>⏹️ Stop</string>
               </property>
              </widget>
             </item>
@@ -1445,7 +1441,7 @@
             <item>
              <widget class="QPushButton" name="pushButton_save_log">
               <property name="text">
-               <string>💾 Lưu Nhật ký</string>
+               <string>💾 Save Log</string>
               </property>
              </widget>
             </item>
@@ -1479,7 +1475,7 @@
          </size>
         </property>
         <property name="text">
-         <string>← Quay lại</string>
+         <string>← Previous</string>
         </property>
        </widget>
       </item>
@@ -1505,7 +1501,7 @@
          </size>
         </property>
         <property name="text">
-         <string>Tiếp →</string>
+         <string>Next →</string>
         </property>
        </widget>
       </item>
@@ -1521,7 +1517,7 @@
          <string notr="true">background-color: #4CAF50; color: white; font-weight: bold; font-size: 14px;</string>
         </property>
         <property name="text">
-         <string>🚀 Bắt đầu Thu thập</string>
+         <string>🚀 Start Collection</string>
         </property>
        </widget>
       </item>

@@ -289,25 +289,21 @@ class NonVolatilePage(QtWidgets.QWidget):
         self._update_navigation_buttons()
     
     def _set_defaults(self):
-        """Thiết lập các giá trị mặc định cho tất cả các điều khiển."""
+        """Set default values for all controls."""
         defaults = {
             'lineEdit_case_id': f"Case-{datetime.now().strftime('%Y%m%d-%H%M')}",
-            'spinBox_fragment_size': 2048,
+            'spinBox_fragment_size': 1500,
             'checkBox_use_targets': True,
             'checkBox_use_modules': True,
             'radioButton_e01': True,
-            'comboBox_compression': 1,  # Fast compression
-            'checkBox_verify_after_creation': True,
-            'checkBox_md5': True,
-            'checkBox_sha1': True,
-            'checkBox_sha256': True,
+            'comboBox_compression': 2,  # Fast compression (index 2)
             'progressBar': 0,
             'label_errors_val': "0",
             'label_source_progress_val': "0 GB / 0 GB",
             'label_speed_val': "0 MB/s",
             'label_time_elapsed_val': "00:00:00",
             'label_eta_val': "00:00:00",
-            'pushButton_start': False  # Initially hidden
+            'pushButton_start': False
         }
         
         for widget_name, value in defaults.items():
@@ -382,6 +378,12 @@ class NonVolatilePage(QtWidgets.QWidget):
             button = getattr(self.ui, button_name, None)
             if button:
                 button.clicked.connect(lambda checked, p=preset: self.select_predefined_targets(p))
+        
+        # Format radio buttons to enable/disable options
+        if hasattr(self.ui, 'radioButton_raw'):
+            self.ui.radioButton_raw.toggled.connect(self._update_imaging_options)
+        if hasattr(self.ui, 'radioButton_e01'):
+            self.ui.radioButton_e01.toggled.connect(self._update_imaging_options)
     
     def _load_initial_data(self):
         """Tải dữ liệu KAPE và thiết bị một cách bất đồng bộ."""
@@ -467,6 +469,9 @@ class NonVolatilePage(QtWidgets.QWidget):
         archive_path = (self.case_data or {}).get("archive_path")
         if not archive_path:
             return
+        
+        # Normalize archive path to use consistent Windows separators
+        archive_path = os.path.normpath(archive_path)
         
         # Create directories
         triage_dir = os.path.join(archive_path, "nonvolatile", "triage")
@@ -1051,7 +1056,14 @@ class NonVolatilePage(QtWidgets.QWidget):
     # =========================================================================
     # CONFIGURATION
     # =========================================================================
-    
+    def _update_imaging_options(self):
+        """Enable/disable imaging options based on format selection."""
+        is_raw = self.ui.radioButton_raw.isChecked()
+        
+        # Compression and fragment only for E01
+        self.ui.comboBox_compression.setEnabled(not is_raw)
+        self.ui.spinBox_fragment_size.setEnabled(not is_raw)
+
     def on_strategy_changed(self):
         """Handle collection strategy change."""
         self._update_config_page()
@@ -1060,10 +1072,10 @@ class NonVolatilePage(QtWidgets.QWidget):
         
         # Enable/disable relevant sections
         triage_widgets = ['frame_targets', 'frame_modules', 'groupBox_modules',
-                         'groupBox_module_options', 'groupBox_export_options']
+                        'groupBox_module_options', 'groupBox_export_options']
         imaging_widgets = ['groupBox_image_format', 'groupBox_image_settings',
-                          'groupBox_verification', 'groupBox_hashing',
-                          'groupBox_image_source', 'groupBox_image_destination']
+                        'groupBox_hashing', 'groupBox_image_source', 
+                        'groupBox_image_destination']
         
         for widget_name in triage_widgets:
             widget = getattr(self.ui, widget_name, None)
@@ -1074,6 +1086,10 @@ class NonVolatilePage(QtWidgets.QWidget):
             widget = getattr(self.ui, widget_name, None)
             if widget:
                 widget.setEnabled(not is_triage)
+        
+        # Update imaging options based on format selection
+        if not is_triage:
+            self._update_imaging_options()
         
         # Reload case paths if available
         if self.case_data:
@@ -1163,25 +1179,25 @@ class NonVolatilePage(QtWidgets.QWidget):
         elif self.ui.radioButton_raw.isChecked():
             format_text = "Raw"
         else:
-            format_text = "AFF"
+            format_text = "Unknown"
         html.append(f"<b>Format:</b> {format_text}<br>")
         
-        # Compression
-        if format_text != "Raw" and hasattr(self.ui, 'comboBox_compression'):
+        # Compression - only show when E01
+        if format_text == "E01" and hasattr(self.ui, 'comboBox_compression'):
             html.append(f"<b>Compression:</b> {self.ui.comboBox_compression.currentText()}<br>")
         
-        # Fragment size
-        if hasattr(self.ui, 'spinBox_fragment_size'):
+        # Segment size - only show when E01
+        if format_text == "E01" and hasattr(self.ui, 'spinBox_fragment_size'):
             size = self.ui.spinBox_fragment_size.value()
-            html.append(f"<b>Fragment:</b> {'None' if size == 0 else str(size) + ' MB'}<br>")
+            html.append(f"<b>Segment:</b> {'None' if size == 0 else str(size) + ' MB'}<br>")
         
-        # Hash algorithms
-        hashes = []
-        for algo in ['md5', 'sha1', 'sha256']:
-            checkbox = getattr(self.ui, f'checkBox_{algo}', None)
-            if checkbox and checkbox.isChecked():
-                hashes.append(algo.upper())
-        html.append(f"<b>Hash:</b> {', '.join(hashes) if hashes else 'None'}<br>")
+        # Hash - show correctly based on radio buttons
+        hashes = ["MD5"]  # MD5 is always calculated
+        if hasattr(self.ui, 'radioButton_sha1') and self.ui.radioButton_sha1.isChecked():
+            hashes.append("SHA-1")
+        elif hasattr(self.ui, 'radioButton_sha256') and self.ui.radioButton_sha256.isChecked():
+            hashes.append("SHA-256")
+        html.append(f"<b>Hash:</b> {', '.join(hashes)}<br>")
         
         return html
     
@@ -1308,8 +1324,8 @@ class NonVolatilePage(QtWidgets.QWidget):
         if self.ui.radioButton_raw.isChecked():
             return self._build_dd_command(device_id)
         else:
-            format_type = "encase6" if self.ui.radioButton_e01.isChecked() else "aff"
-            return self._build_ewf_command(device_id, format_type)
+            # Only support E01
+            return self._build_ewf_command(device_id, "encase6")
     
     def _get_device_id(self):
         """Get physical device ID for imaging."""
@@ -1345,47 +1361,67 @@ class NonVolatilePage(QtWidgets.QWidget):
         return f"\\\\.\\PHYSICALDRIVE0"
     
     def _build_ewf_command(self, device_id, format_type):
-        """Build ewfacquire command."""
+        """Build ewfacquire command - FIXED VERSION."""
         ewf_path = os.path.join(self.tools_dir, "ewftools-x64", "ewfacquire.exe")
         
-        output_dir = self.ui.lineEdit_destination_folder.text()
+        # Normalize paths to use consistent Windows backslashes
+        output_dir = os.path.normpath(self.ui.lineEdit_destination_folder.text())
         filename = self.ui.lineEdit_image_filename.text()
+        
+        # Remove any invalid characters from filename
+        filename = re.sub(r'[<>:"/\\|?*]', '_', filename)
+        
         output_path = os.path.join(output_dir, filename)
         
         cmd = [
             ewf_path,
             "-t", output_path,
-            "-f", format_type,
-            "-u", "-v",
+            "-f", "encase6",
+            "-u",
+            "-v",
             "-b", "64",
         ]
         
-        # Add case info
+        # Case metadata
         if self.ui.lineEdit_case_id.text():
             cmd.extend(["-C", self.ui.lineEdit_case_id.text()])
+        
         if self.ui.lineEdit_case_description.text():
             cmd.extend(["-D", self.ui.lineEdit_case_description.text()])
+        
         if self.ui.lineEdit_investigator.text():
             cmd.extend(["-e", self.ui.lineEdit_investigator.text()])
         
-        # Compression
-        compression_map = {0: "none", 1: "fast", 2: "best"}
-        compression = compression_map.get(self.ui.comboBox_compression.currentIndex(), "fast")
-        if compression != "none":
-            cmd.extend(["-c", compression])
+        # Evidence number
+        if hasattr(self.ui, 'lineEdit_evidence_number') and self.ui.lineEdit_evidence_number.text():
+            cmd.extend(["-E", self.ui.lineEdit_evidence_number.text()])
         
-        # Fragment size
+        # Media type
+        if hasattr(self.ui, 'comboBox_media_type'):
+            media_types = ["fixed", "removable", "optical", "memory"]
+            media_idx = self.ui.comboBox_media_type.currentIndex()
+            cmd.extend(["-m", media_types[media_idx]])
+        
+        # Compression
+        compression_map = {
+            0: "none",
+            1: "empty-block", 
+            2: "fast",
+            3: "best"
+        }
+        comp_level = compression_map.get(self.ui.comboBox_compression.currentIndex(), "fast")
+        cmd.extend(["-c", f"deflate:{comp_level}"])
+        
+        # Segment size
         frag_size = self.ui.spinBox_fragment_size.value()
         if frag_size > 0:
             cmd.extend(["-S", str(frag_size * 1024 * 1024)])
         
-        # Hash
-        hashes = []
-        if self.ui.checkBox_md5.isChecked(): hashes.append("md5")
-        if self.ui.checkBox_sha1.isChecked(): hashes.append("sha1")
-        if self.ui.checkBox_sha256.isChecked(): hashes.append("sha256")
-        if hashes:
-            cmd.extend(["-d", ",".join(hashes)])
+        # Hash - Chỉ thêm SHA nếu cần (MD5 mặc định)
+        if hasattr(self.ui, 'radioButton_sha256') and self.ui.radioButton_sha256.isChecked():
+            cmd.extend(["-d", "sha256"])
+        elif hasattr(self.ui, 'radioButton_sha1') and self.ui.radioButton_sha1.isChecked():
+            cmd.extend(["-d", "sha1"])
         
         cmd.append(device_id)
         
@@ -1393,15 +1429,15 @@ class NonVolatilePage(QtWidgets.QWidget):
     
     def _build_dd_command(self, device_id):
         """Build dc3dd command."""
-        output_path = os.path.join(
-            self.ui.lineEdit_destination_folder.text(),
-            self.ui.lineEdit_image_filename.text() + ".dd"
-        )
+        # Normalize paths to use consistent Windows backslashes
+        output_dir = os.path.normpath(self.ui.lineEdit_destination_folder.text())
+        filename = self.ui.lineEdit_image_filename.text()
         
-        log_path = os.path.join(
-            self.ui.lineEdit_destination_folder.text(),
-            self.ui.lineEdit_image_filename.text() + "_dc3dd.log"
-        )
+        # Remove any invalid characters from filename
+        filename = re.sub(r'[<>:"/\\|?*]', '_', filename)
+        
+        output_path = os.path.join(output_dir, filename + ".dd")
+        log_path = os.path.join(output_dir, filename + "_dc3dd.log")
         
         cmd = [
             self.dc3dd_exe,
@@ -1409,15 +1445,14 @@ class NonVolatilePage(QtWidgets.QWidget):
             f"of={output_path}",
             "bufsz=8M",
             "verb=on",
+            "hash=md5",  # MD5 is always included
         ]
         
-        # Hash options
-        if self.ui.checkBox_md5.isChecked():
-            cmd.append("hash=md5")
-        if self.ui.checkBox_sha1.isChecked():
-            cmd.append("hash=sha1")
-        if self.ui.checkBox_sha256.isChecked():
+        # Add SHA hash based on radio button selection
+        if hasattr(self.ui, 'radioButton_sha256') and self.ui.radioButton_sha256.isChecked():
             cmd.append("hash=sha256")
+        elif hasattr(self.ui, 'radioButton_sha1') and self.ui.radioButton_sha1.isChecked():
+            cmd.append("hash=sha1")
         
         cmd.append(f"log={log_path}")
         
@@ -1521,7 +1556,7 @@ class NonVolatilePage(QtWidgets.QWidget):
         """Start disk imaging process."""
         try:
             cmd = self._build_command()
-            output_dir = self.ui.lineEdit_destination_folder.text()
+            output_dir = os.path.normpath(self.ui.lineEdit_destination_folder.text())
             os.makedirs(output_dir, exist_ok=True)
             
             self.ui.textBrowser_log.clear()
@@ -1724,6 +1759,43 @@ class NonVolatilePage(QtWidgets.QWidget):
                 dest or None
             )
     
+    def _check_imaging_success(self, exit_code):
+        """Check if imaging was actually successful despite exit code."""
+        # Exit code 0 is always success
+        if exit_code == 0:
+            return True
+        
+        # For dc3dd: exit code 2 with successful sector copy is acceptable
+        # This happens when dc3dd tries to read beyond device end
+        if self.ui.radioButton_raw.isChecked() and exit_code == 2:
+            log_text = self.ui.textBrowser_log.toPlainText()
+            
+            # Check if sectors were successfully written
+            if "sectors out" in log_text and "sectors in" in log_text:
+                # Extract sectors in and out
+                match_in = re.search(r'(\d+)\s+sectors in', log_text)
+                match_out = re.search(r'(\d+)\s+sectors out', log_text)
+                
+                if match_in and match_out:
+                    sectors_in = int(match_in.group(1))
+                    sectors_out = int(match_out.group(1))
+                    
+                    # If we successfully wrote all input sectors, consider it success
+                    if sectors_in > 0 and sectors_in == sectors_out:
+                        self.ui.textBrowser_log.append(
+                            f"<br><b>ℹ️ Note:</b> All {sectors_in} sectors were successfully copied. "
+                            "Error occurred reading beyond device end (normal for dc3dd)."
+                        )
+                        return True
+        
+        # For ewfacquire: check for specific success indicators
+        if self.ui.radioButton_e01.isChecked():
+            log_text = self.ui.textBrowser_log.toPlainText()
+            if "Acquiry completed" in log_text or "100%" in log_text:
+                return True
+        
+        return False
+    
     def _imaging_finished(self, exit_code, exit_status):
         """Handle imaging process completion."""
         if hasattr(self, 'update_timer'):
@@ -1731,7 +1803,10 @@ class NonVolatilePage(QtWidgets.QWidget):
         
         self.imaging_active = False
         
-        if exit_code == 0:
+        # Check if imaging was successful
+        success = self._check_imaging_success(exit_code)
+        
+        if success:
             self.ui.textBrowser_log.append("<b>✅ Imaging completed successfully!</b>")
             self.ui.progressBar.setValue(100)
         else:
@@ -1749,8 +1824,8 @@ class NonVolatilePage(QtWidgets.QWidget):
             
             self.wizard_reference.wizard_collection_finished(
                 "nonvolatile",
-                exit_code == 0,
-                "Imaging completed" if exit_code == 0 else f"Imaging failed: {exit_code}",
+                success,
+                "Imaging completed" if success else f"Imaging failed: {exit_code}",
                 dest or None
             )
     
